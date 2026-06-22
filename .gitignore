@@ -1,0 +1,21 @@
+# Lovable source reference — design source of truth, not shipped with the theme
+/_lovable_src/
+
+# Dependencies
+/node_modules/
+/vendor/
+
+# Build artifacts
+*.log
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+
+# Env / secrets — never commit (Multi Digital security standard)
+.env
+.env.*
+!.env.example

@@ -1,0 +1,92 @@
+/*
+ * Kindi component styles — layout/visuals for theme parts and patterns that go
+ * beyond what theme.json expresses (gradients, sticky header, search pill).
+ * Loaded globally (header/footer appear on every view); kept lean.
+ */
+
+/* --- Header --- */
+.kindi-header {
+  z-index: 50;
+  border-bottom: 1px solid var(--wp--preset--color--border);
+  backdrop-filter: blur(8px);
+}
+.kindi-topbar {
+  background: linear-gradient(
+    to left,
+    var(--brand-red),
+    var(--brand-red-dark) 55%,
+    var(--brand-navy)
+  ) !important;
+}
+.kindi-header__bar .wp-block-search__input {
+  height: 3rem;
+  border: 2px solid color-mix(in oklab, var(--brand-navy) 12%, transparent);
+  border-radius: 1rem;
+  font-weight: 600;
+  padding-inline: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.kindi-header__bar .wp-block-search__input:focus {
+  border-color: var(--brand-red);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--brand-red) 15%, transparent);
+  outline: none;
+}
+.kindi-search .wp-block-search__button {
+  background: var(--brand-red);
+  color: #fff;
+  border-radius: 0.75rem;
+  font-weight: 800;
+  border: 0;
+}
+.kindi-search .wp-block-search__button:hover {
+  background: var(--brand-red-dark);
+}
+.kindi-nav__menu a {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* --- Hero --- */
+.kindi-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent);
+  box-shadow: var(--shadow-card);
+  background: linear-gradient(
+    to bottom left,
+    var(--brand-blue-soft),
+    #fff 50%,
+    color-mix(in oklab, var(--brand-red-soft) 50%, transparent)
+  );
+}
+.kindi-hero__title {
+  font-size: clamp(2rem, 1.4rem + 3vw, 3rem);
+}
+.kindi-hero__badge {
+  display: inline-flex;
+  border: 1px solid color-mix(in oklab, var(--brand-blue) 30%, transparent);
+  box-shadow: var(--shadow-card);
+}
+.kindi-hero__mascot img {
+  filter: drop-shadow(0 18px 22px rgba(27, 42, 82, 0.18));
+}
+
+/* --- Section titles --- */
+.kindi-section-title {
+  font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);
+  color: var(--brand-navy);
+  position: relative;
+}
+
+/* --- USP strip --- */
+.kindi-usp {
+  box-shadow: var(--shadow-card);
+}
+
+/* --- Footer --- */
+.kindi-footer a {
+  color: #ffffffcc;
+}
+.kindi-footer a:hover {
+  color: #fff;
+}

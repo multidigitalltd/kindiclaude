@@ -1,0 +1,82 @@
+/*
+ * Kindi base layer.
+ * Bridges theme.json presets to short brand aliases and provides custom
+ * utilities that cannot be expressed in theme.json (gradients, marquee setup,
+ * text strokes, scrollbar hiding). Keep this file tiny — design tokens live in
+ * theme.json.
+ */
+
+:root {
+  /* Short aliases → theme.json presets (single source of truth) */
+  --brand-red: var(--wp--preset--color--brand-red);
+  --brand-red-dark: var(--wp--preset--color--brand-red-dark);
+  --brand-red-soft: var(--wp--preset--color--brand-red-soft);
+  --brand-blue: var(--wp--preset--color--brand-blue);
+  --brand-blue-soft: var(--wp--preset--color--brand-blue-soft);
+  --brand-navy: var(--wp--preset--color--brand-navy);
+  --brand-navy-dark: var(--wp--preset--color--brand-navy-dark);
+  --brand-yellow: var(--wp--preset--color--brand-yellow);
+  --surface: var(--wp--preset--color--surface);
+
+  --shadow-card: var(--wp--preset--shadow--card);
+  --shadow-pop: var(--wp--preset--shadow--pop);
+
+  --radius-base: var(--wp--custom--radius--base);
+}
+
+html {
+  direction: rtl;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Accessibility: always-visible, high-contrast focus ring */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--brand-red);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip link (rendered in header part) */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100000;
+  padding: 0.75rem 1.25rem;
+  background: var(--brand-navy);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+.skip-link:focus {
+  left: 1rem;
+}
+
+/* --- Utilities ported from the Lovable design (src/styles.css) --- */
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.text-stroke-red {
+  -webkit-text-stroke: 2px var(--brand-red);
+  color: transparent;
+}
+
+.text-underline-red {
+  background-image: linear-gradient(
+    180deg,
+    transparent 65%,
+    color-mix(in oklab, var(--brand-red) 30%, transparent) 65%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}

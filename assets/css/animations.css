@@ -1,0 +1,82 @@
+/*
+ * Kindi animations — ported 1:1 from the Lovable design (src/styles.css).
+ * Loaded only on views that render decorative motion (home / shop).
+ * All motion is disabled under prefers-reduced-motion (WCAG 2.2 / ת"י 5568).
+ */
+
+@keyframes kindi-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes kindi-wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+@keyframes kindi-float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-14px) rotate(6deg); }
+}
+@keyframes kindi-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes kindi-confetti {
+  0%, 100% { transform: translateY(0) rotate(0); opacity: 1; }
+  50% { transform: translateY(-20px) rotate(180deg); opacity: 0.7; }
+}
+@keyframes kindi-mascot-sway {
+  0%, 100% { transform: rotate(-1.8deg) scale(1); }
+  50% { transform: rotate(1.8deg) scale(1.015); }
+}
+@keyframes kindi-ground-breath {
+  0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.32; }
+  50% { transform: translateX(-50%) scaleX(1.08); opacity: 0.45; }
+}
+@keyframes kindi-sparkle-pop {
+  0%, 100% { transform: scale(0.85) rotate(0); opacity: 0.65; }
+  50% { transform: scale(1.15) rotate(18deg); opacity: 1; }
+}
+@keyframes kindi-search-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--brand-red) 0%, transparent),
+      0 10px 30px -12px color-mix(in oklab, var(--brand-red) 25%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--brand-red) 18%, transparent),
+      0 18px 38px -10px color-mix(in oklab, var(--brand-red) 45%, transparent);
+  }
+}
+@keyframes kindi-search-shimmer {
+  0% { transform: translateX(-120%); }
+  55% { transform: translateX(220%); }
+  100% { transform: translateX(220%); }
+}
+
+.animate-bob { animation: kindi-bob 3s ease-in-out infinite; }
+.animate-wiggle { animation: kindi-wiggle 4s ease-in-out infinite; }
+.animate-float { animation: kindi-float 5s ease-in-out infinite; }
+.animate-marquee { animation: kindi-marquee 40s linear infinite; }
+.animate-confetti { animation: kindi-confetti 3s ease-in-out infinite; }
+.animate-mascot {
+  transform-origin: 50% 92%;
+  animation: kindi-mascot-sway 4s ease-in-out infinite;
+}
+.animate-ground { animation: kindi-ground-breath 4s ease-in-out infinite; }
+.animate-sparkle { animation: kindi-sparkle-pop 2.6s ease-in-out infinite; }
+.animate-search-glow { animation: kindi-search-glow 2.8s ease-in-out infinite; }
+.animate-search-shimmer { animation: kindi-search-shimmer 3.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bob,
+  .animate-wiggle,
+  .animate-float,
+  .animate-marquee,
+  .animate-confetti,
+  .animate-mascot,
+  .animate-ground,
+  .animate-sparkle,
+  .animate-search-glow,
+  .animate-search-shimmer {
+    animation: none !important;
+  }
+}
