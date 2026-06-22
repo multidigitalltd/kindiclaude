@@ -36,10 +36,10 @@
 			<!-- wp:buttons {"style":{"spacing":{"blockGap":"0.75rem"}}} -->
 			<div class="wp-block-buttons">
 				<!-- wp:button {"backgroundColor":"brand-red","style":{"border":{"radius":"1rem"}}} -->
-				<div class="wp-block-button"><a class="wp-block-button__link has-brand-red-background-color has-background wp-element-button" style="border-radius:1rem">לכל המבצעים החמים</a></div>
+				<div class="wp-block-button"><a class="wp-block-button__link has-brand-red-background-color has-background wp-element-button" style="border-radius:1rem" href="/shop/?orderby=popularity">לכל המבצעים החמים</a></div>
 				<!-- /wp:button -->
 				<!-- wp:button {"textColor":"brand-navy","className":"is-style-outline","style":{"border":{"radius":"1rem"}}} -->
-				<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-brand-navy-color has-text-color wp-element-button" style="border-radius:1rem">לכל המוצרים</a></div>
+				<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-brand-navy-color has-text-color wp-element-button" style="border-radius:1rem" href="/shop/">לכל המוצרים</a></div>
 				<!-- /wp:button -->
 			</div>
 			<!-- /wp:buttons -->

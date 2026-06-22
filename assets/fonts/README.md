@@ -1,31 +1,41 @@
-# גופנים — Ploni · PloniYad · Gloria (Fontef, מסחרי)
+# גופנים — Ploni · Ploni Yad (Fontef, מסחרי)
 
-הת'ים מגיש את הגופנים **מקומית** (לביצועים ולרישוי תקין). יש להעלות לכאן את
-קבצי ה-`woff2` בדיוק בשמות הבאים — `theme.json` כבר מצביע עליהם:
+הגופנים מועלים דרך **ספריית הגופנים של WordPress** (Site Editor → Styles →
+Typography → Manage fonts → Upload). WordPress מאחסן אותם תחת
+`wp-content/uploads/fonts/` ומגיש `@font-face` אוטומטית — אין צורך להניח קבצים
+בתיקייה זו.
 
-| משפחה | משקל | שם קובץ נדרש |
-|--------|------|---------------|
-| Ploni | 300 (Light) | `ploni-light.woff2` |
-| Ploni | 400 (Regular) | `ploni-regular.woff2` |
-| Ploni | 500 (Medium) | `ploni-medium.woff2` |
-| Ploni | 600 (DemiBold) | `ploni-demibold.woff2` |
-| Ploni | 700 (Bold) | `ploni-bold.woff2` |
-| PloniYad | 400 | `ploniyad-regular.woff2` |
-| PloniYad | 500 | `ploniyad-medium.woff2` |
-| PloniYad | 600 | `ploniyad-demibold.woff2` |
-| PloniYad | 700 | `ploniyad-bold.woff2` |
-| PloniYad | 900 (Black) | `ploniyad-black.woff2` |
-| Gloria | 400 | `gloria-regular.woff2` |
-| Gloria | 600 | `gloria-demibold.woff2` |
-| Gloria | 700 | `gloria-bold.woff2` |
+`theme.json` כבר ממפה את משפחות הגופן לפי **שם** (לא לפי slug), כך שברגע
+שמעלים משפחות בשמות `Ploni` ו-`Ploni Yad` — העיצוב מתחבר אוטומטית:
+- גוף הטקסט → `Ploni`
+- כותרות / display → `Ploni Yad`
 
-## המרה ל-woff2
-אם הקבצים אצלכם ב-`woff`/`ttf`/`otf`, להמיר ל-`woff2` (קל ומהיר יותר):
+## מה להעלות (woff2)
 
-```bash
-# התקנה חד-פעמית: pip install fonttools brotli
-fonttools ttLib.woff2 compress ploni-regular.ttf   # → ploni-regular.woff2
-```
+### משפחה 1 — `Ploni` (גוף הטקסט)
+| משקל (Weight) | סגנון | קובץ |
+|----------------|-------|------|
+| 300 — Light | Normal | `ploni-light.woff2` |
+| 400 — Regular | Normal | `ploni-regular.woff2` |
+| 500 — Medium | Normal | `ploni-medium.woff2` |
+| 600 — DemiBold | Normal | `ploni-demibold.woff2` |
+| 700 — Bold | Normal | `ploni-bold.woff2` |
 
-> ⚠️ רישוי: Ploni / PloniYad / Gloria הם גופנים מסחריים של Fontef. יש לוודא
-> שברשותכם רישיון web המתיר self-hosting לפני הפצה לייצור.
+### משפחה 2 — `Ploni Yad` (כותרות / display)
+| משקל (Weight) | סגנון | קובץ |
+|----------------|-------|------|
+| 400 — Regular | Normal | `ploniyad-regular.woff2` |
+| 500 — Medium | Normal | `ploniyad-medium.woff2` |
+| 600 — DemiBold | Normal | `ploniyad-demibold.woff2` |
+| 700 — Bold | Normal | `ploniyad-bold.woff2` |
+| 900 — Black | Normal | `ploniyad-black.woff2` |
+
+**חיוני למינימום** (אם אין את כל המשקלים): Ploni 400/500/600/700 · Ploni Yad 700/900.
+
+## אחרי ההעלאה — לוודא
+1. בכל קובץ ודאו ש-WordPress זיהה את ה-**Weight** הנכון ואת ה-**Style = Normal**.
+2. ודאו ששמות המשפחות בספרייה הם בדיוק `Ploni` ו-`Ploni Yad`. אם השם שמוצג שונה
+   (למשל `Ploni Hand`), עדכנו אותי ואתאים את `theme.json` ב-30 שניות.
+
+> ⚠️ רישוי: Ploni / Ploni Yad הם גופנים מסחריים של Fontef. יש לוודא רישיון web
+> המתיר self-hosting לפני העלאה לייצור.

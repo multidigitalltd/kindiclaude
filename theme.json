@@ -36,36 +36,12 @@
         {
           "slug": "sans",
           "name": "Ploni",
-          "fontFamily": "'Ploni', system-ui, -apple-system, 'Segoe UI', sans-serif",
-          "fontFace": [
-            { "fontFamily": "Ploni", "fontWeight": "300", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/ploni-light.woff2"] },
-            { "fontFamily": "Ploni", "fontWeight": "400", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/ploni-regular.woff2"] },
-            { "fontFamily": "Ploni", "fontWeight": "500", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/ploni-medium.woff2"] },
-            { "fontFamily": "Ploni", "fontWeight": "600", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/ploni-demibold.woff2"] },
-            { "fontFamily": "Ploni", "fontWeight": "700", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/ploni-bold.woff2"] }
-          ]
+          "fontFamily": "'Ploni', system-ui, -apple-system, 'Segoe UI', sans-serif"
         },
         {
           "slug": "display",
           "name": "Ploni Yad",
-          "fontFamily": "'PloniYad', 'Ploni', system-ui, sans-serif",
-          "fontFace": [
-            { "fontFamily": "PloniYad", "fontWeight": "400", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/ploniyad-regular.woff2"] },
-            { "fontFamily": "PloniYad", "fontWeight": "500", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/ploniyad-medium.woff2"] },
-            { "fontFamily": "PloniYad", "fontWeight": "600", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/ploniyad-demibold.woff2"] },
-            { "fontFamily": "PloniYad", "fontWeight": "700", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/ploniyad-bold.woff2"] },
-            { "fontFamily": "PloniYad", "fontWeight": "900", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/ploniyad-black.woff2"] }
-          ]
-        },
-        {
-          "slug": "gloria",
-          "name": "Gloria",
-          "fontFamily": "'Gloria', cursive",
-          "fontFace": [
-            { "fontFamily": "Gloria", "fontWeight": "400", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/gloria-regular.woff2"] },
-            { "fontFamily": "Gloria", "fontWeight": "600", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/gloria-demibold.woff2"] },
-            { "fontFamily": "Gloria", "fontWeight": "700", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/gloria-bold.woff2"] }
-          ]
+          "fontFamily": "'Ploni Yad', 'PloniYad', 'Ploni', system-ui, sans-serif"
         }
       ],
       "fontSizes": [

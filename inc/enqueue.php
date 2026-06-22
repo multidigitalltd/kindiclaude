@@ -26,12 +26,24 @@ function kindi_asset_version( string $relative ): string {
 }
 
 /**
+ * Whether the current view renders the decorative hero / motion (home or shop).
+ *
+ * is_shop() only exists when WooCommerce is active, so it must be guarded —
+ * otherwise ordinary pages fatal when the plugin is inactive.
+ *
+ * @return bool
+ */
+function kindi_is_motion_view(): bool {
+	return is_front_page() || ( function_exists( 'is_shop' ) && is_shop() );
+}
+
+/**
  * Preload the two display weights used in the hero (LCP heading) only.
  *
  * @return void
  */
 function kindi_preload_fonts(): void {
-	if ( ! is_front_page() && ! is_shop() ) {
+	if ( ! kindi_is_motion_view() ) {
 		return;
 	}
 
@@ -75,7 +87,7 @@ function kindi_enqueue_styles(): void {
 	);
 
 	// Animations only on views that render decorative motion (home / shop).
-	if ( is_front_page() || is_shop() ) {
+	if ( kindi_is_motion_view() ) {
 		wp_enqueue_style(
 			'kindi-animations',
 			KINDI_URI . 'assets/css/animations.css',
