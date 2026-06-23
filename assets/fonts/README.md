@@ -5,10 +5,12 @@ Typography → Manage fonts → Upload). WordPress מאחסן אותם תחת
 `wp-content/uploads/fonts/` ומגיש `@font-face` אוטומטית — אין צורך להניח קבצים
 בתיקייה זו.
 
-`theme.json` כבר ממפה את משפחות הגופן לפי **שם** (לא לפי slug), כך שברגע
-שמעלים משפחות בשמות `Ploni` ו-`Ploni Yad` — העיצוב מתחבר אוטומטית:
-- גוף הטקסט → `Ploni`
-- כותרות / display → `Ploni Yad`
+`theme.json` כבר ממפה את משפחות הגופן לפי **שם** (לא לפי slug). השמות שהותקנו
+בפועל דרך ה-Font Library הם:
+- גוף הטקסט → `Ploni ML v2 AAA`
+- כותרות / display → `Ploni Yad v2 AAA`
+
+(עם נפילה אחורה ל-`Ploni` / `Ploni Yad` אם השמות ישתנו בעתיד.)
 
 ## מה להעלות (woff2)
 
