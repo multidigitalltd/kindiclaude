@@ -20,5 +20,5 @@
 <!-- /wp:html -->
 
 <!-- wp:shortcode -->
-[products limit="10" columns="5" orderby="popularity" order="DESC" class="kindi-hot-products"]
+[kindi_hot_products]
 <!-- /wp:shortcode -->

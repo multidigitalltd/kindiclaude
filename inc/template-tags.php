@@ -65,3 +65,19 @@ function kindi_section_head( array $args ): string {
 
 	return $html;
 }
+
+/**
+ * Shortcode: [kindi_hot_products] — popular products grid that degrades
+ * gracefully to a placeholder when WooCommerce is inactive (so the raw
+ * [products] tag is never shown to visitors).
+ *
+ * @return string
+ */
+function kindi_hot_products_shortcode(): string {
+	if ( ! class_exists( 'WooCommerce' ) || ! shortcode_exists( 'products' ) ) {
+		return '<div class="kindi-prod-empty">כאן יוצגו המוצרים החמים שלכם. התקינו והפעילו את WooCommerce והוסיפו מוצרים כדי שיופיעו כאן אוטומטית.</div>';
+	}
+
+	return do_shortcode( '[products limit="10" columns="5" orderby="popularity" order="DESC" class="kindi-hot-products"]' );
+}
+add_shortcode( 'kindi_hot_products', 'kindi_hot_products_shortcode' );
