@@ -19,56 +19,8 @@ foreach ( kindi_opt_lines( 'ticker' ) as $i => $kindi_txt ) {
 	);
 }
 
-// Top-level category navigation (mega-menu columns trimmed to lead items).
-$kindi_nav = array(
-	array( 'label' => 'כל הקטגוריות', 'icon' => 'grid', 'cols' => array(
-		'פופולרי'        => array( 'חדש באתר', 'רבי מכר', 'מבצעי השבוע', 'מתחת ל-50 ₪' ),
-		'לפי תחום'       => array( 'משחקי קופסה', 'יצירה', 'בובות', 'לגו ובנייה', 'פאזלים' ),
-		'לפי גיל'        => array( '0–2', '3–5', '6–8', '9–12', 'נוער' ),
-		'מותגים מובילים' => array( 'Hape', 'Melissa & Doug', 'Janod', 'Playmobil' ),
-	) ),
-	array( 'label' => 'משחקים ותעסוקה', 'icon' => 'dice', 'cols' => array(
-		'משחקי קופסה' => array( 'משפחתי', 'אסטרטגיה', 'מסיבה', 'דו-קרב' ),
-		'תעסוקה'      => array( 'פאזלים', 'ספרי פעילות', 'מדבקות', 'חשיבה ולוגיקה' ),
-		'STEM ולמידה' => array( 'מדע וניסויים', 'רובוטיקה', 'תכנות לילדים' ),
-	) ),
-	array( 'label' => 'חזרה לבית ספר', 'icon' => 'backpack', 'cols' => array(
-		'ילקוטים ותיקים' => array( 'כיתה א\'', 'כיתות ב-ג', 'חטיבה', 'קלמרים' ),
-		'כלי כתיבה'      => array( 'עטים', 'עפרונות', 'טושים', 'סטים מתנה' ),
-		'ציוד נלווה'     => array( 'מחברות', 'תיקיות', 'כיסויי ספרים' ),
-	) ),
-	array( 'label' => 'יצירה ואומנות', 'icon' => 'palette', 'cols' => array(
-		'ערכות יצירה' => array( 'לפי גיל', 'תכשיטים', 'ציור וצביעה', 'פיסול ובצק' ),
-		'ציוד אומנות' => array( 'צבעי גואש', 'צבעי מים', 'פסטלים', 'ניירות' ),
-	) ),
-	array( 'label' => 'הכל לגננת ולגן', 'icon' => 'teddy', 'cols' => array(
-		'ציוד גן'   => array( 'שטיחי משחק', 'פינות יצירה', 'ארגונית גן' ),
-		'משחקי גן'  => array( 'בלוקים', 'פאזלי רצפה', 'מוטוריקה עדינה' ),
-	) ),
-	array( 'label' => 'משחקי חצר וגינה', 'icon' => 'ball', 'cols' => array(
-		'ספורט וכדורים' => array( 'כדורגל', 'כדורסל', 'טניס וחבטות' ),
-		'אופניים ורכיבה' => array( 'אופני איזון', 'קורקינטים', 'קסדות' ),
-		'חצר'           => array( 'טרמפולינות', 'אוהלים', 'משחקי דשא' ),
-	) ),
-	array( 'label' => 'מוצרי קיץ', 'icon' => 'sun', 'cols' => array(
-		'בריכות' => array( 'בריכות מתנפחות', 'מזרני ים', 'משאבות' ),
-		'ים וחוף' => array( 'צעצועי חול', 'מחבטים', 'כדורי ים' ),
-	) ),
-	array( 'label' => 'חגים', 'icon' => 'party', 'cols' => array(
-		'לפי חג'          => array( 'חנוכה', 'פורים', 'פסח', 'ראש השנה' ),
-		'תחפושות ואביזרים' => array( 'תחפושות בנים', 'תחפושות בנות', 'איפור ושיער' ),
-	) ),
-	array( 'label' => 'לפי גילאים', 'icon' => 'baby', 'cols' => array(
-		'תינוקות 0–2' => array( 'נשכנים', 'ניידים', 'ספרי בד' ),
-		'גיל הרך 3–5' => array( 'בנייה', 'תפקידים', 'מוטוריקה' ),
-		'ילדים 6–8'   => array( 'משחקי חשיבה', 'STEM', 'פאזלים גדולים' ),
-	) ),
-	array( 'label' => 'מותגים', 'icon' => 'gem', 'cols' => array(
-		'פרימיום' => array( 'Hape', 'Janod', 'Plan Toys' ),
-		'אספנים'  => array( 'LEGO', 'Schleich', 'Playmobil' ),
-	) ),
-	array( 'label' => 'מבצעים חמים', 'icon' => 'fire', 'highlight' => true ),
-);
+// Top-level navigation — from the assigned WP menu, or the curated default.
+$kindi_nav = kindi_nav_items();
 
 $kindi_ticker_loop = array_merge( $kindi_ticker, $kindi_ticker );
 ?>
@@ -99,7 +51,11 @@ $kindi_ticker_loop = array_merge( $kindi_ticker, $kindi_ticker );
 	</form>
 
 	<div class="kindi-bar__actions">
-		<a class="kindi-bar__util" href="<?php echo esc_url( wp_login_url() ); ?>"><?php echo kindi_icon( 'user', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>התחברות</span></a>
+		<?php
+		$kindi_account = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : '';
+		$kindi_account = $kindi_account ? $kindi_account : wp_login_url();
+		?>
+		<a class="kindi-bar__util" href="<?php echo esc_url( $kindi_account ); ?>"><?php echo kindi_icon( 'user', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><?php echo esc_html( is_user_logged_in() ? 'החשבון שלי' : 'התחברות' ); ?></span></a>
 		<a class="kindi-bar__util" href="#"><?php echo kindi_icon( 'heart', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>מועדפים</span></a>
 		<a class="kindi-cart" href="<?php echo esc_url( class_exists( 'WooCommerce' ) && wc_get_cart_url() ? wc_get_cart_url() : '#' ); ?>" aria-label="סל קניות">
 			<span class="kindi-cart__txt"><small>סל הקניות</small><b class="kindi-cart-amount"><?php echo class_exists( 'WooCommerce' ) ? wp_kses_post( WC()->cart->get_cart_contents_count() . ' פריטים • ' . WC()->cart->get_cart_subtotal() ) : '0 פריטים'; ?></b></span>
@@ -115,16 +71,16 @@ $kindi_ticker_loop = array_merge( $kindi_ticker, $kindi_ticker );
 			$has_col = ! empty( $c['cols'] );
 			?>
 		<div class="kindi-nav__item<?php echo $is_hl ? ' kindi-nav__item--hl' : ''; ?>">
-			<a class="kindi-nav__link" href="#"><span class="kindi-nav__ic"><?php echo kindi_icon( $c['icon'], 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><?php echo esc_html( $c['label'] ); ?><?php echo $has_col ? kindi_icon( 'chevrondown', 'kindi-icon--xs' ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
+			<a class="kindi-nav__link" href="<?php echo esc_url( $c['url'] ); ?>"><span class="kindi-nav__ic"><?php echo kindi_icon( $c['icon'], 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><?php echo esc_html( $c['label'] ); ?><?php echo $has_col ? kindi_icon( 'chevrondown', 'kindi-icon--xs' ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
 			<?php if ( $has_col ) : ?>
 			<div class="kindi-mega">
 				<div class="kindi-mega__cols">
-					<?php foreach ( $c['cols'] as $title => $items ) : ?>
+					<?php foreach ( $c['cols'] as $col ) : ?>
 					<div class="kindi-mega__col">
-						<h4 class="kindi-mega__title"><?php echo kindi_icon( 'sparkles', 'kindi-icon--xs' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $title ); ?></h4>
+						<h4 class="kindi-mega__title"><?php echo kindi_icon( 'sparkles', 'kindi-icon--xs' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $col['title'] ); ?></h4>
 						<ul>
-							<?php foreach ( $items as $it ) : ?>
-							<li><a href="#"><?php echo esc_html( $it ); ?></a></li>
+							<?php foreach ( $col['links'] as $link ) : ?>
+							<li><a href="<?php echo esc_url( $link['url'] ); ?>"><?php echo esc_html( $link['label'] ); ?></a></li>
 							<?php endforeach; ?>
 						</ul>
 					</div>
@@ -147,7 +103,7 @@ $kindi_ticker_loop = array_merge( $kindi_ticker, $kindi_ticker );
 		</div>
 		<div class="kindi-drawer__body">
 			<?php foreach ( $kindi_nav as $c ) : ?>
-			<a class="kindi-drawer__link<?php echo ! empty( $c['highlight'] ) ? ' kindi-drawer__link--hl' : ''; ?>" href="#"><?php echo kindi_icon( $c['icon'], 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $c['label'] ); ?></a>
+			<a class="kindi-drawer__link<?php echo ! empty( $c['highlight'] ) ? ' kindi-drawer__link--hl' : ''; ?>" href="<?php echo esc_url( $c['url'] ); ?>"><?php echo kindi_icon( $c['icon'], 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $c['label'] ); ?></a>
 			<?php endforeach; ?>
 		</div>
 	</div>

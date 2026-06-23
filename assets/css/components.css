@@ -54,6 +54,26 @@
 .kindi-cart:hover .kindi-cart__ic { background: var(--brand-red-dark); }
 .kindi-cart__badge { position: absolute; top: -6px; right: -6px; min-width: 20px; height: 20px; padding-inline: 4px; background: var(--brand-navy); color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; border-radius: 999px; box-shadow: 0 0 0 2px #fff; }
 
+/* Live search suggestions */
+.kindi-search { position: relative; }
+.kindi-suggest {
+  position: absolute; top: calc(100% + 0.5rem); right: 0; left: 0; z-index: 70;
+  background: #fff; border: 1px solid var(--border); border-radius: 1rem;
+  box-shadow: var(--shadow-pop); overflow: hidden; max-height: 70vh; overflow-y: auto;
+}
+.kindi-suggest__group { padding: 0.5rem 1rem; font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--brand-red); background: color-mix(in oklab, var(--brand-red) 5%, #fff); }
+.kindi-suggest__cat { display: flex; justify-content: space-between; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; color: var(--brand-navy); text-decoration: none; }
+.kindi-suggest__cat span { color: var(--muted-foreground); font-weight: 400; }
+.kindi-suggest__cat:hover, .kindi-suggest__item:hover { background: var(--brand-blue-soft); }
+.kindi-suggest__item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; text-decoration: none; border-top: 1px solid var(--border); }
+.kindi-suggest__item img { width: 48px; height: 48px; object-fit: cover; border-radius: 0.5rem; flex-shrink: 0; }
+.kindi-suggest__t { flex: 1; font-size: 0.875rem; font-weight: 600; color: var(--foreground); }
+.kindi-suggest__p { font-weight: 800; color: var(--brand-red); font-size: 0.8125rem; white-space: nowrap; }
+.kindi-suggest__p del { color: var(--muted-foreground); font-weight: 400; }
+.kindi-suggest__all { display: block; text-align: center; padding: 0.75rem; font-weight: 700; font-size: 0.8125rem; color: #fff; background: var(--brand-navy); text-decoration: none; }
+.kindi-suggest__all:hover { background: var(--brand-red); color: #fff; }
+.kindi-suggest__empty { padding: 1.5rem; text-align: center; color: var(--muted-foreground); font-size: 0.875rem; }
+
 /* ============================ Category nav + mega ============================ */
 .kindi-nav { background: var(--brand-navy); color: #fff; display: none; }
 @media (min-width: 1024px) { .kindi-nav { display: block; } }

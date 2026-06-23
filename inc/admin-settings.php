@@ -14,51 +14,100 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Field definitions, grouped by panel section.
+ * Tabs → sections → fields. Frequently-changed content lives in the "מבצעים
+ * ותוכן" tab; rarely-touched section copy is tucked under "טקסטים והגדרות".
  *
- * @return array<string,array<string,array{type:string,label:string,help?:string}>>
+ * @return array<string,array<string,mixed>>
  */
-function kindi_settings_fields(): array {
+function kindi_settings_tabs(): array {
 	return array(
-		'כללי'              => array(
-			'phone'         => array( 'type' => 'text', 'label' => 'טלפון' ),
-			'whatsapp'      => array( 'type' => 'text', 'label' => 'מספר וואטסאפ (בינלאומי, ללא +)', 'help' => 'לדוגמה: 972500000000' ),
-			'free_shipping' => array( 'type' => 'number', 'label' => 'סף משלוח חינם (₪)' ),
-			'shipbar'       => array( 'type' => 'text', 'label' => 'רצועת המשלוח (מתחת ללוגו)' ),
-			'ticker'        => array( 'type' => 'textarea', 'label' => 'רצועת מבצעים נעה', 'help' => 'שורה אחת לכל פריט' ),
+		'promos'   => array(
+			'label'    => 'מבצעים ותוכן',
+			'sections' => array(
+				'רצועות עליונות' => array(
+					'shipbar' => array( 'type' => 'text', 'label' => 'רצועת המשלוח (מתחת ללוגו)' ),
+					'ticker'  => array( 'type' => 'textarea', 'label' => 'רצועת מבצעים נעה', 'help' => 'שורה אחת לכל פריט' ),
+				),
+				'באנר מבצע גדול' => array(
+					'promo1_badge' => array( 'type' => 'text', 'label' => 'תגית' ),
+					'promo1_title' => array( 'type' => 'text', 'label' => 'כותרת' ),
+					'promo1_sub'   => array( 'type' => 'text', 'label' => 'תיאור' ),
+					'promo1_cta'   => array( 'type' => 'text', 'label' => 'טקסט כפתור' ),
+					'promo1_url'   => array( 'type' => 'url', 'label' => 'קישור' ),
+				),
+				'באנר מבצע 2'    => array(
+					'promo2_badge' => array( 'type' => 'text', 'label' => 'תגית' ),
+					'promo2_title' => array( 'type' => 'text', 'label' => 'כותרת' ),
+					'promo2_sub'   => array( 'type' => 'text', 'label' => 'תיאור' ),
+					'promo2_cta'   => array( 'type' => 'text', 'label' => 'טקסט כפתור' ),
+					'promo2_url'   => array( 'type' => 'url', 'label' => 'קישור' ),
+				),
+				'באנר מבצע 3'    => array(
+					'promo3_badge' => array( 'type' => 'text', 'label' => 'תגית' ),
+					'promo3_title' => array( 'type' => 'text', 'label' => 'כותרת' ),
+					'promo3_sub'   => array( 'type' => 'text', 'label' => 'תיאור' ),
+					'promo3_cta'   => array( 'type' => 'text', 'label' => 'טקסט כפתור' ),
+					'promo3_url'   => array( 'type' => 'url', 'label' => 'קישור' ),
+				),
+				'באנר ראשי (Hero)' => array(
+					'hero_badge'    => array( 'type' => 'text', 'label' => 'תגית עליונה' ),
+					'hero_title1'   => array( 'type' => 'text', 'label' => 'כותרת — חלק 1' ),
+					'hero_hl'       => array( 'type' => 'text', 'label' => 'כותרת — חלק מודגש (אדום)' ),
+					'hero_title2'   => array( 'type' => 'text', 'label' => 'כותרת — חלק 2 (כחול)' ),
+					'hero_lead'     => array( 'type' => 'textarea', 'label' => 'תיאור' ),
+					'hero_cta1'     => array( 'type' => 'text', 'label' => 'כפתור ראשי — טקסט' ),
+					'hero_cta1_url' => array( 'type' => 'url', 'label' => 'כפתור ראשי — קישור' ),
+					'hero_cta2'     => array( 'type' => 'text', 'label' => 'כפתור משני — טקסט' ),
+					'hero_cta2_url' => array( 'type' => 'url', 'label' => 'כפתור משני — קישור' ),
+				),
+			),
 		),
-		'באנר ראשי (Hero)'  => array(
-			'hero_badge'    => array( 'type' => 'text', 'label' => 'תגית עליונה' ),
-			'hero_title1'   => array( 'type' => 'text', 'label' => 'כותרת — חלק 1' ),
-			'hero_hl'       => array( 'type' => 'text', 'label' => 'כותרת — חלק מודגש (אדום)' ),
-			'hero_title2'   => array( 'type' => 'text', 'label' => 'כותרת — חלק 2 (כחול)' ),
-			'hero_lead'     => array( 'type' => 'textarea', 'label' => 'תיאור' ),
-			'hero_cta1'     => array( 'type' => 'text', 'label' => 'כפתור ראשי — טקסט' ),
-			'hero_cta1_url' => array( 'type' => 'url', 'label' => 'כפתור ראשי — קישור' ),
-			'hero_cta2'     => array( 'type' => 'text', 'label' => 'כפתור משני — טקסט' ),
-			'hero_cta2_url' => array( 'type' => 'url', 'label' => 'כפתור משני — קישור' ),
-		),
-		'מועדון קינדי'      => array(
-			'club_title'    => array( 'type' => 'text', 'label' => 'כותרת' ),
-			'club_lead'     => array( 'type' => 'textarea', 'label' => 'תיאור' ),
-			'club_benefits' => array( 'type' => 'textarea', 'label' => 'הטבות', 'help' => 'שורה אחת לכל הטבה' ),
-			'club_cta_url'  => array( 'type' => 'url', 'label' => 'קישור הצטרפות' ),
-		),
-		'פרטי החנות'        => array(
-			'store_address' => array( 'type' => 'text', 'label' => 'כתובת' ),
-			'store_phone'   => array( 'type' => 'text', 'label' => 'טלפון בחנות' ),
-			'store_hours'   => array( 'type' => 'text', 'label' => 'שעות פתיחה' ),
-			'store_waze'    => array( 'type' => 'url', 'label' => 'קישור ניווט (Waze)' ),
-			'news_title'    => array( 'type' => 'text', 'label' => 'ניוזלטר — כותרת' ),
-			'news_sub'      => array( 'type' => 'textarea', 'label' => 'ניוזלטר — תיאור' ),
-		),
-		'פוטר ורשתות'       => array(
-			'about'         => array( 'type' => 'textarea', 'label' => 'טקסט "אודות"' ),
-			'email'         => array( 'type' => 'text', 'label' => 'אימייל' ),
-			'fb'            => array( 'type' => 'url', 'label' => 'קישור פייסבוק' ),
-			'ig'            => array( 'type' => 'url', 'label' => 'קישור אינסטגרם' ),
+		'texts'    => array(
+			'label'    => 'טקסטים והגדרות',
+			'sections' => array(
+				'כללי'         => array(
+					'phone'         => array( 'type' => 'text', 'label' => 'טלפון' ),
+					'whatsapp'      => array( 'type' => 'text', 'label' => 'מספר וואטסאפ (בינלאומי, ללא +)', 'help' => 'לדוגמה: 972500000000' ),
+					'free_shipping' => array( 'type' => 'number', 'label' => 'סף משלוח חינם (₪)' ),
+				),
+				'מועדון קינדי' => array(
+					'club_title'    => array( 'type' => 'text', 'label' => 'כותרת' ),
+					'club_lead'     => array( 'type' => 'textarea', 'label' => 'תיאור' ),
+					'club_benefits' => array( 'type' => 'textarea', 'label' => 'הטבות', 'help' => 'שורה אחת לכל הטבה' ),
+					'club_cta_url'  => array( 'type' => 'url', 'label' => 'קישור הצטרפות' ),
+				),
+				'פרטי החנות'   => array(
+					'store_address' => array( 'type' => 'text', 'label' => 'כתובת' ),
+					'store_phone'   => array( 'type' => 'text', 'label' => 'טלפון בחנות' ),
+					'store_hours'   => array( 'type' => 'text', 'label' => 'שעות פתיחה' ),
+					'store_waze'    => array( 'type' => 'url', 'label' => 'קישור ניווט (Waze)' ),
+					'news_title'    => array( 'type' => 'text', 'label' => 'ניוזלטר — כותרת' ),
+					'news_sub'      => array( 'type' => 'textarea', 'label' => 'ניוזלטר — תיאור' ),
+				),
+				'פוטר ורשתות'  => array(
+					'about' => array( 'type' => 'textarea', 'label' => 'טקסט "אודות"' ),
+					'email' => array( 'type' => 'text', 'label' => 'אימייל' ),
+					'fb'    => array( 'type' => 'url', 'label' => 'קישור פייסבוק' ),
+					'ig'    => array( 'type' => 'url', 'label' => 'קישור אינסטגרם' ),
+				),
+			),
 		),
 	);
+}
+
+/**
+ * Flat map of every field key → its definition (for saving/sanitising).
+ *
+ * @return array<string,array{type:string,label:string,help?:string}>
+ */
+function kindi_settings_all_fields(): array {
+	$all = array();
+	foreach ( kindi_settings_tabs() as $tab ) {
+		foreach ( $tab['sections'] as $fields ) {
+			$all += $fields;
+		}
+	}
+	return $all;
 }
 
 /**
@@ -109,8 +158,12 @@ function kindi_settings_render(): void {
 		return;
 	}
 
-	$groups = kindi_settings_fields();
-	$saved  = false;
+	$tabs    = kindi_settings_tabs();
+	$current = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'promos'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( ! isset( $tabs[ $current ] ) ) {
+		$current = 'promos';
+	}
+	$saved = false;
 
 	if ( isset( $_POST['kindi_settings_submit'] ) && check_admin_referer( 'kindi_save_settings', 'kindi_nonce' ) ) {
 		$clean = get_option( 'kindi_options', array() );
@@ -118,11 +171,13 @@ function kindi_settings_render(): void {
 			$clean = array();
 		}
 
-		foreach ( $groups as $fields ) {
-			foreach ( $fields as $key => $field ) {
-				$raw           = isset( $_POST['kindi'][ $key ] ) ? wp_unslash( $_POST['kindi'][ $key ] ) : '';
-				$clean[ $key ] = kindi_sanitize_field( $field['type'], $raw );
+		// Only persist fields actually submitted (the active tab), so other
+		// tabs' values are never wiped.
+		foreach ( kindi_settings_all_fields() as $key => $field ) {
+			if ( ! isset( $_POST['kindi'][ $key ] ) ) {
+				continue;
 			}
+			$clean[ $key ] = kindi_sanitize_field( $field['type'], wp_unslash( $_POST['kindi'][ $key ] ) );
 		}
 
 		update_option( 'kindi_options', $clean );
@@ -133,16 +188,27 @@ function kindi_settings_render(): void {
 	}
 
 	echo '<div class="wrap kindi-settings"><h1>' . esc_html__( 'קינדי — ניהול תוכן האתר', 'kindi' ) . '</h1>';
-	echo '<p class="description">' . esc_html__( 'כל הטקסטים, הקישורים ופרטי הקשר של עמוד הבית במקום אחד. הקטגוריות והמוצרים נמשכים אוטומטית מ-WooCommerce.', 'kindi' ) . '</p>';
+	echo '<p class="description">' . esc_html__( 'קטגוריות ומוצרים נמשכים אוטומטית מ-WooCommerce. כאן עורכים את תוכן השיווק והטקסטים.', 'kindi' ) . '</p>';
 
 	if ( $saved ) {
 		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'התוכן נשמר.', 'kindi' ) . '</p></div>';
 	}
 
+	echo '<h2 class="nav-tab-wrapper">';
+	foreach ( $tabs as $slug => $tab ) {
+		printf(
+			'<a href="%s" class="nav-tab%s">%s</a>',
+			esc_url( admin_url( 'admin.php?page=kindi-settings&tab=' . $slug ) ),
+			$slug === $current ? ' nav-tab-active' : '',
+			esc_html( $tab['label'] )
+		);
+	}
+	echo '</h2>';
+
 	echo '<form method="post" action="">';
 	wp_nonce_field( 'kindi_save_settings', 'kindi_nonce' );
 
-	foreach ( $groups as $section => $fields ) {
+	foreach ( $tabs[ $current ]['sections'] as $section => $fields ) {
 		echo '<h2 style="margin-top:2em">' . esc_html( $section ) . '</h2>';
 		echo '<table class="form-table" role="presentation"><tbody>';
 

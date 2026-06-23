@@ -39,6 +39,23 @@ function kindi_default_options(): array {
 		'hero_cta2'     => 'לכל המוצרים',
 		'hero_cta2_url' => '/shop/',
 
+		// Promo banners (change often).
+		'promo1_badge' => 'מוגבל בזמן',
+		'promo1_title' => 'חזרה לבית הספר — עד 40%- על הכל!',
+		'promo1_sub'   => 'ילקוטים, קלמרים, מחברות, עפרונות ועוד מאות מוצרים במחירי השקה',
+		'promo1_cta'   => 'לכל המבצעים',
+		'promo1_url'   => '/shop/?on_sale=1',
+		'promo2_badge' => 'חדש בקינדי',
+		'promo2_title' => 'גמבוי כשר X3',
+		'promo2_sub'   => '222 משחקים',
+		'promo2_cta'   => 'לרכישה',
+		'promo2_url'   => '/shop/',
+		'promo3_badge' => 'מחיר מיוחד',
+		'promo3_title' => 'לגו בכל הסדרות',
+		'promo3_sub'   => 'החל מ-19.90 ₪',
+		'promo3_cta'   => 'לקולקציה',
+		'promo3_url'   => '/shop/',
+
 		// Club zone.
 		'club_title'    => 'הצטרפו לחברים שלנו וקבלו עולם של הטבות!',
 		'club_lead'     => 'חברים נהנים מהנחות בלעדיות, צוברים נקודות על כל קנייה ומקבלים מתנות מיוחדות ביום ההולדת.',

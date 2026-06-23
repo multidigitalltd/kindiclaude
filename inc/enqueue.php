@@ -98,6 +98,24 @@ function kindi_enqueue_scripts(): void {
 	// Live header cart count (WooCommerce core script, no jQuery UI bloat).
 	if ( class_exists( 'WooCommerce' ) ) {
 		wp_enqueue_script( 'wc-cart-fragments' );
+
+		wp_enqueue_script(
+			'kindi-search',
+			KINDI_URI . 'assets/js/search.js',
+			array(),
+			kindi_asset_version( 'assets/js/search.js' ),
+			true
+		);
+		wp_localize_script(
+			'kindi-search',
+			'kindiSearch',
+			array(
+				'url'       => esc_url_raw( rest_url( 'kindi/v1/search' ) ),
+				'nonce'     => wp_create_nonce( 'wp_rest' ),
+				'allText'   => __( 'כל התוצאות עבור', 'kindi' ),
+				'noResults' => __( 'לא נמצאו תוצאות', 'kindi' ),
+			)
+		);
 	}
 }
 add_action( 'wp_enqueue_scripts', 'kindi_enqueue_scripts' );
@@ -110,7 +128,7 @@ add_action( 'wp_enqueue_scripts', 'kindi_enqueue_scripts' );
  * @return string
  */
 function kindi_defer_scripts( string $tag, string $handle ): string {
-	$deferred = array( 'kindi-header', 'kindi-interactions' );
+	$deferred = array( 'kindi-header', 'kindi-interactions', 'kindi-search' );
 
 	if ( in_array( $handle, $deferred, true ) && false === strpos( $tag, 'defer' ) ) {
 		$tag = str_replace( ' src', ' defer src', $tag );

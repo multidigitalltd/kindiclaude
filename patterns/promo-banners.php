@@ -18,33 +18,33 @@
 	) ); ?>
 	<div class="kindi-promos">
 
-		<a class="kindi-promo kindi-promo--red kindi-promo--big" href="/shop/?on_sale=1">
-			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-back-to-school.webp' ); ?>" alt="" loading="lazy">
+		<a class="kindi-promo kindi-promo--red kindi-promo--big" href="<?php echo esc_url( kindi_opt( 'promo1_url' ) ); ?>">
+			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-back-to-school.webp' ); ?>" alt="" loading="lazy" decoding="async">
 			<span class="kindi-promo__body">
-				<span class="kindi-promo__badge"><?php echo kindi_icon( 'clock', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>מוגבל בזמן</span>
-				<h3 class="kindi-promo__title">חזרה לבית הספר<br><span>עד 40%- על הכל!</span></h3>
-				<p class="kindi-promo__sub">ילקוטים, קלמרים, מחברות, עפרונות ועוד מאות מוצרים במחירי השקה</p>
-				<span class="kindi-promo__cta">לכל המבצעים<?php echo kindi_icon( 'arrowleft', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<span class="kindi-promo__badge"><?php echo kindi_icon( 'clock', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( kindi_opt( 'promo1_badge' ) ); ?></span>
+				<h3 class="kindi-promo__title"><?php echo esc_html( kindi_opt( 'promo1_title' ) ); ?></h3>
+				<p class="kindi-promo__sub"><?php echo esc_html( kindi_opt( 'promo1_sub' ) ); ?></p>
+				<span class="kindi-promo__cta"><?php echo esc_html( kindi_opt( 'promo1_cta' ) ); ?><?php echo kindi_icon( 'arrowleft', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			</span>
 		</a>
 
-		<a class="kindi-promo kindi-promo--navy kindi-promo--sm" href="/shop/">
-			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-gameboy.webp' ); ?>" alt="" loading="lazy">
+		<a class="kindi-promo kindi-promo--navy kindi-promo--sm" href="<?php echo esc_url( kindi_opt( 'promo2_url' ) ); ?>">
+			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-gameboy.webp' ); ?>" alt="" loading="lazy" decoding="async">
 			<span class="kindi-promo__body">
-				<span class="kindi-promo__badge"><?php echo kindi_icon( 'sparkles', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>חדש בקינדי</span>
-				<h3 class="kindi-promo__title">גמבוי כשר X3</h3>
-				<p class="kindi-promo__sub">222 משחקים</p>
-				<span class="kindi-promo__cta">לרכישה<?php echo kindi_icon( 'arrowleft', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<span class="kindi-promo__badge"><?php echo kindi_icon( 'sparkles', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( kindi_opt( 'promo2_badge' ) ); ?></span>
+				<h3 class="kindi-promo__title"><?php echo esc_html( kindi_opt( 'promo2_title' ) ); ?></h3>
+				<p class="kindi-promo__sub"><?php echo esc_html( kindi_opt( 'promo2_sub' ) ); ?></p>
+				<span class="kindi-promo__cta"><?php echo esc_html( kindi_opt( 'promo2_cta' ) ); ?><?php echo kindi_icon( 'arrowleft', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			</span>
 		</a>
 
-		<a class="kindi-promo kindi-promo--blue kindi-promo--sm" href="/shop/">
-			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-blocks.webp' ); ?>" alt="" loading="lazy">
+		<a class="kindi-promo kindi-promo--blue kindi-promo--sm" href="<?php echo esc_url( kindi_opt( 'promo3_url' ) ); ?>">
+			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-blocks.webp' ); ?>" alt="" loading="lazy" decoding="async">
 			<span class="kindi-promo__body">
-				<span class="kindi-promo__badge"><?php echo kindi_icon( 'gem', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>מחיר מיוחד</span>
-				<h3 class="kindi-promo__title">לגו בכל הסדרות</h3>
-				<p class="kindi-promo__sub">החל מ-19.90 ₪</p>
-				<span class="kindi-promo__cta">לקולקציה<?php echo kindi_icon( 'arrowleft', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<span class="kindi-promo__badge"><?php echo kindi_icon( 'gem', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( kindi_opt( 'promo3_badge' ) ); ?></span>
+				<h3 class="kindi-promo__title"><?php echo esc_html( kindi_opt( 'promo3_title' ) ); ?></h3>
+				<p class="kindi-promo__sub"><?php echo esc_html( kindi_opt( 'promo3_sub' ) ); ?></p>
+				<span class="kindi-promo__cta"><?php echo esc_html( kindi_opt( 'promo3_cta' ) ); ?><?php echo kindi_icon( 'arrowleft', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			</span>
 		</a>
 

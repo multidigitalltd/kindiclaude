@@ -119,7 +119,7 @@ function kindi_render_categories(): string {
 				esc_attr( $c['acc'] ),
 				esc_url( $c['url'] ),
 				$style, // phpcs:ignore WordPress.Security.EscapeOutput -- static literal.
-				$c['img'] ? sprintf( '<img src="%s" alt="%s" loading="lazy" width="400" height="400">', esc_url( $c['img'] ), esc_attr( $c['name'] ) ) : '',
+				$c['img'] ? sprintf( '<img src="%s" alt="%s" loading="lazy" decoding="async" width="400" height="400">', esc_url( $c['img'] ), esc_attr( $c['name'] ) ) : '',
 				esc_html( $c['name'] ),
 				esc_html( sprintf( '%s מוצרים', number_format_i18n( $c['count'] ) ) )
 			);
@@ -127,7 +127,7 @@ function kindi_render_categories(): string {
 	} else {
 		foreach ( kindi_fallback_categories() as $c ) {
 			printf(
-				'<a class="kindi-cat kindi-cat--%1$s" href="%2$s"><span class="kindi-cat__media"><img src="%3$s" alt="%4$s" loading="lazy" width="400" height="400"><span class="kindi-cat__tint"></span><span class="kindi-cat__pill">לצפייה במוצרים ←</span></span><span class="kindi-cat__bar"></span><span class="kindi-cat__name"><b>%4$s</b><span class="kindi-cat__count">%5$s</span></span></a>',
+				'<a class="kindi-cat kindi-cat--%1$s" href="%2$s"><span class="kindi-cat__media"><img src="%3$s" alt="%4$s" loading="lazy" decoding="async" width="400" height="400"><span class="kindi-cat__tint"></span><span class="kindi-cat__pill">לצפייה במוצרים ←</span></span><span class="kindi-cat__bar"></span><span class="kindi-cat__name"><b>%4$s</b><span class="kindi-cat__count">%5$s</span></span></a>',
 				esc_attr( $c['acc'] ),
 				esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '#' ),
 				kindi_img( 'photos/' . $c['img'] ),
