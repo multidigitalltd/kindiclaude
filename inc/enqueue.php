@@ -94,6 +94,11 @@ function kindi_enqueue_scripts(): void {
 		kindi_asset_version( 'assets/js/interactions.js' ),
 		true
 	);
+
+	// Live header cart count (WooCommerce core script, no jQuery UI bloat).
+	if ( class_exists( 'WooCommerce' ) ) {
+		wp_enqueue_script( 'wc-cart-fragments' );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'kindi_enqueue_scripts' );
 

@@ -101,8 +101,8 @@ $kindi_ticker_loop = array_merge( $kindi_ticker, $kindi_ticker );
 		<a class="kindi-bar__util" href="<?php echo esc_url( wp_login_url() ); ?>"><?php echo kindi_icon( 'user', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>התחברות</span></a>
 		<a class="kindi-bar__util" href="#"><?php echo kindi_icon( 'heart', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>מועדפים</span></a>
 		<a class="kindi-cart" href="<?php echo esc_url( class_exists( 'WooCommerce' ) && wc_get_cart_url() ? wc_get_cart_url() : '#' ); ?>" aria-label="סל קניות">
-			<span class="kindi-cart__txt"><small>סל הקניות</small><b><?php echo class_exists( 'WooCommerce' ) ? esc_html( WC()->cart->get_cart_contents_count() . ' פריטים' ) : '0 פריטים'; ?></b></span>
-			<span class="kindi-cart__ic"><?php echo kindi_icon( 'cart', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span class="kindi-cart__badge"><?php echo class_exists( 'WooCommerce' ) ? absint( WC()->cart->get_cart_contents_count() ) : 0; ?></span></span>
+			<span class="kindi-cart__txt"><small>סל הקניות</small><b class="kindi-cart-amount"><?php echo class_exists( 'WooCommerce' ) ? wp_kses_post( WC()->cart->get_cart_contents_count() . ' פריטים • ' . WC()->cart->get_cart_subtotal() ) : '0 פריטים'; ?></b></span>
+			<span class="kindi-cart__ic"><?php echo kindi_icon( 'cart', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span class="kindi-cart__badge kindi-cart-count"><?php echo class_exists( 'WooCommerce' ) ? absint( WC()->cart->get_cart_contents_count() ) : 0; ?></span></span>
 		</a>
 	</div>
 </div>

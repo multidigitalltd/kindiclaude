@@ -57,3 +57,23 @@ add_filter( 'loop_shop_columns', 'kindi_wc_loop_columns' );
 function kindi_free_shipping_threshold(): int {
 	return (int) apply_filters( 'kindi_free_shipping_threshold', 299 );
 }
+
+/**
+ * Live header cart updates without a page reload (WooCommerce cart fragments).
+ *
+ * @param array<string,string> $fragments Cart fragments keyed by CSS selector.
+ * @return array<string,string>
+ */
+function kindi_cart_fragments( array $fragments ): array {
+	if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+		return $fragments;
+	}
+
+	$count = WC()->cart->get_cart_contents_count();
+
+	$fragments['span.kindi-cart-count'] = '<span class="kindi-cart__badge kindi-cart-count">' . absint( $count ) . '</span>';
+	$fragments['b.kindi-cart-amount']   = '<b class="kindi-cart-amount">' . wp_kses_post( $count . ' פריטים • ' . WC()->cart->get_cart_subtotal() ) . '</b>';
+
+	return $fragments;
+}
+add_filter( 'woocommerce_add_to_cart_fragments', 'kindi_cart_fragments' );
