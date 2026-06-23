@@ -36,12 +36,12 @@
         {
           "slug": "sans",
           "name": "Ploni",
-          "fontFamily": "'Ploni ML v2 AAA', 'Ploni', system-ui, -apple-system, 'Segoe UI', sans-serif"
+          "fontFamily": "'Ploni', 'Ploni ML v2 AAA', system-ui, -apple-system, 'Segoe UI', sans-serif"
         },
         {
           "slug": "display",
           "name": "Ploni Yad",
-          "fontFamily": "'Ploni Yad v2 AAA', 'Ploni Yad', 'Ploni ML v2 AAA', system-ui, sans-serif"
+          "fontFamily": "'PloniYad', 'Ploni Yad v2 AAA', 'Ploni', system-ui, sans-serif"
         }
       ],
       "fontSizes": [

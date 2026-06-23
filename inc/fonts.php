@@ -1,12 +1,14 @@
 <?php
 /**
- * Fonts — bridge the WordPress Font Library into the theme.
+ * Fonts — bridge the WordPress Font Library into the theme, robustly.
  *
- * WordPress stores Font Library faces as `wp_font_face` posts and normally
- * prints their @font-face rules itself. On stacks where an optimiser strips or
- * defers that output, the brand fonts silently fall back. To guarantee the
- * theme's typography always resolves, we read the installed faces straight from
- * WordPress and re-declare them (and preload the hero weights) from the theme.
+ * Rather than depending on WordPress's own @font-face output (which optimisers
+ * often strip) or on exact Font Library family names, the theme scans the
+ * physical font directory that WordPress stores uploads in, classifies each
+ * file (Ploni body vs Ploni Yad display + weight) and declares @font-face under
+ * names the theme controls ('Ploni' / 'PloniYad'). The theme's CSS references
+ * those names first, so typography resolves no matter how the fonts were named
+ * on upload. A diagnostic HTML comment lists what was found.
  *
  * @package Kindi
  */
@@ -16,62 +18,75 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Read installed Font Library faces (family, weight, style, file URL).
+ * Derive a numeric font weight from a filename.
  *
- * @return array<int,array{family:string,weight:string,style:string,src:string,ext:string}>
+ * @param string $name Lowercased filename.
+ * @return string
  */
-function kindi_installed_font_faces(): array {
-	$cache = wp_cache_get( 'kindi_font_faces' );
-	if ( is_array( $cache ) ) {
-		return $cache;
+function kindi_weight_from_name( string $name ): string {
+	if ( preg_match( '/(?:^|[^0-9])(100|200|300|400|500|600|700|800|900)(?:[^0-9]|$)/', $name, $m ) ) {
+		return $m[1];
 	}
+	if ( false !== strpos( $name, 'thin' ) ) { return '100'; }
+	if ( false !== strpos( $name, 'extralight' ) || false !== strpos( $name, 'ultralight' ) ) { return '200'; }
+	if ( false !== strpos( $name, 'light' ) ) { return '300'; }
+	if ( false !== strpos( $name, 'medium' ) ) { return '500'; }
+	if ( false !== strpos( $name, 'semibold' ) || false !== strpos( $name, 'demibold' ) || false !== strpos( $name, 'semi' ) || false !== strpos( $name, 'demi' ) ) { return '600'; }
+	if ( false !== strpos( $name, 'extrabold' ) || false !== strpos( $name, 'ultrabold' ) ) { return '800'; }
+	if ( false !== strpos( $name, 'black' ) || false !== strpos( $name, 'heavy' ) ) { return '900'; }
+	if ( false !== strpos( $name, 'bold' ) ) { return '700'; }
+	return '400';
+}
 
+/**
+ * Scan the WordPress font directory and classify Ploni / Ploni Yad faces.
+ *
+ * @return array<int,array{family:string,weight:string,style:string,src:string,ext:string,file:string}>
+ */
+function kindi_scan_font_faces(): array {
 	$faces = array();
 
-	if ( ! post_type_exists( 'wp_font_face' ) ) {
-		wp_cache_set( 'kindi_font_faces', $faces, '', HOUR_IN_SECONDS );
+	if ( ! function_exists( 'wp_get_font_dir' ) ) {
 		return $faces;
 	}
 
-	$posts = get_posts(
-		array(
-			'post_type'              => 'wp_font_face',
-			'post_status'            => 'publish',
-			'numberposts'            => -1,
-			'no_found_rows'          => true,
-			'update_post_meta_cache' => false,
-			'update_post_term_cache' => false,
-		)
-	);
+	$dir  = wp_get_font_dir();
+	$path = $dir['path'] ?? '';
+	$url  = trailingslashit( $dir['url'] ?? '' );
 
-	$dir     = function_exists( 'wp_get_font_dir' ) ? wp_get_font_dir() : array( 'url' => content_url( '/uploads/fonts' ) );
-	$dir_url = trailingslashit( $dir['url'] ?? '' );
+	if ( ! $path || ! is_dir( $path ) ) {
+		return $faces;
+	}
 
-	foreach ( $posts as $post ) {
-		$data = json_decode( (string) $post->post_content, true );
-		if ( ! is_array( $data ) || empty( $data['src'] ) ) {
+	$files = array();
+	foreach ( array( 'woff2', 'woff', 'ttf', 'otf' ) as $ext ) {
+		$found = glob( $path . '/*.' . $ext );
+		if ( $found ) {
+			$files = array_merge( $files, $found );
+		}
+	}
+	if ( ! $files ) {
+		return $faces;
+	}
+
+	foreach ( $files as $file ) {
+		$base  = basename( $file );
+		$lower = strtolower( $base );
+
+		// Only handle the brand fonts.
+		if ( false === strpos( $lower, 'ploni' ) && false === strpos( $lower, 'yad' ) ) {
 			continue;
 		}
 
-		$src = is_array( $data['src'] ) ? reset( $data['src'] ) : $data['src'];
-		$src = (string) $src;
-
-		// Normalise a stored filename/relative path to a full URL.
-		if ( 0 !== strpos( $src, 'http' ) ) {
-			$src = $dir_url . ltrim( $src, '/' );
-		}
-
-		$ext   = strtolower( pathinfo( (string) wp_parse_url( $src, PHP_URL_PATH ), PATHINFO_EXTENSION ) );
 		$faces[] = array(
-			'family' => trim( (string) ( $data['fontFamily'] ?? '' ), "\"' " ),
-			'weight' => (string) ( $data['fontWeight'] ?? '400' ),
-			'style'  => (string) ( $data['fontStyle'] ?? 'normal' ),
-			'src'    => $src,
-			'ext'    => $ext,
+			'family' => false !== strpos( $lower, 'yad' ) ? 'PloniYad' : 'Ploni',
+			'weight' => kindi_weight_from_name( $lower ),
+			'style'  => false !== strpos( $lower, 'italic' ) ? 'italic' : 'normal',
+			'src'    => $url . rawurlencode( $base ),
+			'ext'    => strtolower( pathinfo( $base, PATHINFO_EXTENSION ) ),
+			'file'   => $base,
 		);
 	}
-
-	wp_cache_set( 'kindi_font_faces', $faces, '', HOUR_IN_SECONDS );
 
 	return $faces;
 }
@@ -83,23 +98,26 @@ function kindi_installed_font_faces(): array {
  * @return string
  */
 function kindi_font_format( string $ext ): string {
-	$map = array(
-		'woff2' => 'woff2',
-		'woff'  => 'woff',
-		'ttf'   => 'truetype',
-		'otf'   => 'opentype',
-	);
-
+	$map = array( 'woff2' => 'woff2', 'woff' => 'woff', 'ttf' => 'truetype', 'otf' => 'opentype' );
 	return $map[ $ext ] ?? 'woff2';
 }
 
 /**
- * Print @font-face rules for the installed brand fonts, read from WordPress.
+ * Print @font-face rules (and a diagnostic comment) in the document head.
  *
  * @return void
  */
 function kindi_print_font_faces(): void {
-	$faces = kindi_installed_font_faces();
+	$faces = kindi_scan_font_faces();
+
+	// Diagnostic: lists exactly what the theme found on this server.
+	$names = wp_list_pluck( $faces, 'file' );
+	printf(
+		"<!-- kindi-fonts: %d face(s) found%s -->\n",
+		count( $faces ),
+		$faces ? ' [' . esc_html( implode( ', ', $names ) ) . ']' : ' (none in WordPress font dir)'
+	);
+
 	if ( ! $faces ) {
 		return;
 	}
@@ -120,7 +138,7 @@ function kindi_print_font_faces(): void {
 add_action( 'wp_head', 'kindi_print_font_faces', 2 );
 
 /**
- * Preload the display weight used by the hero heading (LCP) when on home/shop.
+ * Preload the display weight used by the hero heading (LCP) on home/shop.
  *
  * @return void
  */
@@ -129,9 +147,8 @@ function kindi_preload_brand_fonts(): void {
 		return;
 	}
 
-	foreach ( kindi_installed_font_faces() as $face ) {
-		// Hero title uses the heaviest "Yad" weight; preload just that one.
-		if ( false !== stripos( $face['family'], 'yad' ) && in_array( $face['weight'], array( '700', '900' ), true ) && 'woff2' === $face['ext'] ) {
+	foreach ( kindi_scan_font_faces() as $face ) {
+		if ( 'PloniYad' === $face['family'] && in_array( $face['weight'], array( '700', '900' ), true ) && 'woff2' === $face['ext'] ) {
 			printf(
 				'<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n",
 				esc_url( $face['src'] )
