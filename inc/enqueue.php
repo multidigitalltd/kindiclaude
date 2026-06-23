@@ -38,33 +38,6 @@ function kindi_is_motion_view(): bool {
 }
 
 /**
- * Preload the two display weights used in the hero (LCP heading) only.
- *
- * @return void
- */
-function kindi_preload_fonts(): void {
-	if ( ! kindi_is_motion_view() ) {
-		return;
-	}
-
-	$fonts = array(
-		'assets/fonts/ploniyad-black.woff2',
-		'assets/fonts/ploni-regular.woff2',
-	);
-
-	foreach ( $fonts as $font ) {
-		if ( ! is_readable( KINDI_DIR . $font ) ) {
-			continue;
-		}
-		printf(
-			'<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n",
-			esc_url( KINDI_URI . $font )
-		);
-	}
-}
-add_action( 'wp_head', 'kindi_preload_fonts', 1 );
-
-/**
  * Enqueue front-end styles. Animation CSS loads only where motion is used.
  *
  * @return void
