@@ -37,7 +37,7 @@ $kindi_sparks   = array(
 		<div class="kindi-zone__stage" aria-hidden="true">
 			<span class="kindi-zone__halo"></span>
 			<span class="kindi-ground-shadow animate-ground"></span>
-			<img class="kindi-zone__mascot animate-mascot" src="<?php echo kindi_img( 'mascot/celebrate.png' ); ?>" alt="" loading="lazy">
+			<img class="kindi-zone__mascot animate-mascot" src="<?php echo kindi_img( 'mascot/celebrate.webp' ); ?>" alt="" loading="lazy">
 			<?php foreach ( $kindi_sparks as $s ) : ?>
 			<span class="kindi-spark animate-sparkle" style="<?php echo esc_attr( $s['style'] ); ?>"><?php echo kindi_icon( $s['icon'], $s['cls'] ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			<?php endforeach; ?>

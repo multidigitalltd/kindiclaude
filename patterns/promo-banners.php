@@ -19,7 +19,7 @@
 	<div class="kindi-promos">
 
 		<a class="kindi-promo kindi-promo--red kindi-promo--big" href="/shop/?on_sale=1">
-			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-back-to-school.jpg' ); ?>" alt="" loading="lazy">
+			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-back-to-school.webp' ); ?>" alt="" loading="lazy">
 			<span class="kindi-promo__body">
 				<span class="kindi-promo__badge"><?php echo kindi_icon( 'clock', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>מוגבל בזמן</span>
 				<h3 class="kindi-promo__title">חזרה לבית הספר<br><span>עד 40%- על הכל!</span></h3>
@@ -29,7 +29,7 @@
 		</a>
 
 		<a class="kindi-promo kindi-promo--navy kindi-promo--sm" href="/shop/">
-			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-gameboy.jpg' ); ?>" alt="" loading="lazy">
+			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-gameboy.webp' ); ?>" alt="" loading="lazy">
 			<span class="kindi-promo__body">
 				<span class="kindi-promo__badge"><?php echo kindi_icon( 'sparkles', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>חדש בקינדי</span>
 				<h3 class="kindi-promo__title">גמבוי כשר X3</h3>
@@ -39,7 +39,7 @@
 		</a>
 
 		<a class="kindi-promo kindi-promo--blue kindi-promo--sm" href="/shop/">
-			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-blocks.jpg' ); ?>" alt="" loading="lazy">
+			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-blocks.webp' ); ?>" alt="" loading="lazy">
 			<span class="kindi-promo__body">
 				<span class="kindi-promo__badge"><?php echo kindi_icon( 'gem', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>מחיר מיוחד</span>
 				<h3 class="kindi-promo__title">לגו בכל הסדרות</h3>
