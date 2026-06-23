@@ -24,6 +24,13 @@ function kindi_settings_tabs(): array {
 		'promos'   => array(
 			'label'    => 'מבצעים ותוכן',
 			'sections' => array(
+				'עמוד הבית — קטגוריות ומוצרים' => array(
+					'home_cats_mode'       => array( 'type' => 'select', 'label' => 'קטגוריות בעמוד הבית', 'options' => array( 'auto' => 'אוטומטי (הפופולריות ביותר)', 'manual' => 'בחירה ידנית' ) ),
+					'home_cats'            => array( 'type' => 'taxonomy_multi', 'label' => 'בחירת קטגוריות', 'help' => 'רלוונטי כשנבחר "בחירה ידנית". סמן את הקטגוריות שיופיעו בעמוד הבית.' ),
+					'home_products_source' => array( 'type' => 'select', 'label' => 'אילו מוצרים להציג', 'options' => array( 'popularity' => 'הנמכרים ביותר', 'date' => 'החדשים ביותר', 'sale' => 'במבצע', 'best_selling' => 'רבי מכר', 'featured' => 'מוצרים מומלצים', 'category' => 'מקטגוריה מסוימת' ) ),
+					'home_products_cat'    => array( 'type' => 'taxonomy_select', 'label' => 'קטגוריית מוצרים', 'help' => 'בשימוש רק כשנבחר "מקטגוריה מסוימת".' ),
+					'home_products_count'  => array( 'type' => 'number', 'label' => 'כמות מוצרים להצגה' ),
+				),
 				'רצועות עליונות' => array(
 					'shipbar' => array( 'type' => 'text', 'label' => 'רצועת המשלוח (מתחת ללוגו)' ),
 					'ticker'  => array( 'type' => 'textarea', 'label' => 'רצועת מבצעים נעה', 'help' => 'שורה אחת לכל פריט' ),
@@ -120,6 +127,7 @@ function kindi_settings_all_fields(): array {
 function kindi_sanitize_field( string $type, $value ) {
 	switch ( $type ) {
 		case 'number':
+		case 'taxonomy_select':
 			return absint( $value );
 		case 'url':
 			return esc_url_raw( trim( (string) $value ) );
@@ -128,6 +136,32 @@ function kindi_sanitize_field( string $type, $value ) {
 		default:
 			return sanitize_text_field( (string) $value );
 	}
+}
+
+/**
+ * Product categories for select/checkbox fields (id => name).
+ *
+ * @return array<int,string>
+ */
+function kindi_admin_product_cats(): array {
+	if ( ! taxonomy_exists( 'product_cat' ) ) {
+		return array();
+	}
+	$terms = get_terms(
+		array(
+			'taxonomy'   => 'product_cat',
+			'hide_empty' => false,
+			'number'     => 300,
+			'orderby'    => 'name',
+		)
+	);
+	$out = array();
+	if ( ! is_wp_error( $terms ) ) {
+		foreach ( $terms as $term ) {
+			$out[ (int) $term->term_id ] = $term->name;
+		}
+	}
+	return $out;
 }
 
 /**
@@ -174,6 +208,13 @@ function kindi_settings_render(): void {
 		// Only persist fields actually submitted (the active tab), so other
 		// tabs' values are never wiped.
 		foreach ( kindi_settings_all_fields() as $key => $field ) {
+			if ( 'taxonomy_multi' === $field['type'] ) {
+				if ( isset( $_POST['kindi__multi'][ $key ] ) ) {
+					$vals          = isset( $_POST['kindi'][ $key ] ) ? (array) wp_unslash( $_POST['kindi'][ $key ] ) : array();
+					$clean[ $key ] = array_values( array_filter( array_map( 'absint', $vals ) ) );
+				}
+				continue;
+			}
 			if ( ! isset( $_POST['kindi'][ $key ] ) ) {
 				continue;
 			}
@@ -224,6 +265,32 @@ function kindi_settings_render(): void {
 					esc_attr( $key ),
 					esc_textarea( (string) $value )
 				);
+			} elseif ( 'select' === $field['type'] ) {
+				echo '<select id="' . esc_attr( $id ) . '" name="kindi[' . esc_attr( $key ) . ']">';
+				foreach ( ( $field['options'] ?? array() ) as $opt_val => $opt_label ) {
+					printf( '<option value="%s"%s>%s</option>', esc_attr( $opt_val ), selected( (string) $value, (string) $opt_val, false ), esc_html( $opt_label ) );
+				}
+				echo '</select>';
+			} elseif ( 'taxonomy_select' === $field['type'] ) {
+				echo '<select id="' . esc_attr( $id ) . '" name="kindi[' . esc_attr( $key ) . ']"><option value="0">— ללא —</option>';
+				foreach ( kindi_admin_product_cats() as $tid => $tname ) {
+					printf( '<option value="%d"%s>%s</option>', (int) $tid, selected( (int) $value, (int) $tid, false ), esc_html( $tname ) );
+				}
+				echo '</select>';
+			} elseif ( 'taxonomy_multi' === $field['type'] ) {
+				$selected_ids = is_array( $value ) ? array_map( 'intval', $value ) : array();
+				echo '<input type="hidden" name="kindi__multi[' . esc_attr( $key ) . ']" value="1">';
+				echo '<div style="max-height:220px;overflow:auto;border:1px solid #dcdcde;border-radius:6px;padding:8px;column-count:2">';
+				foreach ( kindi_admin_product_cats() as $tid => $tname ) {
+					printf(
+						'<label style="display:block;margin:2px 0"><input type="checkbox" name="kindi[%1$s][]" value="%2$d"%3$s> %4$s</label>',
+						esc_attr( $key ),
+						(int) $tid,
+						checked( in_array( (int) $tid, $selected_ids, true ), true, false ),
+						esc_html( $tname )
+					);
+				}
+				echo '</div>';
 			} else {
 				$input_type = 'number' === $field['type'] ? 'number' : ( 'url' === $field['type'] ? 'url' : 'text' );
 				printf(

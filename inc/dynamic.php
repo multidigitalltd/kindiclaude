@@ -61,16 +61,30 @@ function kindi_get_store_categories( int $limit = 12 ): array {
 		return $cached;
 	}
 
-	$terms = get_terms(
-		array(
-			'taxonomy'   => 'product_cat',
-			'hide_empty' => true,
-			'number'     => $limit,
-			'orderby'    => 'count',
-			'order'      => 'DESC',
-			'exclude'    => array_filter( array( (int) get_option( 'default_product_cat' ) ) ),
-		)
-	);
+	$mode   = function_exists( 'kindi_opt' ) ? kindi_opt( 'home_cats_mode', 'auto' ) : 'auto';
+	$manual = function_exists( 'kindi_opt' ) ? kindi_opt( 'home_cats', array() ) : array();
+
+	if ( 'manual' === $mode && is_array( $manual ) && $manual ) {
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'hide_empty' => false,
+				'include'    => array_map( 'absint', $manual ),
+				'orderby'    => 'include',
+			)
+		);
+	} else {
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'hide_empty' => true,
+				'number'     => $limit,
+				'orderby'    => 'count',
+				'order'      => 'DESC',
+				'exclude'    => array_filter( array( (int) get_option( 'default_product_cat' ) ) ),
+			)
+		);
+	}
 
 	if ( is_wp_error( $terms ) || empty( $terms ) ) {
 		return array();

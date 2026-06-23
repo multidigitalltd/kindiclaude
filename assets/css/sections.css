@@ -307,6 +307,6 @@
 .kindi-tst__quote { position: absolute; top: -0.75rem; right: 1.5rem; font-family: var(--wp--preset--font-family--display); font-size: 3rem; line-height: 1; color: var(--brand-red); }
 
 /* ============================ Floating buttons ============================ */
-.kindi-float { position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 50; width: 3.5rem; height: 3.5rem; border-radius: 999px; display: grid; place-items: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); transition: transform 0.2s; }
+.kindi-float { position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 80; width: 3.5rem; height: 3.5rem; border-radius: 999px; display: grid; place-items: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); transition: transform 0.2s; }
 .kindi-float:hover { transform: scale(1.1); }
 .kindi-float--a11y { left: 6rem; bottom: 1.5rem; width: 3rem; height: 3rem; background: var(--brand-navy); color: #fff; border: 0; cursor: pointer; }

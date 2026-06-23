@@ -39,6 +39,13 @@ function kindi_default_options(): array {
 		'hero_cta2'     => 'לכל המוצרים',
 		'hero_cta2_url' => '/shop/',
 
+		// Homepage categories + products control.
+		'home_cats_mode'       => 'auto',
+		'home_cats'            => array(),
+		'home_products_source' => 'popularity',
+		'home_products_cat'    => '',
+		'home_products_count'  => 10,
+
 		// Promo banners (change often).
 		'promo1_badge' => 'מוגבל בזמן',
 		'promo1_title' => 'חזרה לבית הספר — עד 40%- על הכל!',

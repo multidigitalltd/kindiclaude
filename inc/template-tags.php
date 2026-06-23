@@ -75,9 +75,31 @@ function kindi_section_head( array $args ): string {
  */
 function kindi_hot_products_shortcode(): string {
 	if ( ! class_exists( 'WooCommerce' ) || ! shortcode_exists( 'products' ) ) {
-		return '<div class="kindi-prod-empty">כאן יוצגו המוצרים החמים שלכם. התקינו והפעילו את WooCommerce והוסיפו מוצרים כדי שיופיעו כאן אוטומטית.</div>';
+		return '<div class="kindi-prod-empty">כאן יוצגו המוצרים שלכם. התקינו והפעילו את WooCommerce והוסיפו מוצרים כדי שיופיעו כאן אוטומטית.</div>';
 	}
 
-	return do_shortcode( '[products limit="10" columns="5" orderby="popularity" order="DESC" class="kindi-hot-products"]' );
+	$source = kindi_opt( 'home_products_source', 'popularity' );
+	$count  = max( 1, (int) kindi_opt( 'home_products_count', 10 ) );
+	$common = sprintf( 'limit="%d" columns="5" class="kindi-hot-products"', $count );
+
+	switch ( $source ) {
+		case 'date':
+			return do_shortcode( "[recent_products {$common}]" );
+		case 'sale':
+			return do_shortcode( "[sale_products {$common}]" );
+		case 'best_selling':
+			return do_shortcode( "[best_selling_products {$common}]" );
+		case 'featured':
+			return do_shortcode( "[products {$common} visibility=\"featured\"]" );
+		case 'category':
+			$cid  = (int) kindi_opt( 'home_products_cat', 0 );
+			$term = $cid ? get_term( $cid, 'product_cat' ) : null;
+			if ( $term && ! is_wp_error( $term ) ) {
+				return do_shortcode( '[product_category category="' . esc_attr( $term->slug ) . "\" {$common}]" );
+			}
+			// Fall through to popularity when no valid category.
+		default:
+			return do_shortcode( "[products {$common} orderby=\"popularity\" order=\"DESC\"]" );
+	}
 }
 add_shortcode( 'kindi_hot_products', 'kindi_hot_products_shortcode' );
