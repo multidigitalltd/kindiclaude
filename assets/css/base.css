@@ -73,8 +73,23 @@ body {
   left: 1rem;
 }
 
-/* Accessibility high-contrast toggle (set by interactions.js) */
-.kindi-a11y-contrast { filter: contrast(1.25) saturate(1.1); }
+/* Accessibility toolbar preferences (set by a11y.js on <html>) */
+.a11y-contrast { filter: contrast(1.3) saturate(1.15); }
+.a11y-links a { text-decoration: underline !important; text-underline-offset: 2px; }
+.a11y-readable, .a11y-readable * { font-family: Arial, "Helvetica Neue", sans-serif !important; letter-spacing: 0.01em; }
+.a11y-stop-motion *, .a11y-stop-motion *::before, .a11y-stop-motion *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+
+/* Accessibility toolbar UI */
+.kindi-a11y { position: fixed; bottom: 6rem; left: 1.5rem; z-index: 220; width: 17rem; max-width: calc(100vw - 2rem); background: #fff; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35); border: 1px solid var(--border); overflow: hidden; }
+.kindi-a11y[hidden] { display: none; }
+.kindi-a11y__head { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--brand-navy); color: #fff; }
+.kindi-a11y__head strong { font-family: var(--wp--preset--font-family--display); }
+.kindi-a11y__close { background: none; border: 0; color: #fff; cursor: pointer; }
+.kindi-a11y__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 1rem; }
+.kindi-a11y__btn { padding: 0.6rem 0.5rem; border: 1px solid var(--border); border-radius: 0.625rem; background: var(--muted); font-weight: 600; font-size: 0.8125rem; cursor: pointer; color: var(--brand-navy); transition: all 0.15s; }
+.kindi-a11y__btn:hover { background: var(--brand-blue-soft); border-color: var(--brand-blue); }
+.kindi-a11y__btn--reset { grid-column: 1 / -1; background: var(--brand-red-soft); color: var(--brand-red); border-color: transparent; }
+.kindi-a11y__statement { display: block; text-align: center; padding: 0.75rem; border-top: 1px solid var(--border); font-size: 0.8125rem; font-weight: 700; color: var(--brand-navy); text-decoration: none; }
 
 /* --- Utilities ported from the Lovable design (src/styles.css) --- */
 

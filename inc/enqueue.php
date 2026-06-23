@@ -150,7 +150,7 @@ add_action( 'wp_enqueue_scripts', 'kindi_enqueue_scripts' );
  * @return string
  */
 function kindi_defer_scripts( string $tag, string $handle ): string {
-	$deferred = array( 'kindi-header', 'kindi-interactions', 'kindi-search' );
+	$deferred = array( 'kindi-header', 'kindi-interactions', 'kindi-search', 'kindi-a11y' );
 
 	if ( in_array( $handle, $deferred, true ) && false === strpos( $tag, 'defer' ) ) {
 		$tag = str_replace( ' src', ' defer src', $tag );

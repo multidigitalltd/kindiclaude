@@ -45,6 +45,10 @@ kindi_require( 'fonts.php' );
 kindi_require( 'dynamic.php' );
 kindi_require( 'search.php' );
 kindi_require( 'nav.php' );
+kindi_require( 'store.php' );
+kindi_require( 'newsletter.php' );
+kindi_require( 'accessibility.php' );
+kindi_require( 'schema.php' );
 kindi_require( 'setup.php' );
 
 if ( is_admin() ) {
@@ -56,4 +60,8 @@ kindi_require( 'security.php' );
 
 if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'woocommerce.php' );
+	kindi_require( 'product-card.php' );
+	kindi_require( 'shipping-bar.php' );
+	kindi_require( 'recently-viewed.php' );
+	kindi_require( 'filters.php' );
 }

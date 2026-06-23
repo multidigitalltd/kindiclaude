@@ -38,13 +38,4 @@
 		} );
 	}
 
-	// Accessibility high-contrast toggle (lightweight stub).
-	var a11y = document.querySelector( '[data-kindi-a11y]' );
-	if ( a11y ) {
-		a11y.addEventListener( 'click', function () {
-			document.documentElement.classList.toggle( 'kindi-a11y-contrast' );
-			var pressed = document.documentElement.classList.contains( 'kindi-a11y-contrast' );
-			a11y.setAttribute( 'aria-pressed', pressed ? 'true' : 'false' );
-		} );
-	}
 }() );
