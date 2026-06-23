@@ -22,7 +22,7 @@ $kindi_values = array(
 			<span class="kindi-eyebrow"><?php echo kindi_icon( 'sparkles', 'kindi-icon--xs' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>למה דווקא אצלנו</span>
 			<h2 class="kindi-sec-title">הבטחת קינדרטויס — <span class="kindi-hl">בכל הזמנה.</span></h2>
 		</div>
-		<img class="kindi-values__mascot animate-mascot" src="<?php echo kindi_img( 'mascot/wave.webp' ); ?>" alt="" loading="lazy">
+		<img class="kindi-values__mascot animate-mascot" src="<?php echo kindi_img( 'mascot/kindy-new.webp' ); ?>" alt="" loading="lazy">
 	</div>
 	<div class="kindi-values">
 		<?php foreach ( $kindi_values as $v ) : ?>

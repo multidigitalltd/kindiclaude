@@ -141,7 +141,7 @@ $kindi_ticker_loop = array_merge( $kindi_ticker, $kindi_ticker );
 	<div class="kindi-drawer__overlay" data-kindi-menu-close></div>
 	<div class="kindi-drawer__panel" role="dialog" aria-modal="true" aria-label="תפריט קטגוריות">
 		<div class="kindi-drawer__head">
-			<span class="kindi-drawer__title"><img src="<?php echo kindi_img( 'mascot/wave.webp' ); ?>" alt="" width="40" height="40">תפריט קטגוריות</span>
+			<span class="kindi-drawer__title"><img src="<?php echo kindi_img( 'mascot/kindy-new.webp' ); ?>" alt="" width="40" height="40">תפריט קטגוריות</span>
 			<button type="button" class="kindi-drawer__close" aria-label="סגור" data-kindi-menu-close><?php echo kindi_icon( 'close', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
 		</div>
 		<div class="kindi-drawer__body">
