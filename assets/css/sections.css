@@ -1,0 +1,312 @@
+/*
+ * Kindi homepage sections — faithful CSS port of the Lovable design
+ * (src/components/site/*). Uses brand tokens from theme.json via base.css aliases.
+ * Loaded only on the front page.
+ */
+
+/* ============================ Shared ============================ */
+.kindi-icon { display: inline-block; flex-shrink: 0; width: 24px; height: 24px; vertical-align: middle; }
+.kindi-icon--xs { width: 14px; height: 14px; }
+.kindi-icon--sm { width: 16px; height: 16px; }
+.kindi-icon--md { width: 20px; height: 20px; }
+.kindi-icon--lg { width: 28px; height: 28px; }
+.kindi-icon--xl { width: 32px; height: 32px; }
+.kindi-icon--2xl { width: 40px; height: 40px; }
+.kindi-icon--3xl { width: 48px; height: 48px; }
+.kindi-icon--white * { stroke: #fff !important; }
+
+.kindi-section { margin-block: 3rem; }
+@media (min-width: 640px) { .kindi-section { margin-block: 5rem; } }
+
+.kindi-sechead { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+@media (min-width: 640px) { .kindi-sechead { margin-bottom: 2rem; } }
+.kindi-sechead__text { max-width: 36rem; text-align: right; }
+.kindi-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; font-weight: 700;
+  color: var(--brand-red); background: color-mix(in oklab, var(--brand-red) 10%, transparent);
+  padding: 0.25rem 0.75rem; border-radius: 999px; margin-bottom: 0.5rem;
+}
+.kindi-sec-title {
+  font-family: var(--wp--preset--font-family--display); font-weight: 900; line-height: 1.1;
+  color: var(--brand-navy); font-size: clamp(1.5rem, 1.2rem + 1.6vw, 2.25rem); margin: 0;
+}
+.kindi-hl { color: var(--brand-red); }
+.kindi-sec-desc { margin-top: 0.5rem; font-size: 0.875rem; color: color-mix(in oklab, var(--brand-navy) 65%, transparent); }
+.kindi-sec-cta {
+  display: inline-flex; align-items: center; gap: 0.375rem; white-space: nowrap; font-weight: 700;
+  font-size: 0.875rem; color: var(--brand-navy);
+}
+.kindi-sec-cta:hover { color: var(--brand-red); }
+
+/* ============================ Buttons ============================ */
+.kindi-btn { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; border-radius: 1rem; padding: 0.75rem 1.5rem; text-decoration: none; transition: all 0.2s; cursor: pointer; border: 0; }
+.kindi-btn--red { background: var(--brand-red); color: #fff; box-shadow: var(--shadow-pop); }
+.kindi-btn--red:hover { background: var(--brand-red-dark); transform: scale(1.03); color: #fff; }
+.kindi-btn--ghost { background: rgba(255,255,255,0.8); color: var(--brand-navy); border: 2px solid color-mix(in oklab, var(--brand-navy) 15%, transparent); }
+.kindi-btn--ghost:hover { background: #fff; color: var(--brand-navy); }
+
+/* ============================ Hero ============================ */
+.kindi-hero {
+  position: relative; overflow: hidden; border-radius: 2rem; padding: 1.5rem;
+  border: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); box-shadow: var(--shadow-card);
+  background: linear-gradient(to bottom left, var(--brand-blue-soft), #fff 50%, color-mix(in oklab, var(--brand-red-soft) 50%, transparent));
+}
+@media (min-width: 640px) { .kindi-hero { padding: 2rem; } }
+@media (min-width: 1024px) { .kindi-hero { padding: 2.5rem 3rem; } }
+.kindi-hero__blob { position: absolute; border-radius: 999px; filter: blur(64px); pointer-events: none; }
+.kindi-hero__blob--1 { top: -10rem; right: 25%; width: 26rem; height: 26rem; background: color-mix(in oklab, var(--brand-blue) 20%, transparent); }
+.kindi-hero__blob--2 { bottom: -10rem; left: 25%; width: 29rem; height: 29rem; background: color-mix(in oklab, var(--brand-red) 15%, transparent); }
+.kindi-hero__dots { position: absolute; inset: 0; opacity: 0.06; pointer-events: none; background-image: radial-gradient(circle, #1B2A52 1.2px, transparent 1.2px); background-size: 22px 22px; }
+.kindi-hero__grid { position: relative; display: grid; gap: 1.5rem; align-items: center; }
+@media (min-width: 1024px) { .kindi-hero__grid { grid-template-columns: 1.1fr 1fr; } }
+.kindi-hero__copy { text-align: right; position: relative; z-index: 10; display: flex; flex-direction: column; gap: 1rem; }
+.kindi-hero__badge { align-self: flex-start; display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.9); border: 1px solid color-mix(in oklab, var(--brand-blue) 30%, transparent); color: var(--brand-navy); padding: 0.375rem 1rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; box-shadow: var(--shadow-card); }
+.kindi-hero__dot { width: 0.5rem; height: 0.5rem; border-radius: 999px; background: var(--brand-red); }
+.kindi-hero__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; line-height: 1.05; color: var(--brand-navy); font-size: clamp(1.875rem, 1.3rem + 3vw, 3rem); margin: 0; }
+.kindi-hero__underline { position: relative; display: inline-block; color: var(--brand-red); }
+.kindi-hero__underline::after { content: ""; position: absolute; inset-inline: 0; bottom: 0.25rem; height: 0.75rem; background: var(--brand-red-soft); border-radius: 4px; z-index: -1; }
+.kindi-hero__blue { color: var(--brand-blue); }
+.kindi-hero__lead { font-size: 1rem; color: color-mix(in oklab, var(--brand-navy) 75%, transparent); max-width: 32rem; line-height: 1.7; font-weight: 500; }
+.kindi-hero__cta { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.kindi-hero__trust { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.25rem; padding-top: 0.75rem; margin-top: 0.5rem; border-top: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); }
+.kindi-hero__rating { display: inline-flex; align-items: center; gap: 2px; font-size: 0.875rem; color: var(--brand-navy); }
+.kindi-hero__rating b { margin-inline-start: 0.25rem; font-weight: 800; }
+.kindi-hero__rating small { color: color-mix(in oklab, var(--brand-navy) 65%, transparent); font-size: 0.75rem; }
+.kindi-hero__trust-item { display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.75rem; font-weight: 600; color: color-mix(in oklab, var(--brand-navy) 75%, transparent); }
+.kindi-hero__visual { position: relative; z-index: 10; display: none; }
+@media (min-width: 1024px) { .kindi-hero__visual { display: block; aspect-ratio: 1; max-width: 520px; margin-inline: auto; } }
+.kindi-hero__visual .kindi-spark { position: absolute; }
+.kindi-hero__mascot { position: relative; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 18px 22px rgba(27,42,82,0.18)); }
+.kindi-hero__pill { position: absolute; z-index: 20; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 1rem; box-shadow: var(--shadow-pop); }
+.kindi-hero__pill small { display: block; font-size: 10px; line-height: 1; opacity: 0.7; }
+.kindi-hero__pill b { display: block; font-size: 0.75rem; font-weight: 800; margin-top: 2px; }
+.kindi-hero__pill--top { top: 0.5rem; right: 0; background: rgba(255,255,255,0.95); color: var(--brand-navy); border: 1px solid color-mix(in oklab, var(--brand-blue) 20%, transparent); }
+.kindi-hero__pill--bottom { bottom: 1.5rem; left: 0; background: var(--brand-navy); color: #fff; }
+.kindi-hero__pill--bottom small { opacity: 0.8; }
+
+/* ============================ USP strip ============================ */
+.kindi-usp { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+@media (min-width: 640px) { .kindi-usp { gap: 1rem; } }
+@media (min-width: 1024px) { .kindi-usp { grid-template-columns: repeat(4, 1fr); } }
+.kindi-usp__item {
+  display: flex; align-items: center; gap: 0.75rem; background: #fff;
+  border: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent);
+  border-radius: 1rem; padding: 1rem; box-shadow: var(--shadow-card); transition: all 0.25s;
+}
+.kindi-usp__item:hover { box-shadow: var(--shadow-pop); transform: translateY(-2px); }
+.kindi-usp__ic { width: 3rem; height: 3rem; border-radius: 0.75rem; background: var(--brand-blue-soft); display: grid; place-items: center; flex-shrink: 0; }
+.kindi-usp__title { font-weight: 800; color: var(--brand-navy); font-size: 0.875rem; }
+.kindi-usp__sub { font-size: 0.75rem; color: var(--muted-foreground); }
+
+/* ============================ Category grid ============================ */
+.kindi-cats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+@media (min-width: 640px) { .kindi-cats { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; } }
+@media (min-width: 768px) { .kindi-cats { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1024px) { .kindi-cats { grid-template-columns: repeat(6, 1fr); } }
+.kindi-cat {
+  --acc: var(--brand-red);
+  position: relative; display: flex; flex-direction: column; background: #fff; border-radius: 1rem;
+  overflow: hidden; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+  transition: all 0.3s; text-decoration: none;
+}
+.kindi-cat--red { --acc: var(--brand-red); }
+.kindi-cat--navy { --acc: var(--brand-navy); }
+.kindi-cat--blue { --acc: var(--brand-blue); }
+.kindi-cat:hover { box-shadow: var(--shadow-pop); transform: translateY(-6px); border-color: rgba(0,0,0,0.1); }
+.kindi-cat__media { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--brand-blue-soft); }
+.kindi-cat__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease-out; }
+.kindi-cat:hover .kindi-cat__media img { transform: scale(1.12); }
+.kindi-cat__tint { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.15), transparent 60%); opacity: 0.6; transition: opacity 0.5s; }
+.kindi-cat:hover .kindi-cat__tint { opacity: 0; }
+.kindi-cat__pill {
+  position: absolute; bottom: 0.5rem; left: 50%; transform: translate(-50%, 0.75rem); opacity: 0;
+  color: #fff; background: var(--acc); font-size: 11px; font-weight: 800; padding: 0.25rem 0.75rem;
+  border-radius: 999px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2); white-space: nowrap; transition: all 0.3s;
+}
+.kindi-cat:hover .kindi-cat__pill { transform: translate(-50%, 0); opacity: 1; }
+.kindi-cat__bar { position: relative; height: 4px; background: rgba(0,0,0,0.04); overflow: hidden; }
+.kindi-cat__bar::after { content: ""; position: absolute; inset-block: 0; right: 0; width: 25%; background: var(--acc); transition: width 0.5s ease-out; }
+.kindi-cat:hover .kindi-cat__bar::after { width: 100%; }
+.kindi-cat__name { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0.75rem 0.5rem; }
+.kindi-cat__name b { font-family: var(--wp--preset--font-family--display); font-weight: 900; line-height: 1; font-size: 1.125rem; color: var(--brand-navy); transition: color 0.2s; }
+@media (min-width: 640px) { .kindi-cat__name b { font-size: 1.25rem; } }
+.kindi-cat:hover .kindi-cat__name b { color: var(--acc); }
+.kindi-cat__count { margin-top: 0.375rem; font-size: 11px; font-weight: 700; color: color-mix(in oklab, var(--brand-navy) 50%, transparent); }
+
+/* ============================ Promo banners ============================ */
+.kindi-promos { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1rem; grid-auto-rows: 210px; }
+.kindi-promo {
+  position: relative; overflow: hidden; border-radius: 1.5rem; padding: 1.25rem; display: flex;
+  flex-direction: column; gap: 0.75rem; box-shadow: var(--shadow-card); transition: all 0.3s; text-decoration: none;
+  grid-column: span 6;
+}
+@media (min-width: 640px) { .kindi-promo { padding: 1.5rem; } }
+.kindi-promo:hover { box-shadow: var(--shadow-pop); transform: translateY(-4px); }
+.kindi-promo--big { grid-column: span 12; }
+@media (min-width: 768px) {
+  .kindi-promo--big { grid-column: span 8; grid-row: span 2; }
+  .kindi-promo--sm { grid-column: span 4; }
+}
+.kindi-promo--navy { background: linear-gradient(to bottom left, var(--brand-navy), var(--brand-navy-dark)); color: #fff; }
+.kindi-promo--blue { background: linear-gradient(to bottom left, var(--brand-blue-soft), #fff, var(--brand-blue-soft)); color: var(--brand-navy); border: 1px solid color-mix(in oklab, var(--brand-blue) 20%, transparent); }
+.kindi-promo--red { background: linear-gradient(to bottom left, color-mix(in oklab, var(--brand-red-soft) 40%, transparent), #fff, color-mix(in oklab, var(--brand-red-soft) 30%, transparent)); color: var(--brand-navy); border: 1px solid color-mix(in oklab, var(--brand-red) 20%, transparent); }
+.kindi-promo__img { position: absolute; left: 1.25rem; top: 1.25rem; bottom: 1.25rem; width: 48%; height: calc(100% - 40px); object-fit: cover; border-radius: 1rem; transition: transform 0.5s; }
+.kindi-promo--big .kindi-promo__img { width: 52%; }
+.kindi-promo:hover .kindi-promo__img { transform: scale(1.05); }
+.kindi-promo__body { position: relative; z-index: 10; max-width: 58%; display: flex; flex-direction: column; gap: 0.375rem; }
+.kindi-promo--big .kindi-promo__body { max-width: 52%; }
+.kindi-promo__badge { display: inline-flex; align-items: center; gap: 0.375rem; align-self: flex-start; font-size: 11px; font-weight: 700; padding: 0.25rem 0.625rem; border-radius: 999px; }
+.kindi-promo--navy .kindi-promo__badge { background: rgba(255,255,255,0.15); color: #fff; }
+.kindi-promo--blue .kindi-promo__badge { background: var(--brand-navy); color: #fff; }
+.kindi-promo--red .kindi-promo__badge { background: var(--brand-red); color: #fff; }
+.kindi-promo__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; line-height: 1.15; font-size: 1.125rem; margin: 0; }
+.kindi-promo--big .kindi-promo__title { font-size: clamp(1.5rem, 1.1rem + 2vw, 2.25rem); }
+.kindi-promo__title span { color: var(--brand-red); }
+.kindi-promo__sub { font-size: 0.8125rem; opacity: 0.8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.kindi-promo--big .kindi-promo__sub { font-size: 0.9375rem; }
+.kindi-promo__cta { margin-top: 0.25rem; align-self: flex-start; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.875rem; border-radius: 999px; padding: 0.5rem 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.3s; }
+.kindi-promo--navy .kindi-promo__cta { background: #fff; color: var(--brand-navy); }
+.kindi-promo--navy .kindi-promo__cta:hover { background: var(--brand-red); color: #fff; }
+.kindi-promo--blue .kindi-promo__cta, .kindi-promo--red .kindi-promo__cta { background: var(--brand-red); color: #fff; }
+.kindi-promo--blue .kindi-promo__cta:hover, .kindi-promo--red .kindi-promo__cta:hover { background: var(--brand-red-dark); }
+
+/* ============================ Age rail ============================ */
+.kindi-ages { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+@media (min-width: 640px) { .kindi-ages { grid-template-columns: repeat(5, 1fr); gap: 1rem; } }
+.kindi-age {
+  position: relative; overflow: hidden; border-radius: 1rem; background: #fff;
+  border: 2px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); padding: 1.25rem;
+  text-align: center; transition: all 0.3s; box-shadow: var(--shadow-card); text-decoration: none; display: block;
+}
+.kindi-age:hover { border-color: var(--brand-red); transform: translateY(-4px); box-shadow: var(--shadow-pop); }
+.kindi-age__ic { margin: 0 auto 0.75rem; width: 4rem; height: 4rem; border-radius: 1rem; background: var(--brand-blue-soft); display: grid; place-items: center; transition: transform 0.3s, background 0.3s; }
+.kindi-age:hover .kindi-age__ic { transform: scale(1.1) rotate(-6deg); background: color-mix(in oklab, var(--brand-red) 10%, transparent); }
+.kindi-age__range { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.5rem; color: var(--brand-navy); }
+.kindi-age__label { font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-top: 0.25rem; }
+
+/* ============================ Brands ============================ */
+.kindi-brands { background: #fff; border-radius: 1.5rem; border: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); padding: 1.5rem; box-shadow: var(--shadow-card); }
+@media (min-width: 640px) { .kindi-brands { padding: 2rem; } }
+.kindi-brands__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+@media (min-width: 640px) { .kindi-brands__grid { grid-template-columns: repeat(4, 1fr); gap: 1rem; } }
+@media (min-width: 1024px) { .kindi-brands__grid { grid-template-columns: repeat(6, 1fr); } }
+.kindi-brand {
+  height: 4rem; border-radius: 0.75rem; background: color-mix(in oklab, var(--brand-blue-soft) 60%, #fff);
+  border: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); display: grid; place-items: center;
+  font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy);
+  font-size: 0.875rem; transition: all 0.2s; cursor: pointer;
+}
+@media (min-width: 640px) { .kindi-brand { font-size: 1rem; } }
+.kindi-brand:hover { background: var(--brand-blue-soft); border-color: color-mix(in oklab, var(--brand-blue) 40%, transparent); transform: scale(1.05); }
+
+/* ============================ Kindy Zone (club) ============================ */
+.kindi-zone {
+  position: relative; overflow: hidden; border-radius: 2rem; color: #fff;
+  background: linear-gradient(to bottom left, var(--brand-navy), var(--brand-navy-dark), var(--brand-navy));
+  padding: 2rem; display: grid; gap: 2rem; align-items: center; box-shadow: var(--shadow-pop);
+}
+@media (min-width: 1024px) { .kindi-zone { grid-template-columns: 1fr 1fr; padding: 4rem; } }
+.kindi-zone__blob { position: absolute; width: 24rem; height: 24rem; border-radius: 999px; filter: blur(64px); pointer-events: none; }
+.kindi-zone__blob--1 { top: -8rem; left: -8rem; background: color-mix(in oklab, var(--brand-red) 30%, transparent); }
+.kindi-zone__blob--2 { bottom: -8rem; right: -8rem; background: color-mix(in oklab, var(--brand-blue) 35%, transparent); }
+.kindi-zone__body { position: relative; z-index: 10; text-align: right; }
+.kindi-zone__badge { display: inline-flex; align-items: center; gap: 0.375rem; background: var(--brand-red); color: #fff; padding: 0.375rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800; }
+.kindi-zone__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: clamp(1.875rem, 1.3rem + 3vw, 3rem); margin: 1rem 0 0; line-height: 1.15; color: #fff; }
+.kindi-zone__title mark { background: var(--brand-red); color: #fff; padding: 0 0.5rem; border-radius: 0.5rem; }
+.kindi-zone__lead { color: rgba(255,255,255,0.85); margin-top: 1rem; font-size: 1.0625rem; max-width: 28rem; }
+.kindi-zone__benefits { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-top: 1.5rem; max-width: 28rem; }
+.kindi-zone__benefit { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 600; }
+.kindi-zone__check { width: 1.5rem; height: 1.5rem; border-radius: 999px; background: var(--brand-red); display: grid; place-items: center; flex-shrink: 0; }
+.kindi-zone__cta {
+  margin-top: 1.75rem; background: var(--brand-red); color: #fff; padding: 1rem 1.75rem; border-radius: 1rem;
+  font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: var(--shadow-pop);
+  transition: transform 0.2s, background 0.2s; border: 0; cursor: pointer;
+}
+.kindi-zone__cta:hover { background: var(--brand-red-dark); transform: scale(1.03); }
+.kindi-zone__stage { position: relative; z-index: 10; min-height: 24rem; display: flex; align-items: flex-end; justify-content: center; }
+.kindi-zone__halo { position: absolute; bottom: 2.5rem; width: 18rem; height: 18rem; border-radius: 999px; background: linear-gradient(to bottom right, color-mix(in oklab, var(--brand-blue) 70%, transparent), color-mix(in oklab, var(--brand-red) 40%, transparent)); filter: blur(40px); }
+.kindi-zone__mascot { position: relative; height: 100%; max-height: 30rem; width: auto; object-fit: contain; filter: drop-shadow(0 14px 18px rgba(0,0,0,0.45)); }
+
+/* ============================ Testimonials ============================ */
+.kindi-tst { display: grid; gap: 1rem; }
+@media (min-width: 768px) { .kindi-tst { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; } }
+.kindi-tst__card { position: relative; background: #fff; border: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); border-radius: 1.5rem; padding: 1.5rem; box-shadow: var(--shadow-card); transition: all 0.3s; }
+.kindi-tst__card:hover { box-shadow: var(--shadow-pop); transform: translateY(-4px); }
+.kindi-tst__stars { display: flex; gap: 2px; margin-bottom: 0.75rem; }
+.kindi-tst__text { font-size: 0.875rem; color: var(--foreground); line-height: 1.7; margin-bottom: 1.25rem; }
+.kindi-tst__foot { display: flex; align-items: center; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); }
+.kindi-tst__avatar { width: 2.75rem; height: 2.75rem; border-radius: 999px; background: linear-gradient(to bottom right, var(--brand-red), var(--brand-navy)); color: #fff; display: grid; place-items: center; font-weight: 900; font-size: 1.125rem; flex-shrink: 0; }
+.kindi-tst__name { font-weight: 800; color: var(--brand-navy); font-size: 0.875rem; }
+.kindi-tst__role { font-size: 0.75rem; color: var(--muted-foreground); }
+
+/* ============================ Values ============================ */
+.kindi-values__head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.5rem; }
+@media (min-width: 640px) { .kindi-values__head { margin-bottom: 2rem; } }
+.kindi-values__mascot { width: 5rem; height: 5rem; object-fit: contain; display: none; }
+@media (min-width: 768px) { .kindi-values__mascot { display: block; } }
+.kindi-values { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+@media (min-width: 640px) { .kindi-values { gap: 1.25rem; } }
+@media (min-width: 1024px) { .kindi-values { grid-template-columns: repeat(4, 1fr); } }
+.kindi-value {
+  --acc: var(--brand-red);
+  position: relative; background: #fff; border-radius: 1.5rem; padding: 1.25rem; overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.06); box-shadow: var(--shadow-card); transition: all 0.3s;
+}
+@media (min-width: 640px) { .kindi-value { padding: 1.5rem; } }
+.kindi-value--red { --acc: var(--brand-red); }
+.kindi-value--navy { --acc: var(--brand-navy); }
+.kindi-value--blue { --acc: var(--brand-blue); }
+.kindi-value:hover { box-shadow: var(--shadow-pop); transform: translateY(-6px); border-color: color-mix(in oklab, var(--acc) 40%, transparent); }
+.kindi-value__bar { position: absolute; top: 0; right: 1.5rem; left: 1.5rem; height: 4px; border-radius: 0 0 999px 999px; background: var(--acc); opacity: 0.8; }
+.kindi-value__top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
+.kindi-value__ic { width: 3.5rem; height: 3.5rem; border-radius: 1rem; background: var(--acc); display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 0 0 8px color-mix(in oklab, var(--acc) 15%, transparent); transition: transform 0.3s; }
+.kindi-value:hover .kindi-value__ic { transform: scale(1.1) rotate(-6deg); }
+.kindi-value__chip { font-size: 10px; font-weight: 900; letter-spacing: 0.05em; padding: 0.25rem 0.5rem; border-radius: 999px; color: var(--acc); background: color-mix(in oklab, var(--acc) 12%, transparent); }
+.kindi-value__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.25rem; color: var(--brand-navy); margin: 0 0 0.375rem; line-height: 1.2; }
+.kindi-value__body { font-size: 0.875rem; color: color-mix(in oklab, var(--brand-navy) 70%, transparent); line-height: 1.6; }
+
+/* ============================ Store info ============================ */
+.kindi-store { display: grid; gap: 1.5rem; }
+.kindi-store__card {
+  position: relative; overflow: hidden; border-radius: 2rem; color: #fff;
+  background: linear-gradient(to left, var(--brand-navy), var(--brand-navy-dark), var(--brand-blue));
+  padding: 2rem; display: grid; gap: 2rem; align-items: center; box-shadow: var(--shadow-pop);
+}
+@media (min-width: 1024px) { .kindi-store__card { grid-template-columns: 1fr 1fr; padding: 3rem; } }
+.kindi-store__body { position: relative; z-index: 10; text-align: right; }
+.kindi-store__badge { display: inline-flex; align-items: center; gap: 0.375rem; background: var(--brand-red); color: #fff; padding: 0.375rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800; }
+.kindi-store__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: clamp(1.875rem, 1.3rem + 3vw, 3rem); margin: 1rem 0 0; line-height: 1.15; color: #fff; }
+.kindi-store__title mark { background: var(--brand-red); color: #fff; padding: 0 0.5rem; border-radius: 0.5rem; }
+.kindi-store__lead { color: rgba(255,255,255,0.9); margin-top: 1rem; max-width: 28rem; }
+.kindi-store__details { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.kindi-store__detail { display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem; }
+.kindi-store__detail-ic { width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; background: rgba(255,255,255,0.2); display: grid; place-items: center; flex-shrink: 0; }
+.kindi-store__cta { margin-top: 1.75rem; background: var(--brand-red); color: #fff; padding: 1rem 1.75rem; border-radius: 1rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); transition: transform 0.2s, background 0.2s; border: 0; cursor: pointer; }
+.kindi-store__cta:hover { background: var(--brand-red-dark); transform: scale(1.03); }
+.kindi-store__media { position: relative; z-index: 10; aspect-ratio: 4/3; border-radius: 1rem; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; background: linear-gradient(to bottom, color-mix(in oklab, var(--brand-blue) 40%, transparent), var(--brand-navy)); }
+.kindi-store__mascot { position: relative; z-index: 10; height: 92%; width: auto; object-fit: contain; filter: drop-shadow(0 14px 18px rgba(0,0,0,0.45)); }
+.kindi-store__here { position: absolute; top: 0.75rem; right: 0.75rem; z-index: 20; background: #fff; color: var(--brand-navy); padding: 0.375rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800; box-shadow: var(--shadow-pop); display: inline-flex; align-items: center; gap: 0.375rem; }
+
+/* Newsletter */
+.kindi-news { border-radius: 2rem; background: linear-gradient(to bottom left, var(--brand-blue-soft), #fff, color-mix(in oklab, var(--brand-blue-soft) 60%, #fff)); border: 1px solid color-mix(in oklab, var(--brand-blue) 20%, transparent); padding: 2rem; display: grid; gap: 1.5rem; align-items: center; box-shadow: var(--shadow-card); }
+@media (min-width: 768px) { .kindi-news { grid-template-columns: 1fr 1fr; padding: 2.5rem; } }
+.kindi-news__body { text-align: right; color: var(--brand-navy); }
+.kindi-news__badge { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--brand-red); color: #fff; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800; margin-bottom: 0.75rem; }
+.kindi-news__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: clamp(1.5rem, 1.2rem + 1.5vw, 1.875rem); line-height: 1.2; margin: 0; color: var(--brand-navy); }
+.kindi-news__sub { margin-top: 0.5rem; font-size: 0.875rem; color: color-mix(in oklab, var(--brand-navy) 80%, transparent); }
+.kindi-news__form { display: flex; flex-direction: column; gap: 0.5rem; background: #fff; padding: 0.5rem; border-radius: 1rem; box-shadow: var(--shadow-pop); }
+@media (min-width: 640px) { .kindi-news__form { flex-direction: row; } }
+.kindi-news__field { display: flex; align-items: center; gap: 0.5rem; flex: 1; padding-inline: 0.75rem; }
+.kindi-news__field input { flex: 1; background: transparent; border: 0; outline: none; padding-block: 0.75rem; font-size: 0.875rem; text-align: right; font-family: inherit; }
+.kindi-news__btn { background: var(--brand-red); color: #fff; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-weight: 700; white-space: nowrap; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 0.375rem; justify-content: center; }
+.kindi-news__btn:hover { background: var(--brand-red-dark); }
+
+/* Shared mascot stage helpers */
+.kindi-ground-shadow { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); width: 13rem; height: 0.75rem; border-radius: 50%; background: rgba(0,0,0,0.45); filter: blur(8px); }
+.kindi-zone__stage .kindi-spark { position: absolute; }
+.kindi-tst__quote { position: absolute; top: -0.75rem; right: 1.5rem; font-family: var(--wp--preset--font-family--display); font-size: 3rem; line-height: 1; color: var(--brand-red); }
+
+/* ============================ Floating buttons ============================ */
+.kindi-float { position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 50; width: 3.5rem; height: 3.5rem; border-radius: 999px; display: grid; place-items: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); transition: transform 0.2s; }
+.kindi-float:hover { transform: scale(1.1); }
+.kindi-float--a11y { left: 6rem; bottom: 1.5rem; width: 3rem; height: 3rem; background: var(--brand-navy); color: #fff; border: 0; cursor: pointer; }

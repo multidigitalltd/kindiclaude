@@ -39,6 +39,7 @@ add_action( 'after_setup_theme', 'kindi_setup' );
 function kindi_editor_assets(): void {
 	add_editor_style( 'assets/css/base.css' );
 	add_editor_style( 'assets/css/components.css' );
+	add_editor_style( 'assets/css/sections.css' );
 	add_editor_style( 'assets/css/animations.css' );
 }
 add_action( 'after_setup_theme', 'kindi_editor_assets' );

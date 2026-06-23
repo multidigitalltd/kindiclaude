@@ -3,46 +3,28 @@
  * Title: USP Strip
  * Slug: kindi/usp-strip
  * Categories: kindi
- * Description: רצועת יתרונות — משלוח, תשלום מאובטח, שירות ומועדון.
+ * Description: רצועת יתרונות — משלוח, החזרה, תשלום מאובטח, מועדון.
  *
  * @package Kindi
  */
 
+$kindi_usps = array(
+	array( 'icon' => 'truck', 'title' => 'משלוח חינם', 'sub' => 'בהזמנה מעל 299 ₪' ),
+	array( 'icon' => 'rotate', 'title' => 'החזרה קלה', 'sub' => '14 יום ללא התחייבות' ),
+	array( 'icon' => 'shield', 'title' => 'תשלום מאובטח', 'sub' => 'SSL + אישור PCI' ),
+	array( 'icon' => 'gift', 'title' => 'מועדון קינדי', 'sub' => 'נקודות, הנחות ומתנות' ),
+);
 ?>
-<!-- wp:columns {"className":"kindi-usp","style":{"spacing":{"padding":{"top":"1.25rem","bottom":"1.25rem","left":"1.5rem","right":"1.5rem"},"blockGap":{"left":"1.5rem"}},"border":{"radius":"1.25rem"}},"backgroundColor":"white"} -->
-<div class="wp-block-columns kindi-usp has-white-background-color has-background" style="border-radius:1.25rem;padding-top:1.25rem;padding-right:1.5rem;padding-bottom:1.25rem;padding-left:1.5rem">
-
-	<!-- wp:column -->
-	<div class="wp-block-column">
-		<!-- wp:paragraph {"align":"center","style":{"typography":{"fontWeight":"700","fontSize":"0.9375rem"}},"textColor":"brand-navy"} -->
-		<p class="has-text-align-center has-brand-navy-color has-text-color" style="font-size:0.9375rem;font-weight:700">🚚 משלוח חינם מעל 299 ₪</p>
-		<!-- /wp:paragraph -->
+<!-- wp:html -->
+<section class="kindi-usp" aria-label="יתרונות">
+	<?php foreach ( $kindi_usps as $u ) : ?>
+	<div class="kindi-usp__item">
+		<span class="kindi-usp__ic"><?php echo kindi_icon( $u['icon'], 'kindi-icon--xl' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+		<span>
+			<span class="kindi-usp__title"><?php echo esc_html( $u['title'] ); ?></span><br>
+			<span class="kindi-usp__sub"><?php echo esc_html( $u['sub'] ); ?></span>
+		</span>
 	</div>
-	<!-- /wp:column -->
-
-	<!-- wp:column -->
-	<div class="wp-block-column">
-		<!-- wp:paragraph {"align":"center","style":{"typography":{"fontWeight":"700","fontSize":"0.9375rem"}},"textColor":"brand-navy"} -->
-		<p class="has-text-align-center has-brand-navy-color has-text-color" style="font-size:0.9375rem;font-weight:700">🔒 תשלום מאובטח SSL + PCI</p>
-		<!-- /wp:paragraph -->
-	</div>
-	<!-- /wp:column -->
-
-	<!-- wp:column -->
-	<div class="wp-block-column">
-		<!-- wp:paragraph {"align":"center","style":{"typography":{"fontWeight":"700","fontSize":"0.9375rem"}},"textColor":"brand-navy"} -->
-		<p class="has-text-align-center has-brand-navy-color has-text-color" style="font-size:0.9375rem;font-weight:700">🎁 מועדון קינדי — 5% חזרה</p>
-		<!-- /wp:paragraph -->
-	</div>
-	<!-- /wp:column -->
-
-	<!-- wp:column -->
-	<div class="wp-block-column">
-		<!-- wp:paragraph {"align":"center","style":{"typography":{"fontWeight":"700","fontSize":"0.9375rem"}},"textColor":"brand-navy"} -->
-		<p class="has-text-align-center has-brand-navy-color has-text-color" style="font-size:0.9375rem;font-weight:700">📞 שירות אישי 03-5293383</p>
-		<!-- /wp:paragraph -->
-	</div>
-	<!-- /wp:column -->
-
-</div>
-<!-- /wp:columns -->
+	<?php endforeach; ?>
+</section>
+<!-- /wp:html -->

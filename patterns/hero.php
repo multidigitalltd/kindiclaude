@@ -9,57 +9,45 @@
  */
 
 ?>
-<!-- wp:group {"className":"kindi-hero","style":{"border":{"radius":"1.5rem"},"spacing":{"padding":{"top":"2.5rem","bottom":"2.5rem","left":"2rem","right":"2rem"}}},"layout":{"type":"constrained","contentSize":"1440px"}} -->
-<div class="wp-block-group kindi-hero" style="border-radius:1.5rem;padding-top:2.5rem;padding-right:2rem;padding-bottom:2.5rem;padding-left:2rem">
-	<!-- wp:columns {"verticalAlignment":"center"} -->
-	<div class="wp-block-columns are-vertically-aligned-center">
+<!-- wp:html -->
+<section class="kindi-section kindi-hero">
+	<span class="kindi-hero__blob kindi-hero__blob--1" aria-hidden="true"></span>
+	<span class="kindi-hero__blob kindi-hero__blob--2" aria-hidden="true"></span>
+	<span class="kindi-hero__dots" aria-hidden="true"></span>
 
-		<!-- wp:column {"verticalAlignment":"center","width":"55%"} -->
-		<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:55%">
+	<div class="kindi-hero__grid">
+		<div class="kindi-hero__copy">
+			<span class="kindi-hero__badge"><span class="kindi-hero__dot" aria-hidden="true"></span>חדש בקינדר טויס • קולקציית 2026</span>
+			<h1 class="kindi-hero__title">עולם של <span class="kindi-hero__underline">קסם, משחק ויצירה</span><br><span class="kindi-hero__blue">בלחיצה אחת</span></h1>
+			<p class="kindi-hero__lead">אלפי צעצועים, משחקים, חומרי יצירה וציוד לבית הספר ולגן — משלוח מהיר ושירות אישי מהלב.</p>
 
-			<!-- wp:group {"className":"kindi-hero__badge","style":{"border":{"radius":"999px"},"spacing":{"padding":{"top":"0.375rem","bottom":"0.375rem","left":"1rem","right":"1rem"}}},"backgroundColor":"white","layout":{"type":"flex","verticalAlignment":"center"}} -->
-			<div class="wp-block-group kindi-hero__badge has-white-background-color has-background" style="border-radius:999px;padding-top:0.375rem;padding-right:1rem;padding-bottom:0.375rem;padding-left:1rem">
-				<!-- wp:paragraph {"style":{"typography":{"fontSize":"0.75rem","fontWeight":"700"}},"textColor":"brand-navy"} -->
-				<p class="has-brand-navy-color has-text-color" style="font-size:0.75rem;font-weight:700">חדש בקינדר טויס • קולקציית 2026</p>
-				<!-- /wp:paragraph -->
+			<div class="kindi-hero__cta">
+				<a class="kindi-btn kindi-btn--red" href="/shop/?on_sale=1">לכל המבצעים החמים<?php echo kindi_icon( 'arrowleft', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
+				<a class="kindi-btn kindi-btn--ghost" href="/shop/"><?php echo kindi_icon( 'play', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>לכל המוצרים</a>
 			</div>
-			<!-- /wp:group -->
 
-			<!-- wp:heading {"level":1,"className":"kindi-hero__title","style":{"typography":{"fontFamily":"var:preset|font-family|display","fontWeight":"900","lineHeight":"1.05"}}} -->
-			<h1 class="wp-block-heading kindi-hero__title" style="font-weight:900;line-height:1.05">עולם של <span class="has-brand-red-color has-text-color">קסם, משחק ויצירה</span><br><span class="has-brand-blue-color has-text-color">בלחיצה אחת</span></h1>
-			<!-- /wp:heading -->
-
-			<!-- wp:paragraph {"style":{"typography":{"fontWeight":"500"},"color":{"text":"#1b2a52bf"}}} -->
-			<p style="color:#1b2a52bf;font-weight:500">אלפי צעצועים, משחקים, חומרי יצירה וציוד לבית הספר ולגן — משלוח מהיר ושירות אישי מהלב.</p>
-			<!-- /wp:paragraph -->
-
-			<!-- wp:buttons {"style":{"spacing":{"blockGap":"0.75rem"}}} -->
-			<div class="wp-block-buttons">
-				<!-- wp:button {"backgroundColor":"brand-red","style":{"border":{"radius":"1rem"}}} -->
-				<div class="wp-block-button"><a class="wp-block-button__link has-brand-red-background-color has-background wp-element-button" style="border-radius:1rem" href="/shop/?orderby=popularity">לכל המבצעים החמים</a></div>
-				<!-- /wp:button -->
-				<!-- wp:button {"textColor":"brand-navy","className":"is-style-outline","style":{"border":{"radius":"1rem"}}} -->
-				<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-brand-navy-color has-text-color wp-element-button" style="border-radius:1rem" href="/shop/">לכל המוצרים</a></div>
-				<!-- /wp:button -->
+			<div class="kindi-hero__trust">
+				<span class="kindi-hero__rating">
+					<?php for ( $i = 0; $i < 5; $i++ ) {
+						echo kindi_icon( 'star', 'kindi-icon--xs' ); // phpcs:ignore WordPress.Security.EscapeOutput
+					} ?>
+					<b>4.9</b> <small>(+50,000 הורים)</small>
+				</span>
+				<span class="kindi-hero__trust-item"><?php echo kindi_icon( 'truck', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>משלוח מחר עד הבית</span>
+				<span class="kindi-hero__trust-item"><?php echo kindi_icon( 'sparkles', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>+10,000 מוצרים במלאי</span>
 			</div>
-			<!-- /wp:buttons -->
-
-			<!-- wp:paragraph {"style":{"typography":{"fontSize":"0.8125rem","fontWeight":"600"}},"textColor":"brand-navy"} -->
-			<p class="has-brand-navy-color has-text-color" style="font-size:0.8125rem;font-weight:600">★★★★★ 4.9 (+50,000 הורים) &nbsp;·&nbsp; משלוח מחר עד הבית &nbsp;·&nbsp; +10,000 מוצרים במלאי</p>
-			<!-- /wp:paragraph -->
-
 		</div>
-		<!-- /wp:column -->
 
-		<!-- wp:column {"verticalAlignment":"center"} -->
-		<div class="wp-block-column is-vertically-aligned-center">
-			<!-- wp:image {"className":"kindi-hero__mascot animate-mascot","sizeSlug":"large","linkDestination":"none"} -->
-			<figure class="wp-block-image size-large kindi-hero__mascot animate-mascot"><img src="<?php echo esc_url( get_template_directory_uri() . '/assets/img/kindy-hero.png' ); ?>" alt="קינדי מציג את עולם המוצרים בקינדר טויס — צעצועים, ילקוטים, יצירה ומשחקי קופסה"/></figure>
-			<!-- /wp:image -->
+		<div class="kindi-hero__visual">
+			<span class="kindi-spark animate-sparkle" style="top:4%;left:12%"><?php echo kindi_icon( 'sparkles', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+			<span class="kindi-spark animate-sparkle" style="top:32%;right:-2%;animation-delay:0.8s"><?php echo kindi_icon( 'star', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+			<span class="kindi-spark animate-sparkle" style="bottom:24%;left:4%;animation-delay:1.4s"><?php echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+			<span class="kindi-ground-shadow animate-ground"></span>
+			<img class="kindi-hero__mascot animate-mascot" src="<?php echo kindi_img( 'kindy-hero.png' ); ?>" width="520" height="520" alt="קינדי מציג את עולם המוצרים בקינדר טויס — צעצועים, ילקוטים, יצירה ומשחקי קופסה">
+
+			<span class="kindi-hero__pill kindi-hero__pill--top"><?php echo kindi_icon( 'sparkles', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><small>חדש השבוע</small><b>+120 מוצרים</b></span></span>
+			<span class="kindi-hero__pill kindi-hero__pill--bottom"><?php echo kindi_icon( 'truck', 'kindi-icon--lg kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><small>משלוח מחר</small><b>חינם מעל 299₪</b></span></span>
 		</div>
-		<!-- /wp:column -->
-
 	</div>
-	<!-- /wp:columns -->
-</div>
-<!-- /wp:group -->
+</section>
+<!-- /wp:html -->

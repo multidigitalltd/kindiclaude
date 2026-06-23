@@ -38,6 +38,8 @@ function kindi_require( string $relative ): void {
 	}
 }
 
+kindi_require( 'icons.php' );
+kindi_require( 'template-tags.php' );
 kindi_require( 'setup.php' );
 kindi_require( 'enqueue.php' );
 kindi_require( 'performance.php' );

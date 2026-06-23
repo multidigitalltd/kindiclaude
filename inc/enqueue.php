@@ -95,8 +95,34 @@ function kindi_enqueue_styles(): void {
 			kindi_asset_version( 'assets/css/animations.css' )
 		);
 	}
+
+	// Homepage section styles — front page only.
+	if ( is_front_page() ) {
+		wp_enqueue_style(
+			'kindi-sections',
+			KINDI_URI . 'assets/css/sections.css',
+			array( 'kindi-components' ),
+			kindi_asset_version( 'assets/css/sections.css' )
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'kindi_enqueue_styles' );
+
+/**
+ * Enqueue the (deferred) interactions script — header drawer + a11y toggle.
+ *
+ * @return void
+ */
+function kindi_enqueue_scripts(): void {
+	wp_enqueue_script(
+		'kindi-interactions',
+		KINDI_URI . 'assets/js/interactions.js',
+		array(),
+		kindi_asset_version( 'assets/js/interactions.js' ),
+		true
+	);
+}
+add_action( 'wp_enqueue_scripts', 'kindi_enqueue_scripts' );
 
 /**
  * Add defer to theme scripts; never block rendering.

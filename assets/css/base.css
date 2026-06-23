@@ -17,6 +17,10 @@
   --brand-navy-dark: var(--wp--preset--color--brand-navy-dark);
   --brand-yellow: var(--wp--preset--color--brand-yellow);
   --surface: var(--wp--preset--color--surface);
+  --foreground: var(--wp--preset--color--foreground);
+  --muted: var(--wp--preset--color--muted);
+  --muted-foreground: var(--wp--preset--color--muted-foreground);
+  --border: var(--wp--preset--color--border);
 
   --shadow-card: var(--wp--preset--shadow--card);
   --shadow-pop: var(--wp--preset--shadow--pop);
@@ -40,6 +44,19 @@ body {
   border-radius: 4px;
 }
 
+/* Screen-reader-only text */
+.screen-reader-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Skip link (rendered in header part) */
 .skip-link {
   position: absolute;
@@ -55,6 +72,9 @@ body {
 .skip-link:focus {
   left: 1rem;
 }
+
+/* Accessibility high-contrast toggle (set by interactions.js) */
+.kindi-a11y-contrast { filter: contrast(1.25) saturate(1.1); }
 
 /* --- Utilities ported from the Lovable design (src/styles.css) --- */
 
