@@ -22,11 +22,11 @@ $kindi_pay = array( 'VISA', 'MC', 'ISRACARD', 'PayPal', 'Bit' );
 
 		<div class="kindi-footer__brand">
 			<img class="kindi-footer__logo" src="<?php echo kindi_img( 'logo.png' ); ?>" alt="קינדר טויס" width="160" height="80">
-			<p>החנות המובילה לצעצועים, מכשירי כתיבה, חומרי יצירה וציוד לגני ילדים ובתי ספר. שירות אישי, מחירים הוגנים ואלפי לקוחות מרוצים.</p>
+			<p><?php echo esc_html( kindi_opt( 'about' ) ); ?></p>
 			<div class="kindi-footer__social">
-				<a href="#" aria-label="פייסבוק" class="kindi-footer__soc">f</a>
-				<a href="#" aria-label="אינסטגרם" class="kindi-footer__soc">◎</a>
-				<a href="https://wa.me/972500000000" aria-label="וואטסאפ" class="kindi-footer__soc"><?php echo kindi_icon( 'whatsapp', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
+				<a href="<?php echo esc_url( kindi_opt( 'fb' ) ); ?>" aria-label="פייסבוק" class="kindi-footer__soc">f</a>
+				<a href="<?php echo esc_url( kindi_opt( 'ig' ) ); ?>" aria-label="אינסטגרם" class="kindi-footer__soc">◎</a>
+				<a href="https://wa.me/<?php echo esc_attr( kindi_opt( 'whatsapp' ) ); ?>" aria-label="וואטסאפ" class="kindi-footer__soc"><?php echo kindi_icon( 'whatsapp', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
 			</div>
 		</div>
 
@@ -44,10 +44,10 @@ $kindi_pay = array( 'VISA', 'MC', 'ISRACARD', 'PayPal', 'Bit' );
 		<div class="kindi-footer__col kindi-footer__contact">
 			<h4>צרו קשר</h4>
 			<ul>
-				<li><a href="tel:035293383"><?php echo kindi_icon( 'phone', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> 03-5293383</a></li>
-				<li><?php echo kindi_icon( 'mail', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> info@kindertoys.co.il</li>
-				<li><?php echo kindi_icon( 'pin', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> הרב יעקב לנדא 7, בני ברק</li>
-				<li class="kindi-footer__hours">א'-ה' 9:00-21:00<br>ו' 9:00-14:00</li>
+				<li><a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', (string) kindi_opt( 'phone' ) ) ); ?>"><?php echo kindi_icon( 'phone', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo esc_html( kindi_opt( 'phone' ) ); ?></a></li>
+				<li><?php echo kindi_icon( 'mail', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo esc_html( kindi_opt( 'email' ) ); ?></li>
+				<li><?php echo kindi_icon( 'pin', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo esc_html( kindi_opt( 'store_address' ) ); ?></li>
+				<li class="kindi-footer__hours"><?php echo esc_html( kindi_opt( 'store_hours' ) ); ?></li>
 			</ul>
 		</div>
 

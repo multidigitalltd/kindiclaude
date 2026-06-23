@@ -17,13 +17,13 @@
 
 	<div class="kindi-hero__grid">
 		<div class="kindi-hero__copy">
-			<span class="kindi-hero__badge"><span class="kindi-hero__dot" aria-hidden="true"></span>חדש בקינדר טויס • קולקציית 2026</span>
-			<h1 class="kindi-hero__title">עולם של <span class="kindi-hero__underline">קסם, משחק ויצירה</span><br><span class="kindi-hero__blue">בלחיצה אחת</span></h1>
-			<p class="kindi-hero__lead">אלפי צעצועים, משחקים, חומרי יצירה וציוד לבית הספר ולגן — משלוח מהיר ושירות אישי מהלב.</p>
+			<span class="kindi-hero__badge"><span class="kindi-hero__dot" aria-hidden="true"></span><?php echo esc_html( kindi_opt( 'hero_badge' ) ); ?></span>
+			<h1 class="kindi-hero__title"><?php echo esc_html( kindi_opt( 'hero_title1' ) ); ?> <span class="kindi-hero__underline"><?php echo esc_html( kindi_opt( 'hero_hl' ) ); ?></span><br><span class="kindi-hero__blue"><?php echo esc_html( kindi_opt( 'hero_title2' ) ); ?></span></h1>
+			<p class="kindi-hero__lead"><?php echo esc_html( kindi_opt( 'hero_lead' ) ); ?></p>
 
 			<div class="kindi-hero__cta">
-				<a class="kindi-btn kindi-btn--red" href="/shop/?on_sale=1">לכל המבצעים החמים<?php echo kindi_icon( 'arrowleft', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
-				<a class="kindi-btn kindi-btn--ghost" href="/shop/"><?php echo kindi_icon( 'play', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>לכל המוצרים</a>
+				<a class="kindi-btn kindi-btn--red" href="<?php echo esc_url( kindi_opt( 'hero_cta1_url' ) ); ?>"><?php echo esc_html( kindi_opt( 'hero_cta1' ) ); ?><?php echo kindi_icon( 'arrowleft', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
+				<a class="kindi-btn kindi-btn--ghost" href="<?php echo esc_url( kindi_opt( 'hero_cta2_url' ) ); ?>"><?php echo kindi_icon( 'play', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( kindi_opt( 'hero_cta2' ) ); ?></a>
 			</div>
 
 			<div class="kindi-hero__trust">

@@ -9,14 +9,15 @@
  * @package Kindi
  */
 
-// Marquee announcement items.
-$kindi_ticker = array(
-	array( 'icon' => 'truck', 'text' => 'משלוח חינם בהזמנה מעל 299 ₪' ),
-	array( 'icon' => 'gift', 'text' => 'מועדון קינדי — 5% חזרה על כל קנייה' ),
-	array( 'icon' => 'sparkles', 'text' => 'קולקציית חזרה לבית הספר 2026 נחתה' ),
-	array( 'icon' => 'shield', 'text' => 'תשלום מאובטח SSL + PCI' ),
-	array( 'icon' => 'phone', 'text' => 'שירות אישי 03-5293383' ),
-);
+// Marquee announcement items (texts editable in קינדי settings; icons cycle).
+$kindi_ticker_icons = array( 'truck', 'gift', 'sparkles', 'shield', 'phone' );
+$kindi_ticker       = array();
+foreach ( kindi_opt_lines( 'ticker' ) as $i => $kindi_txt ) {
+	$kindi_ticker[] = array(
+		'icon' => $kindi_ticker_icons[ $i % count( $kindi_ticker_icons ) ],
+		'text' => $kindi_txt,
+	);
+}
 
 // Top-level category navigation (mega-menu columns trimmed to lead items).
 $kindi_nav = array(
@@ -80,7 +81,7 @@ $kindi_ticker_loop = array_merge( $kindi_ticker, $kindi_ticker );
 	</div>
 </div>
 
-<div class="kindi-shipbar"><?php echo kindi_icon( 'truck', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> משלוח מהיר חינם מעל 299 ₪ | מועדון הלקוחות — 10% הנחה על הקנייה הראשונה</div>
+<div class="kindi-shipbar"><?php echo kindi_icon( 'truck', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo esc_html( kindi_opt( 'shipbar' ) ); ?></div>
 
 <div class="kindi-bar">
 	<button class="kindi-bar__burger" type="button" aria-label="פתח תפריט" data-kindi-menu-open><?php echo kindi_icon( 'menu', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>

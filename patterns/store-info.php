@@ -9,9 +9,9 @@
  */
 
 $kindi_details = array(
-	array( 'icon' => 'pin', 'bold' => 'הרב יעקב לנדא 7, בני ברק', 'sub' => '' ),
-	array( 'icon' => 'phone', 'bold' => '03-5293383', 'sub' => 'שירות אישי וייעוץ' ),
-	array( 'icon' => 'clock', 'bold' => 'א\'-ה\' 9:00-21:00 • ו\' 9:00-14:00', 'sub' => '' ),
+	array( 'icon' => 'pin', 'bold' => kindi_opt( 'store_address' ), 'sub' => '' ),
+	array( 'icon' => 'phone', 'bold' => kindi_opt( 'store_phone' ), 'sub' => 'שירות אישי וייעוץ' ),
+	array( 'icon' => 'clock', 'bold' => kindi_opt( 'store_hours' ), 'sub' => '' ),
 	array( 'icon' => 'car', 'bold' => 'איסוף עצמי חינם', 'sub' => 'בהזמנה מראש' ),
 );
 ?>
@@ -32,7 +32,7 @@ $kindi_details = array(
 				</div>
 				<?php endforeach; ?>
 			</div>
-			<a class="kindi-store__cta" href="https://waze.com/ul?q=הרב%20יעקב%20לנדא%207%20בני%20ברק" target="_blank" rel="noopener">ניווט בוויז<?php echo kindi_icon( 'arrowleft', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
+			<a class="kindi-store__cta" href="<?php echo esc_url( kindi_opt( 'store_waze' ) ); ?>" target="_blank" rel="noopener">ניווט בוויז<?php echo kindi_icon( 'arrowleft', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
 		</div>
 		<div class="kindi-store__media">
 			<span class="kindi-ground-shadow animate-ground"></span>
@@ -44,8 +44,8 @@ $kindi_details = array(
 	<div class="kindi-news">
 		<div class="kindi-news__body">
 			<span class="kindi-news__badge"><?php echo kindi_icon( 'gift', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>מתנת הצטרפות</span>
-			<h3 class="kindi-news__title">קבלו 10% הנחה על הזמנה ראשונה!</h3>
-			<p class="kindi-news__sub">הירשמו לניוזלטר וקבלו עדכונים על מבצעים, מוצרים חדשים והטבות בלעדיות.</p>
+			<h3 class="kindi-news__title"><?php echo esc_html( kindi_opt( 'news_title' ) ); ?></h3>
+			<p class="kindi-news__sub"><?php echo esc_html( kindi_opt( 'news_sub' ) ); ?></p>
 		</div>
 		<form class="kindi-news__form" action="#" method="post" novalidate>
 			<label class="kindi-news__field">

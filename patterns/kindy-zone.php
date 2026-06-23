@@ -8,7 +8,7 @@
  * @package Kindi
  */
 
-$kindi_benefits = array( '5% חזרה על כל קנייה', 'מתנה ביום הולדת', 'מבצעים בלעדיים', 'משלוח חינם מהיר' );
+$kindi_benefits = kindi_opt_lines( 'club_benefits' );
 $kindi_sparks   = array(
 	array( 'icon' => 'star', 'style' => 'top:10%;right:10%;animation-delay:0s', 'cls' => 'kindi-icon--xl' ),
 	array( 'icon' => 'sparkles', 'style' => 'top:30%;left:5%;animation-delay:0.5s', 'cls' => 'kindi-icon--2xl' ),
@@ -24,14 +24,14 @@ $kindi_sparks   = array(
 
 		<div class="kindi-zone__body">
 			<span class="kindi-zone__badge"><?php echo kindi_icon( 'gift', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>מועדון קינדי</span>
-			<h2 class="kindi-zone__title">הצטרפו לחברים שלנו<br>וקבלו <mark>עולם של הטבות!</mark></h2>
-			<p class="kindi-zone__lead">חברים נהנים מהנחות בלעדיות, צוברים נקודות על כל קנייה ומקבלים מתנות מיוחדות ביום ההולדת.</p>
+			<h2 class="kindi-zone__title"><?php echo esc_html( kindi_opt( 'club_title' ) ); ?></h2>
+			<p class="kindi-zone__lead"><?php echo esc_html( kindi_opt( 'club_lead' ) ); ?></p>
 			<div class="kindi-zone__benefits">
 				<?php foreach ( $kindi_benefits as $b ) : ?>
 				<div class="kindi-zone__benefit"><span class="kindi-zone__check"><?php echo kindi_icon( 'check', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><?php echo esc_html( $b ); ?></div>
 				<?php endforeach; ?>
 			</div>
-			<a class="kindi-zone__cta" href="/my-account/">הצטרפות חינם — לחצו כאן<?php echo kindi_icon( 'arrowleft', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
+			<a class="kindi-zone__cta" href="<?php echo esc_url( kindi_opt( 'club_cta_url' ) ); ?>">הצטרפות חינם — לחצו כאן<?php echo kindi_icon( 'arrowleft', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
 		</div>
 
 		<div class="kindi-zone__stage" aria-hidden="true">

@@ -38,11 +38,16 @@ function kindi_require( string $relative ): void {
 	}
 }
 
+kindi_require( 'options.php' );
 kindi_require( 'icons.php' );
 kindi_require( 'template-tags.php' );
 kindi_require( 'fonts.php' );
 kindi_require( 'dynamic.php' );
 kindi_require( 'setup.php' );
+
+if ( is_admin() ) {
+	kindi_require( 'admin-settings.php' );
+}
 kindi_require( 'enqueue.php' );
 kindi_require( 'performance.php' );
 kindi_require( 'security.php' );
