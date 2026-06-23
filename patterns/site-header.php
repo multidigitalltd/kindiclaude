@@ -64,6 +64,15 @@ $kindi_ticker_loop = array_merge( $kindi_ticker, $kindi_ticker );
 	</div>
 </div>
 
+<div class="kindi-msearch">
+	<form class="kindi-search kindi-search--mobile" role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+		<label class="screen-reader-text" for="kindi-mq">חיפוש באתר</label>
+		<?php echo kindi_icon( 'search', 'kindi-icon--md kindi-search__ic' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+		<input id="kindi-mq" type="search" name="s" placeholder="חפשו מוצרים…" autocomplete="off">
+		<?php if ( class_exists( 'WooCommerce' ) ) : ?><input type="hidden" name="post_type" value="product"><?php endif; ?>
+	</form>
+</div>
+
 <nav class="kindi-nav" aria-label="קטגוריות">
 	<div class="kindi-nav__inner">
 		<?php foreach ( $kindi_nav as $c ) :
@@ -74,17 +83,28 @@ $kindi_ticker_loop = array_merge( $kindi_ticker, $kindi_ticker );
 			<a class="kindi-nav__link" href="<?php echo esc_url( $c['url'] ); ?>"><span class="kindi-nav__ic"><?php echo kindi_icon( $c['icon'], 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><?php echo esc_html( $c['label'] ); ?><?php echo $has_col ? kindi_icon( 'chevrondown', 'kindi-icon--xs' ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
 			<?php if ( $has_col ) : ?>
 			<div class="kindi-mega">
-				<div class="kindi-mega__cols">
-					<?php foreach ( $c['cols'] as $col ) : ?>
-					<div class="kindi-mega__col">
-						<h4 class="kindi-mega__title"><?php echo kindi_icon( 'sparkles', 'kindi-icon--xs' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $col['title'] ); ?></h4>
-						<ul>
-							<?php foreach ( $col['links'] as $link ) : ?>
-							<li><a href="<?php echo esc_url( $link['url'] ); ?>"><?php echo esc_html( $link['label'] ); ?></a></li>
-							<?php endforeach; ?>
-						</ul>
+				<div class="kindi-mega__inner">
+					<div class="kindi-mega__cols">
+						<?php foreach ( $c['cols'] as $col ) : ?>
+						<div class="kindi-mega__col">
+							<h4 class="kindi-mega__title"><?php echo kindi_icon( 'sparkles', 'kindi-icon--xs' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $col['title'] ); ?></h4>
+							<ul>
+								<?php foreach ( $col['links'] as $link ) : ?>
+								<li><a href="<?php echo esc_url( $link['url'] ); ?>"><?php echo esc_html( $link['label'] ); ?></a></li>
+								<?php endforeach; ?>
+							</ul>
+						</div>
+						<?php endforeach; ?>
 					</div>
-					<?php endforeach; ?>
+					<?php if ( ! empty( $c['feature'] ) ) : $kindi_f = $c['feature']; ?>
+					<a class="kindi-mega__feature kindi-mega__feature--<?php echo esc_attr( $kindi_f['tone'] ); ?>" href="<?php echo esc_url( $kindi_f['url'] ); ?>">
+						<span class="kindi-mega__feature-eyebrow">מומלץ עכשיו</span>
+						<span class="kindi-mega__feature-title"><?php echo esc_html( $kindi_f['title'] ); ?></span>
+						<?php if ( $kindi_f['sub'] ) : ?><span class="kindi-mega__feature-sub"><?php echo esc_html( $kindi_f['sub'] ); ?></span><?php endif; ?>
+						<span class="kindi-mega__feature-cta">לצפייה<?php echo kindi_icon( 'arrowleft', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+						<img class="kindi-mega__feature-img" src="<?php echo kindi_img( 'mascot/kindy-new.webp' ); ?>" alt="" loading="lazy" decoding="async">
+					</a>
+					<?php endif; ?>
 				</div>
 			</div>
 			<?php endif; ?>

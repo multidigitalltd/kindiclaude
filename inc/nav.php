@@ -61,8 +61,29 @@ function kindi_build_nav_tree( array $items ): array {
 
 	$out = array();
 	foreach ( ( $children[0] ?? array() ) as $top ) {
-		$cols = array();
+		$cols    = array();
+		$feature = null;
+
 		foreach ( ( $children[ $top->ID ] ?? array() ) as $col ) {
+			$col_classes = is_array( $col->classes ) ? $col->classes : array();
+
+			// A child flagged `kindi-feature` becomes the promo card, not a column.
+			if ( in_array( 'kindi-feature', $col_classes, true ) ) {
+				$tone = 'red';
+				foreach ( $col_classes as $class ) {
+					if ( preg_match( '/^kindi-tone-(red|navy|blue)$/', $class, $mt ) ) {
+						$tone = $mt[1];
+					}
+				}
+				$feature = array(
+					'title' => $col->title,
+					'sub'   => (string) $col->attr_title,
+					'url'   => $col->url,
+					'tone'  => $tone,
+				);
+				continue;
+			}
+
 			$links = array();
 			foreach ( ( $children[ $col->ID ] ?? array() ) as $leaf ) {
 				$links[] = array(
@@ -96,6 +117,7 @@ function kindi_build_nav_tree( array $items ): array {
 			'icon'      => $icon,
 			'highlight' => in_array( 'highlight', $classes, true ),
 			'cols'      => $cols,
+			'feature'   => $feature,
 		);
 	}
 
@@ -126,7 +148,7 @@ function kindi_default_nav(): array {
 		return $out;
 	};
 
-	return array(
+	$nav = array(
 		array( 'label' => 'כל הקטגוריות', 'url' => '#', 'icon' => 'grid', 'highlight' => false, 'cols' => $mk( array(
 			'פופולרי'        => array( 'חדש באתר', 'רבי מכר', 'מבצעי השבוע', 'מתחת ל-50 ₪' ),
 			'לפי תחום'       => array( 'משחקי קופסה', 'יצירה', 'בובות', 'לגו ובנייה', 'פאזלים' ),
@@ -165,4 +187,12 @@ function kindi_default_nav(): array {
 		) ) ),
 		array( 'label' => 'מבצעים חמים', 'url' => '#', 'icon' => 'fire', 'highlight' => true, 'cols' => array() ),
 	);
+
+	// Example feature cards on a few items (matches the reference design).
+	$nav[0]['feature'] = array( 'title' => 'מבצעי סוף שבוע', 'sub' => 'עד 40% הנחה על מאות פריטים', 'url' => '#', 'tone' => 'red' );
+	$nav[1]['feature'] = array( 'title' => 'פאזלים 1 + 1', 'sub' => 'מאות דגמים בסטוק', 'url' => '#', 'tone' => 'blue' );
+	$nav[2]['feature'] = array( 'title' => 'ילקוטים 2026', 'sub' => 'כל המותגים, משלוח חינם', 'url' => '#', 'tone' => 'navy' );
+	$nav[5]['feature'] = array( 'title' => 'קיץ 2026', 'sub' => 'הכל לחופש הגדול', 'url' => '#', 'tone' => 'red' );
+
+	return $nav;
 }

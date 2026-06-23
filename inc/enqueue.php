@@ -38,6 +38,18 @@ function kindi_is_motion_view(): bool {
 }
 
 /**
+ * Whether the current request is a WooCommerce store view.
+ *
+ * @return bool
+ */
+function kindi_is_wc_view(): bool {
+	return ( function_exists( 'is_woocommerce' ) && is_woocommerce() )
+		|| ( function_exists( 'is_cart' ) && is_cart() )
+		|| ( function_exists( 'is_checkout' ) && is_checkout() )
+		|| ( function_exists( 'is_account_page' ) && is_account_page() );
+}
+
+/**
  * Enqueue front-end styles. Animation CSS loads only where motion is used.
  *
  * @return void
@@ -76,6 +88,16 @@ function kindi_enqueue_styles(): void {
 			KINDI_URI . 'assets/css/sections.css',
 			array( 'kindi-components' ),
 			kindi_asset_version( 'assets/css/sections.css' )
+		);
+	}
+
+	// WooCommerce store styling — store views + the front-page product grid.
+	if ( class_exists( 'WooCommerce' ) && ( is_front_page() || kindi_is_wc_view() ) ) {
+		wp_enqueue_style(
+			'kindi-woocommerce',
+			KINDI_URI . 'assets/css/woocommerce.css',
+			array( 'kindi-components' ),
+			kindi_asset_version( 'assets/css/woocommerce.css' )
 		);
 	}
 }

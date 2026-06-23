@@ -49,6 +49,16 @@ function kindi_wc_loop_columns(): int {
 add_filter( 'loop_shop_columns', 'kindi_wc_loop_columns' );
 
 /**
+ * Products per page on archives.
+ *
+ * @return int
+ */
+function kindi_wc_per_page(): int {
+	return (int) apply_filters( 'kindi_products_per_page', 12 );
+}
+add_filter( 'loop_shop_per_page', 'kindi_wc_per_page' );
+
+/**
  * Free-shipping threshold messaging used by the top announcement bar.
  * Single source of truth so templates and JS stay in sync.
  *

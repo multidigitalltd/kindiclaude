@@ -306,22 +306,6 @@
 .kindi-zone__stage .kindi-spark { position: absolute; }
 .kindi-tst__quote { position: absolute; top: -0.75rem; right: 1.5rem; font-family: var(--wp--preset--font-family--display); font-size: 3rem; line-height: 1; color: var(--brand-red); }
 
-/* ============================ Products ============================ */
-.kindi-prod-empty { text-align: center; padding: 3rem 1.5rem; background: #fff; border: 1px dashed color-mix(in oklab, var(--brand-navy) 20%, transparent); border-radius: 1.5rem; color: var(--muted-foreground); font-weight: 600; }
-
-.woocommerce ul.products, ul.products { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; list-style: none; margin: 0; padding: 0; }
-@media (min-width: 640px) { .woocommerce ul.products, ul.products { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1024px) { .woocommerce ul.products, ul.products { grid-template-columns: repeat(5, 1fr); } }
-.woocommerce ul.products li.product { background: var(--background); border: 1px solid var(--border); border-radius: 1.5rem; padding: 0.75rem; text-align: center; box-shadow: var(--shadow-card); transition: all 0.25s; margin: 0 !important; width: auto !important; float: none !important; }
-.woocommerce ul.products li.product:hover { box-shadow: var(--shadow-pop); transform: translateY(-4px); border-color: color-mix(in oklab, var(--brand-blue) 40%, transparent); }
-.woocommerce ul.products li.product img { border-radius: 1rem; margin-bottom: 0.5rem; }
-.woocommerce ul.products li.product .woocommerce-loop-product__title { font-size: 0.875rem; font-weight: 700; color: var(--foreground); padding: 0.25rem 0; }
-.woocommerce ul.products li.product .price { color: var(--brand-red); font-weight: 800; }
-.woocommerce ul.products li.product .price del { color: var(--muted-foreground); font-weight: 400; }
-.woocommerce ul.products li.product .button, .woocommerce ul.products li.product .added_to_cart { display: inline-block; margin-top: 0.5rem; background: var(--brand-navy); color: #fff; border-radius: 0.75rem; padding: 0.5rem 1rem; font-weight: 700; font-size: 0.8125rem; text-decoration: none; transition: background 0.2s; }
-.woocommerce ul.products li.product .button:hover { background: var(--brand-red); }
-.woocommerce span.onsale { background: var(--brand-red); color: #fff; border-radius: 0.5rem; }
-
 /* ============================ Floating buttons ============================ */
 .kindi-float { position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 50; width: 3.5rem; height: 3.5rem; border-radius: 999px; display: grid; place-items: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); transition: transform 0.2s; }
 .kindi-float:hover { transform: scale(1.1); }
