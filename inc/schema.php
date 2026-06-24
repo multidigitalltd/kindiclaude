@@ -49,6 +49,22 @@ function kindi_output_schema(): void {
 		),
 	);
 
+	// WebSite + sitelinks search box.
+	$blocks[] = array(
+		'@context'        => 'https://schema.org',
+		'@type'           => 'WebSite',
+		'url'             => home_url( '/' ),
+		'name'            => get_bloginfo( 'name' ),
+		'potentialAction' => array(
+			'@type'       => 'SearchAction',
+			'target'      => array(
+				'@type'       => 'EntryPoint',
+				'urlTemplate' => home_url( '/?s={search_term_string}&post_type=product' ),
+			),
+			'query-input' => 'required name=search_term_string',
+		),
+	);
+
 	// Product (single product).
 	if ( function_exists( 'is_product' ) && is_product() ) {
 		$product = wc_get_product( get_queried_object_id() );
@@ -58,8 +74,16 @@ function kindi_output_schema(): void {
 				'price'         => $product->get_price(),
 				'priceCurrency' => get_woocommerce_currency(),
 				'availability'  => $product->is_in_stock() ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+				'itemCondition' => 'https://schema.org/NewCondition',
 				'url'           => get_permalink( $product->get_id() ),
 			);
+
+			$sale_end = $product->get_date_on_sale_to();
+			if ( $sale_end ) {
+				$offer['priceValidUntil'] = $sale_end->date( 'Y-m-d' );
+			}
+
+			$brand = function_exists( 'kindi_product_brand' ) ? kindi_product_brand( $product ) : '';
 
 			$product_block = array(
 				'@context'    => 'https://schema.org',
@@ -71,6 +95,10 @@ function kindi_output_schema(): void {
 				'offers'      => $offer,
 			);
 
+			if ( $brand ) {
+				$product_block['brand'] = array( '@type' => 'Brand', 'name' => $brand );
+			}
+
 			if ( $product->get_review_count() > 0 ) {
 				$product_block['aggregateRating'] = array(
 					'@type'       => 'AggregateRating',
@@ -81,6 +109,37 @@ function kindi_output_schema(): void {
 
 			$blocks[] = $product_block;
 		}
+	}
+
+	// BreadcrumbList (product / product category).
+	if ( function_exists( 'is_product' ) && ( is_product() || is_product_category() ) ) {
+		$crumbs = array(
+			array( 'name' => get_bloginfo( 'name' ), 'url' => home_url( '/' ) ),
+		);
+		$terms = get_the_terms( get_queried_object_id(), 'product_cat' );
+		if ( is_product() && $terms && ! is_wp_error( $terms ) ) {
+			$term     = $terms[0];
+			$crumbs[] = array( 'name' => $term->name, 'url' => (string) get_term_link( $term ) );
+			$crumbs[] = array( 'name' => get_the_title(), 'url' => get_permalink() );
+		} elseif ( is_product_category() ) {
+			$obj      = get_queried_object();
+			$crumbs[] = array( 'name' => $obj->name, 'url' => (string) get_term_link( $obj ) );
+		}
+
+		$items = array();
+		foreach ( $crumbs as $i => $crumb ) {
+			$items[] = array(
+				'@type'    => 'ListItem',
+				'position' => $i + 1,
+				'name'     => $crumb['name'],
+				'item'     => $crumb['url'],
+			);
+		}
+		$blocks[] = array(
+			'@context'        => 'https://schema.org',
+			'@type'           => 'BreadcrumbList',
+			'itemListElement' => $items,
+		);
 	}
 
 	foreach ( $blocks as $block ) {
