@@ -62,6 +62,8 @@ kindi_require( 'security.php' );
 if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'woocommerce.php' );
 	kindi_require( 'product-card.php' );
+	kindi_require( 'product-meta.php' );
+	kindi_require( 'waitlist.php' );
 	kindi_require( 'shipping-bar.php' );
 	kindi_require( 'recently-viewed.php' );
 	kindi_require( 'filters.php' );

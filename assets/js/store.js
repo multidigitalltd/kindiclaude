@@ -131,6 +131,47 @@
 		} );
 	} );
 
+	/* ---------------- Back-in-stock waitlist ---------------- */
+	document.querySelectorAll( '[data-kindi-waitlist]' ).forEach( function ( form ) {
+		form.addEventListener( 'submit', function ( e ) {
+			e.preventDefault();
+			if ( typeof window.kindiStore === 'undefined' ) {
+				return;
+			}
+			var msg = form.querySelector( '.kindi-waitlist__msg' );
+			var btn = form.querySelector( 'button' );
+			var body = new URLSearchParams( new FormData( form ) );
+			body.append( 'action', 'kindi_waitlist' );
+			if ( btn ) {
+				btn.disabled = true;
+			}
+			fetch( window.kindiStore.ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: body.toString(),
+			} )
+				.then( function ( r ) { return r.json(); } )
+				.then( function ( data ) {
+					if ( msg ) {
+						msg.textContent = ( data.data && data.data.message ) || 'תודה!';
+					}
+					if ( data.success ) {
+						form.querySelector( '.kindi-waitlist__row' ).style.display = 'none';
+						if ( btn ) {
+							btn.style.display = 'none';
+						}
+					} else if ( btn ) {
+						btn.disabled = false;
+					}
+				} )
+				.catch( function () {
+					if ( btn ) {
+						btn.disabled = false;
+					}
+				} );
+		} );
+	} );
+
 	/* Wishlist page — render saved products via REST. */
 	var wrap = document.querySelector( '[data-kindi-wishlist-grid]' );
 	if ( wrap && typeof window.kindiStore !== 'undefined' ) {

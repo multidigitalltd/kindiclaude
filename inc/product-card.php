@@ -55,6 +55,10 @@ function kindi_is_new_product( $product ): bool {
  * @return string
  */
 function kindi_product_brand( $product ): string {
+	$label = (string) $product->get_meta( '_kindi_brand_label' );
+	if ( $label ) {
+		return $label;
+	}
 	foreach ( array( 'product_brand', 'pa_brand', 'pwb-brand' ) as $tax ) {
 		if ( taxonomy_exists( $tax ) ) {
 			$terms = wp_get_post_terms( $product->get_id(), $tax, array( 'fields' => 'names' ) );

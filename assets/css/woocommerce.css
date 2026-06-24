@@ -210,5 +210,30 @@
 /* ---------- Newsletter done ---------- */
 .kindi-news__done { font-weight: 700; color: var(--brand-navy); padding: 0.75rem; text-align: center; margin: 0; }
 
+/* ---------- Product meta (highlights / specs / in the box) ---------- */
+.kindi-highlights { list-style: none; margin: 1rem 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.kindi-highlights li { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.9375rem; color: var(--foreground); font-weight: 600; }
+.kindi-highlights .kindi-icon { color: var(--brand-red); flex-shrink: 0; margin-top: 2px; }
+.kindi-pmeta { display: grid; gap: 1.5rem; margin: 1.5rem 0; grid-column: 1 / -1; }
+@media (min-width: 768px) { .kindi-pmeta { grid-template-columns: 1fr 1fr; } }
+.kindi-specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+.kindi-spec { background: var(--brand-blue-soft); border-radius: 1rem; padding: 0.85rem 1rem; text-align: center; }
+.kindi-spec__l { display: block; font-size: 0.75rem; color: var(--muted-foreground); font-weight: 600; }
+.kindi-spec__v { display: block; font-size: 1.125rem; font-weight: 900; color: var(--brand-navy); margin-top: 0.15rem; }
+.kindi-inbox { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.25rem; }
+.kindi-inbox h3 { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); margin: 0 0 0.5rem; font-size: 1.0625rem; }
+.kindi-inbox ul { margin: 0; padding-inline-start: 1.1rem; color: var(--foreground); }
+.kindi-inbox li { margin: 0.25rem 0; }
+
+/* ---------- Waitlist ---------- */
+.kindi-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+.kindi-waitlist { background: var(--brand-blue-soft); border-radius: 1.25rem; padding: 1.25rem; margin: 1rem 0; display: flex; flex-direction: column; gap: 0.75rem; }
+.kindi-waitlist h3 { display: flex; align-items: center; gap: 0.5rem; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); margin: 0; font-size: 1.0625rem; }
+.kindi-waitlist__row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.kindi-waitlist__row input { flex: 1; min-width: 8rem; height: 2.75rem; border: 2px solid color-mix(in oklab, var(--brand-navy) 12%, transparent); border-radius: 0.75rem; padding-inline: 0.8rem; font-size: 0.9375rem; }
+.kindi-waitlist__row input:focus { outline: none; border-color: var(--brand-red); }
+.kindi-waitlist__terms { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--brand-navy); }
+.kindi-waitlist__msg { margin: 0; font-weight: 700; color: var(--brand-navy); }
+
 /* ---------- Front-page empty state ---------- */
 .kindi-prod-empty { text-align: center; padding: 3rem 1.5rem; background: #fff; border: 1px dashed color-mix(in oklab, var(--brand-navy) 20%, transparent); border-radius: 1.5rem; color: var(--muted-foreground); font-weight: 600; }
