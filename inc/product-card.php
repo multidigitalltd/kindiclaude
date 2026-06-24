@@ -27,6 +27,7 @@ function kindi_product_card_hooks(): void {
 
 	add_action( 'woocommerce_before_shop_loop_item_title', 'kindi_card_media', 10 );
 	add_action( 'woocommerce_shop_loop_item_title', 'kindi_card_head', 10 );
+	add_action( 'woocommerce_after_shop_loop_item_title', 'kindi_card_rating', 10 );
 	add_action( 'woocommerce_after_shop_loop_item', 'kindi_card_foot', 10 );
 }
 add_action( 'init', 'kindi_product_card_hooks' );
@@ -79,20 +80,13 @@ function kindi_card_media(): void {
 	echo '<div class="kindi-pc__media">';
 
 	echo '<div class="kindi-pc__badges">';
-	if ( $product->is_on_sale() ) {
-		$reg  = (float) $product->get_regular_price();
-		$sale = (float) $product->get_sale_price();
-		if ( $reg > 0 && $sale > 0 ) {
-			echo '<span class="kindi-pc__badge kindi-pc__badge--sale">' . esc_html( round( ( 1 - $sale / $reg ) * 100 ) ) . '%-</span>';
-		} else {
-			echo '<span class="kindi-pc__badge kindi-pc__badge--sale">מבצע</span>';
-		}
+	if ( $product->is_featured() ) {
+		echo '<span class="kindi-pc__badge kindi-pc__badge--best">הכי נמכר</span>';
+	} elseif ( $product->is_on_sale() ) {
+		echo '<span class="kindi-pc__badge kindi-pc__badge--sale">מבצע</span>';
 	}
 	if ( kindi_is_new_product( $product ) ) {
 		echo '<span class="kindi-pc__badge kindi-pc__badge--new">חדש</span>';
-	}
-	if ( $product->is_featured() ) {
-		echo '<span class="kindi-pc__badge kindi-pc__badge--hot">🔥 חם</span>';
 	}
 	echo '</div>';
 
@@ -119,23 +113,35 @@ function kindi_card_media(): void {
 function kindi_card_head(): void {
 	global $product;
 
-	$brand  = kindi_product_brand( $product );
-	$rating = (float) $product->get_average_rating();
-
-	echo '<div class="kindi-pc__top">';
+	$brand = kindi_product_brand( $product );
 	if ( $brand ) {
 		echo '<span class="kindi-pc__brand">' . esc_html( $brand ) . '</span>';
 	}
-	if ( $rating > 0 ) {
-		echo '<span class="kindi-pc__rating">' . kindi_icon( 'star', 'kindi-icon--xs' ) . esc_html( number_format( $rating, 1 ) ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput
-	}
-	echo '</div>';
 
 	printf(
 		'<a class="kindi-pc__title" href="%s">%s</a>',
 		esc_url( get_permalink( $product->get_id() ) ),
 		esc_html( $product->get_name() )
 	);
+}
+
+/**
+ * Card rating row: stars + review count.
+ *
+ * @return void
+ */
+function kindi_card_rating(): void {
+	global $product;
+
+	$count = (int) $product->get_rating_count();
+	if ( $count < 1 && (float) $product->get_average_rating() <= 0 ) {
+		return;
+	}
+
+	echo '<div class="kindi-pc__rating">';
+	echo wc_get_rating_html( (float) $product->get_average_rating(), $count ); // phpcs:ignore WordPress.Security.EscapeOutput -- WC markup.
+	echo '<span class="kindi-pc__rcount">(' . esc_html( (string) $count ) . ')</span>';
+	echo '</div>';
 }
 
 /**
