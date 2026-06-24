@@ -122,9 +122,27 @@ $kindi_ticker_loop = array_merge( $kindi_ticker, $kindi_ticker );
 			<button type="button" class="kindi-drawer__close" aria-label="סגור" data-kindi-menu-close><?php echo kindi_icon( 'close', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
 		</div>
 		<div class="kindi-drawer__body">
-			<?php foreach ( $kindi_nav as $c ) : ?>
+			<?php
+			foreach ( $kindi_nav as $c ) :
+				if ( empty( $c['cols'] ) ) :
+					?>
 			<a class="kindi-drawer__link<?php echo ! empty( $c['highlight'] ) ? ' kindi-drawer__link--hl' : ''; ?>" href="<?php echo esc_url( $c['url'] ); ?>"><?php echo kindi_icon( $c['icon'], 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $c['label'] ); ?></a>
-			<?php endforeach; ?>
+					<?php else : ?>
+			<details class="kindi-drawer__acc">
+				<summary class="kindi-drawer__link"><?php echo kindi_icon( $c['icon'], 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><?php echo esc_html( $c['label'] ); ?></span></summary>
+				<div class="kindi-drawer__sub">
+					<?php foreach ( $c['cols'] as $col ) : ?>
+					<div class="kindi-drawer__coltitle"><?php echo esc_html( $col['title'] ); ?></div>
+						<?php foreach ( $col['links'] as $link ) : ?>
+					<a class="kindi-drawer__sublink" href="<?php echo esc_url( $link['url'] ); ?>"><?php echo esc_html( $link['label'] ); ?></a>
+						<?php endforeach; ?>
+					<?php endforeach; ?>
+				</div>
+			</details>
+					<?php
+				endif;
+			endforeach;
+			?>
 		</div>
 	</div>
 </div>

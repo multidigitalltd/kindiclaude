@@ -13,6 +13,7 @@
 .kindi-shipbar { background: var(--brand-navy); color: #fff; font-size: 0.875rem; padding: 0.5rem 1rem; text-align: center; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
 
 .kindi-bar {
+  position: relative; z-index: 3;
   background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
   max-width: 1440px; margin-inline: auto; height: 5rem; display: flex; align-items: center;
   gap: 1rem; padding-inline: 1rem;
@@ -82,7 +83,7 @@
 .kindi-search--mobile input:focus { outline: none; border-color: var(--brand-red); }
 
 /* ============================ Category nav + mega ============================ */
-.kindi-nav { position: relative; background: var(--brand-navy); color: #fff; display: none; }
+.kindi-nav { position: relative; z-index: 2; background: var(--brand-navy); color: #fff; display: none; }
 @media (min-width: 1024px) { .kindi-nav { display: block; } }
 .kindi-nav__inner { max-width: 1440px; margin-inline: auto; display: flex; align-items: center; gap: 0.25rem; height: 3rem; padding-inline: 1.5rem; }
 .kindi-nav__item { position: static; height: 100%; display: flex; align-items: center; }
@@ -132,6 +133,16 @@
 .kindi-drawer__body { flex: 1; overflow-y: auto; padding: 0.5rem; }
 .kindi-drawer__link { display: flex; align-items: center; gap: 0.625rem; padding: 0.875rem; font-weight: 600; font-size: 0.875rem; color: var(--foreground); text-decoration: none; border-bottom: 1px solid var(--border); }
 .kindi-drawer__link--hl { margin-top: 0.5rem; background: var(--brand-red); color: #fff; border-radius: 0.75rem; justify-content: center; border: 0; }
+.kindi-drawer__acc { border-bottom: 1px solid var(--border); }
+.kindi-drawer__acc > summary { list-style: none; cursor: pointer; }
+.kindi-drawer__acc > summary::-webkit-details-marker { display: none; }
+.kindi-drawer__acc > summary span { flex: 1; }
+.kindi-drawer__chev { margin-inline-start: auto; transition: transform 0.2s; }
+.kindi-drawer__acc[open] > summary .kindi-drawer__chev { transform: rotate(180deg); }
+.kindi-drawer__sub { padding: 0.25rem 0.5rem 0.75rem 2.25rem; display: flex; flex-direction: column; gap: 0.125rem; }
+.kindi-drawer__coltitle { font-size: 0.6875rem; font-weight: 800; color: var(--brand-red); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 0.5rem; }
+.kindi-drawer__sublink { padding: 0.4rem 0; font-size: 0.875rem; color: var(--foreground); text-decoration: none; }
+.kindi-drawer__sublink:hover { color: var(--brand-red); }
 
 /* Wishlist link badge */
 .kindi-wish-ic { position: relative; display: inline-flex; }

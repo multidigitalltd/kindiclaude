@@ -91,6 +91,10 @@ function kindi_settings_tabs(): array {
 					'news_title'    => array( 'type' => 'text', 'label' => 'ניוזלטר — כותרת' ),
 					'news_sub'      => array( 'type' => 'textarea', 'label' => 'ניוזלטר — תיאור' ),
 				),
+				'ביקורות גוגל' => array(
+					'google_place_id' => array( 'type' => 'text', 'label' => 'Google Place ID', 'help' => 'מזהה המקום של החנות בגוגל. ניתן למצוא ב-Google Places ID Finder.' ),
+					'google_api_key'  => array( 'type' => 'text', 'label' => 'Google API Key', 'help' => 'מפתח API עם הרשאת Places API. הביקורות יוצגו אוטומטית בסקשן "לקוחות מספרים".' ),
+				),
 				'פוטר ורשתות'  => array(
 					'about' => array( 'type' => 'textarea', 'label' => 'טקסט "אודות"' ),
 					'email' => array( 'type' => 'text', 'label' => 'אימייל' ),
@@ -292,7 +296,8 @@ function kindi_settings_render(): void {
 				}
 				echo '</div>';
 			} else {
-				$input_type = 'number' === $field['type'] ? 'number' : ( 'url' === $field['type'] ? 'url' : 'text' );
+				// URLs render as text so relative paths (e.g. /shop/) are accepted.
+				$input_type = 'number' === $field['type'] ? 'number' : 'text';
 				printf(
 					'<input type="%1$s" id="%2$s" name="kindi[%3$s]" value="%4$s" class="regular-text" dir="rtl">',
 					esc_attr( $input_type ),

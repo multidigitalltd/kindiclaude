@@ -46,6 +46,7 @@ kindi_require( 'dynamic.php' );
 kindi_require( 'search.php' );
 kindi_require( 'nav.php' );
 kindi_require( 'store.php' );
+kindi_require( 'reviews.php' );
 kindi_require( 'newsletter.php' );
 kindi_require( 'accessibility.php' );
 kindi_require( 'schema.php' );

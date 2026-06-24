@@ -305,6 +305,10 @@
 .kindi-ground-shadow { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); width: 13rem; height: 0.75rem; border-radius: 50%; background: rgba(0,0,0,0.45); filter: blur(8px); }
 .kindi-zone__stage .kindi-spark { position: absolute; }
 .kindi-tst__quote { position: absolute; top: -0.75rem; right: 1.5rem; font-family: var(--wp--preset--font-family--display); font-size: 3rem; line-height: 1; color: var(--brand-red); }
+.kindi-grev__score { display: flex; align-items: center; gap: 0.5rem; background: #fff; border: 1px solid var(--border); border-radius: 1rem; padding: 0.5rem 1rem; box-shadow: var(--shadow-card); }
+.kindi-grev__score strong { font-size: 1.5rem; font-weight: 900; color: var(--brand-navy); }
+.kindi-grev__stars { display: inline-flex; }
+.kindi-grev__count { font-size: 0.75rem; font-weight: 700; color: var(--muted-foreground); }
 
 /* ============================ Floating buttons ============================ */
 .kindi-float { position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 80; width: 3.5rem; height: 3.5rem; border-radius: 999px; display: grid; place-items: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); transition: transform 0.2s; }
