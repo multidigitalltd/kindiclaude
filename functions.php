@@ -67,4 +67,5 @@ if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'shipping-bar.php' );
 	kindi_require( 'recently-viewed.php' );
 	kindi_require( 'filters.php' );
+	kindi_require( 'checkout.php' );
 }

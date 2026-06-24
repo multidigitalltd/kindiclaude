@@ -235,5 +235,47 @@
 .kindi-waitlist__terms { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--brand-navy); }
 .kindi-waitlist__msg { margin: 0; font-weight: 700; color: var(--brand-navy); }
 
+/* ---------- Checkout / cart progress steps ---------- */
+.kindi-steps { display: flex; align-items: center; justify-content: center; gap: 0; list-style: none; margin: 0 0 1.5rem; padding: 1rem; background: #fff; border: 1px solid var(--border); border-radius: 1rem; flex-wrap: wrap; box-shadow: var(--shadow-card); }
+.kindi-step { display: flex; align-items: center; gap: 0.5rem; color: var(--muted-foreground); font-weight: 700; font-size: 0.875rem; }
+.kindi-step:not(:last-child)::after { content: ""; width: 1.75rem; height: 2px; background: var(--border); margin-inline: 0.6rem; }
+.kindi-step__n { width: 1.75rem; height: 1.75rem; border-radius: 999px; background: var(--muted); display: grid; place-items: center; font-size: 0.8125rem; }
+.kindi-step.is-active { color: var(--brand-navy); }
+.kindi-step.is-active .kindi-step__n { background: var(--brand-red); color: #fff; }
+.kindi-step.is-done { color: var(--brand-navy); }
+.kindi-step.is-done .kindi-step__n { background: #22c55e; color: #fff; }
+
+/* ---------- Club banner ---------- */
+.kindi-checkout-club { display: flex; align-items: center; gap: 1rem; background: linear-gradient(to left, var(--brand-red), var(--brand-red-dark)); color: #fff; border-radius: 1rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.kindi-checkout-club strong { font-weight: 900; }
+.kindi-checkout-club__btn { margin-inline-start: auto; background: #fff; color: var(--brand-red); font-weight: 800; padding: 0.5rem 1.25rem; border-radius: 0.75rem; text-decoration: none; white-space: nowrap; }
+
+/* ---------- Checkout layout ---------- */
+@media (min-width: 1024px) {
+  .woocommerce-checkout form.checkout.woocommerce-checkout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2rem; align-items: start; }
+  .woocommerce-checkout form.checkout #customer_details { grid-column: 1; grid-row: 1 / span 2; }
+  .woocommerce-checkout form.checkout #order_review_heading { grid-column: 2; grid-row: 1; margin: 0 0 1rem; }
+  .woocommerce-checkout form.checkout #order_review { grid-column: 2; grid-row: 2; position: sticky; top: 7rem; }
+}
+.woocommerce-checkout #customer_details .col-1, .woocommerce-checkout #customer_details .col-2 { width: 100%; float: none; }
+.woocommerce-checkout h3, .woocommerce-checkout #order_review_heading { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); }
+.woocommerce-checkout #order_review, .woocommerce-cart .cart_totals { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.25rem; box-shadow: var(--shadow-card); }
+.woocommerce-checkout #payment { background: transparent; border-radius: 1rem; }
+.woocommerce-checkout #payment ul.payment_methods { border: 0; padding: 0; }
+.woocommerce-checkout #payment div.payment_box { background: var(--brand-blue-soft); border-radius: 0.75rem; }
+.woocommerce-checkout #payment div.payment_box::before { display: none; }
+.woocommerce form .form-row label { font-weight: 600; color: var(--brand-navy); font-size: 0.875rem; }
+.woocommerce table.shop_table { background: transparent; }
+.woocommerce-checkout #order_review .cart_item img, .woocommerce-cart .cart_item img { width: 48px; border-radius: 0.5rem; }
+
+/* ---------- Cart layout ---------- */
+@media (min-width: 1024px) {
+  .woocommerce-cart .woocommerce > .woocommerce-cart-form { float: none; width: 100%; }
+}
+.woocommerce-cart table.cart td.actions .button { border-radius: 0.875rem; }
+.woocommerce-cart .quantity .qty { border: 2px solid color-mix(in oklab, var(--brand-navy) 12%, transparent); border-radius: 0.6rem; }
+.woocommerce a.remove { color: var(--brand-red) !important; border-radius: 999px; font-weight: 700; }
+.woocommerce a.remove:hover { background: var(--brand-red) !important; color: #fff !important; }
+
 /* ---------- Front-page empty state ---------- */
 .kindi-prod-empty { text-align: center; padding: 3rem 1.5rem; background: #fff; border: 1px dashed color-mix(in oklab, var(--brand-navy) 20%, transparent); border-radius: 1.5rem; color: var(--muted-foreground); font-weight: 600; }
