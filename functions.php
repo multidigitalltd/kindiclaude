@@ -50,6 +50,7 @@ kindi_require( 'reviews.php' );
 kindi_require( 'newsletter.php' );
 kindi_require( 'accessibility.php' );
 kindi_require( 'schema.php' );
+kindi_require( 'critical-css.php' );
 kindi_require( 'setup.php' );
 
 if ( is_admin() ) {
@@ -69,4 +70,5 @@ if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'filters.php' );
 	kindi_require( 'checkout.php' );
 	kindi_require( 'merchant-feed.php' );
+	kindi_require( 'sitemap.php' );
 }
