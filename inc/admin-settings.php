@@ -95,6 +95,11 @@ function kindi_settings_tabs(): array {
 					'news_title'    => array( 'type' => 'text', 'label' => 'ניוזלטר — כותרת' ),
 					'news_sub'      => array( 'type' => 'textarea', 'label' => 'ניוזלטר — תיאור' ),
 				),
+				'ניוזלטר ודיוור' => array(
+					'newsletter_webhook' => array( 'type' => 'text', 'label' => 'Webhook URL', 'help' => 'כתובת ה-webhook של מערכת הדיוור (Zapier / Make / ActiveTrail / smoove ועוד). בכל הרשמה תישלח אליה בקשת POST עם האימייל בפורמט JSON.' ),
+					'newsletter_field'   => array( 'type' => 'text', 'label' => 'שם שדה האימייל', 'help' => 'שם המפתח שבו תישלח כתובת האימייל (ברירת מחדל: email).' ),
+					'newsletter_secret'  => array( 'type' => 'text', 'label' => 'סוד אימות (אופציונלי)', 'help' => 'אם תוגדר — תישלח ככותרת X-Kindi-Secret לאימות מקור הבקשה.' ),
+				),
 				'ביקורות גוגל' => array(
 					'google_place_id' => array( 'type' => 'text', 'label' => 'Google Place ID', 'help' => 'מזהה המקום של החנות בגוגל. ניתן למצוא ב-Google Places ID Finder.' ),
 					'google_api_key'  => array( 'type' => 'text', 'label' => 'Google API Key', 'help' => 'מפתח API עם הרשאת Places API. הביקורות יוצגו אוטומטית בסקשן "לקוחות מספרים".' ),

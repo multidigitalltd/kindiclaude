@@ -27,10 +27,44 @@ function kindi_acf_map(): array {
 	return array(
 		'age'         => 'acf_key_age',
 		'brand_label' => 'acf_key_brand',
-		'pieces'      => 'acf_key_pieces',
+		'skills'      => 'acf_key_skills',
 		'players'     => 'acf_key_players',
 		'play_time'   => 'acf_key_play_time',
+		'pieces'      => 'acf_key_pieces',
 	);
+}
+
+/**
+ * Toy fields that hold a list (stored multiline). Their values are sanitised /
+ * normalised keeping line breaks; everything else is single-line.
+ *
+ * @return array<int,string>
+ */
+function kindi_acf_multiline_keys(): array {
+	return array( 'skills' );
+}
+
+/**
+ * Flatten a raw meta value to a string. ACF select/checkbox/repeater fields are
+ * stored as arrays — join them to newlines so they read as a clean list.
+ *
+ * @param mixed $raw Raw meta value.
+ * @return string
+ */
+function kindi_flatten_meta( $raw ): string {
+	if ( is_array( $raw ) ) {
+		$flat = array();
+		array_walk_recursive(
+			$raw,
+			static function ( $v ) use ( &$flat ) {
+				if ( is_scalar( $v ) && '' !== (string) $v ) {
+					$flat[] = (string) $v;
+				}
+			}
+		);
+		return implode( "\n", $flat );
+	}
+	return (string) $raw;
 }
 
 /**
@@ -51,7 +85,7 @@ function kindi_resolve_field( int $post_id, string $kindi_key ): string {
 	if ( isset( $map[ $kindi_key ] ) ) {
 		$source = (string) kindi_opt( $map[ $kindi_key ], '' );
 		if ( '' !== $source ) {
-			return (string) get_post_meta( $post_id, $source, true );
+			return kindi_flatten_meta( get_post_meta( $post_id, $source, true ) );
 		}
 	}
 
@@ -139,11 +173,13 @@ function kindi_acf_import(): int {
 	foreach ( $ids as $id ) {
 		$id      = (int) $id;
 		$touched = false;
+		$multiline = kindi_acf_multiline_keys();
 		foreach ( $map as $kindi_key => $opt ) {
 			$source = (string) kindi_opt( $opt, '' );
-			$value  = (string) get_post_meta( $id, $source, true );
+			$value  = kindi_flatten_meta( get_post_meta( $id, $source, true ) );
 			if ( '' !== $value && '' === (string) get_post_meta( $id, '_kindi_' . $kindi_key, true ) ) {
-				update_post_meta( $id, '_kindi_' . $kindi_key, sanitize_text_field( $value ) );
+				$clean = in_array( $kindi_key, $multiline, true ) ? sanitize_textarea_field( $value ) : sanitize_text_field( $value );
+				update_post_meta( $id, '_kindi_' . $kindi_key, $clean );
 				$touched = true;
 			}
 		}
@@ -197,9 +233,10 @@ function kindi_acf_settings_section( array $tabs ): array {
 		'_acf_intro'   => array( 'type' => 'note', 'label' => '', 'help' => 'מצא את שדות הגיל/המותג שכבר קיימים על המוצרים (גם אם נוצרו ב-ACF), מפה אותם כאן, ולחץ "ייבוא" — הערכים יועתקו לשדות של קינדי כך שהסינון יעבוד והנתונים יישמרו גם אחרי הסרת ACF.' ),
 		'acf_key_age'       => array( 'type' => 'meta_select', 'label' => 'שדה "גיל מומלץ"' ),
 		'acf_key_brand'     => array( 'type' => 'meta_select', 'label' => 'שדה "מותג"' ),
-		'acf_key_pieces'    => array( 'type' => 'meta_select', 'label' => 'שדה "מספר חלקים"' ),
+		'acf_key_skills'    => array( 'type' => 'meta_select', 'label' => 'שדה "מיומנויות"' ),
 		'acf_key_players'   => array( 'type' => 'meta_select', 'label' => 'שדה "מספר שחקנים"' ),
 		'acf_key_play_time' => array( 'type' => 'meta_select', 'label' => 'שדה "זמן משחק"' ),
+		'acf_key_pieces'    => array( 'type' => 'meta_select', 'label' => 'שדה "מספר חלקים" (אופציונלי)' ),
 	);
 
 	return $tabs;

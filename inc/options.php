@@ -81,6 +81,11 @@ function kindi_default_options(): array {
 		'news_title'    => 'קבלו 10% הנחה על הזמנה ראשונה!',
 		'news_sub'      => 'הירשמו לניוזלטר וקבלו עדכונים על מבצעים, מוצרים חדשים והטבות בלעדיות.',
 
+		// Newsletter → external mailing list (webhook).
+		'newsletter_webhook' => '',
+		'newsletter_field'   => 'email',
+		'newsletter_secret'  => '',
+
 		// Google reviews.
 		'google_place_id'  => '',
 		'google_api_key'   => '',
@@ -88,9 +93,10 @@ function kindi_default_options(): array {
 		// Custom-field (ACF) source-key mapping for toy fields.
 		'acf_key_age'       => '',
 		'acf_key_brand'     => '',
-		'acf_key_pieces'    => '',
+		'acf_key_skills'    => '',
 		'acf_key_players'   => '',
 		'acf_key_play_time' => '',
+		'acf_key_pieces'    => '',
 
 		// Footer / social.
 		'about'         => 'החנות המובילה לצעצועים, מכשירי כתיבה, חומרי יצירה וציוד לגני ילדים ובתי ספר. שירות אישי, מחירים הוגנים ואלפי לקוחות מרוצים.',

@@ -315,3 +315,9 @@
 .kindi-chip input:checked + span { background: var(--brand-red); border-color: var(--brand-red); color: #fff; }
 .kindi-chip input:focus-visible + span { outline: 2px solid var(--brand-blue); outline-offset: 2px; }
 .kindi-giftfinder__select { padding: 0.6rem 0.9rem; border-radius: 0.8rem; border: 2px solid var(--border); font-weight: 600; font-family: inherit; max-width: 240px; }
+
+/* ---------- Product skills chips ---------- */
+.kindi-skills { margin-top: 1.25rem; }
+.kindi-skills h3 { font-size: 1rem; font-weight: 700; color: var(--brand-navy); margin: 0 0 0.6rem; }
+.kindi-skills__list { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; margin: 0; padding: 0; }
+.kindi-skill { display: inline-flex; align-items: center; padding: 0.35rem 0.85rem; border-radius: 999px; background: var(--brand-blue-soft); color: var(--brand-navy); font-weight: 600; font-size: 0.85rem; border: 1px solid color-mix(in oklab, var(--brand-blue) 18%, transparent); }

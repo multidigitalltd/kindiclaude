@@ -22,6 +22,7 @@ function kindi_product_meta_defs(): array {
 		'_kindi_pieces'      => array( 'label' => 'מספר חלקים', 'type' => 'text', 'placeholder' => '1,036' ),
 		'_kindi_players'     => array( 'label' => 'מספר שחקנים', 'type' => 'text', 'placeholder' => '1-4' ),
 		'_kindi_play_time'   => array( 'label' => 'זמן משחק/בנייה', 'type' => 'text', 'placeholder' => '~45 דקות' ),
+		'_kindi_skills'      => array( 'label' => 'מיומנויות', 'type' => 'textarea', 'placeholder' => 'שורה אחת (או מופרד בפסיקים) לכל מיומנות' ),
 		'_kindi_highlights'  => array( 'label' => 'נקודות בולטות', 'type' => 'textarea', 'placeholder' => 'שורה אחת לכל נקודה' ),
 		'_kindi_in_box'      => array( 'label' => 'מה בקופסה', 'type' => 'textarea', 'placeholder' => 'שורה אחת לכל פריט' ),
 	);
@@ -90,6 +91,23 @@ function kindi_pmeta_lines( $product, string $key ): array {
 }
 
 /**
+ * Skills as a clean list. Accepts newline- or comma-separated input (the latter
+ * is common for ACF select/text fields).
+ *
+ * @param WC_Product $product Product.
+ * @return array<int,string>
+ */
+function kindi_skill_items( $product ): array {
+	$raw = kindi_pmeta( $product, 'skills' );
+	if ( '' === $raw ) {
+		return array();
+	}
+	$parts = preg_split( '/\r\n|\r|\n|,|،|;|\|/u', $raw ) ?: array();
+
+	return array_values( array_filter( array_map( 'trim', $parts ), 'strlen' ) );
+}
+
+/**
  * Highlights list near the buy box.
  *
  * @return void
@@ -122,10 +140,11 @@ function kindi_render_specs(): void {
 		'שחקנים' => kindi_pmeta( $product, 'players' ),
 		'זמן'    => kindi_pmeta( $product, 'play_time' ),
 	);
-	$specs = array_filter( $specs );
-	$inbox = kindi_pmeta_lines( $product, 'in_box' );
+	$specs  = array_filter( $specs );
+	$inbox  = kindi_pmeta_lines( $product, 'in_box' );
+	$skills = kindi_skill_items( $product );
 
-	if ( ! $specs && ! $inbox ) {
+	if ( ! $specs && ! $inbox && ! $skills ) {
 		return;
 	}
 
@@ -136,6 +155,13 @@ function kindi_render_specs(): void {
 			echo '<div class="kindi-spec"><span class="kindi-spec__l">' . esc_html( $label ) . '</span><span class="kindi-spec__v">' . esc_html( $value ) . '</span></div>';
 		}
 		echo '</div>';
+	}
+	if ( $skills ) {
+		echo '<div class="kindi-skills"><h3>' . esc_html__( 'מיומנויות', 'kindi' ) . '</h3><ul class="kindi-skills__list">';
+		foreach ( $skills as $skill ) {
+			echo '<li class="kindi-skill">' . esc_html( $skill ) . '</li>';
+		}
+		echo '</ul></div>';
 	}
 	if ( $inbox ) {
 		echo '<div class="kindi-inbox"><h3>מה בקופסה</h3><ul>';

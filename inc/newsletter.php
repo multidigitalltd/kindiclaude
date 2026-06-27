@@ -58,7 +58,7 @@ function kindi_rest_subscribe( WP_REST_Request $request ): WP_REST_Response {
 	}
 
 	/**
-	 * Integrate with an external ESP (Mailchimp, etc.).
+	 * Integrate with an external ESP / mailing list.
 	 *
 	 * @param string $email Subscriber email.
 	 */
@@ -66,6 +66,48 @@ function kindi_rest_subscribe( WP_REST_Request $request ): WP_REST_Response {
 
 	return new WP_REST_Response( array( 'message' => '🎉 תודה! קוד ההנחה בדרך אליכם למייל.' ), 200 );
 }
+
+/**
+ * Push a new subscriber to the configured external webhook (Zapier / Make /
+ * ActiveTrail / smoove / n8n …). Non-blocking so it never delays the visitor;
+ * the local list remains the source-of-truth backup. The email field name and
+ * an optional shared-secret header are configurable for the target system.
+ *
+ * @param string $email Subscriber email.
+ * @return void
+ */
+function kindi_newsletter_webhook( string $email ): void {
+	$url = trim( (string) kindi_opt( 'newsletter_webhook' ) );
+	if ( '' === $url || ! wp_http_validate_url( $url ) ) {
+		return;
+	}
+
+	$field = (string) kindi_opt( 'newsletter_field', 'email' );
+	$field = '' !== $field ? sanitize_key( $field ) : 'email';
+
+	$body = array(
+		$field    => $email,
+		'source'  => 'kindi-newsletter',
+		'site'    => home_url( '/' ),
+	);
+
+	$headers = array( 'Content-Type' => 'application/json' );
+	$secret  = trim( (string) kindi_opt( 'newsletter_secret' ) );
+	if ( '' !== $secret ) {
+		$headers['X-Kindi-Secret'] = $secret;
+	}
+
+	wp_remote_post(
+		$url,
+		array(
+			'timeout'  => 5,
+			'blocking' => false,
+			'headers'  => $headers,
+			'body'     => wp_json_encode( $body ),
+		)
+	);
+}
+add_action( 'kindi_newsletter_subscribe', 'kindi_newsletter_webhook' );
 
 /**
  * Export subscribers as CSV from the admin (admin-post action).
