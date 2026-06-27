@@ -13,11 +13,57 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Fetch Google reviews (cached).
+ * Manually-curated "showcase" reviews from the control panel — no API key, no
+ * external request. Each line: "name | rating(1-5) | text".
+ *
+ * @return array{rating:float,total:int,reviews:array<int,array{text:string,name:string,rating:int,letter:string}>}|array{}
+ */
+function kindi_showcase_reviews(): array {
+	$lines = function_exists( 'kindi_opt_lines' ) ? kindi_opt_lines( 'reviews_manual' ) : array();
+
+	$reviews = array();
+	foreach ( $lines as $line ) {
+		$parts = array_map( 'trim', explode( '|', $line ) );
+		if ( count( $parts ) < 3 ) {
+			continue;
+		}
+		$name = $parts[0];
+		$text = $parts[2];
+		if ( '' === $name || '' === $text ) {
+			continue;
+		}
+		$reviews[] = array(
+			'text'   => $text,
+			'name'   => $name,
+			'rating' => max( 1, min( 5, (int) $parts[1] ) ),
+			'letter' => function_exists( 'mb_substr' ) ? mb_substr( $name, 0, 1 ) : substr( $name, 0, 1 ),
+		);
+	}
+
+	if ( ! $reviews ) {
+		return array();
+	}
+
+	return array(
+		'rating'  => (float) ( kindi_opt( 'reviews_rating' ) ?: 5 ),
+		'total'   => (int) ( kindi_opt( 'reviews_count' ) ?: count( $reviews ) ),
+		'reviews' => $reviews,
+		'link'    => (string) kindi_opt( 'reviews_link' ),
+	);
+}
+
+/**
+ * Reviews for the showcase — curated entries first (no API), falling back to the
+ * Google Places API only if it is explicitly configured.
  *
  * @return array{rating:float,total:int,reviews:array<int,array{text:string,name:string,rating:int,letter:string}>}|array{}
  */
 function kindi_google_reviews(): array {
+	$manual = kindi_showcase_reviews();
+	if ( $manual ) {
+		return $manual;
+	}
+
 	$place = (string) kindi_opt( 'google_place_id' );
 	$key   = (string) kindi_opt( 'google_api_key' );
 

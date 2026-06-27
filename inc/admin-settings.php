@@ -118,9 +118,11 @@ function kindi_settings_tabs(): array {
 					'newsletter_field'   => array( 'type' => 'text', 'label' => 'שם שדה האימייל', 'help' => 'שם המפתח שבו תישלח כתובת האימייל (ברירת מחדל: email).' ),
 					'newsletter_secret'  => array( 'type' => 'text', 'label' => 'סוד אימות (אופציונלי)', 'help' => 'אם תוגדר — תישלח ככותרת X-Kindi-Secret לאימות מקור הבקשה.' ),
 				),
-				'ביקורות גוגל' => array(
-					'google_place_id' => array( 'type' => 'text', 'label' => 'Google Place ID', 'help' => 'מזהה המקום של החנות בגוגל. ניתן למצוא ב-Google Places ID Finder.' ),
-					'google_api_key'  => array( 'type' => 'text', 'label' => 'Google API Key', 'help' => 'מפתח API עם הרשאת Places API. הביקורות יוצגו אוטומטית בסקשן "לקוחות מספרים".' ),
+				'ביקורות גוגל (Showcase)' => array(
+					'reviews_manual' => array( 'type' => 'textarea', 'label' => 'ביקורות להצגה', 'help' => 'שורה אחת לכל ביקורת בפורמט: שם | דירוג (1-5) | טקסט. ללא צורך במפתח API.' ),
+					'reviews_rating' => array( 'type' => 'text', 'label' => 'דירוג כללי', 'help' => 'לדוגמה: 4.9' ),
+					'reviews_count'  => array( 'type' => 'number', 'label' => 'מספר ביקורות כולל', 'help' => 'יוצג כ"X+ ביקורות בגוגל". 0 = מספר הביקורות שהוזנו.' ),
+					'reviews_link'   => array( 'type' => 'url', 'label' => 'קישור לכל הביקורות בגוגל' ),
 				),
 				'פוטר ורשתות'  => array(
 					'about' => array( 'type' => 'textarea', 'label' => 'טקסט "אודות"' ),

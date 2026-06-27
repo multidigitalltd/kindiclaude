@@ -47,7 +47,7 @@ function kindi_pdp_highlights(): void {
 	}
 	echo '</ul>';
 }
-add_action( 'woocommerce_single_product_summary', 'kindi_pdp_highlights', 25 );
+add_action( 'woocommerce_single_product_summary', 'kindi_pdp_highlights', 33 );
 
 /**
  * Delivery + gift-wrap reassurance card under the add-to-cart.
@@ -62,7 +62,7 @@ function kindi_pdp_delivery_card(): void {
 	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--red">' . kindi_icon( 'gift', 'kindi-icon--md' ) . '</span><div><strong>עטיפת מתנה חינם</strong><span>סמנו בעגלה — נעטוף יפה ונצרף ברכה</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	echo '</div>';
 }
-add_action( 'woocommerce_single_product_summary', 'kindi_pdp_delivery_card', 33 );
+add_action( 'woocommerce_single_product_summary', 'kindi_pdp_delivery_card', 34 );
 
 /**
  * Toy key-facts cards (pieces / age / play-time / players) — only those present.
@@ -135,12 +135,13 @@ function kindi_pdp_inbox( $product ): void {
 }
 
 /**
- * Render all the rich after-summary blocks in one full-width section.
+ * Render the left-column blocks (trust strip, key facts, skills, in-the-box),
+ * called directly from the custom content-single-product.php under the gallery.
  *
+ * @param WC_Product $product Product.
  * @return void
  */
-function kindi_pdp_extras(): void {
-	global $product;
+function kindi_pdp_left_extras( $product ): void {
 	if ( ! $product instanceof WC_Product ) {
 		return;
 	}
@@ -162,4 +163,3 @@ function kindi_pdp_extras(): void {
 	kindi_pdp_inbox( $product );
 	echo '</div>';
 }
-add_action( 'woocommerce_after_single_product_summary', 'kindi_pdp_extras', 6 );
