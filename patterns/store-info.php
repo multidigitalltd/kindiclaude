@@ -36,7 +36,7 @@ $kindi_details = array(
 		</div>
 		<div class="kindi-store__media">
 			<span class="kindi-ground-shadow animate-ground"></span>
-			<img class="kindi-store__mascot animate-mascot" src="<?php echo kindi_img( 'mascot/kindy-new.webp' ); ?>" alt="" loading="lazy" decoding="async">
+			<img class="kindi-store__mascot animate-mascot" src="<?php echo kindi_img( 'mascot/wave.webp' ); ?>" alt="" loading="lazy" decoding="async">
 			<span class="kindi-store__here"><?php echo kindi_icon( 'pin', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>כאן אנחנו!</span>
 		</div>
 	</div>
