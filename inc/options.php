@@ -102,12 +102,15 @@ function kindi_default_options(): array {
 		'google_api_key'   => '',
 
 		// Custom-field (ACF) source-key mapping for toy fields.
-		'acf_key_age'       => '',
-		'acf_key_brand'     => '',
-		'acf_key_skills'    => '',
-		'acf_key_players'   => '',
-		'acf_key_play_time' => '',
-		'acf_key_pieces'    => '',
+		// Pre-mapped to the site's existing ACF field names so data is adopted
+		// out of the box; override from the panel if a field is renamed.
+		'acf_key_age'          => 'age_fit',
+		'acf_key_brand'        => 'brand',
+		'acf_key_skills'       => 'skills',
+		'acf_key_players'      => 'users',
+		'acf_key_play_time'    => '',
+		'acf_key_pieces'       => '',
+		'acf_key_archive_desc' => 'תאור_תחתון_לארכיון',
 
 		// Footer / social.
 		'about'         => 'החנות המובילה לצעצועים, מכשירי כתיבה, חומרי יצירה וציוד לגני ילדים ובתי ספר. שירות אישי, מחירים הוגנים ואלפי לקוחות מרוצים.',

@@ -237,6 +237,7 @@ function kindi_acf_settings_section( array $tabs ): array {
 		'acf_key_players'   => array( 'type' => 'meta_select', 'label' => 'שדה "מספר שחקנים"' ),
 		'acf_key_play_time' => array( 'type' => 'meta_select', 'label' => 'שדה "זמן משחק"' ),
 		'acf_key_pieces'    => array( 'type' => 'meta_select', 'label' => 'שדה "מספר חלקים" (אופציונלי)' ),
+		'acf_key_archive_desc' => array( 'type' => 'text', 'label' => 'שדה "תיאור תחתון לארכיון" (קטגוריה)', 'help' => 'שם שדה ה-ACF ברמת הקטגוריה. נטען אוטומטית בתחתית עמוד הקטגוריה.' ),
 	);
 
 	return $tabs;
