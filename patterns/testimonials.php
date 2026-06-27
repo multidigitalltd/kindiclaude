@@ -10,6 +10,10 @@
 
 $kindi_google = function_exists( 'kindi_google_reviews' ) ? kindi_google_reviews() : array();
 
+// If a reviews plugin shortcode is configured (e.g. Rich Showcase for Google
+// Reviews), render its real, auto-pulled reviews inside the designed section.
+$kindi_rev_sc = function_exists( 'kindi_opt' ) ? trim( (string) kindi_opt( 'reviews_shortcode' ) ) : '';
+
 $kindi_tst = ! empty( $kindi_google['reviews'] ) ? $kindi_google['reviews'] : array(
 	array( 'text' => 'חנות מדהימה! קניתי לבן שלי ילקוט ומחברות לכיתה א\' — השירות מקסים, המחירים נהדרים והמשלוח הגיע למחרת. ממליצה לכולם!', 'name' => 'שרה כהן', 'role' => 'אמא לארבעה • בני ברק', 'letter' => 'ש' ),
 	array( 'text' => 'אני גננת שמזמינה מקינדר טויס כבר 5 שנים. המבחר של חומרי היצירה מצוין, המחירים הוגנים והם תמיד מוכנים להמליץ. מקצועיים אמיתיים.', 'name' => 'מירי פרץ', 'role' => 'גננת • ירושלים', 'letter' => 'מ' ),
@@ -35,6 +39,9 @@ $kindi_has_google = ! empty( $kindi_google['reviews'] );
 		</div>
 		<?php endif; ?>
 	</div>
+	<?php if ( '' !== $kindi_rev_sc ) : ?>
+	<div class="kindi-tst-embed"><?php echo do_shortcode( $kindi_rev_sc ); // phpcs:ignore WordPress.Security.EscapeOutput -- Trusted admin shortcode. ?></div>
+	<?php else : ?>
 	<div class="kindi-tst">
 		<?php foreach ( array_slice( $kindi_tst, 0, 3 ) as $t ) : ?>
 		<article class="kindi-tst__card">
@@ -55,5 +62,6 @@ $kindi_has_google = ! empty( $kindi_google['reviews'] );
 		</article>
 		<?php endforeach; ?>
 	</div>
+	<?php endif; ?>
 </section>
 <!-- /wp:html -->

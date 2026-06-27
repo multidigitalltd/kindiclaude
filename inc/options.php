@@ -104,7 +104,8 @@ function kindi_default_options(): array {
 		'cart_reminder_subject' => 'העגלה שלך עדיין מחכה 💝',
 		'cart_reminder_body'    => "היי,\n\nרק תזכורת קטנה — העגלה ששמרת ב-{site} עדיין כאן.\nהפריטים אזלו בעבר במהירות, אז כדאי להשלים את ההזמנה.",
 
-		// Google reviews — curated showcase (no API key needed).
+		// Google reviews — auto (plugin shortcode) or curated showcase.
+		'reviews_shortcode' => '',
 		'reviews_manual' => "מיכל א. | 5 | שירות מעולה ומשלוח מהיר, הילדים מאושרים!\nיוסי ב. | 5 | מבחר ענק ומחירים הוגנים. ממליץ בחום.\nרינת ל. | 5 | חוויית קנייה מצוינת ושירות אישי מהלב.",
 		'reviews_rating' => '4.9',
 		'reviews_count'  => 0,

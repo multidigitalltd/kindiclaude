@@ -293,3 +293,6 @@
 .kindi-grev__count { font-size: 0.75rem; font-weight: 700; color: var(--muted-foreground); }
 
 /* Floating button rules moved to components.css (needed on every page). */
+
+/* Reviews plugin embed inside the designed section */
+.kindi-tst-embed { margin-top: 1.5rem; }
