@@ -55,7 +55,7 @@ function kindi_is_new_product( $product ): bool {
  * @return string
  */
 function kindi_product_brand( $product ): string {
-	$label = (string) $product->get_meta( '_kindi_brand_label' );
+	$label = function_exists( 'kindi_pmeta' ) ? kindi_pmeta( $product, 'brand_label' ) : (string) $product->get_meta( '_kindi_brand_label' );
 	if ( $label ) {
 		return $label;
 	}

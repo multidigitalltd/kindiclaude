@@ -70,7 +70,11 @@ add_action( 'woocommerce_admin_process_product_object', 'kindi_save_product_meta
  * @return string
  */
 function kindi_pmeta( $product, string $key ): string {
-	return (string) $product->get_meta( '_kindi_' . $key );
+	$value = (string) $product->get_meta( '_kindi_' . $key );
+	if ( '' === $value && function_exists( 'kindi_resolve_field' ) ) {
+		$value = kindi_resolve_field( $product->get_id(), $key );
+	}
+	return $value;
 }
 
 /**

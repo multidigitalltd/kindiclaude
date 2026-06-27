@@ -24,6 +24,10 @@ function kindi_default_options(): array {
 		// General.
 		'phone'         => '03-5293383',
 		'whatsapp'      => '972500000000',
+		'whatsapp_hours'       => "א'-ה' 9:00-21:00 • ו' 9:00-14:00",
+		'whatsapp_from'        => 9,
+		'whatsapp_to'          => 21,
+		'whatsapp_product_msg' => "היי, יש לי שאלה על המוצר:\n{product}\n{url}",
 		'free_shipping' => 299,
 		'shipbar'       => 'משלוח מהיר חינם מעל 299 ₪ | מועדון הלקוחות — 10% הנחה על הקנייה הראשונה',
 		'ticker'        => "משלוח חינם בהזמנה מעל 299 ₪\nמועדון קינדי — 5% חזרה על כל קנייה\nקולקציית חזרה לבית הספר 2026 נחתה\nתשלום מאובטח SSL + PCI\nשירות אישי 03-5293383",
@@ -80,6 +84,13 @@ function kindi_default_options(): array {
 		// Google reviews.
 		'google_place_id'  => '',
 		'google_api_key'   => '',
+
+		// Custom-field (ACF) source-key mapping for toy fields.
+		'acf_key_age'       => '',
+		'acf_key_brand'     => '',
+		'acf_key_pieces'    => '',
+		'acf_key_players'   => '',
+		'acf_key_play_time' => '',
 
 		// Footer / social.
 		'about'         => 'החנות המובילה לצעצועים, מכשירי כתיבה, חומרי יצירה וציוד לגני ילדים ובתי ספר. שירות אישי, מחירים הוגנים ואלפי לקוחות מרוצים.',

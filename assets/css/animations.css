@@ -16,10 +16,6 @@
   0%, 100% { transform: translateY(0) rotate(0); }
   50% { transform: translateY(-14px) rotate(6deg); }
 }
-@keyframes kindi-marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
 @keyframes kindi-confetti {
   0%, 100% { transform: translateY(0) rotate(0); opacity: 1; }
   50% { transform: translateY(-20px) rotate(180deg); opacity: 0.7; }
@@ -55,7 +51,6 @@
 .animate-bob { animation: kindi-bob 3s ease-in-out infinite; }
 .animate-wiggle { animation: kindi-wiggle 4s ease-in-out infinite; }
 .animate-float { animation: kindi-float 5s ease-in-out infinite; }
-.animate-marquee { animation: kindi-marquee 40s linear infinite; }
 .animate-confetti { animation: kindi-confetti 3s ease-in-out infinite; }
 .animate-mascot {
   transform-origin: 50% 92%;
@@ -70,7 +65,6 @@
   .animate-bob,
   .animate-wiggle,
   .animate-float,
-  .animate-marquee,
   .animate-confetti,
   .animate-mascot,
   .animate-ground,

@@ -201,3 +201,13 @@
 
 /* ============================ Section title (legacy block helper) ============================ */
 .kindi-section-title { font-family: var(--wp--preset--font-family--display); color: var(--brand-navy); }
+
+/* ---------- Header ticker marquee (global — header shows on every view) ---------- */
+@keyframes kindi-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee { animation: kindi-marquee 40s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none !important; }
+}

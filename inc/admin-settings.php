@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
  * @return array<string,array<string,mixed>>
  */
 function kindi_settings_tabs(): array {
-	return array(
+	$tabs = array(
 		'promos'   => array(
 			'label'    => 'מבצעים ותוכן',
 			'sections' => array(
@@ -73,9 +73,13 @@ function kindi_settings_tabs(): array {
 			'label'    => 'טקסטים והגדרות',
 			'sections' => array(
 				'כללי'         => array(
-					'phone'         => array( 'type' => 'text', 'label' => 'טלפון' ),
-					'whatsapp'      => array( 'type' => 'text', 'label' => 'מספר וואטסאפ (בינלאומי, ללא +)', 'help' => 'לדוגמה: 972500000000' ),
-					'free_shipping' => array( 'type' => 'number', 'label' => 'סף משלוח חינם (₪)' ),
+					'phone'                => array( 'type' => 'text', 'label' => 'טלפון' ),
+					'whatsapp'             => array( 'type' => 'text', 'label' => 'מספר וואטסאפ (בינלאומי, ללא +)', 'help' => 'לדוגמה: 972500000000' ),
+					'whatsapp_hours'       => array( 'type' => 'text', 'label' => 'שעות שירות וואטסאפ (תצוגה)' ),
+					'whatsapp_from'        => array( 'type' => 'number', 'label' => 'וואטסאפ — שעת פתיחה (0-23)', 'help' => 'משמש לסימון "זמינים עכשיו" בכפתור המוצר.' ),
+					'whatsapp_to'          => array( 'type' => 'number', 'label' => 'וואטסאפ — שעת סגירה (0-23)' ),
+					'whatsapp_product_msg' => array( 'type' => 'textarea', 'label' => 'הודעת וואטסאפ מעמוד מוצר', 'help' => 'אפשר להשתמש ב-{product} ו-{url}.' ),
+					'free_shipping'        => array( 'type' => 'number', 'label' => 'סף משלוח חינם (₪)' ),
 				),
 				'מועדון קינדי' => array(
 					'club_title'    => array( 'type' => 'text', 'label' => 'כותרת' ),
@@ -104,6 +108,13 @@ function kindi_settings_tabs(): array {
 			),
 		),
 	);
+
+	/**
+	 * Filter the settings tabs/sections/fields (used to inject the ACF bridge).
+	 *
+	 * @param array<string,array<string,mixed>> $tabs Settings tabs.
+	 */
+	return apply_filters( 'kindi_settings_tabs', $tabs );
 }
 
 /**
@@ -281,7 +292,19 @@ function kindi_settings_render(): void {
 					printf( '<option value="%d"%s>%s</option>', (int) $tid, selected( (int) $value, (int) $tid, false ), esc_html( $tname ) );
 				}
 				echo '</select>';
-			} elseif ( 'taxonomy_multi' === $field['type'] ) {
+			} elseif ( 'meta_select' === $field['type'] ) {
+					$keys = function_exists( 'kindi_detected_meta_keys' ) ? kindi_detected_meta_keys() : array();
+					echo '<select id="' . esc_attr( $id ) . '" name="kindi[' . esc_attr( $key ) . ']"><option value="">— ' . esc_html__( 'לא ממופה', 'kindi' ) . ' —</option>';
+					foreach ( $keys as $mk ) {
+						printf( '<option value="%1$s"%2$s>%1$s</option>', esc_attr( $mk ), selected( (string) $value, (string) $mk, false ) );
+					}
+					echo '</select>';
+					if ( ! $keys ) {
+						echo '<p class="description">' . esc_html__( 'לא נמצאו שדות מותאמים על המוצרים עדיין.', 'kindi' ) . '</p>';
+					}
+				} elseif ( 'note' === $field['type'] ) {
+					echo ''; // Help text printed below handles the content.
+				} elseif ( 'taxonomy_multi' === $field['type'] ) {
 				$selected_ids = is_array( $value ) ? array_map( 'intval', $value ) : array();
 				echo '<input type="hidden" name="kindi__multi[' . esc_attr( $key ) . ']" value="1">';
 				echo '<div style="max-height:220px;overflow:auto;border:1px solid #dcdcde;border-radius:6px;padding:8px;column-count:2">';
@@ -318,5 +341,12 @@ function kindi_settings_render(): void {
 	}
 
 	submit_button( __( 'שמירת תוכן', 'kindi' ), 'primary', 'kindi_settings_submit' );
-	echo '</form></div>';
+	echo '</form>';
+
+	/**
+	 * Fires after the settings form — used for standalone tools (e.g. ACF import).
+	 */
+	do_action( 'kindi_settings_after_form' );
+
+	echo '</div>';
 }
