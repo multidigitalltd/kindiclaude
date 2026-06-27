@@ -377,3 +377,7 @@
 .kindi-inboxcard__head h3 { margin: 0; font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.15rem; }
 .kindi-inboxcard__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .kindi-inboxcard__chip { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 999px; padding: 0.4rem 0.85rem; font-size: 0.8rem; font-weight: 600; }
+
+/* ---------- Recently viewed — span full width below the product grid ---------- */
+.kindi-rv { grid-column: 1 / -1; width: 100%; }
+.kindi-rv .kindi-sec-title { margin-bottom: 1.25rem; }

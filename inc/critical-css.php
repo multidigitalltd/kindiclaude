@@ -35,8 +35,8 @@ img{max-width:100%;height:auto}a{color:#E63946;text-decoration:none}
 .skip-link{position:absolute;left:-9999px}
 .kindi-header{position:sticky;top:0;z-index:100}
 .kindi-topbar{background:linear-gradient(to left,#E63946,#b81f2c 55%,#1B2A52);color:#fff;overflow:hidden}
-.kindi-topbar__track{display:flex;white-space:nowrap;padding-block:.5rem;width:max-content}
-.kindi-topbar__item{display:inline-flex;align-items:center;gap:.5rem;padding-inline:2rem;font-size:13px;font-weight:600}
+.kindi-topbar__track{display:flex;flex-wrap:wrap;justify-content:center;padding-block:.5rem;padding-inline:1rem}
+.kindi-topbar__item{display:inline-flex;align-items:center;gap:.5rem;padding-inline:1.25rem;font-size:13px;font-weight:600}
 .kindi-shipbar{background:#1B2A52;color:#fff;font-size:.875rem;padding:.5rem 1rem;text-align:center;font-weight:500}
 .kindi-bar{position:relative;z-index:3;background:#fff;border-bottom:1px solid #e7eaf0;max-width:1440px;margin-inline:auto;height:5rem;display:flex;align-items:center;gap:1rem;padding-inline:1rem}
 .kindi-bar__logo img{height:3.25rem;width:auto}
@@ -79,7 +79,10 @@ function kindi_async_styles( string $tag, string $handle ): string {
 		return $tag;
 	}
 
-	$async = array( 'kindi-base', 'kindi-components', 'kindi-sections', 'kindi-animations', 'kindi-woocommerce' );
+	// Keep the global chrome (base + components) render-blocking so the header,
+	// icons, nav and mega never flash unstyled; only defer heavier page-specific
+	// stylesheets.
+	$async = array( 'kindi-sections', 'kindi-animations', 'kindi-woocommerce' );
 	if ( ! in_array( $handle, $async, true ) ) {
 		return $tag;
 	}

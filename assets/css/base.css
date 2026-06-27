@@ -17,6 +17,8 @@
   --brand-navy-dark: var(--wp--preset--color--brand-navy-dark);
   --brand-yellow: var(--wp--preset--color--brand-yellow);
   --surface: var(--wp--preset--color--surface);
+  --background: var(--wp--preset--color--background, #fff);
+  --accent: var(--wp--preset--color--brand-yellow);
   --foreground: var(--wp--preset--color--foreground);
   --muted: var(--wp--preset--color--muted);
   --muted-foreground: var(--wp--preset--color--muted-foreground);

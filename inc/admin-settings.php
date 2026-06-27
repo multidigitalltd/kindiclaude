@@ -95,6 +95,13 @@ function kindi_settings_tabs(): array {
 					'news_title'    => array( 'type' => 'text', 'label' => 'ניוזלטר — כותרת' ),
 					'news_sub'      => array( 'type' => 'textarea', 'label' => 'ניוזלטר — תיאור' ),
 				),
+				'באנר עוגיות (Cookies)' => array(
+					'cookie_enable'      => array( 'type' => 'select', 'label' => 'הצגת הבאנר', 'options' => array( '1' => 'מופעל', '0' => 'כבוי' ) ),
+					'cookie_text'        => array( 'type' => 'textarea', 'label' => 'טקסט ההודעה' ),
+					'cookie_btn'         => array( 'type' => 'text', 'label' => 'טקסט כפתור האישור' ),
+					'cookie_policy_text' => array( 'type' => 'text', 'label' => 'טקסט קישור המדיניות' ),
+					'cookie_policy_url'  => array( 'type' => 'url', 'label' => 'קישור למדיניות פרטיות' ),
+				),
 				'מייל — חזרה למלאי' => array(
 					'wl_email_subject' => array( 'type' => 'text', 'label' => 'נושא המייל', 'help' => 'אפשר: {name}, {product}, {url}' ),
 					'wl_email_body'    => array( 'type' => 'textarea', 'label' => 'תוכן המייל', 'help' => 'אפשר: {name}, {product}, {url}. העיצוב (לוגו/צבעים) מתווסף אוטומטית.' ),

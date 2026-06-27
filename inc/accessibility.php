@@ -28,6 +28,21 @@ function kindi_a11y_assets(): void {
 add_action( 'wp_enqueue_scripts', 'kindi_a11y_assets' );
 
 /**
+ * Floating action buttons (WhatsApp + accessibility) — rendered on every page,
+ * so the accessibility panel can always be opened.
+ *
+ * @return void
+ */
+function kindi_floating_buttons(): void {
+	$wa = preg_replace( '/\D+/', '', (string) ( function_exists( 'kindi_opt' ) ? kindi_opt( 'whatsapp' ) : '' ) );
+	if ( '' !== $wa ) {
+		echo '<a class="kindi-float kindi-float--wa" href="' . esc_url( 'https://wa.me/' . $wa ) . '" aria-label="צ׳אט בוואטסאפ" target="_blank" rel="noopener">' . kindi_icon( 'whatsapp', 'kindi-icon--xl kindi-icon--white' ) . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	}
+	echo '<button class="kindi-float kindi-float--a11y" type="button" aria-label="הגדרות נגישות" data-kindi-a11y>' . kindi_icon( 'accessibility', 'kindi-icon--md kindi-icon--white' ) . '</button>'; // phpcs:ignore WordPress.Security.EscapeOutput
+}
+add_action( 'wp_footer', 'kindi_floating_buttons', 20 );
+
+/**
  * Render the toolbar markup in the footer.
  *
  * @return void

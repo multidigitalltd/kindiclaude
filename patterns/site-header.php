@@ -22,12 +22,11 @@ foreach ( kindi_opt_lines( 'ticker' ) as $i => $kindi_txt ) {
 // Top-level navigation — from the assigned WP menu, or the curated default.
 $kindi_nav = kindi_nav_items();
 
-$kindi_ticker_loop = array_merge( $kindi_ticker, $kindi_ticker );
 ?>
 <!-- wp:html -->
 <div class="kindi-topbar">
-	<div class="kindi-topbar__track animate-marquee">
-		<?php foreach ( $kindi_ticker_loop as $t ) : ?>
+	<div class="kindi-topbar__track">
+		<?php foreach ( $kindi_ticker as $t ) : ?>
 		<span class="kindi-topbar__item"><?php echo kindi_icon( $t['icon'], 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $t['text'] ); ?></span>
 		<?php endforeach; ?>
 	</div>
