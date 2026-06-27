@@ -321,3 +321,17 @@
 .kindi-skills h3 { font-size: 1rem; font-weight: 700; color: var(--brand-navy); margin: 0 0 0.6rem; }
 .kindi-skills__list { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; margin: 0; padding: 0; }
 .kindi-skill { display: inline-flex; align-items: center; padding: 0.35rem 0.85rem; border-radius: 999px; background: var(--brand-blue-soft); color: var(--brand-navy); font-weight: 600; font-size: 0.85rem; border: 1px solid color-mix(in oklab, var(--brand-blue) 18%, transparent); }
+
+/* ---------- Save & share cart ---------- */
+.kindi-btn--navy { background: var(--brand-navy); color: #fff; }
+.kindi-btn--navy:hover { background: var(--brand-navy-dark); }
+.kindi-savecart { margin: 1.5rem 0; padding: 1.25rem 1.5rem; border-radius: 1.25rem; background: var(--brand-blue-soft); border: 1px solid color-mix(in oklab, var(--brand-blue) 16%, transparent); }
+.kindi-savecart__head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.9rem; }
+.kindi-savecart__head .kindi-icon { color: var(--brand-red); flex: 0 0 auto; }
+.kindi-savecart__head strong { display: block; color: var(--brand-navy); font-size: 1.05rem; }
+.kindi-savecart__head span { color: var(--muted-foreground); font-size: 0.875rem; }
+.kindi-savecart__row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.kindi-savecart__row input[type="email"] { flex: 1; min-width: 200px; padding: 0.7rem 0.9rem; border-radius: 0.8rem; border: 2px solid var(--border); font-family: inherit; }
+.kindi-savecart__result { margin-top: 1rem; font-weight: 600; color: var(--brand-navy); }
+.kindi-savecart__link { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+.kindi-savecart__link input { flex: 1; padding: 0.6rem 0.8rem; border-radius: 0.7rem; border: 2px solid var(--border); background: #fff; font-size: 0.85rem; direction: ltr; text-align: left; }

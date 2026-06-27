@@ -95,6 +95,17 @@ function kindi_settings_tabs(): array {
 					'news_title'    => array( 'type' => 'text', 'label' => 'ניוזלטר — כותרת' ),
 					'news_sub'      => array( 'type' => 'textarea', 'label' => 'ניוזלטר — תיאור' ),
 				),
+				'מייל — חזרה למלאי' => array(
+					'wl_email_subject' => array( 'type' => 'text', 'label' => 'נושא המייל', 'help' => 'אפשר: {name}, {product}, {url}' ),
+					'wl_email_body'    => array( 'type' => 'textarea', 'label' => 'תוכן המייל', 'help' => 'אפשר: {name}, {product}, {url}. העיצוב (לוגו/צבעים) מתווסף אוטומטית.' ),
+				),
+				'עגלה שמורה — מיילים' => array(
+					'cart_reminder_delay'   => array( 'type' => 'number', 'label' => 'תזכורת לאחר (שעות)', 'help' => 'כמה שעות אחרי השמירה תישלח תזכורת. ברירת מחדל: 24.' ),
+					'cart_email_subject'    => array( 'type' => 'text', 'label' => 'מייל מיידי — נושא', 'help' => 'אפשר: {site}, {url}' ),
+					'cart_email_body'       => array( 'type' => 'textarea', 'label' => 'מייל מיידי — תוכן' ),
+					'cart_reminder_subject' => array( 'type' => 'text', 'label' => 'תזכורת — נושא' ),
+					'cart_reminder_body'    => array( 'type' => 'textarea', 'label' => 'תזכורת — תוכן' ),
+				),
 				'ניוזלטר ודיוור' => array(
 					'newsletter_webhook' => array( 'type' => 'text', 'label' => 'Webhook URL', 'help' => 'כתובת ה-webhook של מערכת הדיוור (Zapier / Make / ActiveTrail / smoove ועוד). בכל הרשמה תישלח אליה בקשת POST עם האימייל בפורמט JSON.' ),
 					'newsletter_field'   => array( 'type' => 'text', 'label' => 'שם שדה האימייל', 'help' => 'שם המפתח שבו תישלח כתובת האימייל (ברירת מחדל: email).' ),
@@ -185,6 +196,43 @@ function kindi_admin_product_cats(): array {
 }
 
 /**
+ * Branded header for the settings screen — Kindi logo + Multi Digital credit.
+ *
+ * @return void
+ */
+function kindi_settings_brand_header(): void {
+	$logo    = function_exists( 'kindi_img' ) ? kindi_img( 'logo.png' ) : '';
+	$version = defined( 'KINDI_VERSION' ) ? KINDI_VERSION : '';
+
+	$md_logo = '<svg viewBox="0 0 132 24" width="118" height="22" role="img" aria-label="Multi Digital" xmlns="http://www.w3.org/2000/svg">'
+		. '<rect x="0" y="3" width="18" height="18" rx="5" fill="#E63946"/>'
+		. '<rect x="6" y="0" width="18" height="18" rx="5" fill="#1B2A52" opacity=".85"/>'
+		. '<text x="30" y="17" font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="700" fill="#1B2A52">Multi Digital</text>'
+		. '</svg>';
+
+	echo '<div class="kindi-brandbar">';
+	echo '<div class="kindi-brandbar__main">';
+	if ( $logo ) {
+		echo '<img class="kindi-brandbar__logo" src="' . esc_url( $logo ) . '" alt="קינדי" />';
+	}
+	echo '<div class="kindi-brandbar__txt"><strong>' . esc_html__( 'קינדי — ניהול תוכן האתר', 'kindi' ) . '</strong>';
+	echo '<span>' . esc_html__( 'תבנית חנות הצעצועים', 'kindi' ) . ( $version ? ' · v' . esc_html( $version ) : '' ) . '</span></div>';
+	echo '</div>';
+	echo '<div class="kindi-brandbar__by"><span>' . esc_html__( 'פותח ומתוחזק על ידי', 'kindi' ) . '</span>' . $md_logo . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- Static inline SVG.
+	echo '</div>';
+
+	echo '<style>
+		.kindi-brandbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(120deg,#1B2A52,#E63946);color:#fff;border-radius:16px;padding:18px 22px;margin:16px 0 12px;box-shadow:0 8px 24px rgba(20,35,63,.15)}
+		.kindi-brandbar__main{display:flex;align-items:center;gap:14px}
+		.kindi-brandbar__logo{height:46px;width:auto;background:#fff;border-radius:10px;padding:5px 8px}
+		.kindi-brandbar__txt strong{display:block;font-size:18px;line-height:1.3}
+		.kindi-brandbar__txt span{font-size:12px;opacity:.85}
+		.kindi-brandbar__by{display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;padding:8px 14px}
+		.kindi-brandbar__by span{font-size:11px;color:#6b7280;font-weight:600}
+	</style>';
+}
+
+/**
  * Register the admin menu page.
  *
  * @return void
@@ -248,7 +296,8 @@ function kindi_settings_render(): void {
 		$saved = true;
 	}
 
-	echo '<div class="wrap kindi-settings"><h1>' . esc_html__( 'קינדי — ניהול תוכן האתר', 'kindi' ) . '</h1>';
+	echo '<div class="wrap kindi-settings">';
+	kindi_settings_brand_header();
 	echo '<p class="description">' . esc_html__( 'קטגוריות ומוצרים נמשכים אוטומטית מ-WooCommerce. כאן עורכים את תוכן השיווק והטקסטים.', 'kindi' ) . '</p>';
 
 	if ( $saved ) {

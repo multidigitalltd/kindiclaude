@@ -199,3 +199,72 @@
 		}
 	}
 }() );
+
+/* Save & share cart — posts the current cart to the server and shows a share link. */
+( function () {
+	'use strict';
+	var panel = document.querySelector( '[data-kindi-savecart]' );
+	if ( ! panel || typeof window.kindiStore === 'undefined' ) {
+		return;
+	}
+	var btn = panel.querySelector( '[data-kindi-savecart-btn]' );
+	var emailEl = panel.querySelector( '[data-kindi-savecart-email]' );
+	var nonceEl = panel.querySelector( 'input[name="nonce"]' );
+	var result = panel.querySelector( '[data-kindi-savecart-result]' );
+
+	btn.addEventListener( 'click', function () {
+		btn.disabled = true;
+		var body = new URLSearchParams();
+		body.set( 'action', 'kindi_save_cart' );
+		body.set( 'nonce', nonceEl ? nonceEl.value : '' );
+		body.set( 'email', emailEl ? emailEl.value : '' );
+
+		fetch( window.kindiStore.ajaxUrl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: body.toString()
+		} )
+			.then( function ( r ) { return r.json(); } )
+			.then( function ( res ) {
+				btn.disabled = false;
+				if ( ! res || ! res.success ) {
+					result.hidden = false;
+					result.textContent = ( res && res.data && res.data.message ) || 'אירעה שגיאה.';
+					return;
+				}
+				result.hidden = false;
+				result.innerHTML = '';
+				var msg = document.createElement( 'p' );
+				msg.textContent = res.data.message;
+				var box = document.createElement( 'div' );
+				box.className = 'kindi-savecart__link';
+				var input = document.createElement( 'input' );
+				input.type = 'text';
+				input.readOnly = true;
+				input.value = res.data.url;
+				var copy = document.createElement( 'button' );
+				copy.type = 'button';
+				copy.className = 'kindi-btn kindi-btn--red';
+				copy.textContent = 'העתקה';
+				copy.addEventListener( 'click', function () {
+					input.select();
+					if ( navigator.clipboard ) {
+						navigator.clipboard.writeText( input.value );
+					} else {
+						document.execCommand( 'copy' );
+					}
+					copy.textContent = 'הועתק ✓';
+				} );
+				box.appendChild( input );
+				box.appendChild( copy );
+				result.appendChild( msg );
+				result.appendChild( box );
+			} )
+			.catch( function () {
+				btn.disabled = false;
+				result.hidden = false;
+				result.textContent = 'אירעה שגיאה. נסו שוב.';
+			} );
+	} );
+}() );

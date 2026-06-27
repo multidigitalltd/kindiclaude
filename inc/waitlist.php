@@ -118,13 +118,32 @@ function kindi_waitlist_restock( $product_id, $status, $product ): void {
 	$url     = get_permalink( $product_id );
 	$changed = false;
 
+	$subject_tpl = (string) kindi_opt( 'wl_email_subject' );
+	$body_tpl    = (string) kindi_opt( 'wl_email_body' );
+
 	foreach ( $list as &$entry ) {
 		if ( ! empty( $entry['notified'] ) ) {
 			continue;
 		}
-		$subject = sprintf( '%s חזר למלאי! 🎉', $title );
-		$body    = sprintf( "היי %s,\n\nהמוצר \"%s\" שחיכית לו חזר למלאי!\nלרכישה: %s\n\nצוות קינדר טויס", $entry['name'], $title, $url );
-		wp_mail( $entry['email'], $subject, $body );
+		$vars = array(
+			'name'    => (string) ( $entry['name'] ?? '' ),
+			'product' => $title,
+			'url'     => $url,
+		);
+		$subject = kindi_email_fill( $subject_tpl, $vars );
+		$body    = kindi_email_fill( $body_tpl, $vars );
+
+		if ( function_exists( 'kindi_send_html_mail' ) ) {
+			$html = kindi_email_template(
+				$subject,
+				wpautop( esc_html( $body ) ),
+				array( 'label' => 'לרכישת המוצר', 'url' => $url )
+			);
+			kindi_send_html_mail( $entry['email'], $subject, $html );
+		} else {
+			wp_mail( $entry['email'], $subject, $body );
+		}
+
 		$entry['notified'] = time();
 		$changed           = true;
 	}

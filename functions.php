@@ -52,6 +52,8 @@ kindi_require( 'accessibility.php' );
 kindi_require( 'schema.php' );
 kindi_require( 'critical-css.php' );
 kindi_require( 'acf-bridge.php' );
+kindi_require( 'emails.php' );
+kindi_require( 'email-branding.php' );
 kindi_require( 'setup.php' );
 
 if ( is_admin() ) {
@@ -75,4 +77,5 @@ if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'gift-finder.php' );
 	kindi_require( 'sticky-cart.php' );
 	kindi_require( 'whatsapp.php' );
+	kindi_require( 'saved-cart.php' );
 }

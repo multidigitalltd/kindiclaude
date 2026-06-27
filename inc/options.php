@@ -86,6 +86,17 @@ function kindi_default_options(): array {
 		'newsletter_field'   => 'email',
 		'newsletter_secret'  => '',
 
+		// Back-in-stock (waitlist) email.
+		'wl_email_subject' => '{product} חזר למלאי! 🎉',
+		'wl_email_body'    => "היי {name},\n\nהמוצר \"{product}\" שחיכית לו חזר למלאי!\nכדאי למהר — הכמות מוגבלת.\n\nצוות קינדר טויס",
+
+		// Saved cart — emails + reminder timing.
+		'cart_reminder_delay'   => 24,
+		'cart_email_subject'    => 'שמרנו לך את העגלה 🛒',
+		'cart_email_body'       => "היי,\n\nשמרנו את העגלה שלך ב-{site} כדי שתוכל/י לחזור אליה בכל רגע.\nאפשר גם לשתף את הקישור עם מישהו אחר.",
+		'cart_reminder_subject' => 'העגלה שלך עדיין מחכה 💝',
+		'cart_reminder_body'    => "היי,\n\nרק תזכורת קטנה — העגלה ששמרת ב-{site} עדיין כאן.\nהפריטים אזלו בעבר במהירות, אז כדאי להשלים את ההזמנה.",
+
 		// Google reviews.
 		'google_place_id'  => '',
 		'google_api_key'   => '',
