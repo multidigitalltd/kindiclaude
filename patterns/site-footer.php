@@ -21,7 +21,7 @@ $kindi_pay = array( 'VISA', 'MC', 'ISRACARD', 'PayPal', 'Bit' );
 	<div class="kindi-footer__grid">
 
 		<div class="kindi-footer__brand">
-			<img class="kindi-footer__logo" src="<?php echo kindi_img( 'logo.png' ); ?>" alt="קינדר טויס" width="160" height="80">
+			<img class="kindi-footer__logo" src="<?php echo kindi_img( 'logo.webp' ); ?>" alt="קינדר טויס" width="109" height="80">
 			<p><?php echo esc_html( kindi_opt( 'about' ) ); ?></p>
 			<div class="kindi-footer__social">
 				<a href="<?php echo esc_url( kindi_opt( 'fb' ) ); ?>" aria-label="פייסבוק" class="kindi-footer__soc">f</a>

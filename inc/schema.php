@@ -65,6 +65,63 @@ function kindi_output_schema(): void {
 		),
 	);
 
+	// LocalBusiness (ToyStore) with real Google reviews — front page only, so the
+	// store's rating can earn review stars in search results.
+	if ( is_front_page() && function_exists( 'kindi_google_reviews' ) ) {
+		$gr = kindi_google_reviews();
+		if ( ! empty( $gr['reviews'] ) ) {
+			$rating = round( (float) ( $gr['rating'] ?? 0 ), 1 );
+			$count  = (int) ( $gr['total'] ?? 0 );
+			$count  = $count > 0 ? $count : count( $gr['reviews'] );
+
+			$store = array(
+				'@context'  => 'https://schema.org',
+				'@type'     => 'ToyStore',
+				'name'      => get_bloginfo( 'name' ),
+				'url'       => home_url( '/' ),
+				'image'     => function_exists( 'kindi_img' ) ? kindi_img( 'logo.png' ) : '',
+				'telephone' => function_exists( 'kindi_opt' ) ? kindi_opt( 'store_phone' ) : '',
+				'address'   => array(
+					'@type'          => 'PostalAddress',
+					'streetAddress'  => function_exists( 'kindi_opt' ) ? kindi_opt( 'store_address' ) : '',
+					'addressCountry' => 'IL',
+				),
+			);
+
+			if ( $rating >= 1 ) {
+				$store['aggregateRating'] = array(
+					'@type'       => 'AggregateRating',
+					'ratingValue' => $rating,
+					'reviewCount' => $count,
+					'bestRating'  => 5,
+					'worstRating' => 1,
+				);
+			}
+
+			$items = array();
+			foreach ( array_slice( $gr['reviews'], 0, 5 ) as $r ) {
+				if ( empty( $r['text'] ) ) {
+					continue;
+				}
+				$items[] = array(
+					'@type'        => 'Review',
+					'author'       => array( '@type' => 'Person', 'name' => (string) ( $r['name'] ?? '' ) ),
+					'reviewRating' => array(
+						'@type'       => 'Rating',
+						'ratingValue' => (int) ( $r['rating'] ?? 5 ),
+						'bestRating'  => 5,
+					),
+					'reviewBody'   => (string) $r['text'],
+				);
+			}
+			if ( $items ) {
+				$store['review'] = $items;
+			}
+
+			$blocks[] = $store;
+		}
+	}
+
 	// Product (single product).
 	if ( function_exists( 'is_product' ) && is_product() ) {
 		$product = wc_get_product( get_queried_object_id() );

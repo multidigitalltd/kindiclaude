@@ -117,3 +117,12 @@ body {
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
+
+/* Accessibility statement page */
+.kindi-a11y-statement { max-width: 60rem; margin-inline: auto; line-height: 1.8; }
+.kindi-a11y-statement h1 { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem); margin-bottom: 1rem; }
+.kindi-a11y-statement h2 { font-weight: 800; color: var(--brand-navy); margin-top: 2rem; margin-bottom: 0.5rem; font-size: 1.25rem; }
+.kindi-a11y-statement ul { padding-inline-start: 1.25rem; }
+.kindi-a11y-statement li { margin-block: 0.35rem; }
+.kindi-a11y-statement a { color: var(--brand-red); font-weight: 600; }
+.kindi-a11y-statement__date { margin-top: 2rem; font-size: 0.875rem; color: var(--muted-foreground); }

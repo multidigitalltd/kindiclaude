@@ -38,7 +38,7 @@ $kindi_nav = kindi_nav_items();
 	<button class="kindi-bar__burger" type="button" aria-label="פתח תפריט" data-kindi-menu-open><?php echo kindi_icon( 'menu', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
 
 	<a class="kindi-bar__logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="קינדר טויס — לעמוד הבית">
-		<img src="<?php echo kindi_img( 'logo.png' ); ?>" alt="קינדר טויס" width="160" height="56">
+		<img src="<?php echo kindi_img( 'logo.webp' ); ?>" alt="קינדר טויס" width="76" height="56">
 	</a>
 
 	<form class="kindi-search" role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>">

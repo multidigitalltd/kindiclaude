@@ -98,6 +98,11 @@ function kindi_settings_tabs(): array {
 					'news_title'    => array( 'type' => 'text', 'label' => 'ניוזלטר — כותרת' ),
 					'news_sub'      => array( 'type' => 'textarea', 'label' => 'ניוזלטר — תיאור' ),
 				),
+				'נגישות' => array(
+					'_a11y_note'       => array( 'type' => 'note', 'label' => '', 'help' => 'הצהרת הנגישות נוצרת אוטומטית בעמוד "/accessibility-statement/" (מקושר מסרגל הנגישות). פרטי הקשר נמשכים מהגדרות "פרטי החנות".' ),
+					'a11y_coordinator' => array( 'type' => 'text', 'label' => 'שם רכז/ת הנגישות' ),
+					'a11y_updated'     => array( 'type' => 'text', 'label' => 'תאריך עדכון ההצהרה', 'help' => 'לדוגמה: 28/06/2026. אם ריק — יוצג התאריך הנוכחי.' ),
+				),
 				'באנר עוגיות (Cookies)' => array(
 					'cookie_enable'      => array( 'type' => 'select', 'label' => 'הצגת הבאנר', 'options' => array( '1' => 'מופעל', '0' => 'כבוי' ) ),
 					'cookie_text'        => array( 'type' => 'textarea', 'label' => 'טקסט ההודעה' ),

@@ -84,6 +84,10 @@ function kindi_default_options(): array {
 		'news_title'    => 'קבלו 10% הנחה על הזמנה ראשונה!',
 		'news_sub'      => 'הירשמו לניוזלטר וקבלו עדכונים על מבצעים, מוצרים חדשים והטבות בלעדיות.',
 
+		// Accessibility statement.
+		'a11y_coordinator' => '',
+		'a11y_updated'     => '',
+
 		// Cookie consent banner.
 		'cookie_enable'      => '1',
 		'cookie_text'        => 'אתר זה עושה שימוש בעוגיות (cookies) כדי לשפר את חוויית הגלישה, להתאים תוכן ולנתח תנועה. המשך הגלישה מהווה הסכמה לשימוש בעוגיות.',
