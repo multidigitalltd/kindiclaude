@@ -73,7 +73,7 @@ function kindi_grp_reviews(): array {
 	// One indexed query: reviews + their text (new text table or legacy column)
 	// + the business rating/total. Text moved to a separate table keyed by
 	// md5(provider:place_id:author_url) in recent plugin versions.
-	$sql = "SELECT r.rating AS rating, r.author_name AS author_name,
+	$sql = "SELECT r.rating AS rating, r.author_name AS author_name, r.profile_photo_url AS photo,
 				COALESCE( NULLIF( r.text, '' ), t.text ) AS body,
 				p.rating AS biz_rating, p.review_count AS biz_total
 			FROM {$t_review} r
@@ -103,6 +103,7 @@ function kindi_grp_reviews(): array {
 			'name'   => $name,
 			'rating' => (int) $row->rating,
 			'letter' => '' !== $name ? ( function_exists( 'mb_substr' ) ? mb_substr( $name, 0, 1 ) : substr( $name, 0, 1 ) ) : '★',
+			'photo'  => (string) ( $row->photo ?? '' ),
 		);
 		$rating = (float) $row->biz_rating;
 		$total  = (int) $row->biz_total;

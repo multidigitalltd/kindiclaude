@@ -298,3 +298,6 @@
 /* Reviews — load more */
 .kindi-tst__card.is-hidden { display: none; }
 .kindi-tst-more { display: flex; justify-content: center; margin-top: 1.5rem; }
+
+/* Reviewer profile photo (from the reviews plugin DB) */
+.kindi-tst__avatar--img { object-fit: cover; background: var(--muted); padding: 0; }

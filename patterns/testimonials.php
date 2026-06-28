@@ -46,7 +46,11 @@ $kindi_has_google = ! empty( $kindi_google['reviews'] );
 			</div>
 			<p class="kindi-tst__text"><?php echo esc_html( $t['text'] ); ?></p>
 			<div class="kindi-tst__foot">
+				<?php if ( ! empty( $t['photo'] ) ) : ?>
+				<img class="kindi-tst__avatar kindi-tst__avatar--img" src="<?php echo esc_url( $t['photo'] ); ?>" alt="" loading="lazy" decoding="async" width="44" height="44" referrerpolicy="no-referrer">
+				<?php else : ?>
 				<span class="kindi-tst__avatar"><?php echo esc_html( $t['letter'] ); ?></span>
+				<?php endif; ?>
 				<span>
 					<span class="kindi-tst__name"><?php echo esc_html( $t['name'] ); ?></span><br>
 					<span class="kindi-tst__role"><?php echo esc_html( $t['role'] ?? 'לקוח/ה מ-Google' ); ?></span>
