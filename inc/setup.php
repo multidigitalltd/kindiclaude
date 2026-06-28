@@ -70,9 +70,15 @@ function kindi_overflow_debug(): void {
 	?>
 	<script>
 	( function () {
-		var vw = document.documentElement.clientWidth, found = [];
+		var de = document.documentElement;
+		var vw = de.clientWidth;
+		var docW = Math.max( de.scrollWidth, document.body ? document.body.scrollWidth : 0 );
+		var hasScroll = docW > vw + 1;
+		var found = [];
 		document.querySelectorAll( '*' ).forEach( function ( el ) {
 			var r = el.getBoundingClientRect();
+			// Ignore intentionally off-screen content (screen-reader / skip links).
+			if ( r.left < -2000 || r.right < -2000 ) { return; }
 			if ( r.width > vw + 1 || r.right > vw + 2 || r.left < -2 ) {
 				el.style.outline = '3px solid red';
 				var c = ( typeof el.className === 'string' ) ? el.className.split( ' ' ).filter( Boolean ).join( '.' ) : '';
@@ -80,8 +86,9 @@ function kindi_overflow_debug(): void {
 			}
 		} );
 		var box = document.createElement( 'div' );
-		box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:2147483647;background:#000;color:#0f0;font:11px/1.4 monospace;padding:8px;max-height:60vh;overflow:auto;direction:ltr;white-space:pre-wrap';
-		box.textContent = 'VIEWPORT ' + vw + 'px — OVERFLOWING:\n' + ( found.length ? found.join( '\n' ) : 'none found' );
+		box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:2147483647;background:#000;color:' + ( hasScroll ? '#f55' : '#0f0' ) + ';font:11px/1.4 monospace;padding:8px;max-height:60vh;overflow:auto;direction:ltr;white-space:pre-wrap';
+		box.textContent = 'VIEWPORT ' + vw + 'px · doc ' + docW + 'px · גלילה אופקית: ' + ( hasScroll ? 'יש ⚠️' : 'אין ✅ (האתר תקין)' ) +
+			'\nתיבות רחבות (ייתכן שכלואות/לא מזיקות):\n' + ( found.length ? found.join( '\n' ) : 'אין' );
 		document.body.appendChild( box );
 	}() );
 	</script>

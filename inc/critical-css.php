@@ -41,7 +41,8 @@ img{max-width:100%;height:auto}a{color:#E63946;text-decoration:none}
 .kindi-bar{position:relative;z-index:3;background:#fff;border-bottom:1px solid #e7eaf0;max-width:1440px;margin-inline:auto;height:5rem;display:flex;align-items:center;gap:1rem;padding-inline:1rem}
 .kindi-bar__logo img{height:3.25rem;width:auto}
 .kindi-bar__actions{display:flex;align-items:center;gap:.5rem;margin-inline-start:auto}
-.kindi-nav{background:#1B2A52;color:#fff;display:none}
+.kindi-nav{background:#1B2A52;color:#fff;display:block}
+.kindi-nav__inner{display:flex;overflow-x:auto;gap:.25rem;min-height:3rem;padding-inline:1rem;max-width:1440px;margin-inline:auto}
 .kindi-main{max-width:1440px;margin-inline:auto;padding-inline:1rem}
 .kindi-section{margin-block:3rem}
 .kindi-hero{position:relative;overflow:hidden;border-radius:2rem;padding:2rem;border:1px solid rgba(27,42,82,.1);background:linear-gradient(to bottom left,#e7effe,#fff 50%,#fde9ec)}
@@ -50,7 +51,7 @@ img{max-width:100%;height:auto}a{color:#E63946;text-decoration:none}
 .kindi-hero__lead{color:rgba(27,42,82,.75);max-width:32rem;line-height:1.7;font-weight:500}
 .kindi-btn{display:inline-flex;align-items:center;gap:.5rem;font-weight:700;border-radius:1rem;padding:.75rem 1.5rem;text-decoration:none}
 .kindi-btn--red{background:#E63946;color:#fff}
-@media(min-width:1024px){.kindi-nav{display:block}.kindi-hero__grid{grid-template-columns:1.1fr 1fr}}
+@media(min-width:1024px){.kindi-nav__inner{overflow-x:visible}.kindi-hero__grid{grid-template-columns:1.1fr 1fr}}
 CSS;
 }
 

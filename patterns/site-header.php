@@ -79,7 +79,7 @@ $kindi_nav = kindi_nav_items();
 			$has_col = ! empty( $c['cols'] );
 			?>
 		<div class="kindi-nav__item<?php echo $is_hl ? ' kindi-nav__item--hl' : ''; ?>">
-			<a class="kindi-nav__link" href="<?php echo esc_url( $c['url'] ); ?>"><span class="kindi-nav__ic"><?php echo kindi_icon( $c['icon'], 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><?php echo esc_html( $c['label'] ); ?><?php echo $has_col ? kindi_icon( 'chevrondown', 'kindi-icon--xs' ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
+			<a class="kindi-nav__link" href="<?php echo esc_url( $c['url'] ); ?>"><span class="kindi-nav__ic"><?php echo kindi_nav_icon( $c['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><?php echo esc_html( $c['label'] ); ?><?php echo $has_col ? kindi_icon( 'chevrondown', 'kindi-icon--xs' ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
 			<?php if ( $has_col ) : ?>
 			<div class="kindi-mega">
 				<div class="kindi-mega__inner">

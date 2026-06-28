@@ -39,3 +39,32 @@
 	}
 
 }() );
+
+/* Category nav: keep it on one line on desktop by shrinking the font when there
+ * are many/long items; on mobile it scrolls horizontally instead. */
+( function () {
+	'use strict';
+	var nav = document.querySelector( '.kindi-nav__inner' );
+	if ( ! nav ) {
+		return;
+	}
+	var fit = function () {
+		nav.style.removeProperty( '--kindi-nav-fs' );
+		if ( window.innerWidth < 1024 ) {
+			return; // Mobile: horizontal scroll, no shrinking.
+		}
+		var fs = 14, guard = 0;
+		while ( nav.scrollWidth > nav.clientWidth + 1 && fs > 10.5 && guard < 24 ) {
+			fs -= 0.5;
+			nav.style.setProperty( '--kindi-nav-fs', fs + 'px' );
+			guard++;
+		}
+	};
+	fit();
+	window.addEventListener( 'load', fit );
+	var t;
+	window.addEventListener( 'resize', function () {
+		clearTimeout( t );
+		t = setTimeout( fit, 150 );
+	} );
+}() );

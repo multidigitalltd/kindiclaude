@@ -30,6 +30,21 @@ function kindi_register_menus(): void {
 add_action( 'after_setup_theme', 'kindi_register_menus' );
 
 /**
+ * Render a top-level nav item's icon. The default is a small Kindi face image;
+ * a `kindi-icon-<name>` menu class swaps in a brand SVG icon instead.
+ *
+ * @param string $icon Icon name ('face' for the default mascot face).
+ * @return string
+ */
+function kindi_nav_icon( string $icon ): string {
+	if ( 'face' === $icon ) {
+		$src = function_exists( 'kindi_img' ) ? kindi_img( 'mascot/face.webp' ) : '';
+		return '<img class="kindi-nav__face" src="' . esc_url( $src ) . '" alt="" width="18" height="18" loading="lazy" decoding="async">';
+	}
+	return kindi_icon( $icon, 'kindi-icon--sm' );
+}
+
+/**
  * Normalised navigation items (from the assigned menu, or the default).
  *
  * @return array<int,array{label:string,url:string,icon:string,highlight:bool,cols:array<int,array{title:string,links:array<int,array{label:string,url:string}>}>}>
@@ -104,7 +119,7 @@ function kindi_build_nav_tree( array $items ): array {
 		}
 
 		$classes = is_array( $top->classes ) ? $top->classes : array();
-		$icon    = 'grid';
+		$icon    = 'face';
 		foreach ( $classes as $class ) {
 			if ( preg_match( '/^kindi-icon-([a-z0-9]+)$/', $class, $m ) ) {
 				$icon = $m[1];
