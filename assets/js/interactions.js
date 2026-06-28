@@ -68,3 +68,19 @@
 		t = setTimeout( fit, 150 );
 	} );
 }() );
+
+/* Expose the header height so the (position:fixed) mega panel anchors right below
+ * the category nav even while the nav scrolls horizontally. */
+( function () {
+	'use strict';
+	var header = document.querySelector( '.kindi-header' );
+	if ( ! header ) {
+		return;
+	}
+	var setH = function () {
+		document.documentElement.style.setProperty( '--kindi-header-h', header.offsetHeight + 'px' );
+	};
+	setH();
+	window.addEventListener( 'load', setH );
+	window.addEventListener( 'resize', setH );
+}() );

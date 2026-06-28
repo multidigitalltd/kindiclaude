@@ -32,7 +32,7 @@ function kindi_critical_css(): string {
 	return <<<'CSS'
 *{box-sizing:border-box}html{direction:rtl}body{margin:0;background:#FAFBFC;color:#15233f;-webkit-font-smoothing:antialiased}
 img{max-width:100%;height:auto}a{color:#E63946;text-decoration:none}
-.skip-link{position:absolute;left:-9999px}
+.skip-link{position:absolute;top:-200px;left:1rem}
 .kindi-header{position:sticky;top:0;z-index:100}
 .kindi-topbar{background:linear-gradient(to left,#E63946,#b81f2c 55%,#1B2A52);color:#fff;overflow:hidden}
 .kindi-topbar__track{display:flex;flex-wrap:wrap;justify-content:center;padding-block:.5rem;padding-inline:1rem}

@@ -59,11 +59,12 @@ body {
   border: 0;
 }
 
-/* Skip link (rendered in header part) */
+/* Skip link (rendered in header part). Hidden ABOVE the viewport — never to the
+ * side, so it can't create horizontal scroll (especially in RTL). */
 .skip-link {
   position: absolute;
-  left: -9999px;
-  top: 0;
+  top: -200px;
+  left: 1rem;
   z-index: 100000;
   padding: 0.75rem 1.25rem;
   background: var(--brand-navy);
@@ -72,7 +73,7 @@ body {
   border-radius: 0 0 0.5rem 0.5rem;
 }
 .skip-link:focus {
-  left: 1rem;
+  top: 0;
 }
 
 /* Accessibility toolbar preferences (set by a11y.js on <html>) */
