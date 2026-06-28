@@ -44,10 +44,50 @@ add_action( 'after_setup_theme', 'kindi_setup' );
  * @return void
  */
 function kindi_viewport_meta(): void {
-	remove_action( 'wp_head', '_block_template_viewport_meta_tag', 0 );
 	echo '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">' . "\n";
 }
-add_action( 'wp_head', 'kindi_viewport_meta', 0 );
+add_action( 'wp_head', 'kindi_viewport_meta', 1 );
+
+// Drop core's block-theme viewport tag so exactly one is printed (ours).
+add_action(
+	'init',
+	static function (): void {
+		remove_action( 'wp_head', '_block_template_viewport_meta_tag', 0 );
+	}
+);
+
+/**
+ * Overflow diagnostic — add ?kindi_overflow=1 to any URL to outline every
+ * element wider than the viewport and list them in a banner (helps pinpoint the
+ * source of horizontal scroll on mobile). Read-only; no effect without the flag.
+ *
+ * @return void
+ */
+function kindi_overflow_debug(): void {
+	if ( empty( $_GET['kindi_overflow'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return;
+	}
+	?>
+	<script>
+	( function () {
+		var vw = document.documentElement.clientWidth, found = [];
+		document.querySelectorAll( '*' ).forEach( function ( el ) {
+			var r = el.getBoundingClientRect();
+			if ( r.width > vw + 1 || r.right > vw + 2 || r.left < -2 ) {
+				el.style.outline = '3px solid red';
+				var c = ( typeof el.className === 'string' ) ? el.className.split( ' ' ).filter( Boolean ).join( '.' ) : '';
+				found.push( el.tagName.toLowerCase() + ( c ? '.' + c : '' ) + ' [w=' + Math.round( r.width ) + ' l=' + Math.round( r.left ) + ' r=' + Math.round( r.right ) + ']' );
+			}
+		} );
+		var box = document.createElement( 'div' );
+		box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:2147483647;background:#000;color:#0f0;font:11px/1.4 monospace;padding:8px;max-height:60vh;overflow:auto;direction:ltr;white-space:pre-wrap';
+		box.textContent = 'VIEWPORT ' + vw + 'px — OVERFLOWING:\n' + ( found.length ? found.join( '\n' ) : 'none found' );
+		document.body.appendChild( box );
+	}() );
+	</script>
+	<?php
+}
+add_action( 'wp_footer', 'kindi_overflow_debug', 999 );
 
 /**
  * Editor styles so the block editor mirrors the front end exactly.
