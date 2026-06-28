@@ -16,9 +16,6 @@
 		'title'     => 'המוצרים',
 		'highlight' => 'החמים שלנו',
 	) ); ?>
+	<?php echo do_shortcode( '[kindi_hot_products]' ); // phpcs:ignore WordPress.Security.EscapeOutput -- WooCommerce/shortcode output. ?>
 </section>
 <!-- /wp:html -->
-
-<!-- wp:shortcode -->
-[kindi_hot_products]
-<!-- /wp:shortcode -->

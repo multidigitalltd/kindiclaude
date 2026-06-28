@@ -9,6 +9,6 @@
  */
 
 ?>
-<!-- wp:shortcode -->
-[kindi_categories]
-<!-- /wp:shortcode -->
+<!-- wp:html -->
+<?php echo do_shortcode( '[kindi_categories]' ); // phpcs:ignore WordPress.Security.EscapeOutput -- Shortcode output is escaped internally. ?>
+<!-- /wp:html -->
