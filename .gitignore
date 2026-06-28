@@ -7,6 +7,8 @@
 
 # Build artifacts
 preview.html
+kindi.zip
+*.zip
 *.log
 .DS_Store
 Thumbs.db
