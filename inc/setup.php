@@ -32,6 +32,24 @@ function kindi_setup(): void {
 add_action( 'after_setup_theme', 'kindi_setup' );
 
 /**
+ * Guarantee a mobile viewport meta tag.
+ *
+ * Block themes rely on WordPress core (_block_template_viewport_meta_tag) to
+ * print this, but some optimisation/cache plugins strip or reorder it — and
+ * without it mobile browsers fall back to a ~980px desktop width, squashing the
+ * layout into a corner with empty space beside it. We remove the core tag (if
+ * present) and print our own at the very top of <head> so it is always there
+ * exactly once.
+ *
+ * @return void
+ */
+function kindi_viewport_meta(): void {
+	remove_action( 'wp_head', '_block_template_viewport_meta_tag', 0 );
+	echo '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">' . "\n";
+}
+add_action( 'wp_head', 'kindi_viewport_meta', 0 );
+
+/**
  * Editor styles so the block editor mirrors the front end exactly.
  *
  * @return void
