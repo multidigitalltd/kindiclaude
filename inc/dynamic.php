@@ -14,6 +14,23 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Diagnostic shortcode: [kindi_ping] — confirms shortcodes run and reports the
+ * active theme version (to catch stale installs). Safe to leave or remove.
+ *
+ * @return string
+ */
+function kindi_ping_shortcode(): string {
+	$ver = defined( 'KINDI_VERSION' ) ? KINDI_VERSION : '?';
+	$wc  = class_exists( 'WooCommerce' ) ? 'פעיל' : 'לא פעיל';
+	$cat = function_exists( 'kindi_get_store_categories' ) ? count( kindi_get_store_categories( 12 ) ) : 0;
+	return '<div style="padding:1rem 1.25rem;background:#1B2A52;color:#fff;border-radius:10px;font-weight:700;text-align:center;font-family:sans-serif">'
+		. '✅ Kindi פעיל — גרסה ' . esc_html( (string) $ver )
+		. ' · שורטקודים עובדים · WooCommerce: ' . esc_html( $wc )
+		. ' · קטגוריות שנמצאו: ' . esc_html( (string) $cat ) . '</div>';
+}
+add_shortcode( 'kindi_ping', 'kindi_ping_shortcode' );
+
+/**
  * Accent palette cycled across category cards.
  *
  * @return array<int,string>
