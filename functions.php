@@ -43,6 +43,7 @@ kindi_require( 'icons.php' );
 kindi_require( 'template-tags.php' );
 kindi_require( 'fonts.php' );
 kindi_require( 'dynamic.php' );
+kindi_require( 'blocks.php' );
 kindi_require( 'search.php' );
 kindi_require( 'nav.php' );
 kindi_require( 'store.php' );
