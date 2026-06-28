@@ -76,8 +76,8 @@
 .woocommerce ul.products li.product .kindi-pc__title,
 .woocommerce ul.products li.product .kindi-pc__rating,
 .woocommerce ul.products li.product .kindi-pc__foot { padding-inline: 1rem; }
-.kindi-pc__brand { display: block; font-size: 0.75rem; color: var(--muted-foreground); font-weight: 600; margin-top: 0.85rem; }
-.kindi-pc__title { display: block; font-size: 0.9375rem; font-weight: 800; color: var(--brand-navy); line-height: 1.35; min-height: 2.7em; text-decoration: none; margin: 0.15rem 0 0.4rem; }
+.kindi-pc__brand { display: block; font-size: 0.78rem; color: var(--muted-foreground); font-weight: 700; margin-top: 0.85rem; }
+.kindi-pc__title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 1.02rem; font-weight: 800; color: var(--brand-navy); line-height: 1.3; min-height: 2.6em; text-decoration: none; margin: 0.2rem 0 0.45rem; }
 .kindi-pc__title:hover { color: var(--brand-red); }
 .kindi-pc__rating { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
 .kindi-pc__rating .star-rating { color: var(--brand-red); font-size: 0.85rem; width: 5.4em; height: 1.2em; line-height: 1.2; margin: 0; }
