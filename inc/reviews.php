@@ -13,6 +13,82 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Read real Google reviews straight from the "Rich Showcase for Google Reviews"
+ * plugin's own database tables (it fetches + refreshes them via its cron). This
+ * renders them in the theme's designed cards with zero extra front-end assets
+ * and no per-request network call — the result is itself cached for 6h.
+ *
+ * @return array{rating:float,total:int,reviews:array<int,array<string,mixed>>}|array{}
+ */
+function kindi_grp_reviews(): array {
+	$cached = get_transient( 'kindi_grp_reviews' );
+	if ( is_array( $cached ) ) {
+		return $cached;
+	}
+
+	global $wpdb;
+	$t_place  = $wpdb->prefix . 'grp_google_place';
+	$t_review = $wpdb->prefix . 'grp_google_review';
+	$t_text   = $wpdb->prefix . 'grp_google_review_text';
+
+	// Bail quietly when the plugin (and its tables) aren't present.
+	if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $t_review ) ) !== $t_review ) { // phpcs:ignore WordPress.DB
+		return array();
+	}
+
+	$limit = (int) apply_filters( 'kindi_reviews_limit', 8 );
+	$min   = (int) apply_filters( 'kindi_reviews_min_rating', 4 );
+
+	// One indexed query: reviews + their text (new text table or legacy column)
+	// + the business rating/total. Text moved to a separate table keyed by
+	// md5(provider:place_id:author_url) in recent plugin versions.
+	$sql = "SELECT r.rating AS rating, r.author_name AS author_name,
+				COALESCE( NULLIF( r.text, '' ), t.text ) AS body,
+				p.rating AS biz_rating, p.review_count AS biz_total
+			FROM {$t_review} r
+			JOIN {$t_place} p ON p.id = r.google_place_id
+			LEFT JOIN {$t_text} t
+				ON t.review_id = MD5( CONCAT( COALESCE( r.provider, 'google' ), ':', p.place_id, ':', COALESCE( r.author_url, '' ) ) )
+				AND t.lang = r.language
+			WHERE r.hide = '' AND r.rating >= %d
+			HAVING body IS NOT NULL AND body <> ''
+			ORDER BY r.time DESC
+			LIMIT %d";
+
+	$rows = $wpdb->get_results( $wpdb->prepare( $sql, $min, $limit ) ); // phpcs:ignore WordPress.DB
+
+	if ( empty( $rows ) ) {
+		set_transient( 'kindi_grp_reviews', array(), HOUR_IN_SECONDS );
+		return array();
+	}
+
+	$reviews = array();
+	$rating  = 0.0;
+	$total   = 0;
+	foreach ( $rows as $row ) {
+		$name      = (string) $row->author_name;
+		$reviews[] = array(
+			'text'   => wp_strip_all_tags( (string) $row->body ),
+			'name'   => $name,
+			'rating' => (int) $row->rating,
+			'letter' => '' !== $name ? ( function_exists( 'mb_substr' ) ? mb_substr( $name, 0, 1 ) : substr( $name, 0, 1 ) ) : '★',
+		);
+		$rating = (float) $row->biz_rating;
+		$total  = (int) $row->biz_total;
+	}
+
+	$data = array(
+		'rating'  => $rating,
+		'total'   => $total,
+		'reviews' => $reviews,
+	);
+
+	set_transient( 'kindi_grp_reviews', $data, 6 * HOUR_IN_SECONDS );
+
+	return $data;
+}
+
+/**
  * Manually-curated "showcase" reviews from the control panel — no API key, no
  * external request. Each line: "name | rating(1-5) | text".
  *
@@ -59,11 +135,19 @@ function kindi_showcase_reviews(): array {
  * @return array{rating:float,total:int,reviews:array<int,array{text:string,name:string,rating:int,letter:string}>}|array{}
  */
 function kindi_google_reviews(): array {
+	// 1) Real reviews already stored by the reviews plugin (fast, cached, lean).
+	$plugin = kindi_grp_reviews();
+	if ( ! empty( $plugin['reviews'] ) ) {
+		return $plugin;
+	}
+
+	// 2) Curated showcase from the panel.
 	$manual = kindi_showcase_reviews();
 	if ( $manual ) {
 		return $manual;
 	}
 
+	// 3) Optional direct Google Places API (only if explicitly configured).
 	$place = (string) kindi_opt( 'google_place_id' );
 	$key   = (string) kindi_opt( 'google_api_key' );
 
