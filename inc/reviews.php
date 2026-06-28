@@ -13,6 +13,37 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Is the "Rich Showcase for Google Reviews" plugin installed & active?
+ *
+ * @return bool
+ */
+function kindi_reviews_plugin_active(): bool {
+	return defined( 'GRW_VERSION' ) || class_exists( 'WP_Rplg_Google_Reviews\\Includes\\Core\\Database' );
+}
+
+/**
+ * Admin warning on the Kindi settings screen when the reviews plugin (the data
+ * source) is missing.
+ *
+ * @return void
+ */
+function kindi_reviews_plugin_notice(): void {
+	if ( kindi_reviews_plugin_active() || ! function_exists( 'get_current_screen' ) ) {
+		return;
+	}
+	$screen = get_current_screen();
+	if ( ! $screen || false === strpos( (string) $screen->id, 'kindi-settings' ) ) {
+		return;
+	}
+	$install = esc_url( admin_url( 'plugin-install.php?s=Rich+Showcase+for+Google+Reviews&tab=search&type=term' ) );
+	echo '<div class="notice notice-warning"><p><strong>' . esc_html__( 'ביקורות גוגל:', 'kindi' ) . '</strong> '
+		. esc_html__( 'כדי להציג ביקורות גוגל אמיתיות נדרש להתקין ולהפעיל את התוסף', 'kindi' )
+		. ' <a href="' . $install . '">Rich Showcase for Google Reviews</a>. '
+		. esc_html__( 'ללא התוסף יוצגו ביקורות הגיבוי הידניות בלבד.', 'kindi' ) . '</p></div>';
+}
+add_action( 'admin_notices', 'kindi_reviews_plugin_notice' );
+
+/**
  * Read real Google reviews straight from the "Rich Showcase for Google Reviews"
  * plugin's own database tables (it fetches + refreshes them via its cron). This
  * renders them in the theme's designed cards with zero extra front-end assets

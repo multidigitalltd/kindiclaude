@@ -119,8 +119,8 @@ function kindi_settings_tabs(): array {
 					'newsletter_secret'  => array( 'type' => 'text', 'label' => 'סוד אימות (אופציונלי)', 'help' => 'אם תוגדר — תישלח ככותרת X-Kindi-Secret לאימות מקור הבקשה.' ),
 				),
 				'ביקורות גוגל' => array(
-					'reviews_shortcode' => array( 'type' => 'textarea', 'label' => 'שורטקוד ביקורות (אוטומטי)', 'help' => 'משתמש בתוסף ביקורות אמיתיות (כמו Rich Showcase for Google Reviews)? הדבק כאן את השורטקוד שלו — הביקורות האמיתיות יוצגו בתוך סקשן הביקורות המעוצב, אוטומטית וללא מפתח API. אם מולא — גובר על הביקורות הידניות שמתחת.' ),
-					'reviews_manual' => array( 'type' => 'textarea', 'label' => 'ביקורות ידניות (גיבוי)', 'help' => 'בשימוש רק אם השדה למעלה ריק. שורה לכל ביקורת: שם | דירוג (1-5) | טקסט.' ),
+					'_reviews_note'  => array( 'type' => 'note', 'label' => '', 'help' => 'ביקורות גוגל האמיתיות נמשכות אוטומטית מהתוסף Rich Showcase for Google Reviews ומוצגות בעיצוב של קינדי. הביקורות הידניות שלמטה משמשות רק כגיבוי כשאין ביקורות מהתוסף.' ),
+					'reviews_manual' => array( 'type' => 'textarea', 'label' => 'ביקורות ידניות (גיבוי)', 'help' => 'שורה לכל ביקורת: שם | דירוג (1-5) | טקסט.' ),
 					'reviews_rating' => array( 'type' => 'text', 'label' => 'דירוג כללי', 'help' => 'לדוגמה: 4.9' ),
 					'reviews_count'  => array( 'type' => 'number', 'label' => 'מספר ביקורות כולל', 'help' => 'יוצג כ"X+ ביקורות בגוגל". 0 = מספר הביקורות שהוזנו.' ),
 					'reviews_link'   => array( 'type' => 'url', 'label' => 'קישור לכל הביקורות בגוגל' ),
