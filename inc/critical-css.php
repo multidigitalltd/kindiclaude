@@ -37,7 +37,6 @@ img{max-width:100%;height:auto}a{color:#E63946;text-decoration:none}
 .kindi-topbar{background:linear-gradient(to left,#E63946,#b81f2c 55%,#1B2A52);color:#fff;overflow:hidden}
 .kindi-topbar__track{display:flex;flex-wrap:wrap;justify-content:center;padding-block:.5rem;padding-inline:1rem}
 .kindi-topbar__item{display:inline-flex;align-items:center;gap:.5rem;padding-inline:1.25rem;font-size:13px;font-weight:600}
-.kindi-shipbar{background:#1B2A52;color:#fff;font-size:.875rem;padding:.5rem 1rem;text-align:center;font-weight:500}
 .kindi-bar{position:relative;z-index:3;background:#fff;border-bottom:1px solid #e7eaf0;max-width:1440px;margin-inline:auto;height:5rem;display:flex;align-items:center;gap:1rem;padding-inline:1rem}
 .kindi-bar__logo img{height:3.25rem;width:auto}
 .kindi-bar__actions{display:flex;align-items:center;gap:.5rem;margin-inline-start:auto}
@@ -51,7 +50,7 @@ img{max-width:100%;height:auto}a{color:#E63946;text-decoration:none}
 .kindi-hero__lead{color:rgba(27,42,82,.75);max-width:32rem;line-height:1.7;font-weight:500}
 .kindi-btn{display:inline-flex;align-items:center;gap:.5rem;font-weight:700;border-radius:1rem;padding:.75rem 1.5rem;text-decoration:none}
 .kindi-btn--red{background:#E63946;color:#fff}
-@media(min-width:1024px){.kindi-nav__inner{overflow-x:visible}.kindi-hero__grid{grid-template-columns:1.1fr 1fr}}
+@media(min-width:1024px){.kindi-hero__grid{grid-template-columns:1.1fr 1fr}}
 CSS;
 }
 

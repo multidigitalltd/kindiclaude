@@ -31,9 +31,8 @@ function kindi_settings_tabs(): array {
 					'home_products_cat'    => array( 'type' => 'taxonomy_select', 'label' => 'קטגוריית מוצרים', 'help' => 'בשימוש רק כשנבחר "מקטגוריה מסוימת".' ),
 					'home_products_count'  => array( 'type' => 'number', 'label' => 'כמות מוצרים להצגה' ),
 				),
-				'רצועות עליונות' => array(
-					'shipbar' => array( 'type' => 'text', 'label' => 'רצועת המשלוח (מתחת ללוגו)' ),
-					'ticker'  => array( 'type' => 'textarea', 'label' => 'רצועת מבצעים נעה', 'help' => 'שורה אחת לכל פריט' ),
+				'רצועה עליונה' => array(
+					'ticker'  => array( 'type' => 'textarea', 'label' => 'רצועת מבצעים עליונה', 'help' => 'שורה אחת לכל פריט' ),
 				),
 				'באנר מבצע גדול' => array(
 					'promo1_img'   => array( 'type' => 'image', 'label' => 'תמונה' ),

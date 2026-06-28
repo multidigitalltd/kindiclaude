@@ -32,8 +32,6 @@ $kindi_nav = kindi_nav_items();
 	</div>
 </div>
 
-<div class="kindi-shipbar"><?php echo kindi_icon( 'truck', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo esc_html( kindi_opt( 'shipbar' ) ); ?></div>
-
 <div class="kindi-bar">
 	<button class="kindi-bar__burger" type="button" aria-label="פתח תפריט" data-kindi-menu-open><?php echo kindi_icon( 'menu', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
 

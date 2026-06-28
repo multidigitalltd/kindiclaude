@@ -10,7 +10,6 @@
 .kindi-topbar__track { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.25rem 0; padding-block: 0.5rem; padding-inline: 1rem; width: auto; }
 .kindi-topbar__item { display: inline-flex; align-items: center; gap: 0.5rem; padding-inline: 1.25rem; font-size: 13px; font-weight: 600; }
 
-.kindi-shipbar { background: var(--brand-navy); color: #fff; font-size: 0.875rem; padding: 0.5rem 1rem; text-align: center; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
 
 .kindi-bar {
   position: relative; z-index: 3;
