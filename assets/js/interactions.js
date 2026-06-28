@@ -69,6 +69,24 @@
 	} );
 }() );
 
+/* "Load more reviews" — reveal hidden testimonial cards 3 at a time. */
+( function () {
+	'use strict';
+	var btn = document.querySelector( '[data-kindi-more-reviews]' );
+	if ( ! btn ) {
+		return;
+	}
+	btn.addEventListener( 'click', function () {
+		var hidden = document.querySelectorAll( '.kindi-tst__card.is-hidden' );
+		for ( var i = 0; i < 3 && i < hidden.length; i++ ) {
+			hidden[ i ].classList.remove( 'is-hidden' );
+		}
+		if ( ! document.querySelectorAll( '.kindi-tst__card.is-hidden' ).length ) {
+			btn.style.display = 'none';
+		}
+	} );
+}() );
+
 /* Expose the header height so the (position:fixed) mega panel anchors right below
  * the category nav even while the nav scrolls horizontally. */
 ( function () {

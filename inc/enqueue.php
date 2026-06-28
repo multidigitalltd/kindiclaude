@@ -81,8 +81,22 @@ function kindi_enqueue_styles(): void {
 		);
 	}
 
-	// Homepage section styles — front page only.
-	if ( is_front_page() ) {
+	// Does the current page embed the theme's dynamic shortcodes? Those need the
+	// section/store styling even off the front page.
+	$has_section_shortcode = false;
+	if ( ! is_front_page() && is_singular() ) {
+		$post = get_post();
+		$body = $post ? (string) $post->post_content : '';
+		foreach ( array( 'kindi_categories', 'kindi_hot_products', 'kindi_gift_finder', 'kindi_recently_viewed', 'kindi_wishlist' ) as $sc ) {
+			if ( $body && has_shortcode( $body, $sc ) ) {
+				$has_section_shortcode = true;
+				break;
+			}
+		}
+	}
+
+	// Homepage section styles — front page, or any page using a section shortcode.
+	if ( is_front_page() || $has_section_shortcode ) {
 		wp_enqueue_style(
 			'kindi-sections',
 			KINDI_URI . 'assets/css/sections.css',
@@ -91,8 +105,8 @@ function kindi_enqueue_styles(): void {
 		);
 	}
 
-	// WooCommerce store styling — store views + the front-page product grid.
-	if ( class_exists( 'WooCommerce' ) && ( is_front_page() || kindi_is_wc_view() ) ) {
+	// WooCommerce store styling — store views, the front page, or shortcode pages.
+	if ( class_exists( 'WooCommerce' ) && ( is_front_page() || kindi_is_wc_view() || $has_section_shortcode ) ) {
 		wp_enqueue_style(
 			'kindi-woocommerce',
 			KINDI_URI . 'assets/css/woocommerce.css',

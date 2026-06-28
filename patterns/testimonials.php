@@ -63,17 +63,6 @@ $kindi_has_google = ! empty( $kindi_google['reviews'] );
 	<div class="kindi-tst-more">
 		<button type="button" class="kindi-btn kindi-btn--ghost" data-kindi-more-reviews><?php echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>טען עוד ביקורות</button>
 	</div>
-	<script>
-	( function () {
-		var b = document.querySelector( '[data-kindi-more-reviews]' );
-		if ( ! b ) { return; }
-		b.addEventListener( 'click', function () {
-			var hidden = document.querySelectorAll( '.kindi-tst__card.is-hidden' );
-			for ( var i = 0; i < 3 && i < hidden.length; i++ ) { hidden[ i ].classList.remove( 'is-hidden' ); }
-			if ( ! document.querySelectorAll( '.kindi-tst__card.is-hidden' ).length ) { b.style.display = 'none'; }
-		} );
-	}() );
-	</script>
 	<?php endif; ?>
 </section>
 <!-- /wp:html -->
