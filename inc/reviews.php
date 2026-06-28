@@ -75,7 +75,8 @@ function kindi_grp_reviews(): array {
 	// md5(provider:place_id:author_url) in recent plugin versions.
 	$sql = "SELECT r.rating AS rating, r.author_name AS author_name, r.profile_photo_url AS photo,
 				COALESCE( NULLIF( r.text, '' ), t.text ) AS body,
-				p.rating AS biz_rating, p.review_count AS biz_total
+				p.rating AS biz_rating, p.review_count AS biz_total,
+				COALESCE( NULLIF( p.map_url, '' ), p.url ) AS biz_link
 			FROM {$t_review} r
 			JOIN {$t_place} p ON p.id = r.google_place_id
 			LEFT JOIN {$t_text} t
@@ -96,6 +97,7 @@ function kindi_grp_reviews(): array {
 	$reviews = array();
 	$rating  = 0.0;
 	$total   = 0;
+	$link    = '';
 	foreach ( $rows as $row ) {
 		$name      = (string) $row->author_name;
 		$reviews[] = array(
@@ -107,12 +109,17 @@ function kindi_grp_reviews(): array {
 		);
 		$rating = (float) $row->biz_rating;
 		$total  = (int) $row->biz_total;
+		$link   = (string) ( $row->biz_link ?? '' );
 	}
+
+	// A manual link from the panel wins over the plugin's stored business URL.
+	$opt_link = function_exists( 'kindi_opt' ) ? (string) kindi_opt( 'reviews_link' ) : '';
 
 	$data = array(
 		'rating'  => $rating,
 		'total'   => $total,
 		'reviews' => $reviews,
+		'link'    => '' !== $opt_link ? $opt_link : $link,
 	);
 
 	set_transient( 'kindi_grp_reviews', $data, 6 * HOUR_IN_SECONDS );

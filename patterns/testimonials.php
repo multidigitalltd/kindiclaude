@@ -25,14 +25,18 @@ $kindi_has_google = ! empty( $kindi_google['reviews'] );
 			<span class="kindi-eyebrow"><?php echo $kindi_has_google ? '★ Google' : 'לקוחות מספרים'; ?></span>
 			<h2 class="kindi-sec-title">למה <span class="kindi-hl">בוחרים בקינדי</span>?</h2>
 		</div>
-		<?php if ( $kindi_has_google ) : ?>
-		<div class="kindi-grev__score">
+		<?php
+		if ( $kindi_has_google ) :
+			$kindi_grev_link = ! empty( $kindi_google['link'] ) ? (string) $kindi_google['link'] : '';
+			$kindi_grev_tag  = $kindi_grev_link ? 'a' : 'div';
+			?>
+		<<?php echo $kindi_grev_tag; // phpcs:ignore WordPress.Security.EscapeOutput ?> class="kindi-grev__score<?php echo $kindi_grev_link ? ' kindi-grev__score--link' : ''; ?>"<?php echo $kindi_grev_link ? ' href="' . esc_url( $kindi_grev_link ) . '" target="_blank" rel="noopener" title="לצפייה בכל הביקורות בגוגל"' : ''; ?>>
 			<strong><?php echo esc_html( number_format( (float) $kindi_google['rating'], 1 ) ); ?></strong>
 			<span class="kindi-grev__stars"><?php for ( $s = 0; $s < 5; $s++ ) {
 				echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput
 			} ?></span>
 			<span class="kindi-grev__count"><?php echo esc_html( number_format_i18n( (int) $kindi_google['total'] ) ); ?>+ ביקורות בגוגל</span>
-		</div>
+		</<?php echo $kindi_grev_tag; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
 		<?php endif; ?>
 	</div>
 	<div class="kindi-tst">

@@ -301,3 +301,7 @@
 
 /* Reviewer profile photo (from the reviews plugin DB) */
 .kindi-tst__avatar--img { object-fit: cover; background: var(--muted); padding: 0; }
+
+/* Clickable Google rating badge */
+.kindi-grev__score--link { text-decoration: none; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.kindi-grev__score--link:hover { transform: translateY(-1px); box-shadow: var(--shadow-card); }
