@@ -152,10 +152,24 @@ ul.products::before, ul.products::after { content: none; display: none; }
 .woocommerce div.product p.price, .woocommerce div.product span.price { color: var(--brand-red); font-weight: 900; font-size: 1.75rem; }
 .woocommerce div.product .woocommerce-product-details__short-description { color: var(--foreground); line-height: 1.7; }
 .woocommerce div.product form.cart { margin-top: 1rem; }
-.woocommerce .quantity .qty {
+/* Quantity stepper: minus / number / plus inside one rounded pill. */
+.woocommerce .quantity {
+  display: inline-flex; align-items: stretch; overflow: hidden;
   border: 2px solid color-mix(in oklab, var(--brand-navy) 12%, transparent); border-radius: 0.75rem;
-  height: 3rem; width: 4.5rem; text-align: center; font-weight: 700;
 }
+.woocommerce .quantity .qty {
+  border: 0; height: 3rem; width: 3rem; text-align: center; font-weight: 700; background: transparent;
+  -moz-appearance: textfield; appearance: textfield;
+}
+.woocommerce .quantity .qty::-webkit-outer-spin-button,
+.woocommerce .quantity .qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.kindi-qbtn {
+  width: 2.75rem; border: 0; background: var(--muted); color: var(--brand-navy);
+  font-size: 1.4rem; font-weight: 700; line-height: 1; cursor: pointer;
+  display: grid; place-items: center; user-select: none; transition: background 0.15s, color 0.15s;
+}
+.kindi-qbtn:hover { background: var(--brand-navy); color: #fff; }
+.kindi-qbtn:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: -2px; }
 .woocommerce div.product .woocommerce-tabs ul.tabs { display: flex; gap: 0.5rem; border: 0; padding: 0; margin-bottom: 1rem; }
 .woocommerce div.product .woocommerce-tabs ul.tabs::before { display: none; }
 .woocommerce div.product .woocommerce-tabs ul.tabs li {
@@ -283,7 +297,7 @@ ul.products::before, ul.products::after { content: none; display: none; }
   .woocommerce-cart .woocommerce > .woocommerce-cart-form { float: none; width: 100%; }
 }
 .woocommerce-cart table.cart td.actions .button { border-radius: 0.875rem; }
-.woocommerce-cart .quantity .qty { border: 2px solid color-mix(in oklab, var(--brand-navy) 12%, transparent); border-radius: 0.6rem; }
+.woocommerce-cart .quantity { border-radius: 0.6rem; }
 .woocommerce a.remove { color: var(--brand-red) !important; border-radius: 999px; font-weight: 700; }
 .woocommerce a.remove:hover { background: var(--brand-red) !important; color: #fff !important; }
 

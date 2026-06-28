@@ -102,3 +102,37 @@
 	window.addEventListener( 'load', setH );
 	window.addEventListener( 'resize', setH );
 }() );
+
+/* Quantity stepper — the +/- buttons injected around the WooCommerce number
+ * field (product page + cart). Delegated, so it also covers fields added by
+ * AJAX cart updates. */
+( function () {
+	'use strict';
+	document.addEventListener( 'click', function ( e ) {
+		var btn = e.target.closest( '.kindi-qbtn' );
+		if ( ! btn ) {
+			return;
+		}
+		var wrap = btn.closest( '.quantity' );
+		var input = wrap && wrap.querySelector( 'input.qty' );
+		if ( ! input || input.disabled || input.readOnly ) {
+			return;
+		}
+		var step = parseFloat( input.getAttribute( 'step' ) ) || 1;
+		var minAttr = input.getAttribute( 'min' );
+		var maxAttr = input.getAttribute( 'max' );
+		var min = ( minAttr !== null && minAttr !== '' ) ? parseFloat( minAttr ) : 1;
+		var max = ( maxAttr !== null && maxAttr !== '' ) ? parseFloat( maxAttr ) : Infinity;
+		var val = parseFloat( input.value ) || 0;
+
+		val += btn.classList.contains( 'kindi-qbtn--plus' ) ? step : -step;
+		if ( val < min ) {
+			val = min;
+		}
+		if ( val > max ) {
+			val = max;
+		}
+		input.value = val;
+		input.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+	} );
+}() );

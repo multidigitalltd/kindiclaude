@@ -13,6 +13,29 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Quantity stepper — a minus button before the number field and a plus button
+ * after it, replacing the browser's native spinner arrows. Fires inside
+ * WooCommerce's quantity-input template, so it covers both the product page and
+ * the cart. Buttons are tabindex=-1 (the field itself stays keyboard-operable).
+ *
+ * @return void
+ */
+function kindi_qty_minus(): void {
+	echo '<button type="button" class="kindi-qbtn kindi-qbtn--minus" tabindex="-1" aria-label="' . esc_attr__( 'הפחתת כמות', 'kindi' ) . '">&#8722;</button>';
+}
+add_action( 'woocommerce_before_quantity_input_field', 'kindi_qty_minus' );
+
+/**
+ * Plus button after the quantity field.
+ *
+ * @return void
+ */
+function kindi_qty_plus(): void {
+	echo '<button type="button" class="kindi-qbtn kindi-qbtn--plus" tabindex="-1" aria-label="' . esc_attr__( 'הוספת כמות', 'kindi' ) . '">&#43;</button>';
+}
+add_action( 'woocommerce_after_quantity_input_field', 'kindi_qty_plus' );
+
+/**
  * Brand eyebrow above the product title.
  *
  * @return void
