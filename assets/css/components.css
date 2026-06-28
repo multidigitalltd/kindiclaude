@@ -85,8 +85,8 @@
 /* ============================ Category nav + mega ============================ */
 .kindi-nav { position: relative; z-index: 2; background: var(--brand-navy); color: #fff; display: none; }
 @media (min-width: 1024px) { .kindi-nav { display: block; } }
-.kindi-nav__inner { max-width: 1440px; margin-inline: auto; display: flex; align-items: center; gap: 0.25rem; height: 3rem; padding-inline: 1.5rem; }
-.kindi-nav__item { position: static; height: 100%; display: flex; align-items: center; }
+.kindi-nav__inner { max-width: 1440px; margin-inline: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 0.15rem 0.25rem; min-height: 3rem; padding-inline: 1.5rem; }
+.kindi-nav__item { position: static; display: flex; align-items: center; }
 .kindi-nav__item--hl { margin-inline-start: auto; }
 .kindi-nav__link { display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.875rem; font-weight: 600; white-space: nowrap; padding: 0.375rem 0.75rem; border-radius: 0.5rem; color: rgba(255,255,255,0.85); text-decoration: none; transition: all 0.15s; }
 .kindi-nav__link:hover { background: rgba(255,255,255,0.1); color: #fff; }
