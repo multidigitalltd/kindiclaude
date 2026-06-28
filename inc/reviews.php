@@ -67,7 +67,7 @@ function kindi_grp_reviews(): array {
 		return array();
 	}
 
-	$limit = (int) apply_filters( 'kindi_reviews_limit', 8 );
+	$limit = (int) apply_filters( 'kindi_reviews_limit', 15 );
 	$min   = (int) apply_filters( 'kindi_reviews_min_rating', 4 );
 
 	// One indexed query: reviews + their text (new text table or legacy column)

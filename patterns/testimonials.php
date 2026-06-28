@@ -36,8 +36,8 @@ $kindi_has_google = ! empty( $kindi_google['reviews'] );
 		<?php endif; ?>
 	</div>
 	<div class="kindi-tst">
-		<?php foreach ( array_slice( $kindi_tst, 0, 3 ) as $t ) : ?>
-		<article class="kindi-tst__card">
+		<?php foreach ( $kindi_tst as $kindi_i => $t ) : ?>
+		<article class="kindi-tst__card<?php echo $kindi_i >= 3 ? ' is-hidden' : ''; ?>">
 			<span class="kindi-tst__quote" aria-hidden="true">”</span>
 			<div class="kindi-tst__stars">
 				<?php for ( $i = 0; $i < 5; $i++ ) {
@@ -55,5 +55,21 @@ $kindi_has_google = ! empty( $kindi_google['reviews'] );
 		</article>
 		<?php endforeach; ?>
 	</div>
+	<?php if ( count( $kindi_tst ) > 3 ) : ?>
+	<div class="kindi-tst-more">
+		<button type="button" class="kindi-btn kindi-btn--ghost" data-kindi-more-reviews><?php echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>טען עוד ביקורות</button>
+	</div>
+	<script>
+	( function () {
+		var b = document.querySelector( '[data-kindi-more-reviews]' );
+		if ( ! b ) { return; }
+		b.addEventListener( 'click', function () {
+			var hidden = document.querySelectorAll( '.kindi-tst__card.is-hidden' );
+			for ( var i = 0; i < 3 && i < hidden.length; i++ ) { hidden[ i ].classList.remove( 'is-hidden' ); }
+			if ( ! document.querySelectorAll( '.kindi-tst__card.is-hidden' ).length ) { b.style.display = 'none'; }
+		} );
+	}() );
+	</script>
+	<?php endif; ?>
 </section>
 <!-- /wp:html -->

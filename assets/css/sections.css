@@ -294,3 +294,7 @@
 
 /* Floating button rules moved to components.css (needed on every page). */
 
+
+/* Reviews — load more */
+.kindi-tst__card.is-hidden { display: none; }
+.kindi-tst-more { display: flex; justify-content: center; margin-top: 1.5rem; }

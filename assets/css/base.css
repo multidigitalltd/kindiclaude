@@ -126,3 +126,7 @@ body {
 .kindi-a11y-statement li { margin-block: 0.35rem; }
 .kindi-a11y-statement a { color: var(--brand-red); font-weight: 600; }
 .kindi-a11y-statement__date { margin-top: 2rem; font-size: 0.875rem; color: var(--muted-foreground); }
+
+/* Prevent accidental horizontal scroll on mobile (clip doesn't break position:sticky) */
+html { overflow-x: clip; }
+body { overflow-x: clip; max-width: 100%; }
