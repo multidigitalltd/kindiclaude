@@ -8,6 +8,10 @@
  * @package Kindi
  */
 
+// Banner images — editable from the panel, falling back to the bundled photos.
+$kindi_promo1_img = kindi_opt( 'promo1_img' ) ?: kindi_img( 'photos/promo-back-to-school.webp' );
+$kindi_promo2_img = kindi_opt( 'promo2_img' ) ?: kindi_img( 'photos/promo-gameboy.webp' );
+$kindi_promo3_img = kindi_opt( 'promo3_img' ) ?: kindi_img( 'photos/promo-blocks.webp' );
 ?>
 <!-- wp:html -->
 <section class="kindi-section">
@@ -19,7 +23,7 @@
 	<div class="kindi-promos">
 
 		<a class="kindi-promo kindi-promo--red kindi-promo--big" href="<?php echo esc_url( kindi_opt( 'promo1_url' ) ); ?>">
-			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-back-to-school.webp' ); ?>" alt="" loading="lazy" decoding="async">
+			<img class="kindi-promo__img" src="<?php echo esc_url( $kindi_promo1_img ); ?>" alt="" loading="lazy" decoding="async">
 			<span class="kindi-promo__body">
 				<span class="kindi-promo__badge"><?php echo kindi_icon( 'clock', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( kindi_opt( 'promo1_badge' ) ); ?></span>
 				<h3 class="kindi-promo__title"><?php echo esc_html( kindi_opt( 'promo1_title' ) ); ?></h3>
@@ -29,7 +33,7 @@
 		</a>
 
 		<a class="kindi-promo kindi-promo--navy kindi-promo--sm" href="<?php echo esc_url( kindi_opt( 'promo2_url' ) ); ?>">
-			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-gameboy.webp' ); ?>" alt="" loading="lazy" decoding="async">
+			<img class="kindi-promo__img" src="<?php echo esc_url( $kindi_promo2_img ); ?>" alt="" loading="lazy" decoding="async">
 			<span class="kindi-promo__body">
 				<span class="kindi-promo__badge"><?php echo kindi_icon( 'sparkles', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( kindi_opt( 'promo2_badge' ) ); ?></span>
 				<h3 class="kindi-promo__title"><?php echo esc_html( kindi_opt( 'promo2_title' ) ); ?></h3>
@@ -39,7 +43,7 @@
 		</a>
 
 		<a class="kindi-promo kindi-promo--blue kindi-promo--sm" href="<?php echo esc_url( kindi_opt( 'promo3_url' ) ); ?>">
-			<img class="kindi-promo__img" src="<?php echo kindi_img( 'photos/promo-blocks.webp' ); ?>" alt="" loading="lazy" decoding="async">
+			<img class="kindi-promo__img" src="<?php echo esc_url( $kindi_promo3_img ); ?>" alt="" loading="lazy" decoding="async">
 			<span class="kindi-promo__body">
 				<span class="kindi-promo__badge"><?php echo kindi_icon( 'gem', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( kindi_opt( 'promo3_badge' ) ); ?></span>
 				<h3 class="kindi-promo__title"><?php echo esc_html( kindi_opt( 'promo3_title' ) ); ?></h3>

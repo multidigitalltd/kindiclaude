@@ -36,6 +36,7 @@ function kindi_settings_tabs(): array {
 					'ticker'  => array( 'type' => 'textarea', 'label' => 'רצועת מבצעים נעה', 'help' => 'שורה אחת לכל פריט' ),
 				),
 				'באנר מבצע גדול' => array(
+					'promo1_img'   => array( 'type' => 'image', 'label' => 'תמונה' ),
 					'promo1_badge' => array( 'type' => 'text', 'label' => 'תגית' ),
 					'promo1_title' => array( 'type' => 'text', 'label' => 'כותרת' ),
 					'promo1_sub'   => array( 'type' => 'text', 'label' => 'תיאור' ),
@@ -43,6 +44,7 @@ function kindi_settings_tabs(): array {
 					'promo1_url'   => array( 'type' => 'url', 'label' => 'קישור' ),
 				),
 				'באנר מבצע 2'    => array(
+					'promo2_img'   => array( 'type' => 'image', 'label' => 'תמונה' ),
 					'promo2_badge' => array( 'type' => 'text', 'label' => 'תגית' ),
 					'promo2_title' => array( 'type' => 'text', 'label' => 'כותרת' ),
 					'promo2_sub'   => array( 'type' => 'text', 'label' => 'תיאור' ),
@@ -50,6 +52,7 @@ function kindi_settings_tabs(): array {
 					'promo2_url'   => array( 'type' => 'url', 'label' => 'קישור' ),
 				),
 				'באנר מבצע 3'    => array(
+					'promo3_img'   => array( 'type' => 'image', 'label' => 'תמונה' ),
 					'promo3_badge' => array( 'type' => 'text', 'label' => 'תגית' ),
 					'promo3_title' => array( 'type' => 'text', 'label' => 'כותרת' ),
 					'promo3_sub'   => array( 'type' => 'text', 'label' => 'תיאור' ),
@@ -171,6 +174,7 @@ function kindi_sanitize_field( string $type, $value ) {
 		case 'taxonomy_select':
 			return absint( $value );
 		case 'url':
+		case 'image':
 			return esc_url_raw( trim( (string) $value ) );
 		case 'textarea':
 			return sanitize_textarea_field( (string) $value );
@@ -232,6 +236,9 @@ function kindi_settings_render(): void {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
+
+	// Needed for the image-picker fields (promo banner images).
+	wp_enqueue_media();
 
 	$tabs    = kindi_settings_tabs();
 	$current = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'promos'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -318,7 +325,20 @@ function kindi_settings_render(): void {
 					printf( '<option value="%d"%s>%s</option>', (int) $tid, selected( (int) $value, (int) $tid, false ), esc_html( $tname ) );
 				}
 				echo '</select>';
-			} elseif ( 'meta_select' === $field['type'] ) {
+			} elseif ( 'image' === $field['type'] ) {
+					$img = (string) $value;
+					echo '<div class="kindi-imgfield">';
+					printf(
+						'<input type="text" id="%1$s" name="kindi[%2$s]" value="%3$s" class="regular-text kindi-imgfield__url" dir="ltr" placeholder="https://…">',
+						esc_attr( $id ),
+						esc_attr( $key ),
+						esc_attr( $img )
+					);
+					echo ' <button type="button" class="button kindi-imgfield__pick">' . esc_html__( 'בחר/העלה תמונה', 'kindi' ) . '</button>';
+					echo ' <button type="button" class="button-link kindi-imgfield__clear">' . esc_html__( 'הסר', 'kindi' ) . '</button>';
+					echo '<div class="kindi-imgfield__preview">' . ( '' !== $img ? '<img src="' . esc_url( $img ) . '" alt="">' : '' ) . '</div>';
+					echo '</div>';
+				} elseif ( 'meta_select' === $field['type'] ) {
 					$keys = function_exists( 'kindi_detected_meta_keys' ) ? kindi_detected_meta_keys() : array();
 					echo '<select id="' . esc_attr( $id ) . '" name="kindi[' . esc_attr( $key ) . ']"><option value="">— ' . esc_html__( 'לא ממופה', 'kindi' ) . ' —</option>';
 					foreach ( $keys as $mk ) {
@@ -373,6 +393,46 @@ function kindi_settings_render(): void {
 	 * Fires after the settings form — used for standalone tools (e.g. ACF import).
 	 */
 	do_action( 'kindi_settings_after_form' );
+
+	?>
+	<style>.kindi-imgfield__preview img{max-width:160px;max-height:90px;border-radius:8px;margin-top:8px;display:block;border:1px solid #dcdcde}</style>
+	<script>
+	( function () {
+		function wire() {
+			document.querySelectorAll( '.kindi-imgfield__pick' ).forEach( function ( btn ) {
+				if ( btn.dataset.wired ) { return; }
+				btn.dataset.wired = '1';
+				btn.addEventListener( 'click', function ( e ) {
+					e.preventDefault();
+					if ( typeof wp === 'undefined' || ! wp.media ) { return; }
+					var wrap = btn.closest( '.kindi-imgfield' );
+					var input = wrap.querySelector( '.kindi-imgfield__url' );
+					var prev = wrap.querySelector( '.kindi-imgfield__preview' );
+					var frame = wp.media( { title: 'בחירת תמונה', button: { text: 'שימוש בתמונה' }, multiple: false } );
+					frame.on( 'select', function () {
+						var a = frame.state().get( 'selection' ).first().toJSON();
+						var url = ( a.sizes && a.sizes.large ) ? a.sizes.large.url : a.url;
+						input.value = url;
+						prev.innerHTML = '<img src="' + url + '" alt="">';
+					} );
+					frame.open();
+				} );
+			} );
+			document.querySelectorAll( '.kindi-imgfield__clear' ).forEach( function ( btn ) {
+				if ( btn.dataset.wired ) { return; }
+				btn.dataset.wired = '1';
+				btn.addEventListener( 'click', function ( e ) {
+					e.preventDefault();
+					var w = btn.closest( '.kindi-imgfield' );
+					w.querySelector( '.kindi-imgfield__url' ).value = '';
+					w.querySelector( '.kindi-imgfield__preview' ).innerHTML = '';
+				} );
+			} );
+		}
+		if ( 'loading' !== document.readyState ) { wire(); } else { document.addEventListener( 'DOMContentLoaded', wire ); }
+	}() );
+	</script>
+	<?php
 
 	echo '</div>';
 }
