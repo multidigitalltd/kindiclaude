@@ -167,7 +167,8 @@ ul.products::before, ul.products::after { content: none; display: none; }
 .woocommerce div.product .woocommerce-tabs ul.tabs li.active a { color: #fff; }
 .related.products, .upsells.products { grid-column: 1 / -1; margin-top: 1rem; }
 .related.products > h2, .upsells.products > h2, .cross-sells > h2 {
-  font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); margin-bottom: 1rem;
+  font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy);
+  font-size: clamp(1.5rem, 1.2rem + 1.6vw, 2.25rem); line-height: 1.1; margin-bottom: 1.25rem;
 }
 
 /* ---------- Cart / Checkout / Account forms ---------- */
