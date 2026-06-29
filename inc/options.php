@@ -49,6 +49,14 @@ function kindi_default_options(): array {
 		'home_products_cat'    => '',
 		'home_products_count'  => 10,
 
+		// Homepage mascots (control-panel uploads; blank = bundled default) + heading tag.
+		'hero_mascot'         => '',
+		'kindyzone_mascot'    => '',
+		'storeinfo_mascot'    => '',
+		'values_mascot'       => '',
+		'section_heading_tag' => 'h2',
+		'phone'               => '03-5293383',
+
 		// Promo banners (change often).
 		'promo1_badge' => 'מוגבל בזמן',
 		'promo1_title' => 'חזרה לבית הספר — עד 40%- על הכל!',

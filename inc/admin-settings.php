@@ -31,6 +31,13 @@ function kindi_settings_tabs(): array {
 					'home_products_cat'    => array( 'type' => 'taxonomy_select', 'label' => 'קטגוריית מוצרים', 'help' => 'בשימוש רק כשנבחר "מקטגוריה מסוימת".' ),
 					'home_products_count'  => array( 'type' => 'number', 'label' => 'כמות מוצרים להצגה' ),
 				),
+				'עמוד הבית — מסקוטים וכותרות' => array(
+					'hero_mascot'         => array( 'type' => 'image', 'label' => 'מסקוט ההירו (ראשי)' ),
+					'kindyzone_mascot'    => array( 'type' => 'image', 'label' => 'מסקוט קינדי-זון' ),
+					'storeinfo_mascot'    => array( 'type' => 'image', 'label' => 'מסקוט פרטי החנות' ),
+					'values_mascot'       => array( 'type' => 'image', 'label' => 'מסקוט רצועת הערכים' ),
+					'section_heading_tag' => array( 'type' => 'select', 'label' => 'תגית כותרת הסקשנים', 'options' => array( 'h2' => 'H2 (מומלץ)', 'h3' => 'H3', 'h4' => 'H4' ), 'help' => 'תגית ה-HTML של כותרות הסקשנים בדף הבית — לשליטה במבנה ה-SEO.' ),
+				),
 				'רצועה עליונה' => array(
 					'ticker'  => array( 'type' => 'textarea', 'label' => 'רצועת מבצעים עליונה', 'help' => 'שורה אחת לכל פריט' ),
 				),

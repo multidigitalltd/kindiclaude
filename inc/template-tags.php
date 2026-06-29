@@ -40,17 +40,21 @@ function kindi_section_head( array $args ): string {
 		)
 	);
 
+	// Section-heading tag is admin-configurable (default h2) for SEO/structure.
+	$tag = function_exists( 'kindi_opt' ) ? (string) kindi_opt( 'section_heading_tag', 'h2' ) : 'h2';
+	$tag = in_array( $tag, array( 'h2', 'h3', 'h4' ), true ) ? $tag : 'h2';
+
 	$html  = '<div class="kindi-sechead">';
 	$html .= '<div class="kindi-sechead__text">';
 	$html .= '<span class="kindi-eyebrow">' . esc_html( $args['eyebrow'] ) . '</span>';
-	$html .= '<h2 class="kindi-sec-title">' . esc_html( $args['title'] );
+	$html .= '<' . $tag . ' class="kindi-sec-title">' . esc_html( $args['title'] );
 	if ( $args['highlight'] ) {
 		$html .= ' <span class="kindi-hl">' . esc_html( $args['highlight'] ) . '</span>';
 	}
 	if ( $args['suffix'] ) {
 		$html .= ' ' . esc_html( $args['suffix'] );
 	}
-	$html .= '</h2>';
+	$html .= '</' . $tag . '>';
 	if ( $args['desc'] ) {
 		$html .= '<p class="kindi-sec-desc">' . esc_html( $args['desc'] ) . '</p>';
 	}
@@ -64,6 +68,26 @@ function kindi_section_head( array $args ): string {
 	$html .= '</div>';
 
 	return $html;
+}
+
+/**
+ * Resolve a mascot image URL from an admin option (a control-panel upload),
+ * falling back to a bundled default. Accepts either a stored URL or attachment ID.
+ *
+ * @param string $opt_key     Option key (e.g. 'hero_mascot').
+ * @param string $default_rel Bundled fallback relative to assets/img/.
+ * @return string Image URL.
+ */
+function kindi_mascot_src( string $opt_key, string $default_rel ): string {
+	$val = function_exists( 'kindi_opt' ) ? (string) kindi_opt( $opt_key, '' ) : '';
+	if ( '' !== $val ) {
+		if ( is_numeric( $val ) ) {
+			$url = wp_get_attachment_image_url( (int) $val, 'large' );
+			return $url ? $url : ( function_exists( 'kindi_img' ) ? kindi_img( $default_rel ) : '' );
+		}
+		return $val;
+	}
+	return function_exists( 'kindi_img' ) ? kindi_img( $default_rel ) : '';
 }
 
 /**
