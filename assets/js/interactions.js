@@ -190,4 +190,21 @@
 		}
 		sync();
 	} );
+
+	// WCAG 1.4.13 — let Esc dismiss the name tooltip on the focused swatch, and
+	// clear that suppression as soon as focus moves on.
+	document.addEventListener( 'keydown', function ( e ) {
+		if ( 'Escape' !== e.key && 'Esc' !== e.key ) {
+			return;
+		}
+		var el = document.activeElement;
+		if ( el && el.classList && el.classList.contains( 'kindi-swatch' ) ) {
+			el.classList.add( 'kindi-tip-off' );
+		}
+	} );
+	document.addEventListener( 'focusout', function ( e ) {
+		if ( e.target && e.target.classList ) {
+			e.target.classList.remove( 'kindi-tip-off' );
+		}
+	} );
 }() );

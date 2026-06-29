@@ -209,7 +209,7 @@ function kindi_variation_swatches_html( string $html, array $args ): string {
 			$classes = 'kindi-swatch kindi-swatch--color' . ( $is_multi ? ' kindi-swatch--multi' : '' );
 			$style   = '' !== $hex ? ' style="--sw:' . esc_attr( $hex ) . '"' : '';
 			$buttons .= sprintf(
-				'<button type="button" class="%1$s" data-value="%2$s" aria-label="%3$s" aria-pressed="false"%4$s></button>',
+				'<button type="button" class="%1$s" data-value="%2$s" data-label="%3$s" aria-label="%3$s" aria-pressed="false"%4$s></button>',
 				esc_attr( $classes ),
 				esc_attr( $slug ),
 				esc_attr( $name ),

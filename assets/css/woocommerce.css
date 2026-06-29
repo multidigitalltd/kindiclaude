@@ -198,6 +198,24 @@ ul.products::before, ul.products::after { content: none; display: none; }
   min-width: 2.5rem; height: 2.25rem; padding: 0 0.85rem; border-radius: 999px;
   font-weight: 700; font-size: 0.9rem; color: var(--brand-navy);
 }
+/* Name tooltip on the colour circles — shows on hover AND keyboard focus
+   (WCAG 2.2 §1.4.13), dismissable with Esc (.kindi-tip-off), motion-aware. The
+   ::after pseudo is the colour fill, so the bubble uses ::before. */
+.kindi-swatch--color[data-label]::before {
+  content: attr(data-label);
+  position: absolute; bottom: calc(100% + 0.5rem); left: 50%; transform: translate(-50%, 0.25rem);
+  background: var(--brand-navy); color: #fff; font-size: 0.78rem; font-weight: 700; line-height: 1.1;
+  white-space: nowrap; padding: 0.4rem 0.6rem; border-radius: 0.5rem; z-index: 6;
+  opacity: 0; pointer-events: none; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.15s, transform 0.15s;
+}
+.kindi-swatch--color[data-label]:hover::before,
+.kindi-swatch--color[data-label]:focus-visible::before { opacity: 1; transform: translate(-50%, 0); }
+.kindi-swatch--color.kindi-tip-off::before { opacity: 0 !important; }
+@media (prefers-reduced-motion: reduce) {
+  .kindi-swatch--color[data-label]::before { transition: none; }
+}
+
 .kindi-swatch.is-active { border-color: var(--brand-red); box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 22%, transparent); }
 .kindi-swatch--text.is-active { background: var(--brand-navy); color: #fff; border-color: var(--brand-navy); }
 .kindi-swatch.is-unavailable { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
