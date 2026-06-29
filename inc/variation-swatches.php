@@ -101,6 +101,49 @@ function kindi_resolve_color( string $name, string $slug ): string {
 }
 
 /**
+ * Term-meta keys that may hold a colour for an attribute term. Our own key wins;
+ * the rest cover values left behind by common swatch plugins so existing data
+ * keeps working after the plugin is removed. Filterable.
+ *
+ * @return array<int,string>
+ */
+function kindi_color_meta_keys(): array {
+	return (array) apply_filters(
+		'kindi_color_meta_keys',
+		array(
+			'kindi_color',              // This theme.
+			'product_attribute_color',  // Variation Swatches (GetWooPlugins / Emran Ahmed).
+			'_swatch_color',
+			'swatch_color',
+			'color',
+			'pa_color_swatches_id_swatch', // Some legacy variants store a hex here.
+		)
+	);
+}
+
+/**
+ * Resolve a colour stored on the attribute term itself (meta), if any.
+ *
+ * @param WP_Term $term Attribute term.
+ * @return string Hex colour or empty string.
+ */
+function kindi_term_color( $term ): string {
+	if ( ! $term instanceof WP_Term ) {
+		return '';
+	}
+	foreach ( kindi_color_meta_keys() as $key ) {
+		$val = get_term_meta( $term->term_id, $key, true );
+		if ( is_string( $val ) && '' !== $val ) {
+			$hex = sanitize_hex_color( $val ) ?: sanitize_hex_color( '#' . ltrim( $val, '#' ) );
+			if ( $hex ) {
+				return $hex;
+			}
+		}
+	}
+	return '';
+}
+
+/**
  * Is this attribute the colour attribute?
  *
  * @param string $attribute Attribute key (e.g. pa_color).
@@ -141,15 +184,26 @@ function kindi_variation_swatches_html( string $html, array $args ): string {
 
 		// Display name: term name for taxonomy attributes, raw value otherwise.
 		$name = $slug;
+		$term = null;
 		if ( $is_tax ) {
 			$term = get_term_by( 'slug', $slug, $attribute );
 			if ( $term && ! is_wp_error( $term ) ) {
 				$name = $term->name;
+			} else {
+				$term = null;
 			}
 		}
 
 		$is_multi = (bool) preg_match( '/צבעוני|רב.?גוני|multi|rainbow|mix/iu', $name );
-		$hex      = $is_color && ! $is_multi ? kindi_resolve_color( $name, $slug ) : '';
+		$hex      = '';
+		if ( $is_color && ! $is_multi ) {
+			// Term meta wins (set in the admin / left by a swatch plugin), then
+			// fall back to the colour-name map.
+			$hex = kindi_term_color( $term );
+			if ( '' === $hex ) {
+				$hex = kindi_resolve_color( $name, $slug );
+			}
+		}
 
 		if ( $is_color && ( '' !== $hex || $is_multi ) ) {
 			$classes = 'kindi-swatch kindi-swatch--color' . ( $is_multi ? ' kindi-swatch--multi' : '' );
@@ -179,3 +233,92 @@ function kindi_variation_swatches_html( string $html, array $args ): string {
 	return $html . $swatches; // phpcs:ignore WordPress.Security.EscapeOutput -- assembled from escaped parts.
 }
 add_filter( 'woocommerce_dropdown_variation_attribute_options_html', 'kindi_variation_swatches_html', 20, 2 );
+
+/* -------------------------------------------------------------------------
+ * Admin: a colour field on each colour-attribute term, so colours can be set
+ * without a plugin. Stored as term meta `kindi_color` (read first above).
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Wire the colour field into the add/edit screens of every colour attribute
+ * taxonomy (e.g. pa_color / pa_צבע).
+ *
+ * @return void
+ */
+function kindi_register_color_term_fields(): void {
+	if ( ! function_exists( 'wc_get_attribute_taxonomies' ) ) {
+		return;
+	}
+	foreach ( wc_get_attribute_taxonomies() as $attr ) {
+		$taxonomy = function_exists( 'wc_attribute_taxonomy_name' ) ? wc_attribute_taxonomy_name( $attr->attribute_name ) : 'pa_' . $attr->attribute_name;
+		if ( ! kindi_is_color_attribute( $taxonomy ) ) {
+			continue;
+		}
+		add_action( "{$taxonomy}_add_form_fields", 'kindi_color_term_add_field' );
+		add_action( "{$taxonomy}_edit_form_fields", 'kindi_color_term_edit_field' );
+		add_action( "created_{$taxonomy}", 'kindi_color_term_save' );
+		add_action( "edited_{$taxonomy}", 'kindi_color_term_save' );
+	}
+}
+add_action( 'admin_init', 'kindi_register_color_term_fields' );
+
+/**
+ * Colour input on the "add term" screen.
+ *
+ * @return void
+ */
+function kindi_color_term_add_field(): void {
+	wp_nonce_field( 'kindi_color_term', 'kindi_color_nonce' );
+	?>
+	<div class="form-field">
+		<label for="kindi_color"><?php esc_html_e( 'צבע (לתצוגת עיגול)', 'kindi' ); ?></label>
+		<input type="color" name="kindi_color" id="kindi_color" value="#ffffff">
+		<p class="description"><?php esc_html_e( 'הצבע שיוצג בעיגול בורר הצבעים בעמוד המוצר. השאירו לבן אם אין צורך.', 'kindi' ); ?></p>
+	</div>
+	<?php
+}
+
+/**
+ * Colour input on the "edit term" screen.
+ *
+ * @param WP_Term $term Term being edited.
+ * @return void
+ */
+function kindi_color_term_edit_field( $term ): void {
+	$value = $term instanceof WP_Term ? (string) get_term_meta( $term->term_id, 'kindi_color', true ) : '';
+	$value = '' !== $value ? $value : '#ffffff';
+	wp_nonce_field( 'kindi_color_term', 'kindi_color_nonce' );
+	?>
+	<tr class="form-field">
+		<th scope="row"><label for="kindi_color"><?php esc_html_e( 'צבע (לתצוגת עיגול)', 'kindi' ); ?></label></th>
+		<td>
+			<input type="color" name="kindi_color" id="kindi_color" value="<?php echo esc_attr( $value ); ?>">
+			<p class="description"><?php esc_html_e( 'הצבע שיוצג בעיגול בורר הצבעים בעמוד המוצר.', 'kindi' ); ?></p>
+		</td>
+	</tr>
+	<?php
+}
+
+/**
+ * Persist the colour term meta.
+ *
+ * @param int $term_id Term ID.
+ * @return void
+ */
+function kindi_color_term_save( int $term_id ): void {
+	if ( ! isset( $_POST['kindi_color_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['kindi_color_nonce'] ) ), 'kindi_color_term' ) ) {
+		return;
+	}
+	if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		return;
+	}
+	if ( ! isset( $_POST['kindi_color'] ) ) {
+		return;
+	}
+	$hex = sanitize_hex_color( sanitize_text_field( wp_unslash( $_POST['kindi_color'] ) ) );
+	if ( $hex && '#ffffff' !== strtolower( $hex ) ) {
+		update_term_meta( $term_id, 'kindi_color', $hex );
+	} else {
+		delete_term_meta( $term_id, 'kindi_color' );
+	}
+}
