@@ -92,8 +92,7 @@ function kindi_default_options(): array {
 		'news_sub'      => 'הירשמו לניוזלטר וקבלו עדכונים על מבצעים, מוצרים חדשים והטבות בלעדיות.',
 
 		// Accessibility statement.
-		'a11y_coordinator' => '',
-		'a11y_updated'     => '',
+		'a11y_statement' => '',
 
 		// Cookie consent banner.
 		'cookie_enable'      => '1',

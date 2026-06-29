@@ -1,0 +1,31 @@
+<!-- wp:template-part {"slug":"header","area":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","metadata":{"name":"Main"},"className":"kindi-main kindi-blog","style":{"spacing":{"padding":{"top":"2.5rem","bottom":"3.5rem","left":"1rem","right":"1rem"}}},"layout":{"type":"constrained","contentSize":"1180px"}} -->
+<main id="main" class="wp-block-group kindi-main kindi-blog" style="padding-top:2.5rem;padding-right:1rem;padding-bottom:3.5rem;padding-left:1rem">
+	<!-- wp:query-title {"type":"search","className":"kindi-blog__title"} /-->
+
+	<!-- wp:query {"queryId":0,"query":{"perPage":12,"inherit":true},"className":"kindi-blog__query"} -->
+	<div class="wp-block-query kindi-blog__query">
+		<!-- wp:post-template {"className":"kindi-postgrid"} -->
+			<!-- wp:post-featured-image {"isLink":true,"className":"kindi-postcard__img"} /-->
+			<!-- wp:post-title {"isLink":true,"level":2,"className":"kindi-postcard__title"} /-->
+			<!-- wp:post-excerpt {"moreText":"להמשך קריאה ←"} /-->
+		<!-- /wp:post-template -->
+
+		<!-- wp:query-pagination -->
+			<!-- wp:query-pagination-previous /-->
+			<!-- wp:query-pagination-numbers /-->
+			<!-- wp:query-pagination-next /-->
+		<!-- /wp:query-pagination -->
+
+		<!-- wp:query-no-results -->
+			<!-- wp:paragraph -->
+			<p>לא נמצאו תוצאות לחיפוש. נסו מילה אחרת.</p>
+			<!-- /wp:paragraph -->
+		<!-- /wp:query-no-results -->
+	</div>
+	<!-- /wp:query -->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","area":"footer","tagName":"footer"} /-->

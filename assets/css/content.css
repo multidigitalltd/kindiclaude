@@ -1,0 +1,82 @@
+/**
+ * Kindi content design — applies the brand language to regular pages (terms,
+ * policies, accessibility), posts, the blog index and archives. Loaded only on
+ * those views (see enqueue.php), so the storefront stays lean.
+ */
+
+/* ---------- Page / post containers ---------- */
+.kindi-page, .kindi-single, .kindi-blog { color: var(--foreground); }
+
+.kindi-page__title, .kindi-single .kindi-page__title {
+  font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy);
+  line-height: 1.1; font-size: clamp(1.875rem, 1.4rem + 2.4vw, 2.75rem); margin: 0 0 1rem;
+}
+
+/* Post meta row (date + category) */
+.kindi-postmeta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; margin-bottom: 1.5rem; color: var(--muted-foreground); font-size: 0.875rem; font-weight: 600; }
+.kindi-postmeta a { color: var(--brand-red); text-decoration: none; }
+.kindi-single__img img, .wp-block-post-featured-image.kindi-single__img img { border-radius: 1.25rem; margin-bottom: 1.5rem; width: 100%; height: auto; box-shadow: var(--shadow-card); }
+
+/* ---------- Prose typography ---------- */
+.kindi-prose { font-size: 1.0625rem; line-height: 1.8; color: var(--foreground); }
+.kindi-prose > * { margin-block: 0 1.15rem; }
+.kindi-prose h1, .kindi-prose h2, .kindi-prose h3, .kindi-prose h4 {
+  font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); line-height: 1.2;
+  margin: 2rem 0 0.85rem;
+}
+.kindi-prose h2 { font-size: 1.6rem; }
+.kindi-prose h3 { font-size: 1.3rem; }
+.kindi-prose h4 { font-size: 1.1rem; }
+.kindi-prose p { margin: 0 0 1.15rem; }
+.kindi-prose a { color: var(--brand-red); text-decoration: underline; text-underline-offset: 3px; }
+.kindi-prose a:hover { color: var(--brand-red-dark); }
+.kindi-prose strong { color: var(--brand-navy); font-weight: 800; }
+.kindi-prose ul, .kindi-prose ol { margin: 0 0 1.15rem; padding-inline-start: 1.4rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.kindi-prose li { line-height: 1.7; }
+.kindi-prose ul li::marker { color: var(--brand-red); }
+.kindi-prose img { max-width: 100%; height: auto; border-radius: 1rem; }
+.kindi-prose blockquote {
+  margin: 1.5rem 0; padding: 1rem 1.25rem; border-inline-start: 4px solid var(--brand-red);
+  background: var(--brand-red-soft); border-radius: 0.75rem; font-weight: 600; color: var(--brand-navy);
+}
+.kindi-prose blockquote p:last-child { margin-bottom: 0; }
+.kindi-prose hr { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }
+.kindi-prose table { width: 100%; border-collapse: collapse; margin: 0 0 1.15rem; font-size: 0.95rem; }
+.kindi-prose th, .kindi-prose td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: start; }
+.kindi-prose th { background: var(--muted); color: var(--brand-navy); font-weight: 800; }
+.kindi-prose :where(h2, h3):first-child { margin-top: 0; }
+
+/* Accessibility statement reuses the prose styles. */
+.kindi-a11y-statement { max-width: 860px; margin-inline: auto; }
+
+/* ---------- Blog index / archives ---------- */
+.kindi-blog__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: clamp(1.875rem, 1.4rem + 2vw, 2.5rem); margin: 0 0 1.75rem; }
+.kindi-blog__title .kindi-hl, .kindi-blog__title span { color: var(--brand-red); }
+
+.kindi-postgrid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+@media (min-width: 640px) { .kindi-postgrid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .kindi-postgrid { grid-template-columns: repeat(3, 1fr); } }
+
+.kindi-postcard { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; overflow: hidden; box-shadow: var(--shadow-card); display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; height: 100%; }
+.kindi-postcard:hover { transform: translateY(-4px); box-shadow: var(--shadow-pop); }
+.kindi-postcard__img { margin: 0; }
+.kindi-postcard__img img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; }
+.kindi-postcard > :not(.kindi-postcard__img) { margin-inline: 1.1rem; }
+.kindi-postcard__cat { margin-top: 1rem; font-size: 0.75rem; font-weight: 800; color: var(--brand-red); }
+.kindi-postcard__cat a { color: var(--brand-red); text-decoration: none; }
+.kindi-postcard__title { font-family: var(--wp--preset--font-family--display); font-weight: 800; font-size: 1.2rem; line-height: 1.25; margin: 0.4rem 0; }
+.kindi-postcard__title a { color: var(--brand-navy); text-decoration: none; }
+.kindi-postcard__title a:hover { color: var(--brand-red); }
+.kindi-postcard .wp-block-post-excerpt { color: var(--muted-foreground); font-size: 0.9375rem; line-height: 1.6; }
+.kindi-postcard .wp-block-post-excerpt__more-text a { color: var(--brand-red); font-weight: 700; }
+.kindi-postcard__date { margin: 0.4rem 1.1rem 1.1rem; font-size: 0.8125rem; color: var(--muted-foreground); }
+
+/* Pagination */
+.wp-block-query-pagination { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin-top: 2.5rem; }
+.wp-block-query-pagination a, .wp-block-query-pagination .current { padding: 0.5rem 0.9rem; border-radius: 0.75rem; border: 1px solid var(--border); color: var(--brand-navy); text-decoration: none; font-weight: 700; }
+.wp-block-query-pagination .current { background: var(--brand-navy); color: #fff; border-color: var(--brand-navy); }
+.wp-block-query-pagination a:hover { border-color: var(--brand-red); color: var(--brand-red); }
+
+/* 404 */
+.kindi-404 { text-align: center; padding: 3rem 1rem; }
+.kindi-404__code { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: clamp(4rem, 10vw, 7rem); color: var(--brand-red); line-height: 1; }

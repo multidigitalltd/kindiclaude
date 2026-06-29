@@ -105,9 +105,8 @@ function kindi_settings_tabs(): array {
 					'news_sub'      => array( 'type' => 'textarea', 'label' => 'ניוזלטר — תיאור' ),
 				),
 				'נגישות' => array(
-					'_a11y_note'       => array( 'type' => 'note', 'label' => '', 'help' => 'הצהרת הנגישות נוצרת אוטומטית בעמוד "/accessibility-statement/" (מקושר מסרגל הנגישות). פרטי הקשר נמשכים מהגדרות "פרטי החנות".' ),
-					'a11y_coordinator' => array( 'type' => 'text', 'label' => 'שם רכז/ת הנגישות' ),
-					'a11y_updated'     => array( 'type' => 'text', 'label' => 'תאריך עדכון ההצהרה', 'help' => 'לדוגמה: 28/06/2026. אם ריק — יוצג התאריך הנוכחי.' ),
+					'_a11y_note'     => array( 'type' => 'note', 'label' => '', 'help' => 'הטקסט שיוצג בעמוד "/accessibility-statement/" (מקושר מסרגל הנגישות). השאירו ריק כדי להשתמש בנוסח ברירת מחדל תקני.' ),
+					'a11y_statement' => array( 'type' => 'html', 'label' => 'טקסט הצהרת הנגישות', 'help' => 'אפשר HTML בסיסי: כותרות (h2), רשימות (ul/li), קישורים והדגשות.' ),
 				),
 				'באנר עוגיות (Cookies)' => array(
 					'cookie_enable'      => array( 'type' => 'select', 'label' => 'הצגת הבאנר', 'options' => array( '1' => 'מופעל', '0' => 'כבוי' ) ),
@@ -189,6 +188,8 @@ function kindi_sanitize_field( string $type, $value ) {
 			return esc_url_raw( trim( (string) $value ) );
 		case 'textarea':
 			return sanitize_textarea_field( (string) $value );
+		case 'html':
+			return wp_kses_post( (string) $value );
 		default:
 			return sanitize_text_field( (string) $value );
 	}
@@ -317,12 +318,13 @@ function kindi_settings_render(): void {
 			$id    = 'kindi_' . $key;
 			echo '<tr><th scope="row"><label for="' . esc_attr( $id ) . '">' . esc_html( $field['label'] ) . '</label></th><td>';
 
-			if ( 'textarea' === $field['type'] ) {
+			if ( 'textarea' === $field['type'] || 'html' === $field['type'] ) {
 				printf(
-					'<textarea id="%1$s" name="kindi[%2$s]" rows="4" class="large-text" dir="rtl">%3$s</textarea>',
+					'<textarea id="%1$s" name="kindi[%2$s]" rows="%4$d" class="large-text" dir="rtl">%3$s</textarea>',
 					esc_attr( $id ),
 					esc_attr( $key ),
-					esc_textarea( (string) $value )
+					esc_textarea( (string) $value ),
+					'html' === $field['type'] ? 12 : 4
 				);
 			} elseif ( 'select' === $field['type'] ) {
 				echo '<select id="' . esc_attr( $id ) . '" name="kindi[' . esc_attr( $key ) . ']">';

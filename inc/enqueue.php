@@ -114,6 +114,18 @@ function kindi_enqueue_styles(): void {
 			kindi_asset_version( 'assets/css/woocommerce.css' )
 		);
 	}
+
+	// Content design — pages (terms/policies/accessibility), posts, blog index,
+	// archives, search and 404. Not the front page or the WooCommerce views.
+	$is_content_view = is_singular() || is_home() || is_archive() || is_search() || is_404();
+	if ( $is_content_view && ! is_front_page() && ! kindi_is_wc_view() ) {
+		wp_enqueue_style(
+			'kindi-content',
+			KINDI_URI . 'assets/css/content.css',
+			array( 'kindi-components' ),
+			kindi_asset_version( 'assets/css/content.css' )
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'kindi_enqueue_styles' );
 
