@@ -78,6 +78,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'recently-viewed.php' );
 	kindi_require( 'filters.php' );
 	kindi_require( 'checkout.php' );
+	kindi_require( 'checkout-fields.php' );
 	kindi_require( 'merchant-feed.php' );
 	kindi_require( 'sitemap.php' );
 	kindi_require( 'gift-finder.php' );
