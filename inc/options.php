@@ -29,6 +29,12 @@ function kindi_default_options(): array {
 		'whatsapp_to'          => 21,
 		'whatsapp_product_msg' => "היי, יש לי שאלה על המוצר:\n{product}\n{url}",
 		'free_shipping' => 299,
+
+		// Product schema — shipping & returns (Google Merchant Listing fields).
+		'ship_cost'     => 29,   // Flat domestic shipping rate (₪); 0 = always free.
+		'ship_days_min' => 1,    // Transit time lower bound (business days).
+		'ship_days_max' => 4,    // Transit time upper bound (business days).
+		'return_days'   => 14,   // Return window (days); 0 = no returns accepted.
 		'ticker'        => "משלוח חינם בהזמנה מעל 299 ₪\nמועדון קינדי — 5% חזרה על כל קנייה\nקולקציית חזרה לבית הספר 2026 נחתה\nתשלום מאובטח SSL + PCI\nשירות אישי 03-5293383",
 
 		// Hero.

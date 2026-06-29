@@ -90,6 +90,12 @@ function kindi_settings_tabs(): array {
 					'whatsapp_product_msg' => array( 'type' => 'textarea', 'label' => 'הודעת וואטסאפ מעמוד מוצר', 'help' => 'אפשר להשתמש ב-{product} ו-{url}.' ),
 					'free_shipping'        => array( 'type' => 'number', 'label' => 'סף משלוח חינם (₪)' ),
 				),
+				'משלוח והחזרות (Schema)' => array(
+					'ship_cost'     => array( 'type' => 'number', 'label' => 'עלות משלוח רגיל (₪)', 'help' => 'מוצג בנתונים המובנים של גוגל. 0 = משלוח חינם תמיד.' ),
+					'ship_days_min' => array( 'type' => 'number', 'label' => 'זמן אספקה — מינימום (ימי עסקים)' ),
+					'ship_days_max' => array( 'type' => 'number', 'label' => 'זמן אספקה — מקסימום (ימי עסקים)' ),
+					'return_days'   => array( 'type' => 'number', 'label' => 'חלון החזרות (ימים)', 'help' => '0 = לא מתקבלות החזרות.' ),
+				),
 				'מועדון קינדי' => array(
 					'club_title'    => array( 'type' => 'text', 'label' => 'כותרת' ),
 					'club_title_hl' => array( 'type' => 'text', 'label' => 'כותרת — חלק מודגש (רקע אדום)' ),

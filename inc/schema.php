@@ -140,6 +140,16 @@ function kindi_output_schema(): void {
 				$offer['priceValidUntil'] = $sale_end->date( 'Y-m-d' );
 			}
 
+			// Shipping & return policy — Google Merchant Listing recommended fields.
+			$shipping = kindi_offer_shipping_details();
+			if ( $shipping ) {
+				$offer['shippingDetails'] = $shipping;
+			}
+			$returns = kindi_offer_return_policy();
+			if ( $returns ) {
+				$offer['hasMerchantReturnPolicy'] = $returns;
+			}
+
 			$brand = function_exists( 'kindi_product_brand' ) ? kindi_product_brand( $product ) : '';
 
 			$product_block = array(
@@ -207,3 +217,94 @@ function kindi_output_schema(): void {
 	}
 }
 add_action( 'wp_head', 'kindi_output_schema', 20 );
+
+/**
+ * OfferShippingDetails for the Product schema, built from theme options.
+ * Declares a flat domestic rate (free over the configured threshold) and a
+ * handling + transit delivery time. Returns an empty array if shipping data
+ * isn't configured.
+ *
+ * @return array<string,mixed>
+ */
+function kindi_offer_shipping_details(): array {
+	if ( ! function_exists( 'kindi_opt' ) ) {
+		return array();
+	}
+	$currency  = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : 'ILS';
+	$cost      = max( 0, (int) kindi_opt( 'ship_cost', 29 ) );
+	$threshold = max( 0, (int) kindi_opt( 'free_shipping', 299 ) );
+	$min_days  = max( 0, (int) kindi_opt( 'ship_days_min', 1 ) );
+	$max_days  = max( $min_days, (int) kindi_opt( 'ship_days_max', 4 ) );
+
+	$details = array(
+		'@type'               => 'OfferShippingDetails',
+		'shippingRate'        => array(
+			'@type'    => 'MonetaryAmount',
+			'value'    => (string) $cost,
+			'currency' => $currency,
+		),
+		'shippingDestination' => array(
+			'@type'         => 'DefinedRegion',
+			'addressCountry' => 'IL',
+		),
+		'deliveryTime'        => array(
+			'@type'        => 'ShippingDeliveryTime',
+			'handlingTime' => array(
+				'@type'    => 'QuantitativeValue',
+				'minValue' => 0,
+				'maxValue' => 1,
+				'unitCode' => 'DAY',
+			),
+			'transitTime'  => array(
+				'@type'    => 'QuantitativeValue',
+				'minValue' => $min_days,
+				'maxValue' => $max_days,
+				'unitCode' => 'DAY',
+			),
+		),
+	);
+
+	// Free-shipping threshold expressed as an eligible-transaction volume.
+	if ( $cost > 0 && $threshold > 0 ) {
+		$details['shippingRate']['freeShippingThreshold'] = array(
+			'@type'                  => 'DeliveryChargeSpecification',
+			'appliesToDeliveryMethod' => 'https://purl.org/goodrelations/v1#DeliveryModeMail',
+			'eligibleTransactionVolume' => array(
+				'@type'         => 'PriceSpecification',
+				'minPrice'      => $threshold,
+				'priceCurrency' => $currency,
+			),
+		);
+	}
+
+	return $details;
+}
+
+/**
+ * MerchantReturnPolicy for the Product schema, built from theme options.
+ * Returns an empty array if the return window is set to 0 (no returns).
+ *
+ * @return array<string,mixed>
+ */
+function kindi_offer_return_policy(): array {
+	if ( ! function_exists( 'kindi_opt' ) ) {
+		return array();
+	}
+	$days = max( 0, (int) kindi_opt( 'return_days', 14 ) );
+	if ( 0 === $days ) {
+		return array(
+			'@type'                => 'MerchantReturnPolicy',
+			'applicableCountry'    => 'IL',
+			'returnPolicyCategory' => 'https://schema.org/MerchantReturnNotPermitted',
+		);
+	}
+
+	return array(
+		'@type'                 => 'MerchantReturnPolicy',
+		'applicableCountry'     => 'IL',
+		'returnPolicyCategory'  => 'https://schema.org/MerchantReturnFiniteReturnWindow',
+		'merchantReturnDays'    => $days,
+		'returnMethod'          => 'https://schema.org/ReturnByMail',
+		'returnFees'            => 'https://schema.org/FreeReturn',
+	);
+}
