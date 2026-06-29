@@ -209,3 +209,66 @@ function kindi_pdp_left_extras( $product ): void {
 	kindi_pdp_inbox( $product );
 	echo '</div>';
 }
+
+/**
+ * Reorder the buy box to match the design: brand → title → short description →
+ * rating → price. (Move the excerpt from after the price up to just under the
+ * title.)
+ *
+ * @return void
+ */
+function kindi_pdp_reorder_summary(): void {
+	remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20 );
+	add_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 6 );
+}
+add_action( 'init', 'kindi_pdp_reorder_summary' );
+
+/**
+ * Sale badge as "-X% חיסכון" (percentage saved) instead of the default "Sale!".
+ *
+ * @param string     $html    Default markup.
+ * @param WP_Post    $post    Post.
+ * @param WC_Product $product Product.
+ * @return string
+ */
+function kindi_pdp_sale_flash( $html, $post, $product ): string {
+	if ( ! $product instanceof WC_Product ) {
+		return $html;
+	}
+	$pct = 0;
+	if ( $product->is_type( 'variable' ) ) {
+		$prices = $product->get_variation_prices( true );
+		$best   = 0;
+		foreach ( ( $prices['regular_price'] ?? array() ) as $vid => $reg ) {
+			$reg  = (float) $reg;
+			$sale = (float) ( $prices['sale_price'][ $vid ] ?? $reg );
+			if ( $reg > 0 && $sale < $reg ) {
+				$best = max( $best, (int) round( ( 1 - $sale / $reg ) * 100 ) );
+			}
+		}
+		$pct = $best;
+	} else {
+		$reg  = (float) $product->get_regular_price();
+		$sale = (float) $product->get_sale_price();
+		if ( $reg > 0 && $sale > 0 && $sale < $reg ) {
+			$pct = (int) round( ( 1 - $sale / $reg ) * 100 );
+		}
+	}
+	$label = $pct > 0 ? sprintf( '%d%%- חיסכון', $pct ) : 'מבצע';
+
+	return '<span class="onsale kindi-pdp__sale">' . esc_html( $label ) . '</span>';
+}
+add_filter( 'woocommerce_sale_flash', 'kindi_pdp_sale_flash', 10, 3 );
+
+/**
+ * "חדש בקינדי" badge in the gallery for recently-published products.
+ *
+ * @return void
+ */
+function kindi_pdp_new_badge(): void {
+	global $product;
+	if ( $product instanceof WC_Product && function_exists( 'kindi_is_new_product' ) && kindi_is_new_product( $product ) ) {
+		echo '<span class="kindi-pdp__newbadge">' . kindi_icon( 'sparkles', 'kindi-icon--xs kindi-icon--white' ) . 'חדש בקינדי</span>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	}
+}
+add_action( 'woocommerce_before_single_product_summary', 'kindi_pdp_new_badge', 8 );
