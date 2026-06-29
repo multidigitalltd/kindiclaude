@@ -63,7 +63,7 @@ function kindi_mini_cart_drawer(): void {
 	?>
 	<div class="kindi-cartdrawer" data-kindi-cart hidden>
 		<div class="kindi-cartdrawer__overlay" data-kindi-cart-close></div>
-		<aside class="kindi-cartdrawer__panel" role="dialog" aria-modal="true" aria-label="סל קניות">
+		<aside class="kindi-cartdrawer__panel" role="dialog" aria-modal="true" aria-label="סל קניות" tabindex="-1">
 			<div class="kindi-cartdrawer__head">
 				<strong>הסל שלי</strong>
 				<button type="button" data-kindi-cart-close aria-label="סגירה"><?php echo kindi_icon( 'close', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>

@@ -59,16 +59,6 @@ function kindi_wc_per_page(): int {
 add_filter( 'loop_shop_per_page', 'kindi_wc_per_page' );
 
 /**
- * Free-shipping threshold messaging used by the top announcement bar.
- * Single source of truth so templates and JS stay in sync.
- *
- * @return int Threshold in NIS.
- */
-function kindi_free_shipping_threshold(): int {
-	return (int) apply_filters( 'kindi_free_shipping_threshold', 299 );
-}
-
-/**
  * Live header cart updates without a page reload (WooCommerce cart fragments).
  *
  * @param array<string,string> $fragments Cart fragments keyed by CSS selector.

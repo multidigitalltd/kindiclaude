@@ -72,7 +72,8 @@ function kindi_saved_cart_panel(): void {
 			</div>
 		</div>
 		<div class="kindi-savecart__row">
-			<input type="email" name="email" value="<?php echo esc_attr( $email ); ?>" placeholder="<?php esc_attr_e( 'אימייל (לקבלת הקישור)', 'kindi' ); ?>" data-kindi-savecart-email>
+			<label class="screen-reader-text" for="kindi-savecart-email"><?php esc_html_e( 'אימייל (לקבלת הקישור)', 'kindi' ); ?></label>
+			<input type="email" id="kindi-savecart-email" name="email" value="<?php echo esc_attr( $email ); ?>" placeholder="<?php esc_attr_e( 'אימייל (לקבלת הקישור)', 'kindi' ); ?>" data-kindi-savecart-email>
 			<input type="hidden" name="nonce" value="<?php echo esc_attr( wp_create_nonce( 'kindi_save_cart' ) ); ?>">
 			<button type="button" class="kindi-btn kindi-btn--navy" data-kindi-savecart-btn><?php esc_html_e( 'שמירת עגלה', 'kindi' ); ?></button>
 		</div>

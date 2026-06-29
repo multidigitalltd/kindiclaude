@@ -28,8 +28,10 @@ function kindi_waitlist_form(): void {
 		<input type="hidden" name="nonce" value="<?php echo esc_attr( wp_create_nonce( 'kindi_waitlist' ) ); ?>">
 		<input type="text" name="kindi_hp" class="kindi-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
 		<div class="kindi-waitlist__row">
-			<input type="text" name="name" placeholder="השם שלכם" required>
-			<input type="email" name="email" placeholder="אימייל" required>
+			<label class="screen-reader-text" for="kindi-wl-name">השם שלכם</label>
+			<input type="text" id="kindi-wl-name" name="name" placeholder="השם שלכם" required>
+			<label class="screen-reader-text" for="kindi-wl-email">אימייל</label>
+			<input type="email" id="kindi-wl-email" name="email" placeholder="אימייל" required>
 		</div>
 		<label class="kindi-waitlist__terms"><input type="checkbox" name="terms" required> אני מאשר/ת קבלת עדכון על המוצר</label>
 		<button type="submit" class="kindi-btn kindi-btn--red">עדכנו אותי כשחוזר</button>

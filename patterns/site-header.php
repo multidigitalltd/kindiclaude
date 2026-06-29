@@ -33,7 +33,7 @@ $kindi_nav = kindi_nav_items();
 </div>
 
 <div class="kindi-bar">
-	<button class="kindi-bar__burger" type="button" aria-label="פתח תפריט" data-kindi-menu-open><?php echo kindi_icon( 'menu', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
+	<button class="kindi-bar__burger" type="button" aria-label="פתח תפריט" aria-controls="kindi-menu-drawer" aria-expanded="false" data-kindi-menu-open><?php echo kindi_icon( 'menu', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
 
 	<a class="kindi-bar__logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="קינדר טויס — לעמוד הבית">
 		<img src="<?php echo kindi_img( 'logo.webp' ); ?>" alt="קינדר טויס" width="76" height="56">
@@ -111,7 +111,7 @@ $kindi_nav = kindi_nav_items();
 </nav>
 
 <!-- Mobile drawer -->
-<div class="kindi-drawer" data-kindi-drawer hidden>
+<div class="kindi-drawer" id="kindi-menu-drawer" data-kindi-drawer hidden>
 	<div class="kindi-drawer__overlay" data-kindi-menu-close></div>
 	<div class="kindi-drawer__panel" role="dialog" aria-modal="true" aria-label="תפריט קטגוריות">
 		<div class="kindi-drawer__head">

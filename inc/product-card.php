@@ -95,7 +95,7 @@ function kindi_card_media(): void {
 	echo '</div>';
 
 	printf(
-		'<button type="button" class="kindi-pc__wish" data-kindi-wish="%d" aria-label="הוספה למועדפים">%s</button>',
+		'<button type="button" class="kindi-pc__wish" data-kindi-wish="%d" aria-pressed="false" aria-label="הוספה למועדפים">%s</button>',
 		(int) $pid,
 		kindi_icon( 'heart', 'kindi-icon--sm' ) // phpcs:ignore WordPress.Security.EscapeOutput
 	);

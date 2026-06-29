@@ -12,9 +12,17 @@
 	if ( openBtn && drawer ) {
 		var closers = drawer.querySelectorAll( '[data-kindi-menu-close]' );
 
+		var panel = drawer.querySelector( '.kindi-drawer__panel' ) || drawer;
+		var menuFocusables = function () {
+			return Array.prototype.slice.call(
+				panel.querySelectorAll( 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])' )
+			).filter( function ( el ) { return el.offsetParent !== null; } );
+		};
+
 		var show = function () {
 			drawer.hidden = false;
 			document.body.style.overflow = 'hidden';
+			openBtn.setAttribute( 'aria-expanded', 'true' );
 			var firstLink = drawer.querySelector( '.kindi-drawer__close' );
 			if ( firstLink ) {
 				firstLink.focus();
@@ -24,6 +32,7 @@
 		var hide = function () {
 			drawer.hidden = true;
 			document.body.style.overflow = '';
+			openBtn.setAttribute( 'aria-expanded', 'false' );
 			openBtn.focus();
 		};
 
@@ -32,8 +41,24 @@
 			el.addEventListener( 'click', hide );
 		} );
 		document.addEventListener( 'keydown', function ( e ) {
-			if ( 'Escape' === e.key && ! drawer.hidden ) {
+			if ( drawer.hidden ) {
+				return;
+			}
+			if ( 'Escape' === e.key ) {
 				hide();
+			} else if ( 'Tab' === e.key ) {
+				var f = menuFocusables();
+				if ( ! f.length ) {
+					return;
+				}
+				var first = f[0], last = f[ f.length - 1 ];
+				if ( e.shiftKey && document.activeElement === first ) {
+					e.preventDefault();
+					last.focus();
+				} else if ( ! e.shiftKey && document.activeElement === last ) {
+					e.preventDefault();
+					first.focus();
+				}
 			}
 		} );
 	}

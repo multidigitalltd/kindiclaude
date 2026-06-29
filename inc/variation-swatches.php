@@ -20,7 +20,11 @@ defined( 'ABSPATH' ) || exit;
  * @return array<string,string>
  */
 function kindi_color_map(): array {
-	return array(
+	static $map = null;
+	if ( null !== $map ) {
+		return $map;
+	}
+	$map = array(
 		// Hebrew.
 		'אדום'      => '#e23b3b',
 		'בורדו'     => '#7b1f2b',
@@ -69,6 +73,7 @@ function kindi_color_map(): array {
 		'silver'    => '#c8ccd1',
 		'white'     => '#ffffff',
 	);
+	return $map;
 }
 
 /**

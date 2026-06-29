@@ -212,6 +212,9 @@ function kindi_google_reviews(): array {
 
 	$response = wp_remote_get( $url, array( 'timeout' => 8 ) );
 	if ( is_wp_error( $response ) ) {
+		// Cache the failure briefly so a slow/down API can't fire a fresh 8s
+		// blocking request on every front-page load.
+		set_transient( 'kindi_g_reviews', array(), 15 * MINUTE_IN_SECONDS );
 		return array();
 	}
 
@@ -254,5 +257,6 @@ function kindi_google_reviews(): array {
  */
 function kindi_flush_reviews_cache(): void {
 	delete_transient( 'kindi_g_reviews' );
+	delete_transient( 'kindi_grp_reviews' ); // Primary source (plugin DB), cached 6h.
 }
 add_action( 'update_option_kindi_options', 'kindi_flush_reviews_cache' );

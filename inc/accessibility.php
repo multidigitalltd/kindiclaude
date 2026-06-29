@@ -38,7 +38,7 @@ function kindi_floating_buttons(): void {
 	if ( '' !== $wa ) {
 		echo '<a class="kindi-float kindi-float--wa" href="' . esc_url( 'https://wa.me/' . $wa ) . '" aria-label="צ׳אט בוואטסאפ" target="_blank" rel="noopener">' . kindi_icon( 'whatsapp', 'kindi-icon--xl kindi-icon--white' ) . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	}
-	echo '<button class="kindi-float kindi-float--a11y" type="button" aria-label="הגדרות נגישות" data-kindi-a11y>' . kindi_icon( 'accessibility', 'kindi-icon--md kindi-icon--white' ) . '</button>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	echo '<button class="kindi-float kindi-float--a11y" type="button" aria-label="הגדרות נגישות" aria-controls="kindi-a11y-panel" aria-expanded="false" data-kindi-a11y>' . kindi_icon( 'accessibility', 'kindi-icon--md kindi-icon--white' ) . '</button>'; // phpcs:ignore WordPress.Security.EscapeOutput
 }
 add_action( 'wp_footer', 'kindi_floating_buttons', 20 );
 
@@ -58,7 +58,7 @@ function kindi_a11y_panel(): void {
 		'reset'    => 'איפוס הגדרות',
 	);
 	?>
-	<div class="kindi-a11y" data-kindi-a11y-panel hidden role="dialog" aria-modal="false" aria-label="כלי נגישות">
+	<div class="kindi-a11y" id="kindi-a11y-panel" data-kindi-a11y-panel hidden role="dialog" aria-modal="false" aria-label="כלי נגישות">
 		<div class="kindi-a11y__head">
 			<strong>נגישות</strong>
 			<button type="button" class="kindi-a11y__close" data-kindi-a11y-close aria-label="סגירה"><?php echo kindi_icon( 'close', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>

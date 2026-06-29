@@ -69,7 +69,8 @@ function kindi_build_product_sitemap(): string {
 		$xml .= '<loc>' . esc_url( get_permalink( $id ) ) . '</loc>';
 		$xml .= '<lastmod>' . esc_html( get_post_modified_time( 'c', true, $id ) ) . '</lastmod>';
 
-		$image_ids = array_merge( array( get_post_thumbnail_id( $id ) ), wc_get_product( $id ) ? wc_get_product( $id )->get_gallery_image_ids() : array() );
+		$product   = wc_get_product( $id );
+		$image_ids = array_merge( array( get_post_thumbnail_id( $id ) ), $product ? $product->get_gallery_image_ids() : array() );
 		$seen      = array();
 		foreach ( array_filter( $image_ids ) as $img_id ) {
 			if ( isset( $seen[ $img_id ] ) ) {

@@ -200,7 +200,10 @@ function kindi_output_schema(): void {
 	}
 
 	foreach ( $blocks as $block ) {
-		echo '<script type="application/ld+json">' . wp_json_encode( $block, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
+		// Keep slashes ESCAPED (no JSON_UNESCAPED_SLASHES): wp_json_encode then
+		// renders "/" as "\/", so a literal </script> inside any value (e.g. a
+		// Google review) cannot break out of the JSON-LD script element.
+		echo '<script type="application/ld+json">' . wp_json_encode( $block, JSON_UNESCAPED_UNICODE ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- JSON-encoded, slashes escaped.
 	}
 }
 add_action( 'wp_head', 'kindi_output_schema', 20 );

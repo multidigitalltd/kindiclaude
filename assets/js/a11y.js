@@ -36,18 +36,37 @@
 	apply();
 
 	if ( toggle && panel ) {
+		var openPanel = function () {
+			panel.hidden = false;
+			toggle.setAttribute( 'aria-expanded', 'true' );
+			var closeBtn = panel.querySelector( '[data-kindi-a11y-close]' );
+			if ( closeBtn ) {
+				closeBtn.focus();
+			}
+		};
+		var closePanel = function ( returnFocus ) {
+			panel.hidden = true;
+			toggle.setAttribute( 'aria-expanded', 'false' );
+			if ( returnFocus ) {
+				toggle.focus();
+			}
+		};
 		toggle.addEventListener( 'click', function () {
-			panel.hidden = ! panel.hidden;
+			if ( panel.hidden ) {
+				openPanel();
+			} else {
+				closePanel( true );
+			}
 		} );
 		var closer = panel.querySelector( '[data-kindi-a11y-close]' );
 		if ( closer ) {
 			closer.addEventListener( 'click', function () {
-				panel.hidden = true;
+				closePanel( true );
 			} );
 		}
 		document.addEventListener( 'keydown', function ( e ) {
-			if ( 'Escape' === e.key ) {
-				panel.hidden = true;
+			if ( 'Escape' === e.key && ! panel.hidden ) {
+				closePanel( true );
 			}
 		} );
 

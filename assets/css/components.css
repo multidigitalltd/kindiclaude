@@ -161,6 +161,7 @@
 .kindi-cartdrawer__panel { position: absolute; top: 0; bottom: 0; inset-inline-start: 0; width: 90%; max-width: 24rem; background: #fff; display: flex; flex-direction: column; box-shadow: 10px 0 40px rgba(0,0,0,0.25); }
 .kindi-cartdrawer:not([hidden]) .kindi-cartdrawer__panel { animation: kindi-cart-in 0.25s ease; }
 @keyframes kindi-cart-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .kindi-cartdrawer:not([hidden]) .kindi-cartdrawer__panel { animation: none; } }
 .kindi-cartdrawer__head { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; background: var(--brand-navy); color: #fff; font-family: var(--wp--preset--font-family--display); }
 .kindi-cartdrawer__head button { background: none; border: 0; color: #fff; cursor: pointer; }
 /* Panel = head (fixed) + body (scrolls) + foot (fixed). The foot lives OUTSIDE

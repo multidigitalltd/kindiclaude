@@ -7,13 +7,26 @@
 	/* ---------------- Mini-cart drawer ---------------- */
 	var drawer = document.querySelector( '[data-kindi-cart]' );
 	if ( drawer ) {
+		var panel = drawer.querySelector( '.kindi-cartdrawer__panel' );
+		var lastFocus = null;
+		var focusables = function () {
+			return Array.prototype.slice.call(
+				( panel || drawer ).querySelectorAll( 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])' )
+			).filter( function ( el ) { return el.offsetParent !== null; } );
+		};
 		var openCart = function () {
+			lastFocus = document.activeElement;
 			drawer.hidden = false;
 			document.body.style.overflow = 'hidden';
+			var f = focusables();
+			( f[0] || panel ).focus();
 		};
 		var closeCart = function () {
 			drawer.hidden = true;
 			document.body.style.overflow = '';
+			if ( lastFocus && lastFocus.focus ) {
+				lastFocus.focus();
+			}
 		};
 
 		document.querySelectorAll( '.kindi-cart' ).forEach( function ( link ) {
@@ -26,8 +39,25 @@
 			el.addEventListener( 'click', closeCart );
 		} );
 		document.addEventListener( 'keydown', function ( e ) {
-			if ( 'Escape' === e.key && ! drawer.hidden ) {
+			if ( drawer.hidden ) {
+				return;
+			}
+			if ( 'Escape' === e.key ) {
 				closeCart();
+			} else if ( 'Tab' === e.key ) {
+				// Trap focus inside the dialog (WCAG 2.1.2 / 2.4.3).
+				var f = focusables();
+				if ( ! f.length ) {
+					return;
+				}
+				var first = f[0], last = f[ f.length - 1 ];
+				if ( e.shiftKey && document.activeElement === first ) {
+					e.preventDefault();
+					last.focus();
+				} else if ( ! e.shiftKey && document.activeElement === last ) {
+					e.preventDefault();
+					first.focus();
+				}
 			}
 		} );
 
@@ -73,7 +103,9 @@
 		var ids = read();
 		document.querySelectorAll( '[data-kindi-wish]' ).forEach( function ( btn ) {
 			var id = btn.getAttribute( 'data-kindi-wish' );
-			btn.classList.toggle( 'is-active', ids.indexOf( id ) !== -1 );
+			var on = ids.indexOf( id ) !== -1;
+			btn.classList.toggle( 'is-active', on );
+			btn.setAttribute( 'aria-pressed', on ? 'true' : 'false' );
 		} );
 	};
 
@@ -121,7 +153,7 @@
 			} )
 				.then( function ( r ) { return r.json(); } )
 				.then( function ( data ) {
-					form.innerHTML = '<p class="kindi-news__done">' + ( data.message || 'תודה!' ) + '</p>';
+					form.innerHTML = '<p class="kindi-news__done" role="status">' + ( data.message || 'תודה!' ) + '</p>';
 				} )
 				.catch( function () {
 					if ( btn ) {

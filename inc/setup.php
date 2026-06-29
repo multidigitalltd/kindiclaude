@@ -25,9 +25,6 @@ function kindi_setup(): void {
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'post-thumbnails' );
 	add_theme_support( 'html5', array( 'search-form', 'gallery', 'caption', 'style', 'script', 'navigation-widgets' ) );
-
-	// Serve modern formats; full sizes generated on demand keep the media library lean.
-	add_theme_support( 'post-thumbnails' );
 }
 add_action( 'after_setup_theme', 'kindi_setup' );
 
