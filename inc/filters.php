@@ -103,6 +103,87 @@ function kindi_category_chips(): array {
 }
 
 /**
+ * Attribute facets relevant to the current view, cached per context:
+ * - Category: only attributes/terms used by products in that category (incl.
+ *   sub-categories), so the facets reflect the real catalogue there.
+ * - Shop: all product attributes and their terms.
+ *
+ * @return array<int,array{attribute_name:string,label:string,taxonomy:string,terms:array<int,array{slug:string,name:string}>}>
+ */
+function kindi_archive_attribute_terms(): array {
+	if ( ! function_exists( 'wc_get_attribute_taxonomies' ) ) {
+		return array();
+	}
+
+	$term = ( function_exists( 'is_tax' ) && is_tax( 'product_cat' ) ) ? get_queried_object() : null;
+	$ctx  = ( $term instanceof WP_Term ) ? 'term_' . $term->term_id : 'shop';
+	$ver  = (int) get_option( 'kindi_term_ver', 1 );
+	$key  = 'kindi_attrterms_v' . $ver . '_' . $ctx;
+
+	$cached = get_transient( $key );
+	if ( is_array( $cached ) ) {
+		return $cached;
+	}
+
+	$atts = wc_get_attribute_taxonomies();
+	$out  = array();
+
+	if ( $term instanceof WP_Term ) {
+		// Products in this category (incl. children), capped for safety.
+		$ids = get_posts(
+			array(
+				'post_type'      => 'product',
+				'post_status'    => 'publish',
+				'fields'         => 'ids',
+				'posts_per_page' => 800,
+				'no_found_rows'  => true,
+				'tax_query'      => array(
+					array( 'taxonomy' => 'product_cat', 'field' => 'term_id', 'terms' => $term->term_id, 'include_children' => true ),
+				),
+			)
+		);
+
+		if ( $ids ) {
+			$taxonomies = array();
+			foreach ( $atts as $att ) {
+				$taxonomies[] = wc_attribute_taxonomy_name( $att->attribute_name );
+			}
+			$obj_terms = wp_get_object_terms( $ids, $taxonomies, array( 'fields' => 'all' ) );
+
+			$by_tax = array();
+			if ( ! is_wp_error( $obj_terms ) ) {
+				foreach ( $obj_terms as $t ) {
+					$by_tax[ $t->taxonomy ][ $t->term_id ] = array( 'slug' => $t->slug, 'name' => $t->name );
+				}
+			}
+			foreach ( $atts as $att ) {
+				$tx = wc_attribute_taxonomy_name( $att->attribute_name );
+				if ( ! empty( $by_tax[ $tx ] ) ) {
+					$out[] = array( 'attribute_name' => $att->attribute_name, 'label' => $att->attribute_label, 'taxonomy' => $tx, 'terms' => array_values( $by_tax[ $tx ] ) );
+				}
+			}
+		}
+	} else {
+		foreach ( $atts as $att ) {
+			$tx    = wc_attribute_taxonomy_name( $att->attribute_name );
+			$terms = get_terms( array( 'taxonomy' => $tx, 'hide_empty' => true ) );
+			if ( is_wp_error( $terms ) || ! $terms ) {
+				continue;
+			}
+			$list = array();
+			foreach ( $terms as $t ) {
+				$list[] = array( 'slug' => $t->slug, 'name' => $t->name );
+			}
+			$out[] = array( 'attribute_name' => $att->attribute_name, 'label' => $att->attribute_label, 'taxonomy' => $tx, 'terms' => $list );
+		}
+	}
+
+	set_transient( $key, $out, 12 * HOUR_IN_SECONDS );
+
+	return $out;
+}
+
+/**
  * Render the filter bar above the product loop.
  *
  * @return void
@@ -136,40 +217,26 @@ function kindi_archive_filters(): void {
 
 	echo '<div class="kindi-filters__row">';
 
-	// Attribute facets (brand, age, …).
-	if ( function_exists( 'wc_get_attribute_taxonomies' ) ) {
-		foreach ( wc_get_attribute_taxonomies() as $att ) {
-			$taxonomy = wc_attribute_taxonomy_name( $att->attribute_name );
+	// Attribute facets — only the attributes/terms that actually exist among the
+	// CURRENT category's products (all attributes on the shop). Cached per
+	// context, so the per-category computation runs rarely.
+	foreach ( kindi_archive_attribute_terms() as $facet ) {
+		$param  = 'filter_' . $facet['attribute_name'];
+		$chosen = isset( $_GET[ $param ] ) ? array_filter( explode( ',', sanitize_text_field( wp_unslash( $_GET[ $param ] ) ) ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-			// Cache the facet term list per taxonomy; flushed on term changes.
-			$cache_key = 'kindi_facet_' . $taxonomy;
-			$terms     = get_transient( $cache_key );
-			if ( false === $terms ) {
-				$terms = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => true ) );
-				$terms = ( is_wp_error( $terms ) || ! $terms ) ? array() : $terms;
-				set_transient( $cache_key, $terms, 12 * HOUR_IN_SECONDS );
-			}
-			if ( ! $terms ) {
-				continue;
-			}
-
-			$param  = 'filter_' . $att->attribute_name;
-			$chosen = isset( $_GET[ $param ] ) ? array_filter( explode( ',', sanitize_text_field( wp_unslash( $_GET[ $param ] ) ) ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-			echo '<details class="kindi-filters__att"><summary>' . esc_html( $att->attribute_label ) . '</summary><div class="kindi-filters__opts">';
-			foreach ( $terms as $term ) {
-				$is_on = in_array( $term->slug, $chosen, true );
-				$new   = $is_on ? array_diff( $chosen, array( $term->slug ) ) : array_merge( $chosen, array( $term->slug ) );
-				$url   = $new ? add_query_arg( $param, implode( ',', $new ) ) : remove_query_arg( $param );
-				printf(
-					'<a class="kindi-fopt%s" href="%s">%s</a>',
-					$is_on ? ' is-active' : '',
-					esc_url( $url ),
-					esc_html( $term->name )
-				);
-			}
-			echo '</div></details>';
+		echo '<details class="kindi-filters__att"><summary>' . esc_html( $facet['label'] ) . '</summary><div class="kindi-filters__opts">';
+		foreach ( $facet['terms'] as $t ) {
+			$is_on = in_array( $t['slug'], $chosen, true );
+			$new   = $is_on ? array_diff( $chosen, array( $t['slug'] ) ) : array_merge( $chosen, array( $t['slug'] ) );
+			$url   = $new ? add_query_arg( $param, implode( ',', $new ) ) : remove_query_arg( $param );
+			printf(
+				'<a class="kindi-fopt%s" href="%s">%s</a>',
+				$is_on ? ' is-active' : '',
+				esc_url( $url ),
+				esc_html( $t['name'] )
+			);
 		}
+		echo '</div></details>';
 	}
 
 	// Price range.

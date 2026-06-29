@@ -211,7 +211,10 @@
 		if ( ! ids.length ) {
 			wrap.innerHTML = '<p class="kindi-prod-empty">רשימת המועדפים ריקה. הוסיפו מוצרים בעזרת ❤</p>';
 		} else {
-			fetch( window.kindiStore.productsUrl + '?ids=' + ids.join( ',' ), {
+			// Use the correct separator — rest_url() already contains "?" on sites
+			// with plain permalinks (?rest_route=...).
+			var sep = window.kindiStore.productsUrl.indexOf( '?' ) === -1 ? '?' : '&';
+			fetch( window.kindiStore.productsUrl + sep + 'ids=' + encodeURIComponent( ids.join( ',' ) ), {
 				headers: { 'X-WP-Nonce': window.kindiStore.nonce },
 			} )
 				.then( function ( r ) { return r.json(); } )
@@ -227,7 +230,9 @@
 							'<span class="kindi-wish-card__p">' + ( p.price || '' ) + '</span></a>';
 					} ).join( '' );
 				} )
-				.catch( function () {} );
+				.catch( function () {
+					wrap.innerHTML = '<p class="kindi-prod-empty">לא ניתן לטעון את המועדפים כעת. נסו לרענן.</p>';
+				} );
 		}
 	}
 }() );
