@@ -335,3 +335,27 @@
 			} );
 	} );
 }() );
+
+/* Product summary "more info" / reviews links → open the matching tab + scroll. */
+( function () {
+	document.addEventListener( 'click', function ( e ) {
+		var trigger = e.target.closest && e.target.closest( '[data-kindi-tab]' );
+		if ( ! trigger ) {
+			return;
+		}
+		var key = trigger.getAttribute( 'data-kindi-tab' );
+		var tabLink = document.querySelector( '.wc-tabs li.' + key + '_tab a, .wc-tabs li a[href="#tab-' + key + '"]' );
+		var panel = document.getElementById( 'tab-' + key );
+		var target = panel || tabLink || document.querySelector( '.woocommerce-tabs' );
+		if ( ! tabLink && ! panel ) {
+			return; // No tabs on this layout — let the default anchor behaviour run.
+		}
+		e.preventDefault();
+		if ( tabLink ) {
+			tabLink.click();
+		}
+		if ( target ) {
+			target.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+		}
+	} );
+}() );

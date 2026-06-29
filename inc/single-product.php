@@ -103,9 +103,14 @@ add_action( 'woocommerce_single_product_summary', 'kindi_pdp_highlights', 33 );
 function kindi_pdp_delivery_card(): void {
 	$threshold = (int) ( function_exists( 'kindi_opt' ) ? kindi_opt( 'free_shipping', 299 ) : 299 );
 
+	$wa = function_exists( 'kindi_whatsapp_url' ) ? kindi_whatsapp_url( 'היי, אשמח לייעוץ על מוצר' ) : '';
+
 	echo '<div class="kindi-pdp__delivery">';
-	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--blue">' . kindi_icon( 'truck', 'kindi-icon--md' ) . '</span><div><strong>' . esc_html( sprintf( 'משלוח חינם בהזמנה מעל ₪%d', $threshold ) ) . '</strong><span>הזמינו היום — משלוח מהיר עד הבית</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
-	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--red">' . kindi_icon( 'gift', 'kindi-icon--md' ) . '</span><div><strong>עטיפת מתנה חינם</strong><span>סמנו בעגלה — נעטוף יפה ונצרף ברכה</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--blue">' . kindi_icon( 'truck', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>' . esc_html( sprintf( 'משלוח חינם בהזמנה מעל ₪%d', $threshold ) ) . '</strong><span>' . kindi_icon( 'clock', 'kindi-icon--xs' ) . 'הזמינו היום — משלוח מהיר עד הבית</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--red">' . kindi_icon( 'gift', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>עטיפת מתנה חינם</strong><span>סמנו בעגלה — נעטוף יפה ונצרף ברכה</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	if ( '' !== $wa ) {
+		echo '<a class="kindi-pdp__drow kindi-pdp__drow--link" href="' . esc_url( $wa ) . '" target="_blank" rel="noopener"><span class="kindi-pdp__dic kindi-pdp__dic--green">' . kindi_icon( 'whatsapp', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>צריך/ה עזרה? דברו עם יועץ בוואטסאפ</strong></div><span class="kindi-pdp__dchev">' . kindi_icon( 'arrowleft', 'kindi-icon--sm' ) . '</span></a>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	}
 	echo '</div>';
 }
 add_action( 'woocommerce_single_product_summary', 'kindi_pdp_delivery_card', 34 );
@@ -218,10 +223,120 @@ function kindi_pdp_left_extras( $product ): void {
  * @return void
  */
 function kindi_pdp_reorder_summary(): void {
+	// Short description (clamped to two lines) directly under the title.
 	remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20 );
-	add_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 6 );
+	add_action( 'woocommerce_single_product_summary', 'kindi_pdp_short_excerpt', 6 );
+	// Replace the default rating with our row: number + red stars + reviews + SKU.
+	remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10 );
+	add_action( 'woocommerce_single_product_summary', 'kindi_pdp_rating', 9 );
+	// Price box (soft red card with the saved amount).
+	remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_price', 10 );
+	add_action( 'woocommerce_single_product_summary', 'kindi_pdp_price', 10 );
 }
 add_action( 'init', 'kindi_pdp_reorder_summary' );
+
+/**
+ * Price box — the WooCommerce price (sale + struck regular) inside a soft red
+ * card, with a "חיסכון" pill showing the amount saved on simple sale products.
+ *
+ * @return void
+ */
+function kindi_pdp_price(): void {
+	global $product;
+	if ( ! $product instanceof WC_Product ) {
+		return;
+	}
+
+	echo '<div class="kindi-pdp__pricebox">';
+	echo '<div class="kindi-pdp__price">' . $product->get_price_html() . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- WooCommerce core, escaped.
+
+	if ( $product->is_type( 'simple' ) && $product->is_on_sale() ) {
+		$regular = (float) $product->get_regular_price();
+		$sale    = (float) $product->get_sale_price();
+		if ( $regular > $sale && $sale > 0 ) {
+			echo '<span class="kindi-pdp__save">' . esc_html__( 'חיסכון', 'kindi' ) . ' ' . wp_kses_post( wc_price( $regular - $sale ) ) . '</span>';
+		}
+	}
+	echo '</div>';
+}
+
+/**
+ * Friendlier in-stock text: "במלאי — נשארו N יחידות בלבד" when the quantity is
+ * known, otherwise just "במלאי".
+ *
+ * @param string     $text    Default text.
+ * @param WC_Product $product Product.
+ * @return string
+ */
+function kindi_pdp_stock_text( $text, $product ): string {
+	if ( ! $product instanceof WC_Product || ! $product->is_in_stock() ) {
+		return $text;
+	}
+	$qty = $product->get_stock_quantity();
+	if ( $product->managing_stock() && null !== $qty && $qty > 0 ) {
+		/* translators: %d: units left in stock. */
+		return sprintf( _n( 'במלאי — נשארה יחידה אחת בלבד', 'במלאי — נשארו %d יחידות בלבד', $qty, 'kindi' ), $qty );
+	}
+	return esc_html__( 'במלאי', 'kindi' );
+}
+add_filter( 'woocommerce_get_availability_text', 'kindi_pdp_stock_text', 10, 2 );
+
+/**
+ * Short description under the title — clamped to two lines (CSS) with a
+ * "מידע נוסף" control that opens the full description tab below.
+ *
+ * @return void
+ */
+function kindi_pdp_short_excerpt(): void {
+	global $product;
+	if ( ! $product instanceof WC_Product ) {
+		return;
+	}
+	$short = $product->get_short_description();
+	if ( '' === $short ) {
+		return;
+	}
+	echo '<div class="kindi-pdp__excerpt">' . wp_kses_post( wpautop( $short ) ) . '</div>';
+	echo '<button type="button" class="kindi-pdp__more" data-kindi-tab="description">'
+		. esc_html__( 'מידע נוסף', 'kindi' )
+		. kindi_icon( 'chevrondown', 'kindi-icon--xs' ) // phpcs:ignore WordPress.Security.EscapeOutput
+		. '</button>';
+}
+
+/**
+ * Rating row: numeric average + red stars + a reviews link that jumps to the
+ * reviews tab + the SKU — matching the Lovable design.
+ *
+ * @return void
+ */
+function kindi_pdp_rating(): void {
+	global $product;
+	if ( ! $product instanceof WC_Product ) {
+		return;
+	}
+	$count   = (int) $product->get_review_count();
+	$average = (float) $product->get_average_rating();
+	$sku     = $product->get_sku();
+
+	if ( $average <= 0 && '' === $sku ) {
+		return;
+	}
+
+	echo '<div class="kindi-pdp__rating">';
+	if ( $average > 0 ) {
+		echo '<span class="kindi-pdp__rnum">' . esc_html( number_format( $average, 1 ) ) . '</span>';
+		echo wc_get_rating_html( $average, $count ); // phpcs:ignore WordPress.Security.EscapeOutput -- WooCommerce core markup.
+		if ( $count > 0 ) {
+			echo '<a href="#tab-reviews" class="kindi-pdp__reviews" data-kindi-tab="reviews" rel="nofollow">('
+				. esc_html( sprintf( _n( '%s ביקורת', '%s ביקורות', $count, 'kindi' ), number_format_i18n( $count ) ) )
+				. ')</a>';
+		}
+	}
+	if ( '' !== $sku ) {
+		echo '<span class="kindi-pdp__sku">&middot; ' . esc_html__( 'מק"ט', 'kindi' ) . ' ' . esc_html( $sku ) . '</span>';
+	}
+	echo '</div>';
+}
 
 /**
  * Sale badge as "-X% חיסכון" (percentage saved) instead of the default "Sale!".
@@ -272,3 +387,50 @@ function kindi_pdp_new_badge(): void {
 	}
 }
 add_action( 'woocommerce_before_single_product_summary', 'kindi_pdp_new_badge', 8 );
+
+/**
+ * Add a "משלוחים והחזרות" product tab (between specs and reviews), built from the
+ * shipping/return options so the content stays in sync with the panel.
+ *
+ * @param array<string,array<string,mixed>> $tabs Tabs.
+ * @return array<string,array<string,mixed>>
+ */
+function kindi_pdp_shipping_tab( array $tabs ): array {
+	$tabs['kindi_shipping'] = array(
+		'title'    => __( 'משלוחים והחזרות', 'kindi' ),
+		'priority' => 25,
+		'callback' => 'kindi_pdp_shipping_tab_content',
+	);
+	return $tabs;
+}
+add_filter( 'woocommerce_product_tabs', 'kindi_pdp_shipping_tab' );
+
+/**
+ * Shipping & returns tab content.
+ *
+ * @return void
+ */
+function kindi_pdp_shipping_tab_content(): void {
+	$opt      = static fn( string $k, $d ) => function_exists( 'kindi_opt' ) ? kindi_opt( $k, $d ) : $d;
+	$cost     = (int) $opt( 'ship_cost', 29 );
+	$free     = (int) $opt( 'free_shipping', 299 );
+	$min_days = (int) $opt( 'ship_days_min', 1 );
+	$max_days = (int) $opt( 'ship_days_max', 4 );
+	$ret      = (int) $opt( 'return_days', 14 );
+	$address  = (string) $opt( 'store_address', '' );
+
+	$ship_line = $cost > 0
+		? sprintf( '₪%d, חינם מעל ₪%d. אספקה תוך %d-%d ימי עסקים.', $cost, $free, $min_days, $max_days )
+		: sprintf( 'חינם. אספקה תוך %d-%d ימי עסקים.', $min_days, $max_days );
+
+	echo '<div class="kindi-pdp-ship">';
+	echo '<p><strong>' . esc_html__( 'משלוח עד הבית:', 'kindi' ) . '</strong> ' . esc_html( $ship_line ) . '</p>';
+	if ( '' !== $address ) {
+		echo '<p><strong>' . esc_html__( 'איסוף עצמי:', 'kindi' ) . '</strong> ' . esc_html( sprintf( 'חינם מהחנות — %s.', $address ) ) . '</p>';
+	}
+	if ( $ret > 0 ) {
+		echo '<p><strong>' . esc_html__( 'החזרות:', 'kindi' ) . '</strong> ' . esc_html( sprintf( 'תוך %d יום באריזה מקורית, החזר כספי מלא.', $ret ) ) . '</p>';
+	}
+	echo '<p><strong>' . esc_html__( 'אחריות:', 'kindi' ) . '</strong> ' . esc_html__( 'שנה מלאה של היבואן הרשמי.', 'kindi' ) . '</p>';
+	echo '</div>';
+}
