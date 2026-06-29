@@ -21,6 +21,9 @@ defined( 'ABSPATH' ) || exit;
  * @return void
  */
 function kindi_qty_minus(): void {
+	if ( kindi_qty_stepper_hidden() ) {
+		return;
+	}
 	echo '<button type="button" class="kindi-qbtn kindi-qbtn--minus" tabindex="-1" aria-label="' . esc_attr__( 'הפחתת כמות', 'kindi' ) . '">&#8722;</button>';
 }
 add_action( 'woocommerce_before_quantity_input_field', 'kindi_qty_minus' );
@@ -31,9 +34,29 @@ add_action( 'woocommerce_before_quantity_input_field', 'kindi_qty_minus' );
  * @return void
  */
 function kindi_qty_plus(): void {
+	if ( kindi_qty_stepper_hidden() ) {
+		return;
+	}
 	echo '<button type="button" class="kindi-qbtn kindi-qbtn--plus" tabindex="-1" aria-label="' . esc_attr__( 'הוספת כמות', 'kindi' ) . '">&#43;</button>';
 }
 add_action( 'woocommerce_after_quantity_input_field', 'kindi_qty_plus' );
+
+/**
+ * Whether the +/- stepper should be suppressed — when the product can't be
+ * bought in more than one (sold individually, or max purchase quantity of 1).
+ *
+ * @return bool
+ */
+function kindi_qty_stepper_hidden(): bool {
+	global $product;
+	if ( ! $product instanceof WC_Product ) {
+		return false;
+	}
+	if ( $product->is_sold_individually() ) {
+		return true;
+	}
+	return 1 === (int) $product->get_max_purchase_quantity();
+}
 
 /**
  * Brand eyebrow above the product title.

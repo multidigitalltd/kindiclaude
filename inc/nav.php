@@ -45,6 +45,93 @@ function kindi_nav_icon( string $icon ): string {
 }
 
 /**
+ * Guess a fitting brand icon for a category label (matches the reference design's
+ * pairing). Used when a menu item has no explicit `kindi-icon-<name>` class, so
+ * WP-menu categories get sensible icons automatically. Falls back to the Kindi
+ * face. More specific keywords are checked before generic ones.
+ *
+ * @param string $label Category label.
+ * @return string Icon key.
+ */
+function kindi_guess_category_icon( string $label ): string {
+	$rules = array(
+		'קטגוריות' => 'grid',
+		'חצר'      => 'ball',
+		'גינה'     => 'ball',
+		'ספורט'    => 'ball',
+		'גיל'      => 'baby',
+		'תינוק'    => 'baby',
+		'פעוט'     => 'baby',
+		'בית ספר'  => 'backpack',
+		'ילקוט'    => 'backpack',
+		'כתיבה'    => 'pencil',
+		'יציר'     => 'palette',
+		'אומנות'   => 'palette',
+		'אמנות'    => 'palette',
+		'גננת'     => 'teddy',
+		'לגן'      => 'teddy',
+		'קיץ'      => 'sun',
+		'בריכ'     => 'sun',
+		'חג'       => 'party',
+		'פורים'    => 'party',
+		'פסח'      => 'party',
+		'חנוכה'    => 'party',
+		'תחפוש'    => 'party',
+		'מותג'     => 'gem',
+		'מבצע'     => 'fire',
+		'הנחה'     => 'fire',
+		'מתנ'      => 'gift',
+		'פאזל'     => 'puzzle',
+		'לגו'      => 'blocks',
+		'בנייה'    => 'blocks',
+		'רכב'      => 'car',
+		'בוב'      => 'baby',
+		'משחק'     => 'dice',
+		'קופס'     => 'dice',
+	);
+	foreach ( $rules as $needle => $icon ) {
+		if ( false !== mb_stripos( $label, $needle ) ) {
+			return $icon;
+		}
+	}
+	return 'face';
+}
+
+/**
+ * Pick the announcement-strip icon that matches a message's content (so icons
+ * always pair with their message exactly like the design), with an index-based
+ * fallback for custom lines.
+ *
+ * @param string $text     Message text.
+ * @param string $fallback Fallback icon key.
+ * @return string Icon key.
+ */
+function kindi_ticker_icon( string $text, string $fallback = 'sparkles' ): string {
+	$map = array(
+		'משלוח'   => 'truck',
+		'מועדון'  => 'gift',
+		'חזרה על' => 'gift',
+		'קולקצי'  => 'sparkles',
+		'בית הספר' => 'sparkles',
+		'נחת'     => 'sparkles',
+		'מאובטח'  => 'shield',
+		'תשלום'   => 'shield',
+		'SSL'     => 'shield',
+		'PCI'     => 'shield',
+		'שירות'   => 'phone',
+	);
+	foreach ( $map as $needle => $icon ) {
+		if ( false !== mb_stripos( $text, $needle ) ) {
+			return $icon;
+		}
+	}
+	if ( preg_match( '/0\d[-\d ]{6,}/', $text ) ) {
+		return 'phone';
+	}
+	return $fallback;
+}
+
+/**
  * Normalised navigation items (from the assigned menu, or the default).
  *
  * @return array<int,array{label:string,url:string,icon:string,highlight:bool,cols:array<int,array{title:string,links:array<int,array{label:string,url:string}>}>}>
@@ -147,7 +234,7 @@ function kindi_build_nav_tree( array $items ): array {
 		}
 
 		$classes = is_array( $top->classes ) ? $top->classes : array();
-		$icon    = 'face';
+		$icon    = kindi_guess_category_icon( (string) $top->title );
 		foreach ( $classes as $class ) {
 			if ( preg_match( '/^kindi-icon-([a-z0-9]+)$/', $class, $m ) ) {
 				$icon = $m[1];

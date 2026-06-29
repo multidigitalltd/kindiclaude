@@ -44,6 +44,9 @@
 .kindi-bar__util span { font-size: 10px; font-weight: 500; }
 .kindi-bar__util:hover { color: var(--brand-navy); }
 @media (min-width: 640px) { .kindi-bar__util { display: flex; } }
+.kindi-bar__phone { display: none; align-items: center; gap: 0.4rem; font-size: 0.875rem; font-weight: 500; color: var(--muted-foreground); text-decoration: none; padding-inline: 0.5rem; white-space: nowrap; transition: color 0.2s; }
+.kindi-bar__phone:hover { color: var(--brand-navy); }
+@media (min-width: 1024px) { .kindi-bar__phone { display: inline-flex; } }
 
 .kindi-cart { display: flex; align-items: center; gap: 0.75rem; height: 3rem; padding-inline-start: 1rem; padding-inline-end: 0.5rem; border-radius: 1rem; background: #fff; border: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); text-decoration: none; transition: all 0.2s; }
 .kindi-cart:hover { border-color: color-mix(in oklab, var(--brand-red) 40%, transparent); box-shadow: var(--shadow-card); }
@@ -96,6 +99,12 @@
 .kindi-nav__face { width: 1.5em; height: 1.5em; border-radius: 999px; object-fit: cover; background: #fff; flex-shrink: 0; }
 .kindi-nav__ic .kindi-icon { width: 1.2em; height: 1.2em; }
 .kindi-nav__link:hover { background: rgba(255,255,255,0.1); color: #fff; }
+/* Open mega item = white pill button with rotated chevron (like the design). */
+.kindi-nav__item:has(.kindi-mega):hover .kindi-nav__link,
+.kindi-nav__item:has(.kindi-mega):focus-within .kindi-nav__link { background: #fff; color: var(--brand-navy); box-shadow: 0 6px 16px rgba(20,35,63,0.12); }
+.kindi-nav__link > .kindi-icon { transition: transform 0.2s; }
+.kindi-nav__item:has(.kindi-mega):hover .kindi-nav__link > .kindi-icon,
+.kindi-nav__item:has(.kindi-mega):focus-within .kindi-nav__link > .kindi-icon { transform: rotate(180deg); }
 .kindi-nav__item--hl .kindi-nav__link { background: var(--brand-red); color: #fff; }
 .kindi-nav__item--hl .kindi-nav__link:hover { background: var(--brand-red-dark); }
 .kindi-nav__ic { width: 1.5rem; height: 1.5rem; border-radius: 0.375rem; background: #fff; display: grid; place-items: center; }

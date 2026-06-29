@@ -9,12 +9,13 @@
  * @package Kindi
  */
 
-// Marquee announcement items (texts editable in קינדי settings; icons cycle).
+// Announcement items (texts editable in קינדי settings). Each line's icon is
+// matched to its content so the pairing is exactly like the design.
 $kindi_ticker_icons = array( 'truck', 'gift', 'sparkles', 'shield', 'phone' );
 $kindi_ticker       = array();
 foreach ( kindi_opt_lines( 'ticker' ) as $i => $kindi_txt ) {
 	$kindi_ticker[] = array(
-		'icon' => $kindi_ticker_icons[ $i % count( $kindi_ticker_icons ) ],
+		'icon' => kindi_ticker_icon( $kindi_txt, $kindi_ticker_icons[ $i % count( $kindi_ticker_icons ) ] ),
 		'text' => $kindi_txt,
 	);
 }
@@ -48,6 +49,11 @@ $kindi_nav = kindi_nav_items();
 	</form>
 
 	<div class="kindi-bar__actions">
+		<?php
+		$kindi_phone = function_exists( 'kindi_opt' ) ? (string) kindi_opt( 'phone', '03-5293383' ) : '03-5293383';
+		$kindi_phone = '' !== $kindi_phone ? $kindi_phone : '03-5293383';
+		?>
+		<a class="kindi-bar__phone" href="tel:<?php echo esc_attr( preg_replace( '/\D+/', '', $kindi_phone ) ); ?>" aria-label="<?php esc_attr_e( 'התקשרו אלינו', 'kindi' ); ?>"><?php echo kindi_icon( 'phone', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><?php echo esc_html( $kindi_phone ); ?></span></a>
 		<?php
 		$kindi_account = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : '';
 		$kindi_account = $kindi_account ? $kindi_account : wp_login_url();
