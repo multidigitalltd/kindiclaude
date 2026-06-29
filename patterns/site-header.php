@@ -33,6 +33,13 @@ $kindi_nav = kindi_nav_items();
 	</div>
 </div>
 
+<?php $kindi_promo = function_exists( 'kindi_opt' ) ? (string) kindi_opt( 'header_promo', '' ) : ''; ?>
+<?php if ( '' !== $kindi_promo ) : ?>
+<div class="kindi-promobar">
+	<span class="kindi-promobar__item"><?php echo kindi_icon( 'truck', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $kindi_promo ); ?></span>
+</div>
+<?php endif; ?>
+
 <div class="kindi-bar">
 	<button class="kindi-bar__burger" type="button" aria-label="פתח תפריט" aria-controls="kindi-menu-drawer" aria-expanded="false" data-kindi-menu-open><?php echo kindi_icon( 'menu', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
 

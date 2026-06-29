@@ -39,7 +39,8 @@ function kindi_settings_tabs(): array {
 					'section_heading_tag' => array( 'type' => 'select', 'label' => 'תגית כותרת הסקשנים', 'options' => array( 'h2' => 'H2 (מומלץ)', 'h3' => 'H3', 'h4' => 'H4' ), 'help' => 'תגית ה-HTML של כותרות הסקשנים בדף הבית — לשליטה במבנה ה-SEO.' ),
 				),
 				'רצועה עליונה' => array(
-					'ticker'  => array( 'type' => 'textarea', 'label' => 'רצועת מבצעים עליונה', 'help' => 'שורה אחת לכל פריט' ),
+					'ticker'       => array( 'type' => 'textarea', 'label' => 'רצועת מבצעים עליונה', 'help' => 'שורה אחת לכל פריט' ),
+					'header_promo' => array( 'type' => 'text', 'label' => 'פס כחול מעל החיפוש', 'help' => 'משלוח חינם / הטבת מועדון. השאירו ריק כדי להסתיר.' ),
 				),
 				'באנר מבצע גדול' => array(
 					'promo1_img'   => array( 'type' => 'image', 'label' => 'תמונה' ),

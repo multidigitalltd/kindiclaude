@@ -112,20 +112,31 @@
 	} );
 }() );
 
-/* Expose the header height so the (position:fixed) mega panel anchors right below
- * the category nav even while the nav scrolls horizontally. */
+/* Anchor the (position:fixed) mega panel right below the category nav. Only the
+ * nav is sticky now, so its bottom moves as the promo strips + search row scroll
+ * away — track it on scroll so the mega stays glued under the nav. */
 ( function () {
 	'use strict';
-	var header = document.querySelector( '.kindi-header' );
-	if ( ! header ) {
+	var nav = document.querySelector( '.kindi-nav' );
+	if ( ! nav ) {
 		return;
 	}
+	var ticking = false;
 	var setH = function () {
-		document.documentElement.style.setProperty( '--kindi-header-h', header.offsetHeight + 'px' );
+		ticking = false;
+		var bottom = Math.max( nav.offsetHeight, nav.getBoundingClientRect().bottom );
+		document.documentElement.style.setProperty( '--kindi-header-h', Math.round( bottom ) + 'px' );
+	};
+	var onScroll = function () {
+		if ( ! ticking ) {
+			ticking = true;
+			window.requestAnimationFrame( setH );
+		}
 	};
 	setH();
 	window.addEventListener( 'load', setH );
 	window.addEventListener( 'resize', setH );
+	window.addEventListener( 'scroll', onScroll, { passive: true } );
 }() );
 
 /* Quantity stepper — the +/- buttons injected around the WooCommerce number
