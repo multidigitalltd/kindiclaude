@@ -460,16 +460,53 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   color: var(--brand-navy); font-weight: 600; font-size: 0.9rem; line-height: 1.55;
 }
 
-/* Payment area inside the order-review card. */
-.woocommerce-checkout #payment ul.payment_methods li { margin-bottom: 0.5rem; }
-.woocommerce-checkout #payment .place-order { padding: 1rem 0 0; }
-.woocommerce-checkout #place_order { width: 100%; padding: 0.95rem 1.5rem; font-size: 1.05rem; font-weight: 800; border-radius: 0.875rem; }
-.woocommerce-checkout #payment .woocommerce-terms-and-conditions-wrapper { margin-bottom: 1rem; }
-/* Inputs: comfortable height + clear focus. */
+/* Fields: branded rounded inputs with a clear focus ring — no raw boxes. */
 .woocommerce-checkout .form-row input.input-text,
 .woocommerce-checkout .form-row textarea,
-.woocommerce-checkout .form-row .select2-selection,
-.woocommerce-checkout .form-row select { width: 100%; }
+.woocommerce-checkout .form-row select,
+.woocommerce-checkout .select2-container .select2-selection,
+.woocommerce form.checkout_coupon .input-text {
+  width: 100%; box-sizing: border-box; min-height: 3rem;
+  padding: 0.7rem 0.9rem; line-height: 1.4; font-size: 1rem; color: var(--brand-navy);
+  background: #fff; border: 1.5px solid color-mix(in oklab, var(--brand-navy) 14%, transparent);
+  border-radius: 0.8rem; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.woocommerce-checkout .select2-container .select2-selection { display: flex; align-items: center; }
+.woocommerce-checkout .select2-container--default .select2-selection--single .select2-selection__arrow { top: 0.6rem; }
+.woocommerce-checkout .form-row input.input-text:focus,
+.woocommerce-checkout .form-row textarea:focus,
+.woocommerce-checkout .form-row select:focus,
+.woocommerce-checkout .select2-container--focus .select2-selection {
+  border-color: var(--brand-blue); box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-blue) 18%, transparent); outline: none;
+}
+.woocommerce-checkout .form-row textarea { min-height: 5rem; resize: vertical; }
+.woocommerce-checkout .woocommerce-additional-fields h3 { font-size: 1.35rem; margin: 0 0 0.35rem; }
+.woocommerce-checkout .woocommerce-additional-fields__field-wrapper { margin-top: 0.75rem; }
+
+/* Order-review product rows: thumbnail + name, breathing room. */
+.woocommerce-checkout #order_review table.shop_table .cart_item td { padding-block: 0.9rem; }
+.woocommerce-checkout #order_review .cart_item img,
+.woocommerce-cart .cart_item img { width: 52px; height: 52px; object-fit: contain; border-radius: 0.6rem; background: var(--brand-cream, #FBF6EC); margin-inline-end: 0.6rem; vertical-align: middle; }
+.woocommerce-checkout #order_review table.shop_table .product-name .product-quantity { color: var(--muted-foreground); font-weight: 600; }
+
+/* Payment methods as selectable cards (bit / credit / etc.). */
+.woocommerce-checkout #payment ul.payment_methods {
+  display: flex; flex-direction: column; gap: 0.6rem; margin: 0 0 1rem;
+}
+.woocommerce-checkout #payment ul.payment_methods li {
+  margin: 0; background: #fff; border: 1.5px solid var(--border); border-radius: 0.9rem;
+  padding: 0.85rem 1rem; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.woocommerce-checkout #payment ul.payment_methods li:hover { border-color: color-mix(in oklab, var(--brand-blue) 40%, transparent); }
+.woocommerce-checkout #payment ul.payment_methods li:has(input:checked) {
+  border-color: var(--brand-blue); box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-blue) 14%, transparent);
+}
+.woocommerce-checkout #payment ul.payment_methods li label { font-weight: 700; color: var(--brand-navy); display: inline-flex; align-items: center; gap: 0.5rem; margin: 0; }
+.woocommerce-checkout #payment ul.payment_methods li img { max-height: 28px; width: auto; margin: 0 0.25rem; vertical-align: middle; }
+.woocommerce-checkout #payment div.payment_box { margin: 0.6rem 0 0; padding: 0.85rem 1rem; font-size: 0.9rem; }
+.woocommerce-checkout #payment .place-order { padding: 0.5rem 0 0; }
+.woocommerce-checkout #place_order { width: 100%; padding: 1rem 1.5rem; font-size: 1.1rem; font-weight: 800; border-radius: 0.95rem; }
+.woocommerce-checkout #payment .woocommerce-terms-and-conditions-wrapper { margin-bottom: 1rem; }
 
 /* ---------- Cart layout — keep the checkout button always in view ---------- */
 /* Desktop: items in a scrolling main column, totals + checkout in a sticky
