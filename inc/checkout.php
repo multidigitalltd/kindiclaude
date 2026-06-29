@@ -11,6 +11,23 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Force shipping to the billing address on the front end, which removes the
+ * "Ship to a different address?" toggle and the separate shipping fields
+ * (shipping still calculates from the billing address). Front-end only, so the
+ * WooCommerce settings screen keeps showing the real stored value.
+ *
+ * @param mixed $value Stored option value.
+ * @return mixed
+ */
+function kindi_force_ship_to_billing( $value ) {
+	if ( is_admin() || ! apply_filters( 'kindi_force_billing_shipping', true ) ) {
+		return $value;
+	}
+	return 'billing_only';
+}
+add_filter( 'option_woocommerce_ship_to_destination', 'kindi_force_ship_to_billing' );
+
+/**
  * Render the cart → details → payment → done progress steps.
  *
  * @param string $active Active step key: 'cart' | 'details'.
