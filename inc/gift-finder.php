@@ -210,9 +210,6 @@ add_shortcode( 'kindi_gift_finder', 'kindi_gift_finder_shortcode' );
  * @return void
  */
 function kindi_backfill_age_min(): void {
-	if ( ! is_admin() || wp_doing_ajax() || ! current_user_can( 'manage_options' ) ) {
-		return;
-	}
 	if ( 'done' === get_option( 'kindi_age_backfill', '' ) ) {
 		return;
 	}
@@ -245,5 +242,26 @@ function kindi_backfill_age_min(): void {
 		// Mark as scanned in a separate key so empty-age products aren't re-scanned.
 		update_post_meta( $id, '_kindi_age_scanned', 1 );
 	}
+
+	// More products remain — run the next batch shortly via cron, off the request.
+	if ( ! wp_next_scheduled( 'kindi_age_backfill_cron' ) ) {
+		wp_schedule_single_event( time() + MINUTE_IN_SECONDS, 'kindi_age_backfill_cron' );
+	}
 }
-add_action( 'admin_init', 'kindi_backfill_age_min' );
+add_action( 'kindi_age_backfill_cron', 'kindi_backfill_age_min' );
+
+/**
+ * Ensure the age backfill is scheduled (once) until complete — replaces the old
+ * per-request admin_init scan. Cheap: only a single get_option + wp_next_scheduled.
+ *
+ * @return void
+ */
+function kindi_schedule_age_backfill(): void {
+	if ( 'done' === get_option( 'kindi_age_backfill', '' ) ) {
+		return;
+	}
+	if ( ! wp_next_scheduled( 'kindi_age_backfill_cron' ) ) {
+		wp_schedule_single_event( time() + MINUTE_IN_SECONDS, 'kindi_age_backfill_cron' );
+	}
+}
+add_action( 'init', 'kindi_schedule_age_backfill' );

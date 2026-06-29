@@ -148,7 +148,7 @@ add_action( 'save_post_product', 'kindi_flush_meta_keys' );
  *
  * @return int Number of products updated.
  */
-function kindi_acf_import(): int {
+function kindi_acf_import_batch( int $limit = 50 ): array {
 	$map = array_filter(
 		kindi_acf_map(),
 		static function ( $opt ) {
@@ -156,24 +156,37 @@ function kindi_acf_import(): int {
 		}
 	);
 	if ( ! $map ) {
-		return 0;
+		return array( 'done' => true, 'count' => 0 );
 	}
 
+	$run = (int) get_option( 'kindi_acf_run', 0 );
+
+	// Products not yet processed in THIS run (run-id versioning avoids bulk meta
+	// deletes when re-importing).
 	$ids = get_posts(
 		array(
 			'post_type'      => 'product',
 			'post_status'    => 'any',
-			'posts_per_page' => -1,
+			'posts_per_page' => $limit,
 			'fields'         => 'ids',
 			'no_found_rows'  => true,
+			'meta_query'     => array(
+				'relation' => 'OR',
+				array( 'key' => '_kindi_acf_run', 'compare' => 'NOT EXISTS' ),
+				array( 'key' => '_kindi_acf_run', 'value' => $run, 'compare' => '!=' ),
+			),
 		)
 	);
 
-	$count = 0;
+	if ( ! $ids ) {
+		return array( 'done' => true, 'count' => 0 );
+	}
+
+	$multiline = kindi_acf_multiline_keys();
+	$count     = 0;
 	foreach ( $ids as $id ) {
 		$id      = (int) $id;
 		$touched = false;
-		$multiline = kindi_acf_multiline_keys();
 		foreach ( $map as $kindi_key => $opt ) {
 			$source = (string) kindi_opt( $opt, '' );
 			$value  = kindi_flatten_meta( get_post_meta( $id, $source, true ) );
@@ -189,16 +202,34 @@ function kindi_acf_import(): int {
 		if ( function_exists( 'kindi_sync_age_min' ) ) {
 			kindi_sync_age_min( $id );
 		}
+		update_post_meta( $id, '_kindi_acf_run', $run );
 	}
 
-	// Force the gift-finder backfill to re-evaluate.
-	delete_option( 'kindi_age_backfill' );
-
-	return $count;
+	return array( 'done' => false, 'count' => $count );
 }
 
 /**
- * Handle the import POST from the settings screen.
+ * Cron worker: process one batch, accumulate the count, reschedule until done.
+ *
+ * @return void
+ */
+function kindi_acf_import_cron(): void {
+	$res   = kindi_acf_import_batch( 50 );
+	$total = (int) get_transient( 'kindi_acf_import_count' ) + (int) $res['count'];
+	set_transient( 'kindi_acf_import_count', $total, DAY_IN_SECONDS );
+
+	if ( $res['done'] ) {
+		delete_option( 'kindi_acf_importing' );
+		delete_option( 'kindi_age_backfill' ); // Re-evaluate the gift-finder age index.
+		set_transient( 'kindi_acf_import_done', $total, 5 * MINUTE_IN_SECONDS );
+	} elseif ( ! wp_next_scheduled( 'kindi_acf_import_cron' ) ) {
+		wp_schedule_single_event( time() + MINUTE_IN_SECONDS, 'kindi_acf_import_cron' );
+	}
+}
+add_action( 'kindi_acf_import_cron', 'kindi_acf_import_cron' );
+
+/**
+ * Handle the import POST from the settings screen — starts a background run.
  *
  * @return void
  */
@@ -210,9 +241,16 @@ function kindi_acf_handle_import(): void {
 		return;
 	}
 
-	$count = kindi_acf_import();
-	set_transient( 'kindi_acf_import_done', $count, 60 );
-	wp_safe_redirect( add_query_arg( array( 'page' => 'kindi-settings', 'tab' => 'texts', 'imported' => 1 ), admin_url( 'admin.php' ) ) );
+	// Begin a new run (bumping the run id marks every product as pending again).
+	update_option( 'kindi_acf_run', (int) get_option( 'kindi_acf_run', 0 ) + 1, false );
+	update_option( 'kindi_acf_importing', 1, false );
+	delete_transient( 'kindi_acf_import_count' );
+	delete_transient( 'kindi_acf_import_done' );
+	if ( ! wp_next_scheduled( 'kindi_acf_import_cron' ) ) {
+		wp_schedule_single_event( time() + 5, 'kindi_acf_import_cron' );
+	}
+
+	wp_safe_redirect( add_query_arg( array( 'page' => 'kindi-settings', 'tab' => 'texts', 'imported' => 'started' ), admin_url( 'admin.php' ) ) );
 	exit;
 }
 add_action( 'admin_init', 'kindi_acf_handle_import' );
@@ -250,9 +288,13 @@ add_filter( 'kindi_settings_tabs', 'kindi_acf_settings_section' );
  * @return void
  */
 function kindi_acf_import_tool(): void {
-	if ( isset( $_GET['imported'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$count = (int) get_transient( 'kindi_acf_import_done' );
-		echo '<div class="notice notice-success is-dismissible"><p>' . sprintf( esc_html__( 'הייבוא הושלם — %d מוצרים עודכנו. כעת ניתן להסיר את תוסף ה-ACF בבטחה.', 'kindi' ), $count ) . '</p></div>';
+	// A finished run shows the final count; a still-running one shows progress.
+	$done = get_transient( 'kindi_acf_import_done' );
+	if ( false !== $done ) {
+		echo '<div class="notice notice-success is-dismissible"><p>' . sprintf( esc_html__( 'הייבוא הושלם — %d מוצרים עודכנו. כעת ניתן להסיר את תוסף ה-ACF בבטחה.', 'kindi' ), (int) $done ) . '</p></div>';
+	} elseif ( get_option( 'kindi_acf_importing' ) ) {
+		$so_far = (int) get_transient( 'kindi_acf_import_count' );
+		echo '<div class="notice notice-info"><p>' . sprintf( esc_html__( 'הייבוא רץ ברקע… %d מוצרים עודכנו עד כה. אפשר להמשיך לעבוד; רעננו את העמוד לעדכון.', 'kindi' ), $so_far ) . '</p></div>';
 	}
 
 	echo '<hr><h2>' . esc_html__( 'ייבוא נתוני שדות מותאמים', 'kindi' ) . '</h2>';
