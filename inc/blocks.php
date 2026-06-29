@@ -30,6 +30,10 @@ function kindi_register_blocks(): void {
 	register_block_type(
 		'kindi/categories',
 		array(
+			'api_version'     => 2,
+			'title'           => __( 'Kindi: קטגוריות', 'kindi' ),
+			'category'        => 'widgets',
+			'icon'            => 'screenoptions',
 			'render_callback' => 'kindi_block_categories',
 		)
 	);
@@ -37,11 +41,33 @@ function kindi_register_blocks(): void {
 	register_block_type(
 		'kindi/featured-products',
 		array(
+			'api_version'     => 2,
+			'title'           => __( 'Kindi: מוצרים חמים', 'kindi' ),
+			'category'        => 'widgets',
+			'icon'            => 'star-filled',
 			'render_callback' => 'kindi_block_featured_products',
 		)
 	);
 }
 add_action( 'init', 'kindi_register_blocks' );
+
+/**
+ * Register the blocks on the editor side too (live server preview via
+ * ServerSideRender) so the Site Editor recognises them instead of erroring on
+ * an "unsupported" block.
+ *
+ * @return void
+ */
+function kindi_blocks_editor_assets(): void {
+	wp_enqueue_script(
+		'kindi-blocks-editor',
+		KINDI_URI . 'assets/js/blocks-editor.js',
+		array( 'wp-blocks', 'wp-element', 'wp-server-side-render' ),
+		kindi_asset_version( 'assets/js/blocks-editor.js' ),
+		true
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'kindi_blocks_editor_assets' );
 
 /**
  * Render the live category grid section.
