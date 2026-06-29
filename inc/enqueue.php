@@ -152,6 +152,17 @@ function kindi_enqueue_scripts(): void {
 				'noResults' => __( 'לא נמצאו תוצאות', 'kindi' ),
 			)
 		);
+
+		// Instant archive filtering (progressive enhancement) — shop/category only.
+		if ( ( function_exists( 'is_shop' ) && is_shop() ) || ( function_exists( 'is_product_taxonomy' ) && is_product_taxonomy() ) ) {
+			wp_enqueue_script(
+				'kindi-filters',
+				KINDI_URI . 'assets/js/filters.js',
+				array(),
+				kindi_asset_version( 'assets/js/filters.js' ),
+				true
+			);
+		}
 	}
 }
 add_action( 'wp_enqueue_scripts', 'kindi_enqueue_scripts' );
@@ -164,7 +175,7 @@ add_action( 'wp_enqueue_scripts', 'kindi_enqueue_scripts' );
  * @return string
  */
 function kindi_defer_scripts( string $tag, string $handle ): string {
-	$deferred = array( 'kindi-header', 'kindi-interactions', 'kindi-search', 'kindi-a11y' );
+	$deferred = array( 'kindi-header', 'kindi-interactions', 'kindi-search', 'kindi-a11y', 'kindi-filters' );
 
 	if ( in_array( $handle, $deferred, true ) && false === strpos( $tag, 'defer' ) ) {
 		$tag = str_replace( ' src', ' defer src', $tag );

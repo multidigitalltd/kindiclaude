@@ -47,6 +47,9 @@
    empty first slot, top-right in RTL) once the list is display:grid — remove. */
 .woocommerce ul.products::before, .woocommerce ul.products::after,
 ul.products::before, ul.products::after { content: none; display: none; }
+/* Instant-filter loading state: dim + block interaction while fetching. */
+ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { ul.products[aria-busy="true"] { transition: none; } }
 @media (min-width: 640px) { .woocommerce ul.products, ul.products { grid-template-columns: repeat(3, 1fr); } }
 @media (min-width: 1024px) { .woocommerce ul.products, ul.products { grid-template-columns: repeat(4, 1fr); } }
 .woocommerce ul.products.columns-5, ul.products.columns-5 { grid-template-columns: repeat(2, 1fr); }
