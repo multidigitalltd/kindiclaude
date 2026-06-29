@@ -282,6 +282,8 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-chip--reset { color: var(--brand-red); border-color: color-mix(in oklab, var(--brand-red) 45%, transparent); gap: 0.25rem; }
 .kindi-chip--reset:hover { background: var(--brand-red); color: #fff; border-color: var(--brand-red); }
 .kindi-chip--reset .kindi-icon { width: 13px; height: 13px; }
+.kindi-chip--parent { background: var(--brand-blue-soft); border-color: color-mix(in oklab, var(--brand-blue) 30%, transparent); gap: 0.2rem; }
+.kindi-chip--parent .kindi-icon { width: 13px; height: 13px; }
 .kindi-filters__att { background: #fff; border: 1px solid var(--border); border-radius: 0.875rem; padding: 0.25rem 0.75rem; }
 .kindi-filters__att summary { cursor: pointer; font-weight: 700; font-size: 0.8125rem; color: var(--brand-navy); padding: 0.35rem 0; list-style: none; }
 .kindi-filters__att summary::-webkit-details-marker { display: none; }

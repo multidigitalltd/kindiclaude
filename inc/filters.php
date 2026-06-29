@@ -43,6 +43,66 @@ function kindi_price_filter_clauses( array $clauses, $query ): array {
 add_filter( 'posts_clauses', 'kindi_price_filter_clauses', 20, 2 );
 
 /**
+ * Hierarchy-aware category chips for the current view, cached per context:
+ * - Shop: top categories (by product count).
+ * - Category: its parent (to go up), the current term, then its sub-categories
+ *   — or, for a leaf, its siblings — for drill-down navigation.
+ *
+ * @return array<int,array{name:string,url:string,active:bool,parent:bool}>
+ */
+function kindi_category_chips(): array {
+	$term = ( function_exists( 'is_tax' ) && is_tax( 'product_cat' ) ) ? get_queried_object() : null;
+	$ctx  = ( $term instanceof WP_Term ) ? 'term_' . $term->term_id : 'shop';
+	$ver  = (int) get_option( 'kindi_term_ver', 1 );
+	$key  = 'kindi_catchips_v' . $ver . '_' . $ctx;
+
+	$cached = get_transient( $key );
+	if ( is_array( $cached ) ) {
+		return $cached;
+	}
+
+	$out = array();
+
+	if ( $term instanceof WP_Term ) {
+		// Parent chip (drill up).
+		if ( $term->parent ) {
+			$parent = get_term( $term->parent, 'product_cat' );
+			if ( $parent instanceof WP_Term ) {
+				$out[] = array( 'name' => $parent->name, 'url' => (string) get_term_link( $parent ), 'active' => false, 'parent' => true );
+			}
+		}
+
+		// Current category (active).
+		$out[] = array( 'name' => $term->name, 'url' => (string) get_term_link( $term ), 'active' => true, 'parent' => false );
+
+		// Sub-categories — or siblings when the current term is a leaf.
+		$children = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => true, 'parent' => $term->term_id, 'orderby' => 'name' ) );
+		$children = ( is_wp_error( $children ) ) ? array() : $children;
+		if ( ! $children && $term->parent ) {
+			$children = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => true, 'parent' => $term->parent, 'orderby' => 'name' ) );
+			$children = ( is_wp_error( $children ) ) ? array() : $children;
+		}
+		foreach ( $children as $child ) {
+			if ( (int) $child->term_id === (int) $term->term_id ) {
+				continue;
+			}
+			$out[] = array( 'name' => $child->name, 'url' => (string) get_term_link( $child ), 'active' => false, 'parent' => false );
+		}
+	} else {
+		// Shop: top-level categories by product count.
+		$roots = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => true, 'parent' => 0, 'number' => 14, 'orderby' => 'count', 'order' => 'DESC' ) );
+		$roots = ( is_wp_error( $roots ) ) ? array() : $roots;
+		foreach ( $roots as $root ) {
+			$out[] = array( 'name' => $root->name, 'url' => (string) get_term_link( $root ), 'active' => false, 'parent' => false );
+		}
+	}
+
+	set_transient( $key, $out, 12 * HOUR_IN_SECONDS );
+
+	return $out;
+}
+
+/**
  * Render the filter bar above the product loop.
  *
  * @return void
@@ -54,26 +114,21 @@ function kindi_archive_filters(): void {
 
 	echo '<div class="kindi-filters">';
 
-	// Category chips.
-	$cats = get_terms(
-		array(
-			'taxonomy'   => 'product_cat',
-			'hide_empty' => true,
-			'parent'     => 0,
-			'number'     => 14,
-			'orderby'    => 'count',
-			'order'      => 'DESC',
-		)
-	);
-	if ( ! is_wp_error( $cats ) && $cats ) {
+	// Category chips — hierarchy aware (parent + sub-categories of the current
+	// category; top categories on the shop). Cached per context (see helper).
+	$chips = kindi_category_chips();
+	if ( $chips ) {
 		echo '<div class="kindi-filters__cats">';
-		printf( '<a class="kindi-chip%s" href="%s">הכל</a>', is_shop() ? ' is-active' : '', esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' ) ) );
-		foreach ( $cats as $term ) {
+		$shop_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+		printf( '<a class="kindi-chip%s" href="%s">%s</a>', is_shop() ? ' is-active' : '', esc_url( $shop_url ), esc_html__( 'הכל', 'kindi' ) );
+		foreach ( $chips as $chip ) {
 			printf(
-				'<a class="kindi-chip%s" href="%s">%s</a>',
-				is_tax( 'product_cat', $term->term_id ) ? ' is-active' : '',
-				esc_url( (string) get_term_link( $term ) ),
-				esc_html( $term->name )
+				'<a class="kindi-chip%1$s%2$s" href="%3$s">%4$s%5$s</a>',
+				! empty( $chip['active'] ) ? ' is-active' : '',
+				! empty( $chip['parent'] ) ? ' kindi-chip--parent' : '',
+				esc_url( $chip['url'] ),
+				! empty( $chip['parent'] ) ? kindi_icon( 'arrowleft', 'kindi-icon--xs' ) : '', // phpcs:ignore WordPress.Security.EscapeOutput
+				esc_html( $chip['name'] )
 			);
 		}
 		echo '</div>';
@@ -169,8 +224,15 @@ add_action( 'woocommerce_before_shop_loop', 'kindi_archive_filters', 5 );
  * @return void
  */
 function kindi_flush_facet_cache( $term_id, $tt_id = 0, $taxonomy = '' ): void {
-	if ( is_string( $taxonomy ) && 0 === strpos( $taxonomy, 'pa_' ) ) {
+	if ( ! is_string( $taxonomy ) ) {
+		return;
+	}
+	if ( 0 === strpos( $taxonomy, 'pa_' ) ) {
 		delete_transient( 'kindi_facet_' . $taxonomy );
+	}
+	// Bump the term-cache version so all cached category-chip sets refresh.
+	if ( 'product_cat' === $taxonomy ) {
+		update_option( 'kindi_term_ver', (int) get_option( 'kindi_term_ver', 1 ) + 1, false );
 	}
 }
 add_action( 'created_term', 'kindi_flush_facet_cache', 10, 3 );
