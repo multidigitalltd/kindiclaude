@@ -131,6 +131,31 @@ function kindi_archive_filters(): void {
 	echo '<button type="submit" class="kindi-chip kindi-chip--go">סינון</button>';
 	echo '</form>';
 
+	// "Clear filters" — shown only when an attribute/price filter is active. It
+	// removes those query args while keeping the current category context.
+	$remove = array();
+	foreach ( array_keys( $_GET ) as $gk ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( 0 === strpos( (string) $gk, 'filter_' ) ) {
+			$remove[] = (string) $gk;
+		}
+	}
+	if ( isset( $_GET['min_price'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$remove[] = 'min_price';
+	}
+	if ( isset( $_GET['max_price'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$remove[] = 'max_price';
+	}
+	if ( $remove ) {
+		$remove[]  = 'paged';
+		$reset_url = remove_query_arg( $remove );
+		printf(
+			'<a class="kindi-chip kindi-chip--reset" href="%s">%s%s</a>',
+			esc_url( $reset_url ),
+			kindi_icon( 'close', 'kindi-icon--xs' ), // phpcs:ignore WordPress.Security.EscapeOutput
+			esc_html__( 'ביטול סינון', 'kindi' )
+		);
+	}
+
 	echo '</div></div>';
 }
 add_action( 'woocommerce_before_shop_loop', 'kindi_archive_filters', 5 );
