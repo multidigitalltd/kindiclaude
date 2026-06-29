@@ -92,6 +92,7 @@ function kindi_settings_tabs(): array {
 				),
 				'מועדון קינדי' => array(
 					'club_title'    => array( 'type' => 'text', 'label' => 'כותרת' ),
+					'club_title_hl' => array( 'type' => 'text', 'label' => 'כותרת — חלק מודגש (רקע אדום)' ),
 					'club_lead'     => array( 'type' => 'textarea', 'label' => 'תיאור' ),
 					'club_benefits' => array( 'type' => 'textarea', 'label' => 'הטבות', 'help' => 'שורה אחת לכל הטבה' ),
 					'club_cta_url'  => array( 'type' => 'url', 'label' => 'קישור הצטרפות' ),

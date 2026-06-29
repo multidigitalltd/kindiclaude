@@ -24,7 +24,8 @@ $kindi_sparks   = array(
 
 		<div class="kindi-zone__body">
 			<span class="kindi-zone__badge"><?php echo kindi_icon( 'gift', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>מועדון קינדי</span>
-			<h2 class="kindi-zone__title"><?php echo esc_html( kindi_opt( 'club_title' ) ); ?></h2>
+			<?php $kindi_club_hl = (string) kindi_opt( 'club_title_hl' ); ?>
+			<h2 class="kindi-zone__title"><?php echo esc_html( kindi_opt( 'club_title' ) ); ?><?php echo '' !== $kindi_club_hl ? '<br><mark>' . esc_html( $kindi_club_hl ) . '</mark>' : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?></h2>
 			<p class="kindi-zone__lead"><?php echo esc_html( kindi_opt( 'club_lead' ) ); ?></p>
 			<div class="kindi-zone__benefits">
 				<?php foreach ( $kindi_benefits as $b ) : ?>
@@ -36,6 +37,7 @@ $kindi_sparks   = array(
 
 		<div class="kindi-zone__stage" aria-hidden="true">
 			<span class="kindi-zone__halo"></span>
+			<span class="kindi-zone__disc"></span>
 			<span class="kindi-ground-shadow animate-ground"></span>
 			<img class="kindi-zone__mascot animate-mascot" src="<?php echo esc_url( kindi_mascot_src( 'kindyzone_mascot', 'mascot/celebrate.webp' ) ); ?>" alt="" loading="lazy" decoding="async">
 			<?php foreach ( $kindi_sparks as $s ) : ?>

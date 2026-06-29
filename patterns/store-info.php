@@ -35,6 +35,7 @@ $kindi_details = array(
 			<a class="kindi-store__cta" href="<?php echo esc_url( kindi_opt( 'store_waze' ) ); ?>" target="_blank" rel="noopener">ניווט בוויז<?php echo kindi_icon( 'arrowleft', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
 		</div>
 		<div class="kindi-store__media">
+			<span class="kindi-store__disc"></span>
 			<span class="kindi-ground-shadow animate-ground"></span>
 			<img class="kindi-store__mascot animate-mascot" src="<?php echo esc_url( kindi_mascot_src( 'storeinfo_mascot', 'mascot/wave.webp' ) ); ?>" alt="" loading="lazy" decoding="async">
 			<span class="kindi-store__here"><?php echo kindi_icon( 'pin', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>כאן אנחנו!</span>
