@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
  */
 function kindi_icon( string $name, string $class = '' ): string {
 	$icons = array(
-		'accessibility' => array( 'stroke' => '#1B2A52', 'body' => '<circle cx="12" cy="4.5" r="1.8" fill="#E8F0FE" /> <path d="M4.5 9h15M9 9v6l-1.5 6M15 9v6l1.5 6M9 15h6" />' ),
+		'accessibility' => array( 'stroke' => 'currentColor', 'body' => '<circle cx="11" cy="3.8" r="1.7" /> <path d="M11 5.8v4.7h4.2l2.3 5" /> <path d="M11 8.2h3.6" /> <circle cx="11" cy="16.2" r="5.2" /> <path d="M16.2 16.2h1.4" />' ),
 		'apple' => array( 'stroke' => '#1B2A52', 'body' => '<path d="M12 7c-2-1.5-6.5-1.5-8 1.5-2 3.5 0 10 3.5 12 1.5.7 3 0 4.5-.7 1.5.7 3 1.4 4.5.7 3.5-2 5.5-8.5 3.5-12-1.5-3-6-3-8-1.5z" fill="#FDE8EA" /> <path d="M12 7V5c0-1.2 1.2-2 2.5-2" /> <path d="M14 4c1.2 0 2 .8 2 2" />' ),
 		'arrowleft' => array( 'stroke' => '#1B2A52', 'body' => '<path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="1.4" />' ),
 		'baby' => array( 'stroke' => '#1B2A52', 'body' => '<circle cx="12" cy="9" r="5.5" fill="#E8F0FE" /> <circle cx="10" cy="9" r="0.7" fill="#1B2A52" stroke="none" /> <circle cx="14" cy="9" r="0.7" fill="#1B2A52" stroke="none" /> <path d="M10.5 11.5c.7.5 2.3.5 3 0" /> <path d="M6.5 7.5C6.5 5 9 4 12 4s5.5 1 5.5 3.5" /> <path d="M7 19c1.5-2.5 3-3 5-3s3.5.5 5 3" fill="#FDE8EA" />' ),
