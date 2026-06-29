@@ -353,6 +353,31 @@ ul.products::before, ul.products::after { content: none; display: none; }
 .woocommerce table.shop_table { background: transparent; }
 .woocommerce-checkout #order_review .cart_item img, .woocommerce-cart .cart_item img { width: 48px; border-radius: 0.5rem; }
 
+/* Order-review table — product name fills the row, the amount hugs the far
+   (left, RTL) edge instead of floating mid-row, with clean separators. */
+.woocommerce-checkout #order_review table.shop_table { width: 100%; border-collapse: collapse; }
+.woocommerce-checkout #order_review table.shop_table th,
+.woocommerce-checkout #order_review table.shop_table td {
+  padding: 0.8rem 0; border: 0; border-bottom: 1px solid var(--border); vertical-align: top;
+}
+.woocommerce-checkout #order_review table.shop_table tfoot tr:last-child th,
+.woocommerce-checkout #order_review table.shop_table tfoot tr:last-child td { border-bottom: 0; }
+.woocommerce-checkout #order_review table.shop_table thead th,
+.woocommerce-checkout #order_review table.shop_table .product-name,
+.woocommerce-checkout #order_review table.shop_table tfoot th { text-align: right; }
+.woocommerce-checkout #order_review table.shop_table .product-name { width: 100%; font-weight: 700; color: var(--brand-navy); }
+.woocommerce-checkout #order_review table.shop_table .product-total,
+.woocommerce-checkout #order_review table.shop_table thead th.product-total,
+.woocommerce-checkout #order_review table.shop_table tfoot td {
+  width: 1%; white-space: nowrap; text-align: left; padding-inline-start: 1rem; font-weight: 700;
+}
+.woocommerce-checkout #order_review table.shop_table .order-total th,
+.woocommerce-checkout #order_review table.shop_table .order-total td { font-size: 1.1rem; color: var(--brand-red); }
+/* Shipping choices: each option on its own line, amount aligned to the edge. */
+.woocommerce-checkout #order_review #shipping_method { margin: 0; padding: 0; list-style: none; }
+.woocommerce-checkout #order_review #shipping_method li { display: flex; align-items: baseline; gap: 0.5rem; margin: 0.35rem 0; }
+.woocommerce-checkout #order_review #shipping_method li label { flex: 1; font-weight: 600; }
+
 /* ---------- Cart layout — keep the checkout button always in view ---------- */
 /* Desktop: items in a scrolling main column, totals + checkout in a sticky
    sidebar that never leaves the viewport however long the cart gets. */
