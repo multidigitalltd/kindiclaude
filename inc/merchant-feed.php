@@ -117,18 +117,21 @@ function kindi_feed_item( $product, $parent = null ): string {
 		$image = wp_get_attachment_url( $source->get_image_id() );
 	}
 	$brand = function_exists( 'kindi_product_brand' ) ? kindi_product_brand( $source ) : '';
-	$cats  = wp_strip_all_tags( wc_get_product_category_list( $source->get_id(), ' &gt; ' ) );
+	$cats  = wp_strip_all_tags( wc_get_product_category_list( $source->get_id(), ' > ' ) );
 	$desc  = $product->get_description() ? $product->get_description() : $source->get_short_description();
 	$desc  = $desc ? $desc : $source->get_description();
 
+	$permalink = get_permalink( $source->get_id() );
+
 	$item  = '<item>';
 	$item .= '<g:id>' . (int) $product->get_id() . '</g:id>';
-	if ( $parent instanceof WC_Product ) {
-		$item .= '<g:item_group_id>' . (int) $parent->get_id() . '</g:item_group_id>';
-	}
+	// item_group_id groups variations; for simple products it equals the id
+	// (matches the store's existing woo-feed output).
+	$item .= '<g:item_group_id>' . (int) ( $parent instanceof WC_Product ? $parent->get_id() : $product->get_id() ) . '</g:item_group_id>';
 	$item .= '<g:title>' . esc_html( $product->get_name() ) . '</g:title>';
 	$item .= '<g:description>' . esc_html( wp_trim_words( wp_strip_all_tags( (string) $desc ), 100 ) ) . '</g:description>';
-	$item .= '<g:link>' . esc_url( get_permalink( $source->get_id() ) ) . '</g:link>';
+	$item .= '<link>' . esc_url( $permalink ) . '</link>';
+	$item .= '<g:canonical_link>' . esc_url( $permalink ) . '</g:canonical_link>';
 	if ( $image ) {
 		$item .= '<g:image_link>' . esc_url( $image ) . '</g:image_link>';
 	}
