@@ -122,7 +122,9 @@ function kindi_grp_reviews(): array {
 		'link'    => '' !== $opt_link ? $opt_link : $link,
 	);
 
-	set_transient( 'kindi_grp_reviews', $data, 6 * HOUR_IN_SECONDS );
+	// Short TTL safety net; the cache is also flushed the moment the reviews
+	// plugin pulls fresh data (see the grw_revupd_schedule hook below).
+	set_transient( 'kindi_grp_reviews', $data, HOUR_IN_SECONDS );
 
 	return $data;
 }
@@ -257,6 +259,9 @@ function kindi_google_reviews(): array {
  */
 function kindi_flush_reviews_cache(): void {
 	delete_transient( 'kindi_g_reviews' );
-	delete_transient( 'kindi_grp_reviews' ); // Primary source (plugin DB), cached 6h.
+	delete_transient( 'kindi_grp_reviews' ); // Primary source (the reviews plugin's DB).
 }
 add_action( 'update_option_kindi_options', 'kindi_flush_reviews_cache' );
+// Refresh the front-end the moment the "Rich Showcase for Google Reviews" plugin
+// pulls new reviews on its schedule (priority 99 = after its own update runs).
+add_action( 'grw_revupd_schedule', 'kindi_flush_reviews_cache', 99 );
