@@ -78,3 +78,30 @@ function kindi_checkout_club_banner(): void {
 		. '</div>';
 }
 add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_club_banner', 4 );
+
+/*
+ * ---------------------------------------------------------------------------
+ * Gift card & Gifta integrations.
+ * ---------------------------------------------------------------------------
+ */
+
+/**
+ * Move the Simply gift-card redemption box up to the top of the checkout form,
+ * so it sits alongside the coupon and Gifta fields instead of further down.
+ * The filter only does anything when the gift-card plugin is active.
+ */
+add_filter( 'simply_offerbox_checkout_action', static fn(): string => 'woocommerce_checkout_before_customer_details' );
+
+/**
+ * Notice before the payment methods: Gifta gift-cards can't be combined with
+ * coupons. Escaped + translatable; keeps the original `custom-payment-text`
+ * class so existing styling still applies.
+ *
+ * @return void
+ */
+function kindi_gifta_coupon_notice(): void {
+	echo '<p class="kindi-gifta-note custom-payment-text">'
+		. esc_html__( 'בתשלום עם כרטיס Gifta לא ניתן להשתמש בקופונים. רוצים להשתמש בקופון? פשוט בחרו אמצעי תשלום אחר.', 'kindi' )
+		. '</p>';
+}
+add_action( 'woocommerce_review_order_before_payment', 'kindi_gifta_coupon_notice' );

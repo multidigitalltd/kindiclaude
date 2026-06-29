@@ -447,6 +447,19 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .woocommerce form.login .button {
   background: var(--brand-navy); color: #fff; border-radius: 0.75rem; padding: 0.65rem 1.4rem; font-weight: 800;
 }
+/* Gift-card redemption box (Simply offerbox), moved up to sit with the coupon
+   and Gifta fields — match the same info-card look. */
+.woocommerce-checkout .simply-offerbox,
+.woocommerce-checkout .simply_offerbox { max-width: 760px; margin: 0 auto 1rem; }
+
+/* Gifta + coupon notice before the payment methods. */
+.woocommerce-checkout .kindi-gifta-note {
+  background: var(--brand-yellow-soft, color-mix(in oklab, var(--wp--preset--color--accent, #f6c544) 22%, #fff));
+  border: 1px solid color-mix(in oklab, var(--wp--preset--color--accent, #f6c544) 45%, transparent);
+  border-radius: 0.875rem; padding: 0.8rem 1rem; margin: 0 0 1rem;
+  color: var(--brand-navy); font-weight: 600; font-size: 0.9rem; line-height: 1.55;
+}
+
 /* Payment area inside the order-review card. */
 .woocommerce-checkout #payment ul.payment_methods li { margin-bottom: 0.5rem; }
 .woocommerce-checkout #payment .place-order { padding: 1rem 0 0; }
