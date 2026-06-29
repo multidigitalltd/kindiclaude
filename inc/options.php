@@ -35,6 +35,9 @@ function kindi_default_options(): array {
 		'ship_days_min' => 1,    // Transit time lower bound (business days).
 		'ship_days_max' => 4,    // Transit time upper bound (business days).
 		'return_days'   => 14,   // Return window (days); 0 = no returns accepted.
+
+		// Product feed (Google Merchant / Meta catalog).
+		'google_category' => '', // Default Google product category (ID or full path); per-product meta wins.
 		'ticker'        => "משלוח חינם בהזמנה מעל 299 ₪\nמועדון קינדי — 5% חזרה על כל קנייה\nקולקציית חזרה לבית הספר 2026 נחתה\nתשלום מאובטח SSL + PCI\nשירות אישי 03-5293383",
 
 		// Hero.

@@ -95,6 +95,7 @@ function kindi_settings_tabs(): array {
 					'ship_days_min' => array( 'type' => 'number', 'label' => 'זמן אספקה — מינימום (ימי עסקים)' ),
 					'ship_days_max' => array( 'type' => 'number', 'label' => 'זמן אספקה — מקסימום (ימי עסקים)' ),
 					'return_days'   => array( 'type' => 'number', 'label' => 'חלון החזרות (ימים)', 'help' => '0 = לא מתקבלות החזרות.' ),
+					'google_category' => array( 'type' => 'text', 'label' => 'קטגוריית Google למוצרים (ברירת מחדל)', 'help' => 'מזהה או נתיב מלא מתוך טקסונומיית Google. ניתן לדרוס לכל מוצר עם השדה _google_product_category.' ),
 				),
 				'מועדון קינדי' => array(
 					'club_title'    => array( 'type' => 'text', 'label' => 'כותרת' ),
