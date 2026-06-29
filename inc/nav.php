@@ -197,17 +197,23 @@ function kindi_build_nav_tree( array $items ): array {
 		foreach ( ( $children[ $top->ID ] ?? array() ) as $col ) {
 			$col_classes = is_array( $col->classes ) ? $col->classes : array();
 
-			// A child flagged `kindi-feature` becomes the promo card, not a column.
-			if ( in_array( 'kindi-feature', $col_classes, true ) ) {
-				$tone = 'red';
-				foreach ( $col_classes as $class ) {
-					if ( preg_match( '/^kindi-tone-(red|navy|blue)$/', $class, $mt ) ) {
-						$tone = $mt[1];
+			// A child marked as a feature (menu-item field or `kindi-feature`
+			// class) becomes the promo card, not a column.
+			$is_feature = '1' === get_post_meta( $col->ID, '_kindi_feature', true ) || in_array( 'kindi-feature', $col_classes, true );
+			if ( $is_feature ) {
+				$tone = (string) get_post_meta( $col->ID, '_kindi_tone', true );
+				if ( ! in_array( $tone, array( 'red', 'navy', 'blue' ), true ) ) {
+					$tone = 'red';
+					foreach ( $col_classes as $class ) {
+						if ( preg_match( '/^kindi-tone-(red|navy|blue)$/', $class, $mt ) ) {
+							$tone = $mt[1];
+						}
 					}
 				}
+				$sub = (string) get_post_meta( $col->ID, '_kindi_subtitle', true );
 				$feature = array(
 					'title' => $col->title,
-					'sub'   => (string) $col->attr_title,
+					'sub'   => '' !== $sub ? $sub : (string) $col->attr_title,
 					'url'   => $col->url,
 					'tone'  => $tone,
 				);
@@ -234,18 +240,26 @@ function kindi_build_nav_tree( array $items ): array {
 		}
 
 		$classes = is_array( $top->classes ) ? $top->classes : array();
-		$icon    = kindi_guess_category_icon( (string) $top->title );
+
+		// Icon priority: menu-item field → kindi-icon-* class → guess by name.
+		$icon = kindi_guess_category_icon( (string) $top->title );
 		foreach ( $classes as $class ) {
 			if ( preg_match( '/^kindi-icon-([a-z0-9]+)$/', $class, $m ) ) {
 				$icon = $m[1];
 			}
 		}
+		$meta_icon = (string) get_post_meta( $top->ID, '_kindi_icon', true );
+		if ( '' !== $meta_icon && 'auto' !== $meta_icon ) {
+			$icon = $meta_icon;
+		}
+
+		$highlight = '1' === get_post_meta( $top->ID, '_kindi_highlight', true ) || in_array( 'highlight', $classes, true );
 
 		$out[] = array(
 			'label'     => $top->title,
 			'url'       => $top->url,
 			'icon'      => $icon,
-			'highlight' => in_array( 'highlight', $classes, true ),
+			'highlight' => $highlight,
 			'cols'      => $cols,
 			'feature'   => $feature,
 		);

@@ -61,6 +61,7 @@ kindi_require( 'setup.php' );
 
 if ( is_admin() ) {
 	kindi_require( 'admin-settings.php' );
+	kindi_require( 'nav-menu-fields.php' );
 }
 kindi_require( 'enqueue.php' );
 kindi_require( 'performance.php' );
