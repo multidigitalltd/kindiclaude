@@ -136,3 +136,58 @@
 		input.dispatchEvent( new Event( 'change', { bubbles: true } ) );
 	} );
 }() );
+
+/* Variation swatches — drive the hidden WooCommerce attribute <select> from the
+ * colour circles / pills, keep the active state in sync, and grey out options
+ * that the current selection makes unavailable. */
+( function () {
+	'use strict';
+	var boxes = document.querySelectorAll( '.kindi-swatches' );
+	if ( ! boxes.length ) {
+		return;
+	}
+
+	boxes.forEach( function ( box ) {
+		var select = box.parentNode.querySelector( 'select[name^="attribute_"]' );
+		if ( ! select ) {
+			return;
+		}
+		select.classList.add( 'kindi-select--hidden' );
+
+		var sync = function () {
+			var value = select.value;
+			box.querySelectorAll( '.kindi-swatch' ).forEach( function ( b ) {
+				var v = b.getAttribute( 'data-value' );
+				var active = v === value && '' !== value;
+				b.classList.toggle( 'is-active', active );
+				b.setAttribute( 'aria-pressed', active ? 'true' : 'false' );
+
+				// WooCommerce rebuilds the <option> list per dependent selection;
+				// an option that's gone (or disabled) is currently unavailable.
+				var opt = select.querySelector( 'option[value="' + ( window.CSS && CSS.escape ? CSS.escape( v ) : v ) + '"]' );
+				b.classList.toggle( 'is-unavailable', ! opt || opt.disabled );
+			} );
+		};
+
+		box.addEventListener( 'click', function ( e ) {
+			var b = e.target.closest( '.kindi-swatch' );
+			if ( ! b || b.classList.contains( 'is-unavailable' ) ) {
+				return;
+			}
+			var v = b.getAttribute( 'data-value' );
+			// Click an active swatch again to clear it.
+			select.value = select.value === v ? '' : v;
+			select.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+			sync();
+		} );
+
+		select.addEventListener( 'change', sync );
+		// WooCommerce triggers its updates through jQuery; bind there too (only if
+		// it's already on the page — we never load it ourselves) so the swatches
+		// follow programmatic changes / the "clear" link.
+		if ( window.jQuery ) {
+			window.jQuery( select ).on( 'change', sync );
+		}
+		sync();
+	} );
+}() );
