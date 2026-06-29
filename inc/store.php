@@ -28,6 +28,7 @@ function kindi_store_assets(): void {
 		'kindiStore',
 		array(
 			'productsUrl'  => esc_url_raw( rest_url( 'kindi/v1/products' ) ),
+			'hotUrl'       => esc_url_raw( rest_url( 'kindi/v1/hot' ) ),
 			'subscribeUrl' => esc_url_raw( rest_url( 'kindi/v1/subscribe' ) ),
 			'ajaxUrl'      => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
 			'nonce'        => wp_create_nonce( 'wp_rest' ),

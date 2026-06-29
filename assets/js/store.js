@@ -204,6 +204,36 @@
 		} );
 	} );
 
+	/* Hot-products quick-filter tabs — fetch the grid for the chosen source and
+	 * swap it in, no full reload. */
+	var tabsWrap = document.querySelector( '[data-kindi-hot-tabs]' );
+	var hotGrid = document.querySelector( '[data-kindi-hot-grid]' );
+	if ( tabsWrap && hotGrid && typeof window.kindiStore !== 'undefined' && window.kindiStore.hotUrl ) {
+		tabsWrap.addEventListener( 'click', function ( e ) {
+			var tab = e.target.closest( '.kindi-tab' );
+			if ( ! tab || tab.classList.contains( 'is-active' ) ) {
+				return;
+			}
+			tabsWrap.querySelectorAll( '.kindi-tab' ).forEach( function ( t ) {
+				t.classList.remove( 'is-active' );
+				t.setAttribute( 'aria-selected', 'false' );
+			} );
+			tab.classList.add( 'is-active' );
+			tab.setAttribute( 'aria-selected', 'true' );
+
+			var source = tab.getAttribute( 'data-source' );
+			var sep = window.kindiStore.hotUrl.indexOf( '?' ) === -1 ? '?' : '&';
+			hotGrid.style.opacity = '0.45';
+			fetch( window.kindiStore.hotUrl + sep + 'source=' + encodeURIComponent( source ), { credentials: 'same-origin' } )
+				.then( function ( r ) { return r.json(); } )
+				.then( function ( data ) {
+					hotGrid.innerHTML = ( data && data.html ) ? data.html : '';
+					hotGrid.style.opacity = '';
+				} )
+				.catch( function () { hotGrid.style.opacity = ''; } );
+		} );
+	}
+
 	/* Wishlist page — render saved products via REST. */
 	var wrap = document.querySelector( '[data-kindi-wishlist-grid]' );
 	if ( wrap && typeof window.kindiStore !== 'undefined' ) {

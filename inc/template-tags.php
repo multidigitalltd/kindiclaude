@@ -37,6 +37,7 @@ function kindi_section_head( array $args ): string {
 			'suffix'    => '',
 			'desc'      => '',
 			'cta'       => null,
+			'cta_url'   => '#',
 		)
 	);
 
@@ -97,13 +98,12 @@ function kindi_mascot_src( string $opt_key, string $default_rel ): string {
  *
  * @return string
  */
-function kindi_hot_products_shortcode(): string {
+function kindi_hot_products_html( string $source = 'popularity', int $count = 10 ): string {
 	if ( ! class_exists( 'WooCommerce' ) || ! shortcode_exists( 'products' ) ) {
 		return '<div class="kindi-prod-empty">כאן יוצגו המוצרים שלכם. התקינו והפעילו את WooCommerce והוסיפו מוצרים כדי שיופיעו כאן אוטומטית.</div>';
 	}
 
-	$source = kindi_opt( 'home_products_source', 'popularity' );
-	$count  = max( 1, (int) kindi_opt( 'home_products_count', 10 ) );
+	$count  = max( 1, $count );
 	$common = sprintf( 'limit="%d" columns="5" class="kindi-hot-products"', $count );
 
 	switch ( $source ) {
@@ -125,5 +125,14 @@ function kindi_hot_products_shortcode(): string {
 		default:
 			return do_shortcode( "[products {$common} orderby=\"popularity\" order=\"DESC\"]" );
 	}
+}
+
+/**
+ * Shortcode: [kindi_hot_products] — uses the control-panel source/count.
+ *
+ * @return string
+ */
+function kindi_hot_products_shortcode(): string {
+	return kindi_hot_products_html( (string) kindi_opt( 'home_products_source', 'popularity' ), (int) kindi_opt( 'home_products_count', 10 ) );
 }
 add_shortcode( 'kindi_hot_products', 'kindi_hot_products_shortcode' );

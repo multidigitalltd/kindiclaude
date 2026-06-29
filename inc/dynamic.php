@@ -162,6 +162,7 @@ function kindi_render_categories(): string {
  * @return string
  */
 function kindi_categories_shortcode(): string {
+	$shop = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
 	$head = kindi_section_head(
 		array(
 			'eyebrow'   => 'קטגוריות מובילות',
@@ -169,6 +170,8 @@ function kindi_categories_shortcode(): string {
 			'highlight' => 'העולם המתאים',
 			'suffix'    => 'לכם',
 			'desc'      => 'קולקציה מסודרת לפי עניין, גיל ומטרה — כדי שתמצאו בדיוק מה שאתם מחפשים',
+			'cta'       => 'לכל הקטגוריות',
+			'cta_url'   => $shop,
 		)
 	);
 
