@@ -103,14 +103,9 @@ add_action( 'woocommerce_single_product_summary', 'kindi_pdp_highlights', 33 );
 function kindi_pdp_delivery_card(): void {
 	$threshold = (int) ( function_exists( 'kindi_opt' ) ? kindi_opt( 'free_shipping', 299 ) : 299 );
 
-	$wa = function_exists( 'kindi_whatsapp_url' ) ? kindi_whatsapp_url( 'היי, אשמח לייעוץ על מוצר' ) : '';
-
 	echo '<div class="kindi-pdp__delivery">';
 	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--blue">' . kindi_icon( 'truck', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>' . esc_html( sprintf( 'משלוח חינם בהזמנה מעל ₪%d', $threshold ) ) . '</strong><span>' . kindi_icon( 'clock', 'kindi-icon--xs' ) . 'הזמינו היום — משלוח מהיר עד הבית</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--red">' . kindi_icon( 'gift', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>עטיפת מתנה חינם</strong><span>סמנו בעגלה — נעטוף יפה ונצרף ברכה</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
-	if ( '' !== $wa ) {
-		echo '<a class="kindi-pdp__drow kindi-pdp__drow--link" href="' . esc_url( $wa ) . '" target="_blank" rel="noopener"><span class="kindi-pdp__dic kindi-pdp__dic--green">' . kindi_icon( 'whatsapp', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>צריך/ה עזרה? דברו עם יועץ בוואטסאפ</strong></div><span class="kindi-pdp__dchev">' . kindi_icon( 'arrowleft', 'kindi-icon--sm' ) . '</span></a>'; // phpcs:ignore WordPress.Security.EscapeOutput
-	}
 	echo '</div>';
 }
 add_action( 'woocommerce_single_product_summary', 'kindi_pdp_delivery_card', 34 );
@@ -387,6 +382,56 @@ function kindi_pdp_new_badge(): void {
 	}
 }
 add_action( 'woocommerce_before_single_product_summary', 'kindi_pdp_new_badge', 8 );
+
+/**
+ * "קנייה מהירה" (Buy Now) button under Add to Cart — adds to the cart and goes
+ * straight to checkout. It carries the same name="add-to-cart" so WooCommerce
+ * processes it normally; a hidden flag (set by store.js on click) triggers the
+ * checkout redirect.
+ *
+ * @return void
+ */
+function kindi_pdp_buy_now(): void {
+	global $product;
+	if ( ! $product instanceof WC_Product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+		return;
+	}
+	echo '<input type="hidden" name="kindi_buy_now" value="0" data-kindi-buynow-flag>';
+	echo '<button type="submit" name="add-to-cart" value="' . esc_attr( (string) $product->get_id() ) . '" class="button kindi-buynow" data-kindi-buynow>'
+		. kindi_icon( 'check', 'kindi-icon--sm kindi-icon--white' ) // phpcs:ignore WordPress.Security.EscapeOutput
+		. esc_html__( 'קנייה מהירה', 'kindi' )
+		. '</button>';
+}
+add_action( 'woocommerce_after_add_to_cart_button', 'kindi_pdp_buy_now' );
+
+/**
+ * Redirect to checkout after a "Buy Now" add-to-cart.
+ *
+ * @param string $url Default redirect URL.
+ * @return string
+ */
+function kindi_buy_now_redirect( $url ): string {
+	// WooCommerce validates the add-to-cart request itself; this only reads a flag.
+	if ( isset( $_REQUEST['kindi_buy_now'] ) && '1' === sanitize_text_field( wp_unslash( $_REQUEST['kindi_buy_now'] ) ) && function_exists( 'wc_get_checkout_url' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return wc_get_checkout_url();
+	}
+	return (string) $url;
+}
+add_filter( 'woocommerce_add_to_cart_redirect', 'kindi_buy_now_redirect' );
+
+/**
+ * Show related/up-sell products five per row below the product.
+ *
+ * @param array<string,mixed> $args Loop args.
+ * @return array<string,mixed>
+ */
+function kindi_pdp_related_args( array $args ): array {
+	$args['posts_per_page'] = 5;
+	$args['columns']        = 5;
+	return $args;
+}
+add_filter( 'woocommerce_output_related_products_args', 'kindi_pdp_related_args' );
+add_filter( 'woocommerce_upsell_display_args', 'kindi_pdp_related_args' );
 
 /**
  * Add a "משלוחים והחזרות" product tab (between specs and reviews), built from the

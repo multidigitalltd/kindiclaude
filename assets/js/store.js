@@ -359,3 +359,18 @@
 		}
 	} );
 }() );
+
+/* "Buy now" — set the flag so the add-to-cart redirects to checkout. */
+( function () {
+	document.addEventListener( 'click', function ( e ) {
+		var btn = e.target.closest && e.target.closest( '[data-kindi-buynow]' );
+		if ( ! btn ) {
+			return;
+		}
+		var form = btn.closest( 'form.cart' );
+		var flag = form && form.querySelector( '[data-kindi-buynow-flag]' );
+		if ( flag ) {
+			flag.value = '1';
+		}
+	} );
+}() );

@@ -702,3 +702,17 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 /* Shipping & returns tab. */
 .kindi-pdp-ship p { margin: 0 0 0.75rem; line-height: 1.7; }
 .kindi-pdp-ship strong { color: var(--brand-navy); }
+
+/* Buy-now button under add-to-cart (full width navy). */
+.kindi-buynow { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%;
+  margin-top: 0.75rem; background: var(--brand-navy); color: #fff; border-radius: 0.95rem;
+  padding: 0.95rem 1.5rem; font-weight: 800; font-size: 1.05rem; border: 0; cursor: pointer; transition: background 0.15s ease; }
+.kindi-buynow:hover { background: var(--brand-navy-dark); color: #fff; }
+
+/* Force the gallery + summary to fill their 50% grid cells — WooCommerce core
+   sets both to 48% floats, which would shrink the image to a quarter of the page. */
+.woocommerce div.product.kindi-pdp .woocommerce-product-gallery,
+.woocommerce div.product.kindi-pdp .summary.entry-summary,
+.woocommerce div.product.kindi-pdp .kindi-pdp__summary { width: 100% !important; float: none !important; margin: 0 !important; }
+.woocommerce div.product.kindi-pdp .woocommerce-product-gallery__wrapper,
+.woocommerce div.product.kindi-pdp .woocommerce-product-gallery__wrapper img { width: 100%; }
