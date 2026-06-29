@@ -57,7 +57,7 @@ $kindi_has_google = ! empty( $kindi_google['reviews'] );
 				<?php endif; ?>
 				<span>
 					<span class="kindi-tst__name"><?php echo esc_html( $t['name'] ); ?></span><br>
-					<span class="kindi-tst__role"><?php echo esc_html( $t['role'] ?? 'לקוח/ה מ-Google' ); ?></span>
+					<span class="kindi-tst__role"><?php echo esc_html( $t['role'] ?? 'ביקורת מאומתת מ-Google' ); ?></span>
 				</span>
 			</div>
 		</article>
