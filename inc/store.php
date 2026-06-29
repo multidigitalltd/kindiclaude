@@ -69,8 +69,14 @@ function kindi_mini_cart_drawer(): void {
 				<strong>הסל שלי</strong>
 				<button type="button" data-kindi-cart-close aria-label="סגירה"><?php echo kindi_icon( 'close', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
 			</div>
-			<div class="kindi-cartdrawer__body widget_shopping_cart_content">
-				<?php woocommerce_mini_cart(); ?>
+			<?php // The scroll container must stay put across AJAX updates. WooCommerce's
+			// mini-cart fragment (div.widget_shopping_cart_content) is replaced wholesale
+			// on every add-to-cart, so it lives INSIDE __body rather than on it — otherwise
+			// the swap would drop the scroll styles and the footer would slide off-screen. ?>
+			<div class="kindi-cartdrawer__body">
+				<div class="widget_shopping_cart_content">
+					<?php woocommerce_mini_cart(); ?>
+				</div>
 			</div>
 			<?php // Dedicated footer OUTSIDE the AJAX-replaced mini-cart, so the total + checkout button are always visible while the items list scrolls. ?>
 			<div class="kindi-cartdrawer__foot" data-kindi-cart-foot>
