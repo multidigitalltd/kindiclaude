@@ -71,11 +71,46 @@ function kindi_mini_cart_drawer(): void {
 			<div class="kindi-cartdrawer__body widget_shopping_cart_content">
 				<?php woocommerce_mini_cart(); ?>
 			</div>
+			<?php // Dedicated footer OUTSIDE the AJAX-replaced mini-cart, so the total + checkout button are always visible while the items list scrolls. ?>
+			<div class="kindi-cartdrawer__foot" data-kindi-cart-foot>
+				<?php echo kindi_cart_foot_total_html(); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within. ?>
+				<div class="kindi-cartdrawer__footbtns">
+					<a class="button kindi-cartdrawer__viewcart" href="<?php echo esc_url( wc_get_cart_url() ); ?>"><?php esc_html_e( 'צפייה בסל', 'kindi' ); ?></a>
+					<a class="button checkout kindi-cartdrawer__checkout" href="<?php echo esc_url( wc_get_checkout_url() ); ?>"><?php esc_html_e( 'מעבר לתשלום', 'kindi' ); ?></a>
+				</div>
+			</div>
 		</aside>
 	</div>
 	<?php
 }
 add_action( 'wp_footer', 'kindi_mini_cart_drawer' );
+
+/**
+ * Drawer-footer total markup (kept in sync via a cart fragment).
+ *
+ * @return string
+ */
+function kindi_cart_foot_total_html(): string {
+	$subtotal = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_subtotal() : '';
+	$count    = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+
+	return '<div class="kindi-cartdrawer__foottotal' . ( $count ? '' : ' is-empty' ) . '">'
+		. '<span>' . esc_html__( 'סה"כ ביניים', 'kindi' ) . '</span>'
+		. '<strong>' . wp_kses_post( (string) $subtotal ) . '</strong>'
+		. '</div>';
+}
+
+/**
+ * Keep the drawer-footer total fresh on add/remove via WooCommerce fragments.
+ *
+ * @param array<string,string> $fragments Cart fragments.
+ * @return array<string,string>
+ */
+function kindi_cart_foot_fragment( array $fragments ): array {
+	$fragments['div.kindi-cartdrawer__foottotal'] = kindi_cart_foot_total_html();
+	return $fragments;
+}
+add_filter( 'woocommerce_add_to_cart_fragments', 'kindi_cart_foot_fragment' );
 
 /**
  * REST: products by IDs (for the wishlist grid).

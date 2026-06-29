@@ -328,8 +328,13 @@ ul.products::before, ul.products::after { content: none; display: none; }
 
 /* ---------- Checkout layout — one centered column, card sections ---------- */
 .woocommerce-checkout form.checkout.woocommerce-checkout { display: block; max-width: 760px; margin-inline: auto; }
+/* Force a single column: neutralise WooCommerce's float-based two-column. */
+.woocommerce-checkout form.checkout #customer_details,
+.woocommerce-checkout form.checkout #order_review,
+.woocommerce-checkout #customer_details .col2-set,
+.woocommerce-checkout #customer_details .col-1,
+.woocommerce-checkout #customer_details .col-2 { float: none !important; width: 100% !important; }
 .woocommerce-checkout form.checkout #customer_details { display: block; margin-bottom: 1.5rem; }
-.woocommerce-checkout #customer_details .col-1, .woocommerce-checkout #customer_details .col-2 { width: 100%; float: none; }
 /* Each section as a soft white card. */
 .woocommerce-checkout .woocommerce-billing-fields,
 .woocommerce-checkout .woocommerce-shipping-fields,
@@ -377,6 +382,34 @@ ul.products::before, ul.products::after { content: none; display: none; }
 .woocommerce-checkout #order_review #shipping_method { margin: 0; padding: 0; list-style: none; }
 .woocommerce-checkout #order_review #shipping_method li { display: flex; align-items: baseline; gap: 0.5rem; margin: 0.35rem 0; }
 .woocommerce-checkout #order_review #shipping_method li label { flex: 1; font-weight: 600; }
+.woocommerce-checkout #order_review #shipping_method li input { margin: 0; }
+
+/* Coupon + login prompts as tidy info cards above the form. */
+.woocommerce-checkout .woocommerce-form-coupon-toggle,
+.woocommerce-checkout .woocommerce-form-login-toggle { max-width: 760px; margin: 0 auto 1rem; }
+.woocommerce-checkout .woocommerce-form-coupon-toggle .woocommerce-info,
+.woocommerce-checkout .woocommerce-form-login-toggle .woocommerce-info,
+.woocommerce form.checkout_coupon, .woocommerce form.login {
+  background: var(--brand-blue-soft); border: 1px solid color-mix(in oklab, var(--brand-blue) 16%, transparent);
+  border-radius: 1rem; padding: 1rem 1.25rem; color: var(--brand-navy); font-weight: 600;
+}
+.woocommerce-checkout .woocommerce-info::before { color: var(--brand-blue); }
+.woocommerce form.checkout_coupon, .woocommerce form.login { max-width: 760px; margin: 0 auto 1.25rem; }
+.woocommerce form.checkout_coupon .form-row, .woocommerce form.login .form-row { margin-bottom: 0.75rem; }
+.woocommerce form.checkout_coupon .button,
+.woocommerce form.login .button {
+  background: var(--brand-navy); color: #fff; border-radius: 0.75rem; padding: 0.65rem 1.4rem; font-weight: 800;
+}
+/* Payment area inside the order-review card. */
+.woocommerce-checkout #payment ul.payment_methods li { margin-bottom: 0.5rem; }
+.woocommerce-checkout #payment .place-order { padding: 1rem 0 0; }
+.woocommerce-checkout #place_order { width: 100%; padding: 0.95rem 1.5rem; font-size: 1.05rem; font-weight: 800; border-radius: 0.875rem; }
+.woocommerce-checkout #payment .woocommerce-terms-and-conditions-wrapper { margin-bottom: 1rem; }
+/* Inputs: comfortable height + clear focus. */
+.woocommerce-checkout .form-row input.input-text,
+.woocommerce-checkout .form-row textarea,
+.woocommerce-checkout .form-row .select2-selection,
+.woocommerce-checkout .form-row select { width: 100%; }
 
 /* ---------- Cart layout — keep the checkout button always in view ---------- */
 /* Desktop: items in a scrolling main column, totals + checkout in a sticky
