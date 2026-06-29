@@ -122,9 +122,10 @@ function kindi_grp_reviews(): array {
 		'link'    => '' !== $opt_link ? $opt_link : $link,
 	);
 
-	// Short TTL safety net; the cache is also flushed the moment the reviews
-	// plugin pulls fresh data (see the grw_revupd_schedule hook below).
-	set_transient( 'kindi_grp_reviews', $data, HOUR_IN_SECONDS );
+	// Long TTL for fastest loads (reviews change rarely); the cache is also
+	// flushed when the reviews plugin pulls fresh data on its own schedule
+	// (see the grw_revupd_schedule hook below), so 12h costs nothing in freshness.
+	set_transient( 'kindi_grp_reviews', $data, 12 * HOUR_IN_SECONDS );
 
 	return $data;
 }
