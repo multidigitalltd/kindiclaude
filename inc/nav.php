@@ -51,16 +51,44 @@ function kindi_nav_icon( string $icon ): string {
  */
 function kindi_nav_items(): array {
 	$locations = get_nav_menu_locations();
+	$menu_id   = ! empty( $locations['primary'] ) ? (int) $locations['primary'] : 0;
 
-	if ( ! empty( $locations['primary'] ) ) {
-		$items = wp_get_nav_menu_items( $locations['primary'] );
+	if ( $menu_id ) {
+		// The menu rarely changes — cache the built tree, flushed on menu save.
+		$key    = 'kindi_nav_tree_' . $menu_id;
+		$cached = get_transient( $key );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+		$items = wp_get_nav_menu_items( $menu_id );
 		if ( $items ) {
-			return kindi_build_nav_tree( $items );
+			$tree = kindi_build_nav_tree( $items );
+			set_transient( $key, $tree, DAY_IN_SECONDS );
+			return $tree;
 		}
 	}
 
 	return kindi_default_nav();
 }
+
+/**
+ * Flush the cached nav tree when any menu is edited.
+ *
+ * @param int $menu_id Menu ID.
+ * @return void
+ */
+function kindi_flush_nav_cache( $menu_id = 0 ): void {
+	if ( $menu_id ) {
+		delete_transient( 'kindi_nav_tree_' . (int) $menu_id );
+	}
+	// Location assignment may change which menu is primary — clear broadly.
+	$locations = get_nav_menu_locations();
+	if ( ! empty( $locations['primary'] ) ) {
+		delete_transient( 'kindi_nav_tree_' . (int) $locations['primary'] );
+	}
+}
+add_action( 'wp_update_nav_menu', 'kindi_flush_nav_cache' );
+add_action( 'wp_delete_nav_menu', 'kindi_flush_nav_cache' );
 
 /**
  * Build the 3-level nav tree from flat WP menu items.

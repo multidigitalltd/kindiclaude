@@ -49,6 +49,25 @@ function kindi_is_new_product( $product ): bool {
 }
 
 /**
+ * Prime the term cache for every product in the archive loop in one query, so
+ * the per-card brand/category lookups below hit cache instead of running
+ * N×taxonomy queries (avoids the N+1 on shop/category archives).
+ *
+ * @return void
+ */
+function kindi_prime_loop_term_cache(): void {
+	$q = $GLOBALS['wp_query'] ?? null;
+	if ( ! $q instanceof WP_Query || empty( $q->posts ) ) {
+		return;
+	}
+	$ids = wp_list_pluck( $q->posts, 'ID' );
+	if ( $ids ) {
+		update_object_term_cache( $ids, 'product' );
+	}
+}
+add_action( 'woocommerce_before_shop_loop', 'kindi_prime_loop_term_cache' );
+
+/**
  * Best-effort brand label (product brand taxonomy, brand attribute, else category).
  *
  * @param WC_Product $product Product.

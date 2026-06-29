@@ -85,8 +85,16 @@ function kindi_archive_filters(): void {
 	if ( function_exists( 'wc_get_attribute_taxonomies' ) ) {
 		foreach ( wc_get_attribute_taxonomies() as $att ) {
 			$taxonomy = wc_attribute_taxonomy_name( $att->attribute_name );
-			$terms    = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => true ) );
-			if ( is_wp_error( $terms ) || ! $terms ) {
+
+			// Cache the facet term list per taxonomy; flushed on term changes.
+			$cache_key = 'kindi_facet_' . $taxonomy;
+			$terms     = get_transient( $cache_key );
+			if ( false === $terms ) {
+				$terms = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => true ) );
+				$terms = ( is_wp_error( $terms ) || ! $terms ) ? array() : $terms;
+				set_transient( $cache_key, $terms, 12 * HOUR_IN_SECONDS );
+			}
+			if ( ! $terms ) {
 				continue;
 			}
 
@@ -126,3 +134,20 @@ function kindi_archive_filters(): void {
 	echo '</div></div>';
 }
 add_action( 'woocommerce_before_shop_loop', 'kindi_archive_filters', 5 );
+
+/**
+ * Flush a cached attribute-facet list when its terms change.
+ *
+ * @param int    $term_id  Term ID.
+ * @param int    $tt_id    Term taxonomy ID.
+ * @param string $taxonomy Taxonomy name.
+ * @return void
+ */
+function kindi_flush_facet_cache( $term_id, $tt_id = 0, $taxonomy = '' ): void {
+	if ( is_string( $taxonomy ) && 0 === strpos( $taxonomy, 'pa_' ) ) {
+		delete_transient( 'kindi_facet_' . $taxonomy );
+	}
+}
+add_action( 'created_term', 'kindi_flush_facet_cache', 10, 3 );
+add_action( 'edited_term', 'kindi_flush_facet_cache', 10, 3 );
+add_action( 'delete_term', 'kindi_flush_facet_cache', 10, 3 );
