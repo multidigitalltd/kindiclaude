@@ -138,7 +138,7 @@ ul.products::before, ul.products::after { content: none; display: none; }
 /* ---------- Single product (custom Lovable layout) ---------- */
 .woocommerce div.product.kindi-pdp { display: block; }
 .kindi-pdp__grid { display: grid; gap: 1.5rem; }
-@media (min-width: 1024px) { .kindi-pdp__grid { grid-template-columns: 1.05fr 1fr; gap: 3rem; align-items: start; } }
+@media (min-width: 1024px) { .kindi-pdp__grid { grid-template-columns: 1.25fr 1fr; gap: 3rem; align-items: start; } }
 .kindi-pdp__media { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
 .kindi-pdp__summary.summary { margin: 0; float: none; width: auto; }
 .kindi-pdp__below { margin-top: 3rem; }
@@ -152,19 +152,24 @@ ul.products::before, ul.products::after { content: none; display: none; }
 .woocommerce div.product p.price, .woocommerce div.product span.price { color: var(--brand-red); font-weight: 900; font-size: 1.75rem; }
 .woocommerce div.product .woocommerce-product-details__short-description { color: var(--foreground); line-height: 1.7; }
 .woocommerce div.product form.cart { margin-top: 1rem; }
-/* Quantity stepper: minus / number / plus inside one rounded pill. */
+/* Quantity stepper: minus | number | plus in one rounded pill, on a single
+   row. !important on the layout props because WooCommerce's own stylesheet (and
+   some optimizers) set float/display on .quantity and .qty, which would drop the
+   buttons onto their own lines. */
 .woocommerce .quantity {
-  display: inline-flex; align-items: stretch; overflow: hidden;
+  display: inline-flex !important; flex-direction: row !important; flex-wrap: nowrap;
+  align-items: stretch; overflow: hidden; width: auto; max-width: max-content;
   border: 2px solid color-mix(in oklab, var(--brand-navy) 12%, transparent); border-radius: 0.75rem;
 }
 .woocommerce .quantity .qty {
-  border: 0; height: 3rem; width: 3rem; text-align: center; font-weight: 700; background: transparent;
+  flex: 0 0 auto; float: none !important; margin: 0 !important;
+  border: 0; height: 3rem; width: 3rem; min-width: 3rem; text-align: center; font-weight: 700; background: transparent;
   -moz-appearance: textfield; appearance: textfield;
 }
 .woocommerce .quantity .qty::-webkit-outer-spin-button,
 .woocommerce .quantity .qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .kindi-qbtn {
-  width: 2.75rem; border: 0; background: var(--muted); color: var(--brand-navy);
+  flex: 0 0 auto; width: 2.75rem; align-self: stretch; border: 0; background: var(--muted); color: var(--brand-navy);
   font-size: 1.4rem; font-weight: 700; line-height: 1; cursor: pointer;
   display: grid; place-items: center; user-select: none; transition: background 0.15s, color 0.15s;
 }
