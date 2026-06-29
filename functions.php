@@ -53,6 +53,7 @@ kindi_require( 'accessibility.php' );
 kindi_require( 'accessibility-statement.php' );
 kindi_require( 'cookie-consent.php' );
 kindi_require( 'schema.php' );
+kindi_require( 'pixel.php' );
 kindi_require( 'critical-css.php' );
 kindi_require( 'acf-bridge.php' );
 kindi_require( 'emails.php' );

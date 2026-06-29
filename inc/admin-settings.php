@@ -156,6 +156,41 @@ function kindi_settings_tabs(): array {
 		),
 	);
 
+	$toggle = array( '1' => 'מופעל', '0' => 'כבוי' );
+
+	$tabs['pixel'] = array(
+		'label'    => 'פיקסל ומעקב (Meta)',
+		'sections' => array(
+			'מזהה הפיקסל' => array(
+				'_pixel_note'  => array( 'type' => 'note', 'label' => '', 'help' => 'הזינו את מזהה הפיקסל של Meta (Facebook) וכל קוד המעקב יוטמע אוטומטית — תחליף רזה ל-PixelYourSite. השאירו ריק כדי לכבות לחלוטין.' ),
+				'fb_pixel_id'  => array( 'type' => 'text', 'label' => 'מזהה פיקסל (Pixel ID)', 'help' => 'מספר בלבד, לדוגמה: 1234567890123456.' ),
+				'pixel_enable' => array( 'type' => 'select', 'label' => 'הפעלת הפיקסל', 'options' => $toggle ),
+			),
+			'אירועי מסחר (WooCommerce)' => array(
+				'px_view_content'      => array( 'type' => 'select', 'label' => 'צפייה במוצר (ViewContent)', 'options' => $toggle ),
+				'px_add_to_cart'       => array( 'type' => 'select', 'label' => 'הוספה לעגלה (AddToCart)', 'options' => $toggle ),
+				'px_initiate_checkout' => array( 'type' => 'select', 'label' => 'התחלת תשלום (InitiateCheckout)', 'options' => $toggle ),
+				'px_purchase'          => array( 'type' => 'select', 'label' => 'רכישה (Purchase)', 'options' => $toggle ),
+				'px_view_category'     => array( 'type' => 'select', 'label' => 'צפייה בקטגוריה (ViewCategory)', 'options' => $toggle ),
+			),
+			'אירועים כלליים' => array(
+				'px_search'    => array( 'type' => 'select', 'label' => 'חיפוש (Search)', 'options' => $toggle ),
+				'px_404'       => array( 'type' => 'select', 'label' => 'עמוד 404', 'options' => $toggle ),
+				'px_signup'    => array( 'type' => 'select', 'label' => 'הרשמת משתמש (CompleteRegistration)', 'options' => $toggle ),
+				'px_login'     => array( 'type' => 'select', 'label' => 'התחברות משתמש', 'options' => $toggle ),
+				'px_scroll'    => array( 'type' => 'select', 'label' => 'גלילה בעמוד (90%)', 'options' => $toggle ),
+				'px_time'      => array( 'type' => 'select', 'label' => 'זמן בעמוד (30 שניות)', 'options' => $toggle ),
+				'px_downloads' => array( 'type' => 'select', 'label' => 'הורדות קבצים', 'options' => $toggle ),
+				'px_forms'     => array( 'type' => 'select', 'label' => 'שליחת טפסים (Lead)', 'options' => $toggle ),
+				'px_comments'  => array( 'type' => 'select', 'label' => 'תגובות', 'options' => $toggle ),
+			),
+			'מעקב נתונים מקומי (הזמנות)' => array(
+				'_report_note'        => array( 'type' => 'note', 'label' => '', 'help' => 'שומר על כל הזמנה את מקור התנועה, דף הנחיתה ופרמטרי ה-UTM (מגע ראשון). המידע מוצג בעמוד ההזמנה ובמייל "הזמנה חדשה" למנהל.' ),
+				'px_native_reporting' => array( 'type' => 'select', 'label' => 'מעקב מקור הזמנות (UTM / דף נחיתה)', 'options' => $toggle ),
+			),
+		),
+	);
+
 	/**
 	 * Filter the settings tabs/sections/fields (used to inject the ACF bridge).
 	 *

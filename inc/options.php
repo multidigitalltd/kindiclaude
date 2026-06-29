@@ -38,6 +38,25 @@ function kindi_default_options(): array {
 
 		// Product feed (Google Merchant / Meta catalog).
 		'google_category' => '', // Default Google product category (ID or full path); per-product meta wins.
+
+		// Meta (Facebook) Pixel — native, lean replacement for PixelYourSite.
+		'fb_pixel_id'         => '',
+		'pixel_enable'        => '1',
+		'px_view_content'     => '1',
+		'px_add_to_cart'      => '1',
+		'px_initiate_checkout' => '1',
+		'px_purchase'         => '1',
+		'px_view_category'    => '1',
+		'px_search'           => '1',
+		'px_404'              => '1',
+		'px_signup'           => '1',
+		'px_login'            => '1',
+		'px_scroll'           => '1',
+		'px_time'             => '1',
+		'px_downloads'        => '1',
+		'px_forms'            => '1',
+		'px_comments'         => '1',
+		'px_native_reporting' => '1',
 		'ticker'        => "משלוח חינם בהזמנה מעל 299 ₪\nמועדון קינדי — 5% חזרה על כל קנייה\nקולקציית חזרה לבית הספר 2026 נחתה\nתשלום מאובטח SSL + PCI\nשירות אישי 03-5293383",
 
 		// Hero.
