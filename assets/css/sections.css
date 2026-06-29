@@ -320,3 +320,9 @@
 /* Clickable Google rating badge */
 .kindi-grev__score--link { text-decoration: none; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
 .kindi-grev__score--link:hover { transform: translateY(-1px); box-shadow: var(--shadow-card); }
+
+/* Trust bands appended above the footer on cart & checkout. */
+.kindi-trustband, .kindi-why { margin-top: 2.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+.kindi-sechead--center { justify-content: center; text-align: center; }
+.kindi-sechead--center .kindi-sechead__text { display: flex; flex-direction: column; align-items: center; }
+.kindi-usp--card { margin-top: 0.5rem; }

@@ -95,8 +95,12 @@ function kindi_enqueue_styles(): void {
 		}
 	}
 
-	// Homepage section styles — front page, or any page using a section shortcode.
-	if ( is_front_page() || $has_section_shortcode ) {
+	// Homepage section styles — front page, any page using a section shortcode,
+	// or the cart/checkout (which now show the reviews + "why choose us" bands).
+	$needs_sections = is_front_page() || $has_section_shortcode
+		|| ( function_exists( 'is_cart' ) && is_cart() )
+		|| ( function_exists( 'is_checkout' ) && is_checkout() );
+	if ( $needs_sections ) {
 		wp_enqueue_style(
 			'kindi-sections',
 			KINDI_URI . 'assets/css/sections.css',

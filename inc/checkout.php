@@ -86,11 +86,12 @@ add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_club_banner', 4 
  */
 
 /**
- * Move the Simply gift-card redemption box up to the top of the checkout form,
- * so it sits alongside the coupon and Gifta fields instead of further down.
- * The filter only does anything when the gift-card plugin is active.
+ * Render the Simply gift-card redemption box on the same hook as the coupon
+ * toggle (woocommerce_before_checkout_form) so the two sit together at the top
+ * of the checkout instead of the box dropping into the billing column. The
+ * filter only does anything when the gift-card plugin is active.
  */
-add_filter( 'simply_offerbox_checkout_action', static fn(): string => 'woocommerce_checkout_before_customer_details' );
+add_filter( 'simply_offerbox_checkout_action', static fn(): string => 'woocommerce_before_checkout_form' );
 
 /**
  * Notice before the payment methods: Gifta gift-cards can't be combined with
@@ -105,3 +106,132 @@ function kindi_gifta_coupon_notice(): void {
 		. '</p>';
 }
 add_action( 'woocommerce_review_order_before_payment', 'kindi_gifta_coupon_notice' );
+
+/*
+ * ---------------------------------------------------------------------------
+ * Trust content on cart & checkout, above the footer: the homepage Google
+ * reviews (both pages) and a "why choose us" band (checkout). Appended to the
+ * page content so it lands below the cart/checkout and above the footer
+ * regardless of the underlying layout.
+ * ---------------------------------------------------------------------------
+ */
+
+/**
+ * Append the trust content to the cart/checkout page body.
+ *
+ * @param string $content Post content.
+ * @return string
+ */
+function kindi_cart_checkout_trust( string $content ): string {
+	if ( ! is_main_query() || ! in_the_loop() || is_admin() ) {
+		return $content;
+	}
+	if ( function_exists( 'is_cart' ) && is_cart() ) {
+		return $content . kindi_reviews_band();
+	}
+	if ( function_exists( 'is_checkout' ) && is_checkout()
+		&& ! ( function_exists( 'is_order_received_page' ) && is_order_received_page() ) ) {
+		return $content . kindi_reviews_band() . kindi_why_choose_band();
+	}
+	return $content;
+}
+add_filter( 'the_content', 'kindi_cart_checkout_trust', 20 );
+
+/**
+ * The homepage Google reviews as a compact band (top 3), reusing the
+ * testimonial card styles. Returns '' when there are no reviews to show.
+ *
+ * @return string
+ */
+function kindi_reviews_band(): string {
+	$data    = function_exists( 'kindi_google_reviews' ) ? kindi_google_reviews() : array();
+	$reviews = ! empty( $data['reviews'] ) ? array_slice( $data['reviews'], 0, 3 ) : array();
+	if ( ! $reviews ) {
+		return '';
+	}
+	$has_score = ! empty( $data['rating'] );
+	$link      = ! empty( $data['link'] ) ? (string) $data['link'] : '';
+
+	ob_start();
+	?>
+	<section class="kindi-section kindi-trustband" aria-label="<?php esc_attr_e( 'ביקורות לקוחות', 'kindi' ); ?>">
+		<div class="kindi-sechead">
+			<div class="kindi-sechead__text">
+				<span class="kindi-eyebrow"><?php echo $has_score ? '★ Google' : esc_html__( 'לקוחות מספרים', 'kindi' ); ?></span>
+				<h2 class="kindi-sec-title"><?php esc_html_e( 'הלקוחות שלנו ממליצים', 'kindi' ); ?></h2>
+			</div>
+			<?php if ( $has_score ) :
+				$tag = $link ? 'a' : 'div'; ?>
+			<<?php echo $tag; // phpcs:ignore WordPress.Security.EscapeOutput -- literal 'a'|'div'. ?> class="kindi-grev__score<?php echo $link ? ' kindi-grev__score--link' : ''; ?>"<?php echo $link ? ' href="' . esc_url( $link ) . '" target="_blank" rel="noopener" title="' . esc_attr__( 'לצפייה בכל הביקורות בגוגל', 'kindi' ) . '"' : ''; ?>>
+				<strong><?php echo esc_html( number_format( (float) $data['rating'], 1 ) ); ?></strong>
+				<span class="kindi-grev__stars"><?php for ( $s = 0; $s < 5; $s++ ) {
+					echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput
+				} ?></span>
+				<span class="kindi-grev__count"><?php echo esc_html( number_format_i18n( (int) ( $data['total'] ?? count( $reviews ) ) ) ); ?>+ <?php esc_html_e( 'ביקורות בגוגל', 'kindi' ); ?></span>
+			</<?php echo $tag; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+			<?php endif; ?>
+		</div>
+		<div class="kindi-tst">
+			<?php foreach ( $reviews as $t ) : ?>
+			<article class="kindi-tst__card">
+				<span class="kindi-tst__quote" aria-hidden="true">”</span>
+				<div class="kindi-tst__stars"><?php for ( $i = 0; $i < 5; $i++ ) {
+					echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput
+				} ?></div>
+				<p class="kindi-tst__text"><?php echo esc_html( $t['text'] ); ?></p>
+				<div class="kindi-tst__foot">
+					<?php if ( ! empty( $t['photo'] ) ) : ?>
+					<img class="kindi-tst__avatar kindi-tst__avatar--img" src="<?php echo esc_url( $t['photo'] ); ?>" alt="" loading="lazy" decoding="async" width="44" height="44" referrerpolicy="no-referrer">
+					<?php else : ?>
+					<span class="kindi-tst__avatar"><?php echo esc_html( $t['letter'] ?? '★' ); ?></span>
+					<?php endif; ?>
+					<span>
+						<span class="kindi-tst__name"><?php echo esc_html( $t['name'] ); ?></span><br>
+						<span class="kindi-tst__role"><?php echo esc_html( $t['role'] ?? 'ביקורת מאומתת מ-Google' ); ?></span>
+					</span>
+				</div>
+			</article>
+			<?php endforeach; ?>
+		</div>
+	</section>
+	<?php
+	return (string) ob_get_clean();
+}
+
+/**
+ * "למה לבחור בנו?" band — four reassurance points, reusing the USP strip look.
+ *
+ * @return string
+ */
+function kindi_why_choose_band(): string {
+	$items = array(
+		array( 'icon' => 'phone', 'title' => 'שירות לקוחות אישי', 'sub' => 'עם מענה מהיר' ),
+		array( 'icon' => 'gem', 'title' => 'מוצרים איכותיים', 'sub' => 'בלבד' ),
+		array( 'icon' => 'truck', 'title' => 'משלוח עד הבית', 'sub' => 'ארוז בצורה נקייה ומסודרת' ),
+		array( 'icon' => 'rocket', 'title' => 'משלוח מהיר', 'sub' => 'החבילה שלכם נארזת באותו יום' ),
+	);
+
+	ob_start();
+	?>
+	<section class="kindi-section kindi-why" aria-label="<?php esc_attr_e( 'למה לבחור בנו', 'kindi' ); ?>">
+		<div class="kindi-sechead kindi-sechead--center">
+			<div class="kindi-sechead__text">
+				<span class="kindi-eyebrow"><?php echo kindi_icon( 'sparkles', 'kindi-icon--xs' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php esc_html_e( 'היתרונות שלנו', 'kindi' ); ?></span>
+				<h2 class="kindi-sec-title"><?php esc_html_e( 'למה לבחור בנו?', 'kindi' ); ?></h2>
+			</div>
+		</div>
+		<div class="kindi-usp kindi-usp--card">
+			<?php foreach ( $items as $u ) : ?>
+			<div class="kindi-usp__item">
+				<span class="kindi-usp__ic"><?php echo kindi_icon( $u['icon'], 'kindi-icon--xl' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<span>
+					<span class="kindi-usp__title"><?php echo esc_html( $u['title'] ); ?></span><br>
+					<span class="kindi-usp__sub"><?php echo esc_html( $u['sub'] ); ?></span>
+				</span>
+			</div>
+			<?php endforeach; ?>
+		</div>
+	</section>
+	<?php
+	return (string) ob_get_clean();
+}
