@@ -326,14 +326,23 @@ ul.products::before, ul.products::after { content: none; display: none; }
 .kindi-checkout-club strong { font-weight: 900; }
 .kindi-checkout-club__btn { margin-inline-start: auto; background: #fff; color: var(--brand-red); font-weight: 800; padding: 0.5rem 1.25rem; border-radius: 0.75rem; text-decoration: none; white-space: nowrap; }
 
-/* ---------- Checkout layout ---------- */
-@media (min-width: 1024px) {
-  .woocommerce-checkout form.checkout.woocommerce-checkout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2rem; align-items: start; }
-  .woocommerce-checkout form.checkout #customer_details { grid-column: 1; grid-row: 1 / span 2; }
-  .woocommerce-checkout form.checkout #order_review_heading { grid-column: 2; grid-row: 1; margin: 0 0 1rem; }
-  .woocommerce-checkout form.checkout #order_review { grid-column: 2; grid-row: 2; position: sticky; top: 7rem; }
-}
+/* ---------- Checkout layout — one centered column, card sections ---------- */
+.woocommerce-checkout form.checkout.woocommerce-checkout { display: block; max-width: 760px; margin-inline: auto; }
+.woocommerce-checkout form.checkout #customer_details { display: block; margin-bottom: 1.5rem; }
 .woocommerce-checkout #customer_details .col-1, .woocommerce-checkout #customer_details .col-2 { width: 100%; float: none; }
+/* Each section as a soft white card. */
+.woocommerce-checkout .woocommerce-billing-fields,
+.woocommerce-checkout .woocommerce-shipping-fields,
+.woocommerce-checkout .woocommerce-additional-fields {
+  background: #fff; border: 1px solid var(--border); border-radius: 1.25rem;
+  padding: 1.25rem 1.5rem; box-shadow: var(--shadow-card); margin-bottom: 1.25rem;
+}
+.woocommerce-checkout .woocommerce-billing-fields h3,
+.woocommerce-checkout .woocommerce-shipping-fields h3,
+.woocommerce-checkout #order_review_heading { font-size: 1.35rem; margin: 0 0 1rem; }
+.woocommerce-checkout #order_review_heading { margin-top: 1.5rem; }
+.woocommerce-checkout .form-row { margin-bottom: 1rem; }
+.woocommerce-checkout form.checkout #order_review { position: static; width: 100%; }
 .woocommerce-checkout h3, .woocommerce-checkout #order_review_heading { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); }
 .woocommerce-checkout #order_review, .woocommerce-cart .cart_totals { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.25rem; box-shadow: var(--shadow-card); }
 .woocommerce-checkout #payment { background: transparent; border-radius: 1rem; }
@@ -344,9 +353,26 @@ ul.products::before, ul.products::after { content: none; display: none; }
 .woocommerce table.shop_table { background: transparent; }
 .woocommerce-checkout #order_review .cart_item img, .woocommerce-cart .cart_item img { width: 48px; border-radius: 0.5rem; }
 
-/* ---------- Cart layout ---------- */
+/* ---------- Cart layout — keep the checkout button always in view ---------- */
+/* Desktop: items in a scrolling main column, totals + checkout in a sticky
+   sidebar that never leaves the viewport however long the cart gets. */
 @media (min-width: 1024px) {
-  .woocommerce-cart .woocommerce > .woocommerce-cart-form { float: none; width: 100%; }
+  .woocommerce-cart .woocommerce { display: grid; grid-template-columns: minmax(0, 1fr) 22rem; gap: 2rem; align-items: start; }
+  .woocommerce-cart .woocommerce > .woocommerce-notices-wrapper { grid-column: 1 / -1; }
+  .woocommerce-cart .woocommerce-cart-form { grid-column: 1; width: 100%; float: none; min-width: 0; }
+  .woocommerce-cart .cart-collaterals { grid-column: 2; width: 100%; margin: 0; position: sticky; top: calc(var(--kindi-header-h, 7rem) + 1rem); }
+  .woocommerce-cart .cart-collaterals .cart_totals { width: 100%; float: none; }
+  .woocommerce-cart .cart-collaterals .cross-sells { display: none; }
+}
+/* Mobile: the totals card sticks to the bottom of the screen so the checkout
+   button stays reachable while the items scroll above it. */
+@media (max-width: 1023.98px) {
+  .woocommerce-cart .cart-collaterals { position: sticky; bottom: 0; z-index: 40; margin: 0; }
+  .woocommerce-cart .cart-collaterals .cart_totals {
+    box-shadow: 0 -10px 28px rgba(20, 35, 63, 0.16);
+    border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+  }
+  .woocommerce-cart .cart-collaterals .cross-sells { display: none; }
 }
 .woocommerce-cart table.cart td.actions .button { border-radius: 0.875rem; }
 .woocommerce-cart .quantity { border-radius: 0.6rem; }
