@@ -176,8 +176,8 @@
 .kindi-age:hover { border-color: var(--brand-red); transform: translateY(-4px); box-shadow: var(--shadow-pop); }
 .kindi-age__ic { margin: 0 auto 0.75rem; width: 4rem; height: 4rem; border-radius: 1rem; background: var(--brand-blue-soft); display: grid; place-items: center; transition: transform 0.3s, background 0.3s; }
 .kindi-age:hover .kindi-age__ic { transform: scale(1.1) rotate(-6deg); background: color-mix(in oklab, var(--brand-red) 10%, transparent); }
-.kindi-age__range { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.5rem; color: var(--brand-navy); }
-.kindi-age__label { font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-top: 0.25rem; }
+.kindi-age__range { display: block; font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.5rem; line-height: 1.1; color: var(--brand-navy); }
+.kindi-age__label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-top: 0.25rem; }
 
 /* ============================ Brands ============================ */
 .kindi-brands { background: #fff; border-radius: 1.5rem; border: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); padding: 1.5rem; box-shadow: var(--shadow-card); }

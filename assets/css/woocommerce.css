@@ -83,7 +83,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .woocommerce ul.products li.product .kindi-pc__rating,
 .woocommerce ul.products li.product .kindi-pc__foot { padding-inline: 1rem; }
 .kindi-pc__brand { display: block; font-size: 0.6875rem; color: var(--brand-red); font-weight: 700; letter-spacing: 0.02em; margin-top: 0.85rem; }
-.kindi-pc__title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.875rem; font-weight: 700; color: var(--brand-navy); line-height: 1.375; min-height: 2.5rem; text-decoration: none; margin: 0.25rem 0 0; }
+.kindi-pc__title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 1rem; font-weight: 700; color: var(--brand-navy); line-height: 1.35; min-height: 2.7rem; text-decoration: none; margin: 0.25rem 0 0; }
 .kindi-pc__title:hover { color: var(--brand-red); }
 .kindi-pc__rating { display: flex; align-items: center; gap: 0.4rem; margin: 0.5rem 0 0; }
 .kindi-pc__rating .star-rating { color: var(--brand-red); font-size: 0.85rem; width: 5.4em; height: 1.2em; line-height: 1.2; margin: 0; }
@@ -99,10 +99,15 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   display: grid; place-items: center; font-size: 0; position: relative; margin: 0; flex-shrink: 0;
   box-shadow: 0 6px 14px -4px color-mix(in oklab, var(--brand-red) 50%, transparent);
 }
-.woocommerce ul.products li.product .button.kindi-pc__add::before { content: "+"; font-size: 1.5rem; line-height: 1; color: #fff; }
+/* Thin, perfectly centred plus drawn from two bars (instead of a heavy glyph). */
+.woocommerce ul.products li.product .button.kindi-pc__add::before,
+.woocommerce ul.products li.product .button.kindi-pc__add::after {
+  content: ""; position: absolute; top: 50%; left: 50%; background: #fff; border-radius: 2px;
+}
+.woocommerce ul.products li.product .button.kindi-pc__add::before { width: 0.85rem; height: 1.5px; transform: translate(-50%, -50%); }
+.woocommerce ul.products li.product .button.kindi-pc__add::after { width: 1.5px; height: 0.85rem; transform: translate(-50%, -50%); }
 .woocommerce ul.products li.product .button.kindi-pc__add:hover { background: var(--brand-red-dark); transform: scale(1.08); }
 .woocommerce ul.products li.product .button.kindi-pc__add.added { background: #22c55e; }
-.woocommerce ul.products li.product .button.kindi-pc__add.added::before { content: "\2713"; font-size: 1.05rem; }
 
 /* ---------- Buttons ---------- */
 .woocommerce a.button, .woocommerce button.button, .woocommerce input.button,
