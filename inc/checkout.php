@@ -98,6 +98,78 @@ add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_club_banner', 4 
 
 /*
  * ---------------------------------------------------------------------------
+ * Checkout layout — two columns: the process (contact, shipping, payment) on
+ * 2/3, the order summary on a sticky 1/3. We wrap the WooCommerce checkout in
+ * .kindi-co / .kindi-co__main / .kindi-co__side via the checkout-form hooks and
+ * relocate the payment block from the order-review column into the main one.
+ * The grid itself lives in woocommerce.css.
+ * ---------------------------------------------------------------------------
+ */
+
+/**
+ * Move the payment block out of the order-review (summary) column into the main
+ * process column, right after the customer details. Safe for AJAX: WooCommerce
+ * refreshes #payment by its `.woocommerce-checkout-payment` fragment selector,
+ * regardless of where it sits in the DOM.
+ *
+ * @return void
+ */
+function kindi_checkout_relocate_payment(): void {
+	if ( ! function_exists( 'is_checkout' ) || ! is_checkout() ) {
+		return;
+	}
+	remove_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_payment', 20 );
+	add_action( 'woocommerce_checkout_after_customer_details', 'woocommerce_checkout_payment', 20 );
+}
+add_action( 'wp', 'kindi_checkout_relocate_payment' );
+
+/**
+ * Open the two-column wrapper + the main (process) column.
+ *
+ * @return void
+ */
+function kindi_checkout_cols_open(): void {
+	echo '<div class="kindi-co"><div class="kindi-co__main">';
+}
+add_action( 'woocommerce_checkout_before_customer_details', 'kindi_checkout_cols_open', 5 );
+
+/**
+ * Close the main column and open the summary (side) column. Runs after the
+ * relocated payment block (priority 20) on the same hook.
+ *
+ * @return void
+ */
+function kindi_checkout_cols_mid(): void {
+	echo '</div><div class="kindi-co__side">';
+}
+add_action( 'woocommerce_checkout_after_customer_details', 'kindi_checkout_cols_mid', 30 );
+
+/**
+ * Close the summary column and the two-column wrapper.
+ *
+ * @return void
+ */
+function kindi_checkout_cols_close(): void {
+	echo '</div></div>';
+}
+add_action( 'woocommerce_checkout_after_order_review', 'kindi_checkout_cols_close', 50 );
+
+/**
+ * Prepend a truck icon to each shipping-method label (cart & checkout) so the
+ * methods can render as cards with an icon + title + price.
+ *
+ * @param string $label  Method label HTML (title + cost).
+ * @param mixed  $method Shipping rate (unused).
+ * @return string
+ */
+function kindi_shipping_method_icon( string $label, $method = null ): string {
+	return '<span class="kindi-ship__ic">' . kindi_icon( 'truck', 'kindi-icon--md' ) . '</span>' // phpcs:ignore WordPress.Security.EscapeOutput
+		. '<span class="kindi-ship__txt">' . $label . '</span>';
+}
+add_filter( 'woocommerce_cart_shipping_method_full_label', 'kindi_shipping_method_icon', 10, 2 );
+
+/*
+ * ---------------------------------------------------------------------------
  * Gift card & Gifta integrations.
  * ---------------------------------------------------------------------------
  */

@@ -362,15 +362,28 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-checkout-club strong { font-weight: 900; }
 .kindi-checkout-club__btn { margin-inline-start: auto; background: #fff; color: var(--brand-red); font-weight: 800; padding: 0.5rem 1.25rem; border-radius: 0.75rem; text-decoration: none; white-space: nowrap; }
 
-/* ---------- Checkout layout — one centered column, card sections ---------- */
-.woocommerce-checkout form.checkout.woocommerce-checkout { display: block; max-width: 760px; margin-inline: auto; }
-/* Force a single column: neutralise WooCommerce's float-based two-column. */
+/* ---------- Checkout layout — process (2/3) + sticky summary (1/3) ---------- */
+.woocommerce-checkout form.checkout.woocommerce-checkout { display: block; max-width: 1180px; margin-inline: auto; }
+/* Neutralise WooCommerce's float-based columns — billing + shipping stack
+   inside the process column; the .kindi-co wrappers drive the two-column grid. */
 .woocommerce-checkout form.checkout #customer_details,
 .woocommerce-checkout form.checkout #order_review,
 .woocommerce-checkout #customer_details .col2-set,
 .woocommerce-checkout #customer_details .col-1,
 .woocommerce-checkout #customer_details .col-2 { float: none !important; width: 100% !important; }
-.woocommerce-checkout form.checkout #customer_details { display: block; margin-bottom: 1.5rem; }
+.woocommerce-checkout form.checkout #customer_details { display: block; margin-bottom: 0; }
+
+/* Two-column wrapper injected around the checkout (see inc/checkout.php):
+   .kindi-co__main = contact + shipping + payment, .kindi-co__side = summary. */
+.kindi-co { display: block; }
+.kindi-co__main, .kindi-co__side { min-width: 0; }
+@media (min-width: 1024px) {
+  .kindi-co {
+    display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 2rem; align-items: start;
+  }
+  .kindi-co__side { position: sticky; top: calc(var(--kindi-header-h, 7rem) + 1rem); }
+}
 /* Each section as a soft white card. */
 .woocommerce-checkout .woocommerce-billing-fields,
 .woocommerce-checkout .woocommerce-shipping-fields,
@@ -381,7 +394,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .woocommerce-checkout .woocommerce-billing-fields h3,
 .woocommerce-checkout .woocommerce-shipping-fields h3,
 .woocommerce-checkout #order_review_heading { font-size: 1.35rem; margin: 0 0 1rem; }
-.woocommerce-checkout #order_review_heading { margin-top: 1.5rem; }
+.woocommerce-checkout #order_review_heading { margin-top: 0; }
 .woocommerce-checkout .form-row { margin-bottom: 1rem; }
 .woocommerce-checkout form.checkout #order_review { position: static; width: 100%; }
 .woocommerce-checkout h3, .woocommerce-checkout #order_review_heading { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); }
@@ -414,11 +427,28 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 }
 .woocommerce-checkout #order_review table.shop_table .order-total th,
 .woocommerce-checkout #order_review table.shop_table .order-total td { font-size: 1.1rem; color: var(--brand-red); }
-/* Shipping choices: each option on its own line, amount aligned to the edge. */
-.woocommerce-checkout #order_review #shipping_method { margin: 0; padding: 0; list-style: none; }
-.woocommerce-checkout #order_review #shipping_method li { display: flex; align-items: baseline; gap: 0.5rem; margin: 0.35rem 0; }
-.woocommerce-checkout #order_review #shipping_method li label { flex: 1; font-weight: 600; }
-.woocommerce-checkout #order_review #shipping_method li input { margin: 0; }
+/* Shipping choices as selectable cards (truck icon + label + price). The
+   selected card gets a red border + soft-red background + red radio. */
+.woocommerce-checkout #order_review #shipping_method { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+.woocommerce-checkout #order_review #shipping_method li {
+  display: flex; align-items: center; gap: 0.55rem; margin: 0; padding: 0.7rem 0.85rem;
+  background: #fff; border: 2px solid var(--border); border-radius: 0.95rem;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.woocommerce-checkout #order_review #shipping_method li:hover { border-color: color-mix(in oklab, var(--brand-red) 35%, transparent); }
+.woocommerce-checkout #order_review #shipping_method li:has(input:checked) {
+  border-color: var(--brand-red); background: var(--brand-red-soft);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 12%, transparent);
+}
+.woocommerce-checkout #order_review #shipping_method li input { margin: 0; flex: 0 0 auto; accent-color: var(--brand-red); width: 1.15rem; height: 1.15rem; }
+.woocommerce-checkout #order_review #shipping_method li label {
+  flex: 1; display: flex; align-items: center; gap: 0.5rem; margin: 0;
+  font-weight: 700; color: var(--brand-navy); line-height: 1.3;
+}
+.woocommerce-checkout #order_review #shipping_method li label .kindi-ship__ic { flex: 0 0 auto; display: inline-flex; }
+.woocommerce-checkout #order_review #shipping_method li label .kindi-ship__txt { flex: 1; }
+.woocommerce-checkout #order_review #shipping_method li label .woocommerce-Price-amount,
+.woocommerce-checkout #order_review #shipping_method li label .amount { margin-inline-start: auto; color: #16a34a; font-weight: 800; white-space: nowrap; }
 
 /* Coupon + login prompts as tidy info cards above the form. */
 .woocommerce-checkout .woocommerce-form-coupon-toggle,
@@ -478,21 +508,36 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .woocommerce-cart .cart_item img { width: 52px; height: 52px; object-fit: contain; border-radius: 0.6rem; background: var(--brand-cream, #FBF6EC); margin-inline-end: 0.6rem; vertical-align: middle; }
 .woocommerce-checkout #order_review table.shop_table .product-name .product-quantity { color: var(--muted-foreground); font-weight: 600; }
 
-/* Payment methods as selectable cards (bit / credit / etc.). */
+/* Payment methods as a row of selectable cards (12 payments / PayPal / bit /
+   credit card …). The selected card turns red and expands to full width so its
+   fields (card number, expiry, CVV, name) sit on their own row beneath. */
 .woocommerce-checkout #payment ul.payment_methods {
-  display: flex; flex-direction: column; gap: 0.6rem; margin: 0 0 1rem;
+  display: flex; flex-wrap: wrap; gap: 0.7rem; margin: 0 0 1.25rem; border: 0; padding: 0;
 }
 .woocommerce-checkout #payment ul.payment_methods li {
-  margin: 0; background: #fff; border: 1.5px solid var(--border); border-radius: 0.9rem;
-  padding: 0.85rem 1rem; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  flex: 1 1 150px; position: relative; margin: 0; background: #fff;
+  border: 2px solid var(--border); border-radius: 1rem; padding: 1rem 0.85rem;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
-.woocommerce-checkout #payment ul.payment_methods li:hover { border-color: color-mix(in oklab, var(--brand-blue) 40%, transparent); }
+.woocommerce-checkout #payment ul.payment_methods li:hover { border-color: color-mix(in oklab, var(--brand-red) 35%, transparent); }
 .woocommerce-checkout #payment ul.payment_methods li:has(input:checked) {
-  border-color: var(--brand-blue); box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-blue) 14%, transparent);
+  flex-basis: 100%; border-color: var(--brand-red); background: var(--brand-red-soft);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 12%, transparent);
 }
-.woocommerce-checkout #payment ul.payment_methods li label { font-weight: 700; color: var(--brand-navy); display: inline-flex; align-items: center; gap: 0.5rem; margin: 0; }
-.woocommerce-checkout #payment ul.payment_methods li img { max-height: 28px; width: auto; margin: 0 0.25rem; vertical-align: middle; }
-.woocommerce-checkout #payment div.payment_box { margin: 0.6rem 0 0; padding: 0.85rem 1rem; font-size: 0.9rem; }
+/* Hide the native radio — the whole card is the control. */
+.woocommerce-checkout #payment ul.payment_methods li > input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.woocommerce-checkout #payment ul.payment_methods li > label {
+  display: flex; flex-direction: column-reverse; align-items: center; justify-content: center;
+  gap: 0.4rem; margin: 0; cursor: pointer; text-align: center;
+  font-weight: 800; color: var(--brand-navy); font-size: 0.95rem; min-height: 2.6rem;
+}
+/* When expanded (selected) the header sits in a left-aligned row above the fields. */
+.woocommerce-checkout #payment ul.payment_methods li:has(input:checked) > label {
+  flex-direction: row; justify-content: flex-start; min-height: 0; margin-bottom: 0.35rem;
+}
+.woocommerce-checkout #payment ul.payment_methods li img { max-height: 26px; width: auto; margin: 0 0.15rem; vertical-align: middle; }
+.woocommerce-checkout #payment div.payment_box { margin: 0.5rem 0 0; padding: 0; font-size: 0.9rem; background: transparent; }
+.woocommerce-checkout #payment div.payment_box .form-row { margin-bottom: 0.85rem; }
 .woocommerce-checkout #payment .place-order { padding: 0.5rem 0 0; }
 .woocommerce-checkout #place_order { width: 100%; padding: 1rem 1.5rem; font-size: 1.1rem; font-weight: 800; border-radius: 0.95rem; }
 .woocommerce-checkout #payment .woocommerce-terms-and-conditions-wrapper { margin-bottom: 1rem; }
@@ -800,6 +845,19 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 
 /* 4-up product grid in the archive main column. */
 @media (min-width: 1024px) { .kindi-archive__main ul.products, .woocommerce .kindi-archive__main ul.products { grid-template-columns: repeat(4, 1fr); } }
+
+/* No-results state — the layout (and the sidebar filters) stays put. */
+.kindi-archive__empty {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 0.6rem; padding: 3rem 1.5rem; background: #fff;
+  border: 1px dashed color-mix(in oklab, var(--brand-navy) 20%, transparent);
+  border-radius: 1.5rem;
+}
+.kindi-archive__empty-ic { display: inline-flex; opacity: 0.85; }
+.kindi-archive__empty-ic .kindi-icon { width: 3rem; height: 3rem; }
+.kindi-archive__empty-title { margin: 0; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.5rem; }
+.kindi-archive__empty-text { margin: 0; color: var(--muted-foreground); font-weight: 600; max-width: 30rem; }
+.kindi-archive__empty .kindi-chip--reset { margin-top: 0.4rem; }
 
 /* Short description — hidden in grid, shown only in list view. */
 .kindi-pc__excerpt { display: none; }

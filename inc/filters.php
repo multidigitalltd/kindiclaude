@@ -400,6 +400,24 @@ function kindi_archive_sidebar(): void {
 	echo '</div></details>';
 
 	// "Clear filters" when any attribute/price filter is active.
+	$reset_url = kindi_archive_reset_url();
+	if ( '' !== $reset_url ) {
+		printf(
+			'<a class="kindi-chip kindi-chip--reset" href="%s">%s%s</a>',
+			esc_url( $reset_url ),
+			kindi_icon( 'close', 'kindi-icon--xs' ), // phpcs:ignore WordPress.Security.EscapeOutput
+			esc_html__( 'ביטול סינון', 'kindi' )
+		);
+	}
+}
+
+/**
+ * URL that clears all active attribute/price filters (plus pagination), or an
+ * empty string when no such filter is active.
+ *
+ * @return string
+ */
+function kindi_archive_reset_url(): string {
 	$remove = array();
 	foreach ( array_keys( $_GET ) as $gk ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( 0 === strpos( (string) $gk, 'filter_' ) ) {
@@ -412,17 +430,49 @@ function kindi_archive_sidebar(): void {
 	if ( isset( $_GET['max_price'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$remove[] = 'max_price';
 	}
-	if ( $remove ) {
-		$remove[]  = 'paged';
-		$reset_url = remove_query_arg( $remove );
-		printf(
-			'<a class="kindi-chip kindi-chip--reset" href="%s">%s%s</a>',
-			esc_url( $reset_url ),
-			kindi_icon( 'close', 'kindi-icon--xs' ), // phpcs:ignore WordPress.Security.EscapeOutput
-			esc_html__( 'ביטול סינון', 'kindi' )
-		);
+	if ( ! $remove ) {
+		return '';
 	}
+	$remove[] = 'paged';
+	return (string) remove_query_arg( $remove );
 }
+
+/**
+ * No-products state on our archives. WooCommerce normally fires neither
+ * `woocommerce_before_shop_loop` nor `woocommerce_after_shop_loop` when the loop
+ * is empty, so our two-column wrappers (and the sidebar) would vanish. Re-render
+ * the full layout here — filters stay in the sidebar — with a friendly message
+ * and a clear-filters action.
+ *
+ * @return void
+ */
+function kindi_archive_no_products(): void {
+	if ( ! kindi_is_product_archive() ) {
+		wc_get_template( 'loop/no-products-found.php' );
+		return;
+	}
+
+	echo '<div class="kindi-archive kindi-archive--empty">';
+	echo '<aside class="kindi-archive__side">';
+	kindi_archive_sidebar();
+	echo '</aside>';
+	echo '<div class="kindi-archive__main">';
+	kindi_archive_toolbar();
+
+	echo '<div class="kindi-archive__empty">';
+	echo '<span class="kindi-archive__empty-ic">' . kindi_icon( 'search', 'kindi-icon--xl' ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	echo '<h2 class="kindi-archive__empty-title">' . esc_html__( 'מצטערים, אין תוצאות', 'kindi' ) . '</h2>';
+	echo '<p class="kindi-archive__empty-text">' . esc_html__( 'לא נמצאו מוצרים שתואמים את הסינון שבחרתם. אפשר לבטל את הסינון ולנסות שוב.', 'kindi' ) . '</p>';
+	$reset = kindi_archive_reset_url();
+	if ( '' !== $reset ) {
+		echo '<a class="kindi-chip kindi-chip--reset" href="' . esc_url( $reset ) . '">' . kindi_icon( 'close', 'kindi-icon--xs' ) . esc_html__( 'ביטול סינון', 'kindi' ) . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	}
+	echo '</div>';
+
+	echo '</div></div>';
+}
+remove_action( 'woocommerce_no_products_found', 'wc_no_products_found', 10 );
+add_action( 'woocommerce_no_products_found', 'kindi_archive_no_products', 10 );
 
 /**
  * Classify a facet for rendering: 'color' (swatches), 'age' (pills) or 'list'.

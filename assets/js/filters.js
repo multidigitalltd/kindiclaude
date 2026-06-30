@@ -7,16 +7,14 @@
 ( function () {
 	'use strict';
 
-	// Regions replaced from the fetched document, in document order.
-	var SWAP = [
-		'.kindi-archive__toolbar',
-		'.kindi-archive__side',
-		'ul.products',
-		'.woocommerce-pagination',
-	];
+	// Swap the whole archive block as one unit. Doing it region-by-region drops
+	// the "no results" message when a filter yields zero products (the fetched
+	// page has no ul.products), so replace the entire .kindi-archive instead —
+	// toolbar, sidebar, grid (or empty state) and pagination all stay in sync.
+	var SWAP = [ '.kindi-archive' ];
 
 	var scope = document.querySelector( '.woocommerce' ) || document.getElementById( 'main' );
-	if ( ! scope || ! scope.querySelector( 'ul.products' ) ) {
+	if ( ! scope || ! scope.querySelector( '.kindi-archive' ) ) {
 		return;
 	}
 
@@ -61,6 +59,9 @@
 
 	var load = function ( url, push ) {
 		setBusy( true );
+		// Preserve the mobile filter drawer's open state across the swap.
+		var archNow = scope.querySelector( '.kindi-archive' );
+		var wasOpen = !! ( archNow && archNow.classList.contains( 'is-filters-open' ) );
 		fetch( url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' } )
 			.then( function ( r ) { return r.text(); } )
 			.then( function ( html ) {
@@ -76,6 +77,12 @@
 				} );
 				if ( push ) {
 					history.pushState( { kindiFilter: true }, '', url );
+				}
+				var archNew = scope.querySelector( '.kindi-archive' );
+				if ( archNew && wasOpen ) {
+					archNew.classList.add( 'is-filters-open' );
+				} else {
+					document.body.style.overflow = '';
 				}
 				setBusy( false );
 				applyView();
