@@ -336,9 +336,8 @@ function kindi_archive_sidebar(): void {
 		echo '<details class="kindi-side__group" open><summary>' . esc_html__( 'תתי קטגוריה', 'kindi' ) . '</summary><div class="kindi-side__cats">';
 		foreach ( $subcats as $c ) {
 			printf(
-				'<a class="kindi-side__cat" href="%s"><span class="kindi-side__cat-ic">%s</span><span class="kindi-side__cat-name">%s</span><span class="kindi-side__cat-count">(%d)</span></a>',
+				'<a class="kindi-side__cat" href="%s"><span class="kindi-side__cat-name">%s</span><span class="kindi-side__cat-count">(%d)</span></a>',
 				esc_url( (string) ( $c['url'] ?? '' ) ),
-				kindi_nav_icon( (string) ( $c['icon'] ?? 'grid' ) ), // phpcs:ignore WordPress.Security.EscapeOutput
 				esc_html( (string) ( $c['name'] ?? '' ) ),
 				(int) ( $c['count'] ?? 0 )
 			);

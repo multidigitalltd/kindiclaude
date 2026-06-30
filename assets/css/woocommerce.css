@@ -654,9 +654,10 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-pdp__sku { color: var(--muted-foreground); }
 
 /* Price box. */
-.kindi-pdp__pricebox { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin: 1.1rem 0; padding: 1.3rem 1.6rem;
+.kindi-pdp__pricebox { display: inline-flex; align-items: center; gap: 1rem; flex-wrap: wrap; width: fit-content; max-width: 100%; margin: 1.1rem 0; padding: 1.1rem 1.5rem;
   border-radius: 1.25rem; border: 1px solid color-mix(in oklab, var(--brand-red) 14%, transparent);
   background: linear-gradient(90deg, color-mix(in oklab, var(--brand-red) 9%, #fff), color-mix(in oklab, var(--brand-red) 3%, #fff)); }
+.kindi-pdp__save { margin-inline-start: 0 !important; }
 .kindi-pdp__price { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
 .kindi-pdp__price ins { order: -1; text-decoration: none; }
 .kindi-pdp__price ins .woocommerce-Price-amount,
@@ -692,11 +693,16 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-pdp-ship p { margin: 0 0 0.75rem; line-height: 1.7; }
 .kindi-pdp-ship strong { color: var(--brand-navy); }
 
-/* Buy-now button under add-to-cart (full width navy). */
-.kindi-buynow { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%;
-  margin-top: 0.75rem; background: var(--brand-navy); color: #fff; border-radius: 0.95rem;
-  padding: 0.95rem 1.5rem; font-weight: 800; font-size: 1.05rem; border: 0; cursor: pointer; transition: background 0.15s ease; }
+/* Buy-now button under add-to-cart — sized to the qty + add-to-cart row (see the
+   form.cart rule below), with breathing room above it. */
+.kindi-buynow { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-basis: 100%; width: 100%;
+  margin-top: 1.1rem; background: var(--brand-navy); color: #fff; border-radius: 0.95rem;
+  padding: 0.95rem 1.5rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 1.05rem; border: 0; cursor: pointer; transition: background 0.15s ease; }
 .kindi-buynow:hover { background: var(--brand-navy-dark); color: #fff; }
+/* Simple-product cart: shrink the form to the qty + add row so the full-width
+   buy-now below it matches that row's width (not the whole column). */
+.woocommerce div.product form.cart:not(.variations_form) { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; width: fit-content; max-width: 100%; }
+.woocommerce div.product form.cart:not(.variations_form) .quantity { margin: 0 !important; }
 
 /* Force the gallery + summary to fill their 50% grid cells — WooCommerce core
    sets both to 48% floats, which would shrink the image to a quarter of the page. */
@@ -721,7 +727,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-bundle__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.25rem; }
 .kindi-bundle__total { font-size: 1rem; color: var(--brand-navy); }
 .kindi-bundle__total strong { font-size: 1.35rem; font-weight: 900; color: var(--brand-red); }
-.kindi-bundle__add { background: var(--brand-navy); color: #fff; border: 0; border-radius: 0.95rem; padding: 0.85rem 1.6rem; font-weight: 800; font-size: 1rem; cursor: pointer; transition: background 0.15s ease, transform 0.15s ease; }
+.kindi-bundle__add { background: var(--brand-navy); color: #fff; border: 0; border-radius: 0.95rem; padding: 0.85rem 1.6rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 1rem; cursor: pointer; transition: background 0.15s ease, transform 0.15s ease; }
 .kindi-bundle__add:hover { background: var(--brand-navy-dark); transform: translateY(-1px); }
 .kindi-bundle__add.is-loading { opacity: 0.7; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .kindi-bundle__add:hover { transform: none; } }
@@ -763,7 +769,10 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 @media (min-width: 1024px) { .kindi-archive { grid-template-columns: 17rem minmax(0, 1fr); } }
 .kindi-archive__main { min-width: 0; }
 .kindi-archive__side { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.25rem; box-shadow: var(--shadow-card); }
-@media (min-width: 1024px) { .kindi-archive__side { position: sticky; top: calc(var(--kindi-header-h, 4rem) + 1rem); } }
+@media (min-width: 1024px) { .kindi-archive__side { position: sticky; top: calc(var(--kindi-header-h, 4rem) + 1rem); max-height: calc(100vh - var(--kindi-header-h, 4rem) - 2rem); overflow-y: auto; } }
+/* Active view-toggle icon → white (the icons use a fixed navy stroke). */
+.kindi-view__btn.is-active .kindi-icon,
+.kindi-view__btn.is-active .kindi-icon * { stroke: #fff !important; }
 .kindi-side__head { display: flex; align-items: center; gap: 0.5rem; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.1rem; padding-bottom: 0.75rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
 .kindi-side__group { border-bottom: 1px solid var(--border); padding: 0.6rem 0; }
 .kindi-side__group > summary { list-style: none; cursor: pointer; font-weight: 800; color: var(--brand-navy); padding: 0.3rem 0; display: flex; align-items: center; justify-content: space-between; }

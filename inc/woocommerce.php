@@ -31,8 +31,9 @@ function kindi_woocommerce_setup(): void {
 		)
 	);
 
-	// Native gallery interactions (Vanilla / core) — no extra libraries required.
-	add_theme_support( 'wc-product-gallery-zoom' );
+	// Native gallery interactions. Zoom is intentionally NOT enabled — the hover
+	// magnifier overlaid a transparent zoom over the original image, which looked
+	// poor; lightbox (click to enlarge) + slider stay.
 	add_theme_support( 'wc-product-gallery-lightbox' );
 	add_theme_support( 'wc-product-gallery-slider' );
 }

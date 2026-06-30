@@ -73,6 +73,14 @@
 				prev = now;
 			} ).observe( badge, { childList: true, characterData: true, subtree: true } );
 		}
+
+		// WooCommerce fires this (via jQuery) after an AJAX add-to-cart — open the
+		// drawer so the shopper sees the item landed in the cart.
+		if ( window.jQuery ) {
+			window.jQuery( document.body ).on( 'added_to_cart', function () {
+				openCart();
+			} );
+		}
 	}
 
 	/* ---------------- Wishlist (localStorage) ---------------- */
