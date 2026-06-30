@@ -439,11 +439,75 @@
 		body.append( 'nonce', cfg.qtyNonce || '' );
 		body.append( 'key', key );
 		body.append( 'qty', qty );
-		fetch( cfg.ajaxUrl, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() } )
+		return fetch( cfg.ajaxUrl, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() } )
 			.then( function ( r ) { return r.json(); } )
-			.then( function ( d ) { if ( d && d.success ) { applyFragments( d.data.fragments ); } } )
+			.then( function ( d ) { if ( d && d.success ) { applyFragments( d.data.fragments ); } return d; } )
 			.catch( function () {} );
 	}
+
+	/* Trigger WooCommerce to recalculate + re-render the checkout summary. */
+	function refreshCheckout() {
+		if ( window.jQuery ) { window.jQuery( document.body ).trigger( 'update_checkout' ); }
+	}
+
+	/* Checkout order-summary: quantity steppers + remove (delegated, survives the
+	   AJAX fragment refresh). After changing the cart, recalc the checkout. */
+	document.addEventListener( 'click', function ( e ) {
+		if ( ! e.target.closest( '.kindi-summary' ) ) { return; }
+		var stepBtn = e.target.closest( '.kindi-summary .kindi-mcqty__b' );
+		var rm = e.target.closest( '.kindi-summary__remove' );
+		if ( stepBtn ) {
+			var wrap = stepBtn.closest( '.kindi-mcqty' );
+			var numEl = wrap.querySelector( '.kindi-mcqty__n' );
+			var q = ( parseInt( numEl.textContent, 10 ) || 1 ) + parseInt( stepBtn.getAttribute( 'data-d' ), 10 );
+			if ( q < 0 ) { q = 0; }
+			numEl.textContent = q;
+			postQty( wrap.getAttribute( 'data-key' ), q ).then( refreshCheckout );
+		} else if ( rm ) {
+			postQty( rm.getAttribute( 'data-key' ), 0 ).then( refreshCheckout );
+		}
+	} );
+
+	/* Checkout summary coupon box: apply / remove via WooCommerce's wc-ajax. */
+	function couponAjax( endpoint, params ) {
+		var url = ( cfg.wcAjaxUrl || '/?wc-ajax=%%endpoint%%' ).replace( '%%endpoint%%', endpoint );
+		var body = new URLSearchParams();
+		Object.keys( params ).forEach( function ( k ) { body.append( k, params[ k ] ); } );
+		fetch( url, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() } )
+			.then( function ( r ) { return r.text(); } )
+			.then( refreshCheckout )
+			.catch( function () {} );
+	}
+	document.addEventListener( 'click', function ( e ) {
+		var apply = e.target.closest( '[data-kindi-coupon-apply]' );
+		var rmc = e.target.closest( '[data-kindi-coupon-remove]' );
+		if ( apply ) {
+			var cbox = apply.closest( '[data-kindi-coupon]' );
+			var input = cbox && cbox.querySelector( '[data-kindi-coupon-input]' );
+			var code = input ? input.value.trim() : '';
+			if ( code ) { couponAjax( 'apply_coupon', { coupon_code: code, security: cfg.couponApplyNonce || '' } ); }
+		} else if ( rmc ) {
+			couponAjax( 'remove_coupon', { coupon: rmc.getAttribute( 'data-kindi-coupon-remove' ), security: cfg.couponRemoveNonce || '' } );
+		}
+	} );
+	// Apply the coupon on Enter inside the code field.
+	document.addEventListener( 'keydown', function ( e ) {
+		if ( 'Enter' !== e.key ) { return; }
+		var input = e.target.closest( '[data-kindi-coupon-input]' );
+		if ( ! input ) { return; }
+		e.preventDefault();
+		var cbox = input.closest( '[data-kindi-coupon]' );
+		var btn = cbox && cbox.querySelector( '[data-kindi-coupon-apply]' );
+		if ( btn ) { btn.click(); }
+	} );
+
+	/* Club banner collapse toggle (checkout). */
+	document.addEventListener( 'click', function ( e ) {
+		var t = e.target.closest( '[data-kindi-club-toggle]' );
+		if ( ! t ) { return; }
+		var club = t.closest( '[data-kindi-club]' );
+		if ( club ) { club.classList.toggle( 'is-collapsed' ); }
+	} );
 
 	function wireMiniCartQty() {
 		document.querySelectorAll( '.kindi-cartdrawer .woocommerce-mini-cart-item' ).forEach( function ( item ) {
@@ -453,7 +517,12 @@
 			if ( ! remove || ! qEl ) { return; }
 			item.dataset.kqty = '1';
 			var key = remove.getAttribute( 'data-cart_item_key' );
-			var cur = parseInt( ( qEl.textContent || '' ).replace( /[^\d]/g, '' ), 10 ) || 1;
+			// The quantity span reads "{qty} × {price}" — the qty is the leading
+			// text node, so parse that (NOT every digit, which would fold the price
+			// into the number and show e.g. 1990 instead of 1).
+			var qtyNode = qEl.firstChild;
+			var qtyText = qtyNode && 3 === qtyNode.nodeType ? qtyNode.nodeValue : qEl.textContent;
+			var cur = parseInt( qtyText, 10 ) || 1;
 			var amount = qEl.querySelector( '.woocommerce-Price-amount, .amount' );
 
 			var line = document.createElement( 'div' );

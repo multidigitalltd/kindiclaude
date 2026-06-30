@@ -357,10 +357,135 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-step.is-done { color: var(--brand-navy); }
 .kindi-step.is-done .kindi-step__n { background: #22c55e; color: #fff; }
 
-/* ---------- Club banner ---------- */
-.kindi-checkout-club { display: flex; align-items: center; gap: 1rem; background: linear-gradient(to left, var(--brand-red), var(--brand-red-dark)); color: #fff; border-radius: 1rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-.kindi-checkout-club strong { font-weight: 900; }
-.kindi-checkout-club__btn { margin-inline-start: auto; background: #fff; color: var(--brand-red); font-weight: 800; padding: 0.5rem 1.25rem; border-radius: 0.75rem; text-decoration: none; white-space: nowrap; }
+/* ---------- Club banner (above the steps) ---------- */
+.kindi-club {
+  display: flex; align-items: center; gap: 1rem;
+  background: linear-gradient(to left, var(--brand-red-dark), var(--brand-red));
+  color: #fff; border-radius: 1rem; padding: 1rem 1.25rem; margin-bottom: 1rem;
+}
+.kindi-club__ic { flex: 0 0 auto; width: 2.75rem; height: 2.75rem; display: grid; place-items: center; background: rgba(255, 255, 255, 0.18); border-radius: 999px; }
+.kindi-club__ic .kindi-icon { width: 1.6rem; height: 1.6rem; }
+.kindi-club__text { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.kindi-club__text strong { font-weight: 900; font-size: 1.02rem; line-height: 1.3; }
+.kindi-club__text span { font-size: 0.85rem; opacity: 0.92; line-height: 1.35; }
+.kindi-club__btn { margin-inline-start: auto; flex: 0 0 auto; background: #fff; color: var(--brand-red); font-weight: 800; padding: 0.55rem 1.3rem; border-radius: 0.75rem; text-decoration: none; white-space: nowrap; transition: transform 0.12s ease; }
+.kindi-club__btn:hover { transform: translateY(-1px); }
+.kindi-club__toggle { flex: 0 0 auto; width: 2.1rem; height: 2.1rem; display: grid; place-items: center; background: rgba(255, 255, 255, 0.15); border: 0; border-radius: 999px; color: #fff; cursor: pointer; transition: background 0.12s ease, transform 0.2s ease; }
+.kindi-club__toggle:hover { background: rgba(255, 255, 255, 0.28); }
+.kindi-club.is-collapsed .kindi-club__text span { display: none; }
+.kindi-club.is-collapsed .kindi-club__toggle { transform: rotate(180deg); }
+@media (max-width: 600px) {
+  .kindi-club { flex-wrap: wrap; gap: 0.6rem 0.85rem; padding: 0.85rem 1rem; }
+  .kindi-club__text { flex: 1 1 60%; }
+  .kindi-club__btn { margin-inline-start: 0; order: 3; flex: 1 1 100%; text-align: center; }
+}
+
+/* ====================================================================== */
+/* Checkout — numbered section cards (1 contact · 2 address · 3 shipping ·  */
+/* 4 payment) shared frame.                                                 */
+/* ====================================================================== */
+.kindi-cobox { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; box-shadow: var(--shadow-card); margin-bottom: 1.25rem; overflow: hidden; }
+.kindi-cobox__head { display: flex; align-items: center; gap: 0.75rem; flex-direction: row-reverse; padding: 1.1rem 1.4rem; border-bottom: 1px solid var(--border); }
+.kindi-cobox__n { flex: 0 0 auto; width: 2.1rem; height: 2.1rem; display: grid; place-items: center; border-radius: 999px; background: var(--brand-navy); color: #fff; font-weight: 800; font-size: 0.95rem; }
+.kindi-cobox__heading { flex: 1; text-align: right; }
+.kindi-cobox__title { margin: 0; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.2rem; }
+.kindi-cobox__sub { margin: 0.1rem 0 0; color: var(--muted-foreground); font-size: 0.85rem; font-weight: 600; }
+.kindi-cobox__body { padding: 1.4rem; }
+
+/* Two-up field grid inside the contact/address cards. */
+.kindi-cobox__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.25rem; }
+.kindi-cobox__grid .form-row { width: auto; float: none; margin: 0; padding: 0; }
+.kindi-cobox__grid .form-row-wide,
+.kindi-cobox__grid .kindi-optin,
+.kindi-cobox__grid .kindi-billsame,
+.kindi-cobox__grid #order_comments_field { grid-column: 1 / -1; }
+@media (max-width: 600px) { .kindi-cobox__grid { grid-template-columns: 1fr; } }
+
+/* In-field icons (positioned at the trailing/left edge in RTL). */
+.kindi-cobox__grid #billing_email_field input,
+.kindi-cobox__grid #billing_phone_field input,
+.kindi-cobox__grid #billing_first_name_field input,
+.kindi-cobox__grid #billing_address_1_field input { padding-left: 2.6rem; background-repeat: no-repeat; background-position: left 0.9rem center; background-size: 1.15rem 1.15rem; }
+.kindi-cobox__grid #billing_email_field input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='m3 7 9 6 9-6'/%3E%3C/svg%3E"); }
+.kindi-cobox__grid #billing_phone_field input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z'/%3E%3C/svg%3E"); }
+.kindi-cobox__grid #billing_first_name_field input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1'/%3E%3C/svg%3E"); }
+.kindi-cobox__grid #billing_address_1_field input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E"); }
+
+/* Marketing opt-in + billing-same checkboxes. */
+.kindi-optin, .kindi-billsame { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 0.75rem; }
+.kindi-optin label, .kindi-billsame label { display: inline-flex; align-items: center; gap: 0.5rem; margin: 0; font-weight: 700; color: var(--brand-navy); cursor: pointer; }
+.kindi-optin input[type="checkbox"], .kindi-billsame input[type="checkbox"] { width: 1.2rem; height: 1.2rem; accent-color: var(--brand-red); margin: 0; }
+.kindi-optin__gift { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--brand-red); font-weight: 800; font-size: 0.85rem; }
+.kindi-billsame { color: var(--brand-navy); }
+
+/* ---------- Box 3: shipping-method cards ---------- */
+.kindi-ship { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; }
+.kindi-ship__item { position: relative; margin: 0; }
+.kindi-ship__item > input { position: absolute; inset-inline-start: 1rem; top: 50%; transform: translateY(-50%); width: 1.2rem; height: 1.2rem; accent-color: var(--brand-red); margin: 0; }
+.kindi-ship__item > label {
+  display: flex; align-items: center; gap: 0.85rem; margin: 0; cursor: pointer;
+  padding: 0.9rem 1rem 0.9rem 2.6rem; border: 2px solid var(--border); border-radius: 1rem;
+  background: #fff; transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.kindi-ship__item:hover > label { border-color: color-mix(in oklab, var(--brand-red) 35%, transparent); }
+.kindi-ship__item > input:checked + label {
+  border-color: var(--brand-red); background: var(--brand-red-soft);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 12%, transparent);
+}
+.kindi-ship__item > input:focus-visible + label { outline: 2px solid var(--brand-blue); outline-offset: 2px; }
+.kindi-ship__ic { flex: 0 0 auto; width: 2.5rem; height: 2.5rem; display: grid; place-items: center; background: var(--brand-blue-soft); border-radius: 0.75rem; }
+.kindi-ship__ic .kindi-icon { width: 1.4rem; height: 1.4rem; }
+.kindi-ship__main { flex: 1; min-width: 0; }
+.kindi-ship__title { display: block; font-weight: 800; color: var(--brand-navy); line-height: 1.3; }
+.kindi-ship__price { flex: 0 0 auto; font-weight: 800; color: var(--brand-navy); white-space: nowrap; }
+.kindi-ship__free { color: #16a34a; }
+.kindi-ship__none { margin: 0; color: var(--muted-foreground); font-weight: 600; }
+
+/* Payment card wrapper resets — the #payment cards already styled below. */
+.kindi-cobox--payment .kindi-cobox__body #payment { background: transparent; }
+
+/* ====================================================================== */
+/* Box (summary) — interactive order summary in the 1/3 column.            */
+/* ====================================================================== */
+.kindi-summary { display: block; width: 100%; border: 0; background: none; }
+.kindi-summary__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+.kindi-summary__headtext { display: flex; flex-direction: column; }
+.kindi-summary__headtext strong { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.25rem; }
+.kindi-summary__headtext span { color: var(--muted-foreground); font-size: 0.85rem; font-weight: 600; }
+.kindi-summary__edit { color: var(--brand-red); font-weight: 800; font-size: 0.85rem; text-decoration: none; white-space: nowrap; }
+.kindi-summary__edit:hover { text-decoration: underline; }
+.kindi-summary__free { display: flex; align-items: center; gap: 0.5rem; margin: 0.9rem 0; padding: 0.7rem 0.9rem; background: color-mix(in oklab, #16a34a 10%, #fff); border: 1px solid color-mix(in oklab, #16a34a 30%, transparent); border-radius: 0.85rem; color: #15803d; font-weight: 800; font-size: 0.9rem; }
+.kindi-summary__free .kindi-icon { color: #16a34a; flex: 0 0 auto; }
+
+.kindi-summary__items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.kindi-summary__item { display: grid; grid-template-columns: 3.25rem 1fr auto; gap: 0.75rem; align-items: start; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+.kindi-summary__img img { width: 3.25rem; height: 3.25rem; object-fit: contain; border-radius: 0.6rem; background: var(--brand-cream, #FBF6EC); }
+.kindi-summary__info { min-width: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.kindi-summary__title { font-weight: 800; color: var(--brand-navy); line-height: 1.3; text-decoration: none; font-size: 0.95rem; }
+.kindi-summary__title:hover { color: var(--brand-red); }
+.kindi-summary__meta { color: var(--muted-foreground); font-size: 0.8rem; font-weight: 600; }
+.kindi-summary__controls { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.15rem; }
+.kindi-summary__remove { width: 1.8rem; height: 1.8rem; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid var(--border); background: #fff; border-radius: 999px; color: var(--muted-foreground); font-size: 1.1rem; line-height: 1; cursor: pointer; transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease; }
+.kindi-summary__remove:hover { background: var(--brand-red); color: #fff; border-color: var(--brand-red); }
+.kindi-summary__side { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; text-align: left; }
+.kindi-summary__price { font-weight: 800; color: var(--brand-red); white-space: nowrap; font-size: 0.95rem; }
+.kindi-summary__price del { display: block; color: var(--muted-foreground); font-weight: 600; font-size: 0.8rem; opacity: 0.8; }
+.kindi-summary__price ins { text-decoration: none; }
+
+/* Coupon box. */
+.kindi-coupon { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; padding: 0.35rem 0.35rem 0.35rem 0.75rem; border: 1.5px solid var(--border); border-radius: 0.85rem; background: #fff; }
+.kindi-coupon__ic { flex: 0 0 auto; display: inline-flex; }
+.kindi-coupon__input { flex: 1; min-width: 0; border: 0; background: none; font-size: 0.95rem; color: var(--brand-navy); padding: 0.5rem 0.25rem; }
+.kindi-coupon__input:focus { outline: none; }
+.kindi-coupon__btn { flex: 0 0 auto; background: var(--brand-navy); color: #fff; border: 0; border-radius: 0.65rem; padding: 0.55rem 1.2rem; font-weight: 800; cursor: pointer; transition: background 0.12s ease; }
+.kindi-coupon__btn:hover { background: var(--brand-navy-dark, #16224a); }
+.kindi-coupon__remove { border: 0; background: none; color: var(--brand-red); font-size: 1rem; line-height: 1; cursor: pointer; padding: 0 0.25rem; }
+
+.kindi-summary__totals { margin-top: 0.5rem; padding-top: 0.5rem; }
+.kindi-summary__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; color: var(--brand-navy); font-weight: 600; }
+.kindi-summary__row--coupon { color: var(--brand-red); font-weight: 700; }
+.kindi-summary__row--total { margin-top: 0.35rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.2rem; }
+.kindi-summary__row--total .woocommerce-Price-amount { color: var(--brand-red); }
 
 /* ---------- Checkout layout — process (2/3) + sticky summary (1/3) ---------- */
 .woocommerce-checkout form.checkout.woocommerce-checkout { display: block; max-width: 1180px; margin-inline: auto; }
@@ -384,8 +509,9 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   }
   .kindi-co__side { position: sticky; top: calc(var(--kindi-header-h, 7rem) + 1rem); }
 }
-/* Each section as a soft white card. */
-.woocommerce-checkout .woocommerce-billing-fields,
+/* Billing fields now hold the numbered .kindi-cobox cards, so the wrapper itself
+   is transparent. The shipping/order-notes wrappers stay as soft white cards. */
+.woocommerce-checkout .woocommerce-billing-fields { background: none; border: 0; padding: 0; box-shadow: none; margin: 0; }
 .woocommerce-checkout .woocommerce-shipping-fields,
 .woocommerce-checkout .woocommerce-additional-fields {
   background: #fff; border: 1px solid var(--border); border-radius: 1.25rem;
@@ -394,7 +520,8 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .woocommerce-checkout .woocommerce-billing-fields h3,
 .woocommerce-checkout .woocommerce-shipping-fields h3,
 .woocommerce-checkout #order_review_heading { font-size: 1.35rem; margin: 0 0 1rem; }
-.woocommerce-checkout #order_review_heading { margin-top: 0; }
+/* The custom summary card has its own heading, so hide WooCommerce's. */
+.woocommerce-checkout #order_review_heading { display: none; }
 .woocommerce-checkout .form-row { margin-bottom: 1rem; }
 .woocommerce-checkout form.checkout #order_review { position: static; width: 100%; }
 .woocommerce-checkout h3, .woocommerce-checkout #order_review_heading { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); }
@@ -961,7 +1088,10 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-pdp__more { display: inline-flex; clear: both; }
 .kindi-pdp__excerpt + .kindi-pdp__more { margin-top: 0.5rem; }
 
-/* Mini-cart: tidy price + per-item quantity stepper. */
+/* Mini-cart: tidy price + per-item quantity stepper. The native "qty × price"
+   line is replaced by the stepper + single price below, so hide it outright
+   (belt-and-braces, regardless of the JS inline hide). */
+.kindi-cartdrawer .woocommerce-mini-cart-item .quantity { display: none !important; }
 .kindi-cartdrawer .woocommerce-mini-cart-item { flex-wrap: wrap; }
 .kindi-mcline { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; width: 100%; margin-top: 0.4rem; }
 .kindi-mcprice { font-weight: 800; color: var(--brand-red); white-space: nowrap; }
