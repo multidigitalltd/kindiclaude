@@ -570,6 +570,10 @@ function kindi_gifta_coupon_notice(): void {
 /**
  * Append the trust content to the cart/checkout page body.
  *
+ * Cart: reviews band (top 3 Google reviews, compact format).
+ * Checkout: "why choose us" band only — the full testimonials section is
+ * rendered via woocommerce_after_checkout_form (kindi_checkout_reviews).
+ *
  * @param string $content Post content.
  * @return string
  */
@@ -582,11 +586,102 @@ function kindi_cart_checkout_trust( string $content ): string {
 	}
 	if ( function_exists( 'is_checkout' ) && is_checkout()
 		&& ! ( function_exists( 'is_order_received_page' ) && is_order_received_page() ) ) {
-		return $content . kindi_reviews_band() . kindi_why_choose_band();
+		return $content . kindi_why_choose_band();
 	}
 	return $content;
 }
 add_filter( 'the_content', 'kindi_cart_checkout_trust', 20 );
+
+/**
+ * Full testimonials section after the checkout form — identical markup and
+ * fallback data to patterns/testimonials.php so the design matches the homepage.
+ * Hooked to woocommerce_after_checkout_form, which fires reliably on both
+ * classic and FSE themes (unlike the_content which needs in_the_loop()).
+ *
+ * @return void
+ */
+function kindi_checkout_reviews(): void {
+	if ( function_exists( 'is_order_received_page' ) && is_order_received_page() ) {
+		return;
+	}
+
+	$data       = function_exists( 'kindi_google_reviews' ) ? kindi_google_reviews() : array();
+	$has_google = ! empty( $data['reviews'] );
+	$reviews    = $has_google ? $data['reviews'] : array(
+		array(
+			'text'   => 'חנות מדהימה! קניתי לבן שלי ילקוט ומחברות לכיתה א\' — השירות מקסים, המחירים נהדרים והמשלוח הגיע למחרת. ממליצה לכולם!',
+			'name'   => 'שרה כהן',
+			'role'   => 'אמא לארבעה • בני ברק',
+			'letter' => 'ש',
+		),
+		array(
+			'text'   => 'אני גננת שמזמינה מקינדר טויס כבר 5 שנים. המבחר של חומרי היצירה מצוין, המחירים הוגנים והם תמיד מוכנים להמליץ. מקצועיים אמיתיים.',
+			'name'   => 'מירי פרץ',
+			'role'   => 'גננת • ירושלים',
+			'letter' => 'מ',
+		),
+		array(
+			'text'   => 'אתר נוח להזמנה, מבחר ענק של משחקי קופסה ובובות. הילדים שלי מתים על המשחקים שקניתי לחנוכה. גם השירות הטלפוני מעולה!',
+			'name'   => 'יוסי לוי',
+			'role'   => 'אבא מאושר • פתח תקווה',
+			'letter' => 'י',
+		),
+	);
+
+	$grev_link = $has_google && ! empty( $data['link'] ) ? (string) $data['link'] : '';
+	$grev_tag  = $grev_link ? 'a' : 'div';
+
+	ob_start();
+	?>
+	<section class="kindi-section" aria-label="<?php esc_attr_e( 'ביקורות לקוחות', 'kindi' ); ?>">
+		<div class="kindi-sechead">
+			<div class="kindi-sechead__text">
+				<span class="kindi-eyebrow"><?php echo $has_google ? '★ Google' : esc_html__( 'לקוחות מספרים', 'kindi' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<h2 class="kindi-sec-title"><?php esc_html_e( 'למה ', 'kindi' ); ?><span class="kindi-hl"><?php esc_html_e( 'בוחרים בקינדי', 'kindi' ); ?></span>?</h2>
+			</div>
+			<?php if ( $has_google ) : ?>
+			<<?php echo $grev_tag; // phpcs:ignore WordPress.Security.EscapeOutput ?> class="kindi-grev__score<?php echo $grev_link ? ' kindi-grev__score--link' : ''; ?>"<?php echo $grev_link ? ' href="' . esc_url( $grev_link ) . '" target="_blank" rel="noopener" title="' . esc_attr__( 'לצפייה בכל הביקורות בגוגל', 'kindi' ) . '"' : ''; ?>>
+				<strong><?php echo esc_html( number_format( (float) $data['rating'], 1 ) ); ?></strong>
+				<span class="kindi-grev__stars"><?php for ( $s = 0; $s < 5; $s++ ) { echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput } ?></span>
+				<span class="kindi-grev__count"><?php echo esc_html( number_format_i18n( (int) ( $data['total'] ?? count( $reviews ) ) ) ); ?>+ <?php esc_html_e( 'ביקורות בגוגל', 'kindi' ); ?></span>
+			</<?php echo $grev_tag; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+			<?php endif; ?>
+		</div>
+		<div class="kindi-tst">
+			<?php foreach ( $reviews as $idx => $t ) : ?>
+			<article class="kindi-tst__card<?php echo $idx >= 3 ? ' is-hidden' : ''; ?>">
+				<span class="kindi-tst__quote" aria-hidden="true">"</span>
+				<div class="kindi-tst__stars">
+					<?php for ( $s = 0; $s < 5; $s++ ) { echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput } ?>
+				</div>
+				<p class="kindi-tst__text"><?php echo esc_html( $t['text'] ); ?></p>
+				<div class="kindi-tst__foot">
+					<?php if ( ! empty( $t['photo'] ) ) : ?>
+					<img class="kindi-tst__avatar kindi-tst__avatar--img" src="<?php echo esc_url( $t['photo'] ); ?>" alt="" loading="lazy" decoding="async" width="44" height="44" referrerpolicy="no-referrer">
+					<?php else : ?>
+					<span class="kindi-tst__avatar"><?php echo esc_html( $t['letter'] ?? '★' ); ?></span>
+					<?php endif; ?>
+					<span>
+						<span class="kindi-tst__name"><?php echo esc_html( $t['name'] ); ?></span><br>
+						<span class="kindi-tst__role"><?php echo esc_html( $t['role'] ?? 'ביקורת מאומתת מ-Google' ); ?></span>
+					</span>
+				</div>
+			</article>
+			<?php endforeach; ?>
+		</div>
+		<?php if ( count( $reviews ) > 3 ) : ?>
+		<div class="kindi-tst-more">
+			<button type="button" class="kindi-btn kindi-btn--ghost" data-kindi-more-reviews>
+				<?php echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+				<?php esc_html_e( 'טען עוד ביקורות', 'kindi' ); ?>
+			</button>
+		</div>
+		<?php endif; ?>
+	</section>
+	<?php
+	echo (string) ob_get_clean(); // phpcs:ignore WordPress.Security.EscapeOutput -- built with escaping.
+}
+add_action( 'woocommerce_after_checkout_form', 'kindi_checkout_reviews', 10 );
 
 /**
  * The homepage Google reviews as a compact band (top 3), reusing the
