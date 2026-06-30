@@ -694,11 +694,15 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
 .kindi-summary .simply-offerbox,
 .kindi-summary .simply_offerbox { margin: 1rem 0 0; }
 .kindi-summary .kindi-gifta-note { margin: 0.85rem 0 0; }
-/* Gift-card redemption (YITH / Simply) stays visible and is relocated next to
-   the coupon box in the summary by store.js (.kindi-giftcard-relocated). */
-.kindi-co__side .kindi-giftcard-relocated,
-.kindi-co__side .ywgc_have_code,
-.kindi-co__side .ywgc_enter_code { max-width: none; width: 100%; margin: 1rem 0 0; }
+/* Gift-card redemption (Gifta + YITH) relocated below the summary by store.js,
+   two columns side by side (each on half width, stacking on mobile). */
+.kindi-giftcards { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1rem 0 0; align-items: stretch; }
+.kindi-giftcards__col { flex: 1 1 calc(50% - 0.4rem); min-width: 0; background: #fff; border: 1px solid var(--border); border-radius: 0.875rem; padding: 0.85rem 0.95rem; }
+.kindi-giftcards__col > * { max-width: none; }
+.kindi-giftcards__col input[type="text"],
+.kindi-giftcards__col input:not([type="checkbox"]):not([type="radio"]) { width: 100%; box-sizing: border-box; }
+.kindi-giftcards .kindi-gifta-note { margin: 0.6rem 0 0; font-size: 0.82rem; }
+@media (max-width: 600px) { .kindi-giftcards__col { flex-basis: 100%; } }
 
 /* Gifta + coupon notice before the payment methods. */
 .woocommerce-checkout .kindi-gifta-note {
