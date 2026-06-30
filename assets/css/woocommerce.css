@@ -361,7 +361,10 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-club {
   display: flex; align-items: center; gap: 1rem;
   background: linear-gradient(to left, var(--brand-red-dark), var(--brand-red));
-  color: #fff; border-radius: 1rem; padding: 1rem 1.25rem; margin-bottom: 1rem;
+  color: #fff; border-radius: 0; margin: 0 0 1.25rem;
+  /* Full-bleed across the viewport, content aligned to the ~1180px container. */
+  width: 100vw; margin-inline: calc(50% - 50vw);
+  padding: 1rem max(1.25rem, calc(50vw - 590px));
 }
 .kindi-club__ic { flex: 0 0 auto; width: 2.75rem; height: 2.75rem; display: grid; place-items: center; background: rgba(255, 255, 255, 0.18); border-radius: 999px; }
 .kindi-club__ic .kindi-icon { width: 1.6rem; height: 1.6rem; }
@@ -400,6 +403,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-cobox__grid .kindi-billsame,
 .kindi-cobox__grid #order_comments_field { grid-column: 1 / -1; }
 @media (max-width: 600px) { .kindi-cobox__grid { grid-template-columns: 1fr; } }
+.kindi-hidden-field { display: none !important; }
 
 /* In-field icons (positioned at the trailing/left edge in RTL). */
 .kindi-cobox__grid #billing_email_field input,
@@ -493,7 +497,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-coupon__ic { flex: 0 0 auto; display: inline-flex; }
 .kindi-coupon__input { flex: 1; min-width: 0; border: 0; background: none; font-size: 0.95rem; color: var(--brand-navy); padding: 0.5rem 0.25rem; }
 .kindi-coupon__input:focus { outline: none; }
-.kindi-coupon__btn { flex: 0 0 auto; background: var(--brand-navy); color: #fff; border: 0; border-radius: 0.65rem; padding: 0.55rem 1.2rem; font-weight: 800; cursor: pointer; transition: background 0.12s ease; }
+.kindi-coupon__btn { flex: 0 0 auto; background: var(--brand-navy); color: #fff; border: 0; border-radius: 0.65rem; padding: 0.55rem 1.2rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; cursor: pointer; transition: background 0.12s ease; }
 .kindi-coupon__btn:hover { background: var(--brand-navy-dark, #16224a); }
 .kindi-coupon__remove { border: 0; background: none; color: var(--brand-red); font-size: 1rem; line-height: 1; cursor: pointer; padding: 0 0.25rem; }
 
@@ -502,6 +506,49 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-summary__row--coupon { color: var(--brand-red); font-weight: 700; }
 .kindi-summary__row--total { margin-top: 0.35rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.2rem; }
 .kindi-summary__row--total .woocommerce-Price-amount { color: var(--brand-red); }
+
+/* Grand total + place-order button + terms, at the foot of the summary. */
+.kindi-summary__place { margin-top: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.kindi-summary__grand { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.9rem; }
+.kindi-summary__grand-label { display: flex; flex-direction: column; font-weight: 700; color: var(--muted-foreground); font-size: 0.9rem; }
+.kindi-summary__grand-label small { font-size: 0.75rem; font-weight: 600; }
+.kindi-summary__grand-amount { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.7rem; color: var(--brand-navy); white-space: nowrap; }
+.kindi-summary__grand-amount .woocommerce-Price-amount { color: var(--brand-navy); }
+.kindi-summary__place .button.kindi-placeorder,
+.kindi-summary__place #place_order {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: var(--brand-red); color: #fff; border: 0; border-radius: 0.95rem;
+  padding: 1.05rem 1.5rem; font-family: var(--wp--preset--font-family--sans); font-size: 1.12rem; font-weight: 800; cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.kindi-summary__place .button.kindi-placeorder::after,
+.kindi-summary__place #place_order::after { content: "←"; font-size: 1.05em; line-height: 1; }
+.kindi-summary__place .button.kindi-placeorder:hover,
+.kindi-summary__place #place_order:hover { background: var(--brand-red-dark); transform: translateY(-1px); }
+.kindi-summary__place .woocommerce-terms-and-conditions-wrapper,
+.kindi-summary__place .woocommerce-privacy-policy-text { margin-top: 0.85rem; }
+.kindi-summary__place .woocommerce-privacy-policy-text p,
+.kindi-summary__place .woocommerce-terms-and-conditions-wrapper p { font-size: 0.8rem; color: var(--muted-foreground); text-align: center; margin: 0; line-height: 1.5; }
+.kindi-summary__place a { color: var(--brand-red); }
+
+/* Trust badges + WhatsApp help box, below the summary in the side column. */
+.kindi-coextras { margin-top: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+.kindi-trustrow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; box-shadow: var(--shadow-card); padding: 1rem 0.5rem; }
+.kindi-trustrow__item { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; text-align: center; font-weight: 700; color: var(--brand-navy); font-size: 0.78rem; line-height: 1.3; }
+.kindi-trustrow__ic .kindi-icon { width: 1.5rem; height: 1.5rem; }
+.kindi-helpbox { display: flex; align-items: center; gap: 0.85rem; background: color-mix(in oklab, #16a34a 8%, #fff); border: 1px solid color-mix(in oklab, #16a34a 30%, transparent); border-radius: 1.25rem; padding: 1rem 1.1rem; text-decoration: none; transition: background 0.15s ease; }
+.kindi-helpbox:hover { background: color-mix(in oklab, #16a34a 14%, #fff); }
+.kindi-helpbox__text { display: flex; flex-direction: column; gap: 0.1rem; }
+.kindi-helpbox__text strong { color: #15803d; font-weight: 900; font-size: 1.05rem; }
+.kindi-helpbox__text span { color: #15803d; font-size: 0.85rem; opacity: 0.9; }
+.kindi-helpbox__wa { margin-inline-start: auto; flex: 0 0 auto; width: 2.75rem; height: 2.75rem; display: grid; place-items: center; background: #25D366; border-radius: 999px; }
+.kindi-helpbox__wa .kindi-icon { width: 1.5rem; height: 1.5rem; }
+
+/* Remove the Simply gift-card plugin's stray top bar (the box lives in the
+   summary now); keep the relocated offerbox inside .kindi-summary. */
+.woocommerce-checkout > .simply-offerbox, .woocommerce-checkout > .simply_offerbox,
+form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
+.simply-top-bar, .simply_top_bar, .simply-offerbox-bar { display: none !important; }
 
 /* ---------- Checkout layout — process (2/3) + sticky summary (1/3) ---------- */
 .woocommerce-checkout form.checkout.woocommerce-checkout { display: block; max-width: 1180px; margin-inline: auto; }
@@ -611,8 +658,13 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 }
 /* Gift-card redemption box (Simply offerbox), moved up to sit with the coupon
    and Gifta fields — match the same info-card look. */
+/* Gifta gift-card box + its notice now live in the summary column, below the
+   coupon — full width of that column. */
 .woocommerce-checkout .simply-offerbox,
-.woocommerce-checkout .simply_offerbox { max-width: 760px; margin: 0 auto 1rem; }
+.woocommerce-checkout .simply_offerbox { max-width: none; width: 100%; margin: 0 0 1rem; }
+.kindi-summary .simply-offerbox,
+.kindi-summary .simply_offerbox { margin: 1rem 0 0; }
+.kindi-summary .kindi-gifta-note { margin: 0.85rem 0 0; }
 
 /* Gifta + coupon notice before the payment methods. */
 .woocommerce-checkout .kindi-gifta-note {

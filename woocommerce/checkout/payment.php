@@ -57,21 +57,8 @@ if ( ! wp_doing_ajax() ) {
 		</div>
 		<?php endif; ?>
 	<?php endif; ?>
-
-	<div class="form-row place-order">
-		<noscript>
-			<?php esc_html_e( 'מאחר שהדפדפן אינו תומך ב-JavaScript או שהיא מושבתת, יש ללחוץ על "עדכון סכומים" לפני ביצוע ההזמנה.', 'kindi' ); ?>
-			<br/><button type="submit" class="button alt" name="woocommerce_checkout_update_totals" value="<?php esc_attr_e( 'עדכון סכומים', 'kindi' ); ?>"><?php esc_html_e( 'עדכון סכומים', 'kindi' ); ?></button>
-		</noscript>
-
-		<?php wc_get_template( 'checkout/terms.php' ); ?>
-
-		<?php do_action( 'woocommerce_review_order_before_submit' ); ?>
-
-		<?php echo apply_filters( 'woocommerce_order_button_html', '<button type="submit" class="button alt" name="woocommerce_checkout_place_order" id="place_order" value="' . esc_attr( $order_button_text ) . '" data-value="' . esc_attr( $order_button_text ) . '">' . esc_html( $order_button_text ) . '</button>' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-
-		<?php do_action( 'woocommerce_review_order_after_submit' ); ?>
-
-		<?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
-	</div>
+	<?php
+	// The place-order button + terms + nonce are rendered in the order-summary
+	// column instead (see checkout/review-order.php → kindi-summary__place).
+	?>
 </div>

@@ -137,6 +137,13 @@ function kindi_checkout_field_layout( array $fields ): array {
 
 	unset( $b['billing_company'] );
 
+	// Israel-only store: drop the unused "state/region" field so the address card
+	// shows exactly street · apartment · city · postcode.
+	if ( isset( $b['billing_state'] ) ) {
+		$b['billing_state']['required'] = false;
+		$b['billing_state']['class']    = array( 'kindi-hidden-field' );
+	}
+
 	if ( isset( $b['billing_email'] ) ) {
 		$b['billing_email']['type'] = 'email';
 	}
@@ -424,6 +431,39 @@ add_action( 'woocommerce_checkout_after_customer_details', 'kindi_checkout_cols_
  *
  * @return void
  */
+/**
+ * Trust badges + a WhatsApp "need help?" box, below the order summary in the
+ * sticky side column (outside the AJAX-refreshed summary).
+ *
+ * @return void
+ */
+function kindi_checkout_side_extras(): void {
+	$wa   = function_exists( 'kindi_whatsapp_url' ) ? kindi_whatsapp_url( 'היי, אשמח לעזרה בהשלמת ההזמנה' ) : '';
+	$href = '' !== $wa ? $wa : '#';
+	?>
+	<div class="kindi-coextras">
+		<div class="kindi-trustrow">
+			<div class="kindi-trustrow__item"><span class="kindi-trustrow__ic"><?php echo kindi_icon( 'truck', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span><?php esc_html_e( 'משלוח מהיר', 'kindi' ); ?></span></div>
+			<div class="kindi-trustrow__item"><span class="kindi-trustrow__ic"><?php echo kindi_icon( 'rotate', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span><?php esc_html_e( 'החזרה חינם 30 יום', 'kindi' ); ?></span></div>
+			<div class="kindi-trustrow__item"><span class="kindi-trustrow__ic"><?php echo kindi_icon( 'shield', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span><?php esc_html_e( 'תשלום מאובטח', 'kindi' ); ?></span></div>
+		</div>
+		<a class="kindi-helpbox" href="<?php echo esc_url( $href ); ?>"<?php echo '' !== $wa ? ' target="_blank" rel="noopener"' : ''; ?>>
+			<span class="kindi-helpbox__text">
+				<strong><?php esc_html_e( 'צריכים עזרה?', 'kindi' ); ?></strong>
+				<span><?php esc_html_e( 'צוות השירות שלנו זמין בוואטסאפ', 'kindi' ); ?></span>
+			</span>
+			<span class="kindi-helpbox__wa"><?php echo kindi_icon( 'whatsapp', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+		</a>
+	</div>
+	<?php
+}
+add_action( 'woocommerce_checkout_after_order_review', 'kindi_checkout_side_extras', 40 );
+
+/**
+ * Close the summary column and the two-column wrapper.
+ *
+ * @return void
+ */
 function kindi_checkout_cols_close(): void {
 	echo '</div></div>';
 }
@@ -455,10 +495,21 @@ add_filter( 'woocommerce_cart_shipping_method_full_label', 'kindi_shipping_metho
  * of the checkout instead of the box dropping into the billing column. The
  * filter only does anything when the gift-card plugin is active.
  */
-add_filter( 'simply_offerbox_checkout_action', static fn(): string => 'woocommerce_before_checkout_form' );
+add_filter( 'simply_offerbox_checkout_action', static fn(): string => 'kindi_summary_after_coupon' );
 
 // Hide the Simply gift-card plugin's own top bar (no-op when the plugin is absent).
 add_filter( 'simply_show_top_bar', '__return_false' );
+add_filter( 'simply_offerbox_show_top_bar', '__return_false' );
+
+/**
+ * Place-order button label.
+ *
+ * @return string
+ */
+function kindi_order_button_text(): string {
+	return __( 'אישור הזמנה ותשלום', 'kindi' );
+}
+add_filter( 'woocommerce_order_button_text', 'kindi_order_button_text' );
 
 /**
  * Notice before the payment methods: Gifta gift-cards can't be combined with
@@ -472,7 +523,7 @@ function kindi_gifta_coupon_notice(): void {
 		. esc_html__( 'בתשלום עם כרטיס Gifta לא ניתן להשתמש בקופונים. רוצים להשתמש בקופון? פשוט בחרו אמצעי תשלום אחר.', 'kindi' )
 		. '</p>';
 }
-add_action( 'woocommerce_review_order_before_payment', 'kindi_gifta_coupon_notice' );
+add_action( 'kindi_summary_after_coupon', 'kindi_gifta_coupon_notice', 20 );
 
 /*
  * ---------------------------------------------------------------------------

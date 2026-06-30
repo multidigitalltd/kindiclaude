@@ -31,7 +31,8 @@ if ( $kindi_cart->needs_shipping() && $kindi_cart->show_shipping() ) {
 		}
 	}
 }
-$kindi_count = (int) $kindi_cart->get_cart_contents_count();
+$kindi_count    = (int) $kindi_cart->get_cart_contents_count();
+$kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place order', 'woocommerce' ) );
 ?>
 <div class="shop_table woocommerce-checkout-review-order-table kindi-summary">
 	<div class="kindi-summary__head">
@@ -93,6 +94,12 @@ $kindi_count = (int) $kindi_cart->get_cart_contents_count();
 		<button type="button" class="kindi-coupon__btn" data-kindi-coupon-apply><?php esc_html_e( 'החל', 'kindi' ); ?></button>
 	</div>
 
+	<?php
+	// Anchor for the Gifta gift-card box + its notice, so they sit in the summary
+	// column directly below the coupon (see inc/checkout.php).
+	do_action( 'kindi_summary_after_coupon' );
+	?>
+
 	<div class="kindi-summary__totals">
 		<div class="kindi-summary__row"><span><?php esc_html_e( 'סכום ביניים', 'kindi' ); ?></span><span><?php wc_cart_totals_subtotal_html(); ?></span></div>
 
@@ -120,7 +127,18 @@ $kindi_count = (int) $kindi_cart->get_cart_contents_count();
 		?>
 
 		<?php do_action( 'woocommerce_review_order_before_order_total' ); ?>
-		<div class="kindi-summary__row kindi-summary__row--total"><span><?php esc_html_e( 'סה"כ', 'kindi' ); ?></span><span><?php wc_cart_totals_order_total_html(); ?></span></div>
+	</div>
+
+	<div class="kindi-summary__place">
+		<div class="kindi-summary__grand">
+			<span class="kindi-summary__grand-label"><?php esc_html_e( 'סה"כ לתשלום', 'kindi' ); ?><small><?php esc_html_e( 'כולל מע"מ', 'kindi' ); ?></small></span>
+			<span class="kindi-summary__grand-amount"><?php wc_cart_totals_order_total_html(); ?></span>
+		</div>
 		<?php do_action( 'woocommerce_review_order_after_order_total' ); ?>
+		<?php do_action( 'woocommerce_review_order_before_submit' ); ?>
+		<?php echo apply_filters( 'woocommerce_order_button_html', '<button type="submit" class="button alt kindi-placeorder" name="woocommerce_checkout_place_order" id="place_order" value="' . esc_attr( $kindi_btn_text ) . '" data-value="' . esc_attr( $kindi_btn_text ) . '">' . esc_html( $kindi_btn_text ) . '</button>' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+		<?php do_action( 'woocommerce_review_order_after_submit' ); ?>
+		<?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
+		<?php wc_get_template( 'checkout/terms.php' ); ?>
 	</div>
 </div>
