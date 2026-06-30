@@ -85,9 +85,6 @@ add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_top', 5 );
  * @return void
  */
 function kindi_checkout_club_banner(): void {
-	if ( is_user_logged_in() ) {
-		return;
-	}
 	$chevron = '<svg class="kindi-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 	echo '<div class="kindi-club" data-kindi-club>'
 		. '<span class="kindi-club__ic">' . kindi_icon( 'crown', 'kindi-icon--lg kindi-icon--white' ) . '</span>' // phpcs:ignore WordPress.Security.EscapeOutput
@@ -584,6 +581,63 @@ add_filter( 'simply_offerbox_checkout_action', static fn(): string => 'kindi_sum
 // Hide the Simply gift-card plugin's own top bar (no-op when the plugin is absent).
 add_filter( 'simply_show_top_bar', '__return_false' );
 add_filter( 'simply_offerbox_show_top_bar', '__return_false' );
+
+/**
+ * Display title for a payment gateway. Falls back to the admin method title and
+ * then a sensible default, because some gateways (e.g. Gifta) leave the
+ * front-end title empty, which would render an empty payment card.
+ *
+ * @param mixed $gateway Payment gateway.
+ * @return string Plain-text title.
+ */
+function kindi_payment_method_title( $gateway ): string {
+	if ( ! is_object( $gateway ) ) {
+		return __( 'תשלום', 'kindi' );
+	}
+	$title = method_exists( $gateway, 'get_title' ) ? trim( wp_strip_all_tags( (string) $gateway->get_title() ) ) : '';
+	if ( '' === $title && method_exists( $gateway, 'get_method_title' ) ) {
+		$title = trim( wp_strip_all_tags( (string) $gateway->get_method_title() ) );
+	}
+	if ( '' === $title ) {
+		$id    = (string) ( $gateway->id ?? '' );
+		$title = false !== stripos( $id, 'gifta' ) ? __( 'כרטיס מתנה Gifta', 'kindi' ) : __( 'תשלום', 'kindi' );
+	}
+	return $title;
+}
+
+/**
+ * Icon HTML for a payment gateway. Known local methods (Gifta, phone payment,
+ * bank transfer, price quote) get a brand Kindi icon; everything else keeps the
+ * gateway's own logo/icon.
+ *
+ * @param mixed $gateway Payment gateway.
+ * @return string Icon HTML ('' if none).
+ */
+function kindi_payment_method_icon_html( $gateway ): string {
+	if ( ! is_object( $gateway ) ) {
+		return '';
+	}
+	$id     = (string) ( $gateway->id ?? '' );
+	$title  = method_exists( $gateway, 'get_title' ) ? wp_strip_all_tags( (string) $gateway->get_title() ) : '';
+	$mtitle = method_exists( $gateway, 'get_method_title' ) ? wp_strip_all_tags( (string) $gateway->get_method_title() ) : '';
+	$hay    = $id . ' ' . $title . ' ' . $mtitle;
+
+	$key = '';
+	if ( false !== stripos( $hay, 'gifta' ) || false !== mb_stripos( $hay, 'מתנה' ) ) {
+		$key = 'gift';
+	} elseif ( false !== mb_stripos( $hay, 'טלפוני' ) || false !== stripos( $hay, 'phone' ) ) {
+		$key = 'phone';
+	} elseif ( 'bacs' === $id || false !== mb_stripos( $hay, 'העברה' ) || false !== mb_stripos( $hay, 'בנקאית' ) || false !== stripos( $hay, 'bank' ) ) {
+		$key = 'bank';
+	} elseif ( false !== mb_stripos( $hay, 'הצעת מחיר' ) || false !== mb_stripos( $hay, 'הצעה' ) || false !== stripos( $hay, 'quote' ) ) {
+		$key = 'doc';
+	}
+
+	if ( '' !== $key ) {
+		return kindi_icon( $key, 'kindi-icon--md' );
+	}
+	return (string) ( method_exists( $gateway, 'get_icon' ) ? $gateway->get_icon() : '' );
+}
 
 /**
  * Place-order button label.

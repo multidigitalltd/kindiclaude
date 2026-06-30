@@ -746,7 +746,7 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
    credit card …). All cards stay in the row; the fields for the selected method
    render in .kindi-payfields below the row (see checkout/payment.php). */
 .woocommerce-checkout #payment ul.payment_methods {
-  display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 0.7rem; margin: 0 0 1.25rem; border: 0; padding: 0; align-items: stretch;
+  display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 0.7rem; margin: 0 0 1.25rem; border: 0; padding: 0; align-items: stretch;
 }
 .woocommerce-checkout #payment ul.payment_methods li {
   position: relative; margin: 0; background: #fff;
