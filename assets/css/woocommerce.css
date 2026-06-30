@@ -377,6 +377,9 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-club__toggle:hover { background: rgba(255, 255, 255, 0.28); }
 .kindi-club.is-collapsed .kindi-club__text span { display: none; }
 .kindi-club.is-collapsed .kindi-club__toggle { transform: rotate(180deg); }
+/* Simply Club shortcode wrapper: keep the full-bleed/container alignment but
+   drop the red bar + flex so the plugin's own login/offers UI renders cleanly. */
+.kindi-club--simply { display: block; background: none; color: inherit; padding-top: 0; padding-bottom: 1.25rem; }
 @media (max-width: 600px) {
   .kindi-club { flex-wrap: wrap; gap: 0.6rem 0.85rem; padding: 0.85rem 1rem; }
   .kindi-club__text { flex: 1 1 60%; }

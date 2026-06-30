@@ -85,6 +85,17 @@ add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_top', 5 );
  * @return void
  */
 function kindi_checkout_club_banner(): void {
+	// Simply Club provides the login popup (logged out) and the redemption
+	// offers box (logged in) through this shortcode. Render it so the strip is
+	// functional; fall back to the static branded strip when the plugin is off.
+	if ( shortcode_exists( 'simply_club_offerbox' ) ) {
+		$club = trim( do_shortcode( '[simply_club_offerbox]' ) );
+		if ( '' !== $club ) {
+			echo '<div class="kindi-club kindi-club--simply" data-kindi-club>' . $club . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- Simply Club shortcode output.
+			return;
+		}
+	}
+
 	$chevron = '<svg class="kindi-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 	echo '<div class="kindi-club" data-kindi-club>'
 		. '<span class="kindi-club__ic">' . kindi_icon( 'crown', 'kindi-icon--lg kindi-icon--white' ) . '</span>' // phpcs:ignore WordPress.Security.EscapeOutput
@@ -594,9 +605,15 @@ function kindi_payment_method_title( $gateway ): string {
 	if ( ! is_object( $gateway ) ) {
 		return __( 'תשלום', 'kindi' );
 	}
-	$title = method_exists( $gateway, 'get_title' ) ? trim( wp_strip_all_tags( (string) $gateway->get_title() ) ) : '';
+	// Normalise: strip tags, decode entities, fold &nbsp;/whitespace, so a title
+	// that is only markup or blank space counts as empty and gets a fallback.
+	$norm = static function ( string $s ): string {
+		$s = str_replace( "\xc2\xa0", ' ', html_entity_decode( wp_strip_all_tags( $s ), ENT_QUOTES, 'UTF-8' ) );
+		return trim( (string) preg_replace( '/\s+/', ' ', $s ) );
+	};
+	$title = method_exists( $gateway, 'get_title' ) ? $norm( (string) $gateway->get_title() ) : '';
 	if ( '' === $title && method_exists( $gateway, 'get_method_title' ) ) {
-		$title = trim( wp_strip_all_tags( (string) $gateway->get_method_title() ) );
+		$title = $norm( (string) $gateway->get_method_title() );
 	}
 	if ( '' === $title ) {
 		$id    = (string) ( $gateway->id ?? '' );
