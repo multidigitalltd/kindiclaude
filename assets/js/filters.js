@@ -79,6 +79,7 @@
 				}
 				setBusy( false );
 				applyView();
+				initPriceSlider();
 				var top = scope.querySelector( '.kindi-archive__toolbar' ) || scope.querySelector( 'ul.products' );
 				if ( top ) {
 					var y = top.getBoundingClientRect().top + window.pageYOffset - 120;
@@ -139,5 +140,64 @@
 
 	window.addEventListener( 'popstate', function () {
 		load( location.href, false );
+	} );
+
+	/* ---- Price range slider (dual handle, RTL) -------------------------- */
+	function initPriceSlider() {
+		document.querySelectorAll( '.kindi-priceslider' ).forEach( function ( box ) {
+			if ( box.dataset.wired ) { return; }
+			box.dataset.wired = '1';
+			var lo = box.querySelector( '.kindi-priceslider__lo' );
+			var hi = box.querySelector( '.kindi-priceslider__hi' );
+			var fill = box.querySelector( '.kindi-priceslider__fill' );
+			var pill = box.querySelector( '[data-pl-pill]' );
+			if ( ! lo || ! hi ) { return; }
+			var min = parseInt( box.dataset.min, 10 ) || 0;
+			var max = parseInt( box.dataset.max, 10 ) || 100;
+			var range = ( max - min ) || 1;
+			function paint() {
+				var a = Math.min( +lo.value, +hi.value );
+				var b = Math.max( +lo.value, +hi.value );
+				if ( fill ) {
+					fill.style.right = ( ( a - min ) / range * 100 ) + '%';
+					fill.style.width = ( ( b - a ) / range * 100 ) + '%';
+				}
+				if ( pill ) { pill.textContent = 'עד ₪' + b; }
+			}
+			function commit() {
+				var a = Math.min( +lo.value, +hi.value );
+				var b = Math.max( +lo.value, +hi.value );
+				var u = new URL( location.href );
+				u.searchParams.set( 'min_price', a );
+				u.searchParams.set( 'max_price', b );
+				u.searchParams.delete( 'paged' );
+				load( u.href, true );
+			}
+			lo.addEventListener( 'input', paint );
+			hi.addEventListener( 'input', paint );
+			lo.addEventListener( 'change', commit );
+			hi.addEventListener( 'change', commit );
+			paint();
+		} );
+	}
+	initPriceSlider();
+
+	/* ---- Mobile filter drawer ------------------------------------------ */
+	document.addEventListener( 'click', function ( e ) {
+		var arch = document.querySelector( '.kindi-archive' );
+		if ( ! arch ) { return; }
+		if ( e.target.closest( '[data-kindi-filters-open]' ) ) {
+			arch.classList.add( 'is-filters-open' );
+			document.body.style.overflow = 'hidden';
+		} else if ( e.target.closest( '[data-kindi-filters-close]' ) ) {
+			arch.classList.remove( 'is-filters-open' );
+			document.body.style.overflow = '';
+		}
+	} );
+	document.addEventListener( 'keydown', function ( e ) {
+		if ( 'Escape' === e.key ) {
+			var arch = document.querySelector( '.kindi-archive.is-filters-open' );
+			if ( arch ) { arch.classList.remove( 'is-filters-open' ); document.body.style.overflow = ''; }
+		}
 	} );
 }() );
