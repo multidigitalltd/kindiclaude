@@ -381,3 +381,22 @@
 		}
 	} );
 }() );
+
+/* Hide the informational "הלקוח תואם לאזור …" shipping-zone notice site-wide
+   (catch-all for any source, incl. AJAX-injected notices). */
+( function () {
+	'use strict';
+	var NEEDLE = 'תואם לאזור';
+	var SEL = '.woocommerce-message, .woocommerce-info, .woocommerce-notice, .wc-block-components-notice-banner, .woocommerce-notices-wrapper > *';
+	function scrub() {
+		document.querySelectorAll( SEL ).forEach( function ( el ) {
+			if ( el.textContent && el.textContent.indexOf( NEEDLE ) !== -1 ) {
+				el.style.display = 'none';
+			}
+		} );
+	}
+	scrub();
+	try {
+		new MutationObserver( scrub ).observe( document.body, { childList: true, subtree: true } );
+	} catch ( e ) {}
+}() );

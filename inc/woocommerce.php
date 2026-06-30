@@ -65,6 +65,41 @@ function kindi_product_search_template( array $templates ): array {
 add_filter( 'search_template_hierarchy', 'kindi_product_search_template' );
 
 /**
+ * Hide the informational "הלקוח תואם לאזור …" shipping-zone notice by removing
+ * any WooCommerce notice containing that phrase before notices are printed.
+ *
+ * @return void
+ */
+function kindi_scrub_zone_notice(): void {
+	if ( ! function_exists( 'wc_get_notices' ) || ! function_exists( 'wc_set_notices' ) || ! WC()->session ) {
+		return;
+	}
+	$all = wc_get_notices();
+	if ( empty( $all ) ) {
+		return;
+	}
+	$needle = 'תואם לאזור';
+	$found  = false;
+	foreach ( $all as $type => $list ) {
+		foreach ( $list as $i => $notice ) {
+			$msg = is_array( $notice ) ? (string) ( $notice['notice'] ?? '' ) : (string) $notice;
+			if ( '' !== $msg && false !== mb_strpos( $msg, $needle ) ) {
+				unset( $all[ $type ][ $i ] );
+				$found = true;
+			}
+		}
+	}
+	if ( $found ) {
+		wc_set_notices( $all );
+	}
+}
+add_action( 'woocommerce_before_single_product', 'kindi_scrub_zone_notice', 5 );
+add_action( 'woocommerce_before_cart', 'kindi_scrub_zone_notice', 5 );
+add_action( 'woocommerce_before_checkout_form', 'kindi_scrub_zone_notice', 5 );
+add_action( 'woocommerce_before_shop_loop', 'kindi_scrub_zone_notice', 1 );
+add_action( 'template_redirect', 'kindi_scrub_zone_notice', 99 );
+
+/**
  * Products per page on archives.
  *
  * @return int
