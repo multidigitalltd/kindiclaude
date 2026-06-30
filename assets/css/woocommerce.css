@@ -575,11 +575,15 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
 /* Billing fields now hold the numbered .kindi-cobox cards, so the wrapper itself
    is transparent. The shipping/order-notes wrappers stay as soft white cards. */
 .woocommerce-checkout .woocommerce-billing-fields { background: none; border: 0; padding: 0; box-shadow: none; margin: 0; }
-.woocommerce-checkout .woocommerce-shipping-fields,
-.woocommerce-checkout .woocommerce-additional-fields {
+.woocommerce-checkout .woocommerce-additional-fields,
+.woocommerce-checkout .woocommerce-shipping-fields:has(.form-row),
+.woocommerce-checkout .woocommerce-shipping-fields:has(h3) {
   background: #fff; border: 1px solid var(--border); border-radius: 1.25rem;
   padding: 1.25rem 1.5rem; box-shadow: var(--shadow-card); margin-bottom: 1.25rem;
 }
+/* With ship-to-billing there are no shipping fields — hide the empty wrapper so
+   it doesn't leave a blank white box above the order-notes section. */
+.woocommerce-checkout .woocommerce-shipping-fields:not(:has(.form-row)):not(:has(h3)) { display: none; }
 .woocommerce-checkout .woocommerce-billing-fields h3,
 .woocommerce-checkout .woocommerce-shipping-fields h3,
 .woocommerce-checkout #order_review_heading { font-size: 1.35rem; margin: 0 0 1rem; }

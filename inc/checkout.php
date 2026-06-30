@@ -114,43 +114,46 @@ function kindi_checkout_field_layout( array $fields ): array {
 	if ( empty( $fields['billing'] ) ) {
 		return $fields;
 	}
-	$b = &$fields['billing'];
 
-	$set = static function ( array &$b, string $key, string $label, string $placeholder, int $priority, string $row ): void {
-		if ( ! isset( $b[ $key ] ) ) {
-			return;
+	// label, placeholder, priority, row-class.
+	$map = array(
+		'billing_first_name' => array( 'שם פרטי', 'ישראלה', 10, 'form-row-first' ),
+		'billing_last_name'  => array( 'שם משפחה', 'ישראלי', 20, 'form-row-last' ),
+		'billing_phone'      => array( 'טלפון נייד', '050-1234567', 30, 'form-row-first' ),
+		'billing_email'      => array( 'אימייל', 'name@example.com', 40, 'form-row-last' ),
+		'billing_address_1'  => array( 'רחוב ומספר', 'הרצל 12', 50, 'form-row-first' ),
+		'billing_address_2'  => array( 'דירה / כניסה', 'דירה 4, קומה 2', 60, 'form-row-last' ),
+		'billing_city'       => array( 'עיר', 'תל אביב', 70, 'form-row-first' ),
+		'billing_postcode'   => array( 'מיקוד', '6100000', 80, 'form-row-last' ),
+	);
+
+	foreach ( $map as $key => $cfg ) {
+		if ( ! isset( $fields['billing'][ $key ] ) ) {
+			continue;
 		}
-		$b[ $key ]['label']       = $label;
-		$b[ $key ]['placeholder'] = $placeholder;
-		$b[ $key ]['priority']    = $priority;
-		$b[ $key ]['class']       = array( $row );
-	};
+		$fields['billing'][ $key ]['label']       = $cfg[0];
+		$fields['billing'][ $key ]['placeholder'] = $cfg[1];
+		$fields['billing'][ $key ]['priority']    = $cfg[2];
+		$fields['billing'][ $key ]['class']       = array( $cfg[3] );
+		$fields['billing'][ $key ]['input_class'] = array( 'input-text' );
+	}
 
-	$set( $b, 'billing_first_name', 'שם פרטי', 'ישראלה', 10, 'form-row-first' );
-	$set( $b, 'billing_last_name', 'שם משפחה', 'ישראלי', 20, 'form-row-last' );
-	$set( $b, 'billing_phone', 'טלפון נייד', '050-1234567', 30, 'form-row-first' );
-	$set( $b, 'billing_email', 'אימייל', 'name@example.com', 40, 'form-row-last' );
-	$set( $b, 'billing_address_1', 'רחוב ומספר', 'הרצל 12', 50, 'form-row-first' );
-	$set( $b, 'billing_address_2', 'דירה / כניסה', 'דירה 4, קומה 2', 60, 'form-row-last' );
-	$set( $b, 'billing_city', 'עיר', 'תל אביב', 70, 'form-row-first' );
-	$set( $b, 'billing_postcode', 'מיקוד', '6100000', 80, 'form-row-last' );
-
-	unset( $b['billing_company'] );
+	unset( $fields['billing']['billing_company'] );
 
 	// Israel-only store: drop the unused "state/region" field so the address card
 	// shows exactly street · apartment · city · postcode.
-	if ( isset( $b['billing_state'] ) ) {
-		$b['billing_state']['required'] = false;
-		$b['billing_state']['class']    = array( 'kindi-hidden-field' );
+	if ( isset( $fields['billing']['billing_state'] ) ) {
+		$fields['billing']['billing_state']['required'] = false;
+		$fields['billing']['billing_state']['class']    = array( 'kindi-hidden-field' );
 	}
-
-	if ( isset( $b['billing_email'] ) ) {
-		$b['billing_email']['type'] = 'email';
+	if ( isset( $fields['billing']['billing_email'] ) ) {
+		$fields['billing']['billing_email']['type'] = 'email';
 	}
 
 	return $fields;
 }
-add_filter( 'woocommerce_checkout_fields', 'kindi_checkout_field_layout' );
+// Late priority so our labels/layout win over locale + plugin field filters.
+add_filter( 'woocommerce_checkout_fields', 'kindi_checkout_field_layout', 9999 );
 
 /**
  * Persist the marketing opt-in checkbox (from the contact card) onto the order.
