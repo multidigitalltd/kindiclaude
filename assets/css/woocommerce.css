@@ -693,9 +693,13 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
 .kindi-summary .simply-offerbox,
 .kindi-summary .simply_offerbox { margin: 1rem 0 0; }
 .kindi-summary .kindi-gifta-note { margin: 0.85rem 0 0; }
-/* Gift-card (Gifta) redemption box — removed from checkout per request. */
+/* Gift-card boxes — removed from checkout per request. */
+/* Gifta: matched by class/id substring; YITH: specific class names. */
 .woocommerce-checkout [class*="gifta" i],
 .woocommerce-checkout [id*="gifta" i],
+.woocommerce-checkout .ywgc_have_code,
+.woocommerce-checkout .ywgc_enter_code,
+.woocommerce-checkout .woocommerce-form-coupon-toggle:has(+ .ywgc_enter_code),
 .woocommerce-checkout .simply-offerbox,
 .woocommerce-checkout .simply_offerbox,
 .kindi-giftcard-relocated { display: none !important; }

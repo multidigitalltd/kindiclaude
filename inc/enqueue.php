@@ -188,6 +188,24 @@ function kindi_enqueue_scripts(): void {
 add_action( 'wp_enqueue_scripts', 'kindi_enqueue_scripts' );
 
 /**
+ * Dequeue wc-address-i18n on the checkout page.
+ *
+ * The script reorders all billing fields by priority inside
+ * .woocommerce-billing-fields__field-wrapper after DOM load, which collapses
+ * our two-card layout (Box 1 contact / Box 2 address) into a single flat
+ * list. Since this is an Israel-only store with a fixed billing layout the
+ * script serves no purpose and must be removed.
+ *
+ * @return void
+ */
+function kindi_dequeue_address_i18n(): void {
+	if ( function_exists( 'is_checkout' ) && is_checkout() ) {
+		wp_dequeue_script( 'wc-address-i18n' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'kindi_dequeue_address_i18n', 100 );
+
+/**
  * Add defer to theme scripts; never block rendering.
  *
  * @param string $tag    Script tag HTML.
