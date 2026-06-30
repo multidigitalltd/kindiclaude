@@ -642,7 +642,9 @@ function kindi_checkout_reviews(): void {
 			<?php if ( $has_google ) : ?>
 			<<?php echo $grev_tag; // phpcs:ignore WordPress.Security.EscapeOutput ?> class="kindi-grev__score<?php echo $grev_link ? ' kindi-grev__score--link' : ''; ?>"<?php echo $grev_link ? ' href="' . esc_url( $grev_link ) . '" target="_blank" rel="noopener" title="' . esc_attr__( 'לצפייה בכל הביקורות בגוגל', 'kindi' ) . '"' : ''; ?>>
 				<strong><?php echo esc_html( number_format( (float) $data['rating'], 1 ) ); ?></strong>
-				<span class="kindi-grev__stars"><?php for ( $s = 0; $s < 5; $s++ ) { echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput } ?></span>
+				<span class="kindi-grev__stars"><?php for ( $s = 0; $s < 5; $s++ ) {
+						echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput
+					} ?></span>
 				<span class="kindi-grev__count"><?php echo esc_html( number_format_i18n( (int) ( $data['total'] ?? count( $reviews ) ) ) ); ?>+ <?php esc_html_e( 'ביקורות בגוגל', 'kindi' ); ?></span>
 			</<?php echo $grev_tag; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
 			<?php endif; ?>
@@ -652,7 +654,9 @@ function kindi_checkout_reviews(): void {
 			<article class="kindi-tst__card<?php echo $idx >= 3 ? ' is-hidden' : ''; ?>">
 				<span class="kindi-tst__quote" aria-hidden="true">"</span>
 				<div class="kindi-tst__stars">
-					<?php for ( $s = 0; $s < 5; $s++ ) { echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput } ?>
+					<?php for ( $s = 0; $s < 5; $s++ ) {
+						echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput
+					} ?>
 				</div>
 				<p class="kindi-tst__text"><?php echo esc_html( $t['text'] ); ?></p>
 				<div class="kindi-tst__foot">
