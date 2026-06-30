@@ -592,6 +592,54 @@ function kindi_cart_checkout_trust( string $content ): string {
 }
 add_filter( 'the_content', 'kindi_cart_checkout_trust', 20 );
 
+/*
+ * ---------------------------------------------------------------------------
+ * Template override enforcement — force WooCommerce to use the theme's
+ * form-checkout.php regardless of any plugin that registers a lower-priority
+ * woocommerce_locate_template filter (e.g. YITH, Simply, Gifta).  Without
+ * this, those plugins return their own form-checkout.php first, which still
+ * wraps fields in the native col2-set / col-1 / col-2 structure that breaks
+ * our two-card layout.
+ * ---------------------------------------------------------------------------
+ */
+
+/**
+ * Force the theme's form-checkout.php via the locate step (runs before caching).
+ *
+ * @param string $template      Resolved template path.
+ * @param string $template_name Template name relative to the WC templates dir.
+ * @return string
+ */
+function kindi_locate_checkout_form( string $template, string $template_name ): string {
+	if ( 'checkout/form-checkout.php' === $template_name ) {
+		$override = KINDI_DIR . 'woocommerce/checkout/form-checkout.php';
+		if ( is_readable( $override ) ) {
+			return $override;
+		}
+	}
+	return $template;
+}
+add_filter( 'woocommerce_locate_template', 'kindi_locate_checkout_form', 9999, 2 );
+
+/**
+ * Force the theme's form-checkout.php at the include step (runs even when the
+ * path was already cached by wc_get_template's internal wp_cache_get).
+ *
+ * @param string $template      Template path about to be included.
+ * @param string $template_name Template name relative to the WC templates dir.
+ * @return string
+ */
+function kindi_use_checkout_form( string $template, string $template_name ): string {
+	if ( 'checkout/form-checkout.php' === $template_name ) {
+		$override = KINDI_DIR . 'woocommerce/checkout/form-checkout.php';
+		if ( is_readable( $override ) ) {
+			return $override;
+		}
+	}
+	return $template;
+}
+add_filter( 'wc_get_template', 'kindi_use_checkout_form', 9999, 2 );
+
 /**
  * Full testimonials section after the checkout form — identical markup and
  * fallback data to patterns/testimonials.php so the design matches the homepage.
