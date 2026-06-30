@@ -515,6 +515,28 @@ function kindi_order_button_text(): string {
 add_filter( 'woocommerce_order_button_text', 'kindi_order_button_text' );
 
 /**
+ * Remove the Gifta "connect / login" payment gateway from the checkout — Gifta
+ * gift cards are redeemed via the gift-card box in the summary, not as a payment
+ * method. Matches any gateway whose id or title mentions Gifta.
+ *
+ * @param array<string,WC_Payment_Gateway> $gateways Available gateways.
+ * @return array<string,WC_Payment_Gateway>
+ */
+function kindi_remove_gifta_gateway( array $gateways ): array {
+	if ( is_admin() ) {
+		return $gateways;
+	}
+	foreach ( $gateways as $id => $gateway ) {
+		$title = is_object( $gateway ) && method_exists( $gateway, 'get_title' ) ? (string) $gateway->get_title() : '';
+		if ( false !== stripos( (string) $id, 'gifta' ) || ( '' !== $title && false !== mb_stripos( $title, 'gifta' ) ) || ( '' !== $title && false !== mb_stripos( $title, 'גיפט' ) ) ) {
+			unset( $gateways[ $id ] );
+		}
+	}
+	return $gateways;
+}
+add_filter( 'woocommerce_available_payment_gateways', 'kindi_remove_gifta_gateway' );
+
+/**
  * Notice before the payment methods: Gifta gift-cards can't be combined with
  * coupons. Escaped + translatable; keeps the original `custom-payment-text`
  * class so existing styling still applies.
