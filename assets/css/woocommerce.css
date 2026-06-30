@@ -792,7 +792,35 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 /* 4-up product grid in the archive main column. */
 @media (min-width: 1024px) { .kindi-archive__main ul.products, .woocommerce .kindi-archive__main ul.products { grid-template-columns: repeat(4, 1fr); } }
 
-/* List view (toggle). */
-.kindi-archive.is-list ul.products { grid-template-columns: 1fr !important; }
-.kindi-archive.is-list ul.products li.product { display: grid; grid-template-columns: 13rem 1fr; align-items: center; }
-@media (max-width: 640px) { .kindi-archive.is-list ul.products li.product { grid-template-columns: 7rem 1fr; } }
+/* Short description — hidden in grid, shown only in list view. */
+.kindi-pc__excerpt { display: none; }
+
+/* List view (toggle): image on the side, content spread across the full width
+   with the short description and a full-text add-to-cart button. */
+.kindi-archive.is-list ul.products { grid-template-columns: 1fr !important; gap: 1rem; }
+.kindi-archive.is-list ul.products li.product {
+  display: grid; grid-template-columns: 14rem 1fr; column-gap: 1.5rem; align-items: center; padding: 0.85rem;
+}
+.kindi-archive.is-list li.product .kindi-pc__media { grid-column: 1; grid-row: 1 / span 20; align-self: stretch; border-radius: 0.85rem; }
+.kindi-archive.is-list li.product .kindi-pc__brand,
+.kindi-archive.is-list li.product .kindi-pc__title,
+.kindi-archive.is-list li.product .kindi-pc__rating,
+.kindi-archive.is-list li.product .kindi-pc__excerpt,
+.kindi-archive.is-list li.product .kindi-pc__foot { grid-column: 2; padding-inline: 0; }
+.kindi-archive.is-list li.product .kindi-pc__brand { margin-top: 0; }
+.kindi-archive.is-list li.product .kindi-pc__title { -webkit-line-clamp: 1; min-height: 0; font-size: 1.2rem; }
+.kindi-archive.is-list li.product .kindi-pc__excerpt {
+  display: block; color: var(--muted-foreground); font-size: 0.9rem; line-height: 1.6; margin: 0.5rem 0 0;
+  -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
+}
+.kindi-archive.is-list li.product .kindi-pc__foot { border-top: 0; padding-bottom: 0; margin-top: 0.85rem; justify-content: flex-start; gap: 1.25rem; }
+/* Full-text add-to-cart button in list view (no round "+"). */
+.kindi-archive.is-list li.product .button.kindi-pc__add {
+  width: auto; height: auto; min-width: 0; border-radius: 0.9rem; padding: 0.65rem 1.6rem; font-size: 0.95rem; place-items: center; display: inline-flex;
+}
+.kindi-archive.is-list li.product .button.kindi-pc__add::before,
+.kindi-archive.is-list li.product .button.kindi-pc__add::after { content: none; }
+@media (max-width: 640px) {
+  .kindi-archive.is-list ul.products li.product { grid-template-columns: 7rem 1fr; column-gap: 0.85rem; }
+  .kindi-archive.is-list li.product .kindi-pc__excerpt { display: none; }
+}

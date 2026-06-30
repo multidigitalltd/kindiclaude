@@ -146,6 +146,15 @@ function kindi_card_head(): void {
 		esc_url( get_permalink( $product->get_id() ) ),
 		esc_html( $product->get_name() )
 	);
+
+	// Short description — hidden in grid view, shown in the archive list view.
+	$excerpt = $product->get_short_description();
+	if ( '' === $excerpt ) {
+		$excerpt = $product->get_description();
+	}
+	if ( '' !== $excerpt ) {
+		echo '<p class="kindi-pc__excerpt">' . esc_html( wp_trim_words( wp_strip_all_tags( $excerpt ), 28 ) ) . '</p>';
+	}
 }
 
 /**
