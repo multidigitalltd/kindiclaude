@@ -68,6 +68,23 @@ function kindi_print_critical_css(): void {
 add_action( 'wp_head', 'kindi_print_critical_css', 2 );
 
 /**
+ * Preload the hero mascot (the mobile LCP image) on the front page so it starts
+ * downloading immediately instead of after HTML parsing reaches it.
+ *
+ * @return void
+ */
+function kindi_preload_lcp_image(): void {
+	if ( ! is_front_page() || ! function_exists( 'kindi_mascot_src' ) ) {
+		return;
+	}
+	$src = kindi_mascot_src( 'hero_mascot', 'mascot/kindy-hero.webp' );
+	if ( '' !== $src ) {
+		printf( '<link rel="preload" as="image" href="%s" fetchpriority="high">' . "\n", esc_url( $src ) );
+	}
+}
+add_action( 'wp_head', 'kindi_preload_lcp_image', 1 );
+
+/**
  * Convert the theme's stylesheet links to non-blocking (preload→onload swap).
  *
  * @param string $tag    Link tag.
@@ -80,9 +97,14 @@ function kindi_async_styles( string $tag, string $handle ): string {
 	}
 
 	// Keep the global chrome (base + components) render-blocking so the header,
-	// icons, nav and mega never flash unstyled; only defer heavier page-specific
-	// stylesheets.
-	$async = array( 'kindi-sections', 'kindi-animations', 'kindi-woocommerce' );
+	// icons, nav and mega never flash unstyled; defer heavier page-specific
+	// stylesheets — including WooCommerce's own (the main render-blocking cost on
+	// mobile). They still apply via the preload→onload swap, just non-blocking.
+	$async = array(
+		'kindi-sections', 'kindi-animations', 'kindi-woocommerce',
+		'woocommerce-layout', 'woocommerce-smallscreen', 'woocommerce-general',
+		'wc-blocks-style', 'wc-blocks-packages-style', 'brands-styles',
+	);
 	if ( ! in_array( $handle, $async, true ) ) {
 		return $tag;
 	}
