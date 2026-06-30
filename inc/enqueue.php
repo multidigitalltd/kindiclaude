@@ -188,22 +188,37 @@ function kindi_enqueue_scripts(): void {
 add_action( 'wp_enqueue_scripts', 'kindi_enqueue_scripts' );
 
 /**
- * Dequeue wc-address-i18n on the checkout page.
+ * Neutralise wc-address-i18n on the checkout page.
  *
- * The script reorders all billing fields by priority inside
- * .woocommerce-billing-fields__field-wrapper after DOM load, which collapses
- * our two-card layout (Box 1 contact / Box 2 address) into a single flat
- * list. Since this is an Israel-only store with a fixed billing layout the
- * script serves no purpose and must be removed.
+ * The script reorders all billing fields by priority after DOM load, which
+ * collapses our two-card layout (Box 1 contact / Box 2 address) into a single
+ * flat list and shuffles the phone field to the bottom. A plain
+ * wp_dequeue_script() does NOT work because wc-checkout declares
+ * wc-address-i18n as a dependency, so WordPress prints it anyway to satisfy
+ * that dependency. We therefore strip the dependency first, then dequeue and
+ * deregister the script. This is an Israel-only store with a fixed billing
+ * layout, so the locale reordering serves no purpose.
  *
  * @return void
  */
 function kindi_dequeue_address_i18n(): void {
-	if ( function_exists( 'is_checkout' ) && is_checkout() ) {
-		wp_dequeue_script( 'wc-address-i18n' );
+	if ( ! function_exists( 'is_checkout' ) || ! is_checkout() ) {
+		return;
 	}
+
+	$scripts = wp_scripts();
+
+	// Drop wc-address-i18n from wc-checkout's dependency list so dequeuing sticks.
+	if ( isset( $scripts->registered['wc-checkout'] ) && is_array( $scripts->registered['wc-checkout']->deps ) ) {
+		$scripts->registered['wc-checkout']->deps = array_values(
+			array_diff( $scripts->registered['wc-checkout']->deps, array( 'wc-address-i18n' ) )
+		);
+	}
+
+	wp_dequeue_script( 'wc-address-i18n' );
+	wp_deregister_script( 'wc-address-i18n' );
 }
-add_action( 'wp_enqueue_scripts', 'kindi_dequeue_address_i18n', 100 );
+add_action( 'wp_enqueue_scripts', 'kindi_dequeue_address_i18n', 999 );
 
 /**
  * Add defer to theme scripts; never block rendering.
