@@ -244,3 +244,19 @@
 		}
 	} );
 }() );
+
+/* Checkout: recalculate the order totals when a gift add-on (free wrapping or
+ * the ₪10 greeting card) is toggled, so the fee line appears/updates at once.
+ * WooCommerce recalculates on its `update_checkout` jQuery event; trigger it via
+ * the jQuery WooCommerce already loads (we never load it ourselves). */
+( function () {
+	document.addEventListener( 'change', function ( e ) {
+		var t = e.target;
+		if ( ! t || ! t.name ) {
+			return;
+		}
+		if ( ( 'kindi_gift_wrap' === t.name || 'kindi_gift_card' === t.name ) && window.jQuery ) {
+			window.jQuery( document.body ).trigger( 'update_checkout' );
+		}
+	} );
+}() );

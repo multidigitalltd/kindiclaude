@@ -663,6 +663,100 @@ function kindi_order_button_text(): string {
 }
 add_filter( 'woocommerce_order_button_text', 'kindi_order_button_text' );
 
+/**
+ * Whether a gateway is a Gifta gift-card gateway (id or title mentions Gifta).
+ *
+ * @param string $id    Gateway id.
+ * @param string $label Gateway title / method title.
+ * @return bool
+ */
+function kindi_is_gifta_gateway( string $id, string $label = '' ): bool {
+	return false !== stripos( $id, 'gifta' )
+		|| ( '' !== $label && ( false !== mb_stripos( $label, 'gifta' ) || false !== mb_stripos( $label, 'גיפט' ) ) );
+}
+
+/**
+ * Order the payment gateways so Gifta is always last, and remove it entirely
+ * when a coupon is applied — a Gifta gift card cannot be combined with coupons.
+ *
+ * @param array<string,WC_Payment_Gateway> $gateways Available gateways.
+ * @return array<string,WC_Payment_Gateway>
+ */
+function kindi_order_payment_gateways( array $gateways ): array {
+	if ( is_admin() ) {
+		return $gateways;
+	}
+
+	$gifta = array();
+	foreach ( $gateways as $id => $gateway ) {
+		$label = is_object( $gateway ) && method_exists( $gateway, 'get_title' ) ? (string) $gateway->get_title() : '';
+		if ( kindi_is_gifta_gateway( (string) $id, $label ) ) {
+			$gifta[ $id ] = $gateway;
+		}
+	}
+	if ( ! $gifta ) {
+		return $gateways;
+	}
+
+	$has_coupon = function_exists( 'WC' ) && WC()->cart && count( WC()->cart->get_applied_coupons() ) > 0;
+
+	// Drop Gifta from the list while a coupon is active.
+	foreach ( array_keys( $gifta ) as $id ) {
+		unset( $gateways[ $id ] );
+	}
+	// Otherwise re-append it so it sits last.
+	if ( ! $has_coupon ) {
+		foreach ( $gifta as $id => $gateway ) {
+			$gateways[ $id ] = $gateway;
+		}
+	}
+	return $gateways;
+}
+add_filter( 'woocommerce_available_payment_gateways', 'kindi_order_payment_gateways' );
+
+/**
+ * Note above the payment methods: a Gifta gift card can't be combined with
+ * coupons. Shown only when a Gifta gateway is enabled.
+ *
+ * @return void
+ */
+function kindi_gifta_coupon_notice(): void {
+	if ( ! function_exists( 'WC' ) || ! WC()->payment_gateways() ) {
+		return;
+	}
+	$has_gifta = false;
+	foreach ( WC()->payment_gateways()->payment_gateways() as $gateway ) {
+		if ( 'yes' === ( $gateway->enabled ?? 'no' ) && kindi_is_gifta_gateway( (string) $gateway->id, (string) $gateway->get_method_title() ) ) {
+			$has_gifta = true;
+			break;
+		}
+	}
+	if ( ! $has_gifta ) {
+		return;
+	}
+	echo '<p class="kindi-gifta-note custom-payment-text">'
+		. esc_html__( 'לתשומת ליבכם: לא ניתן לממש כרטיס Gifta יחד עם קופון. לשימוש בכרטיס Gifta הסירו את הקופון; לשימוש בקופון בחרו אמצעי תשלום אחר.', 'kindi' )
+		. '</p>';
+}
+add_action( 'woocommerce_review_order_before_payment', 'kindi_gifta_coupon_notice' );
+
+/**
+ * Safety net: block placing the order with Gifta while a coupon is applied.
+ * WooCommerce verifies the checkout nonce before this validation hook runs.
+ *
+ * @return void
+ */
+function kindi_block_gifta_with_coupon(): void {
+	$method = isset( $_POST['payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	if ( '' === $method || ! kindi_is_gifta_gateway( $method ) ) {
+		return;
+	}
+	if ( function_exists( 'WC' ) && WC()->cart && count( WC()->cart->get_applied_coupons() ) > 0 ) {
+		wc_add_notice( __( 'לא ניתן לשלם עם כרטיס Gifta כאשר מופעל קופון. הסירו את הקופון או בחרו אמצעי תשלום אחר.', 'kindi' ), 'error' );
+	}
+}
+add_action( 'woocommerce_checkout_process', 'kindi_block_gifta_with_coupon' );
+
 /*
  * ---------------------------------------------------------------------------
  * Trust content on cart & checkout, above the footer: the homepage Google
