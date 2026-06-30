@@ -329,3 +329,14 @@
 .kindi-sechead--center { justify-content: center; text-align: center; }
 .kindi-sechead--center .kindi-sechead__text { display: flex; flex-direction: column; align-items: center; }
 .kindi-usp--card { margin-top: 0.5rem; }
+
+/* Skip rendering off-screen homepage sections until scrolled near — cuts
+   initial render / main-thread work on mobile (faster FCP/LCP). The intrinsic
+   size reserves space so it doesn't cause layout shift. */
+@media (max-width: 1023.98px) {
+  .kindi-promos, .kindi-ages, .kindi-values, .kindi-brands,
+  .kindi-zone, .kindi-store, .kindi-tst, .kindi-rv, .kindi-news {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 520px;
+  }
+}

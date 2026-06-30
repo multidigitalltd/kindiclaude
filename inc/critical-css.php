@@ -79,7 +79,9 @@ function kindi_preload_lcp_image(): void {
 	}
 	$src = kindi_mascot_src( 'hero_mascot', 'mascot/kindy-hero.webp' );
 	if ( '' !== $src ) {
-		printf( '<link rel="preload" as="image" href="%s" fetchpriority="high">' . "\n", esc_url( $src ) );
+		// The hero mascot only shows at ≥1024px, so preload it there only —
+		// otherwise mobile would download a hidden image and slow its LCP.
+		printf( '<link rel="preload" as="image" href="%s" media="(min-width: 1024px)" fetchpriority="high">' . "\n", esc_url( $src ) );
 	}
 }
 add_action( 'wp_head', 'kindi_preload_lcp_image', 1 );
