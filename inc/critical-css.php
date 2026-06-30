@@ -105,7 +105,8 @@ function kindi_async_styles( string $tag, string $handle ): string {
 	$async = array(
 		'kindi-sections', 'kindi-animations', 'kindi-woocommerce',
 		'woocommerce-layout', 'woocommerce-smallscreen', 'woocommerce-general',
-		'wc-blocks-style', 'wc-blocks-packages-style', 'brands-styles',
+		'woocommerce-blocktheme', 'wc-blocks-style', 'wc-blocks-packages-style',
+		'brands-styles', 'aos',
 	);
 	if ( ! in_array( $handle, $async, true ) ) {
 		return $tag;
