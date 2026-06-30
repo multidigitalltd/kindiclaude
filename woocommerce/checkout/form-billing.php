@@ -21,7 +21,7 @@ if ( ! isset( $checkout ) || ! $checkout instanceof WC_Checkout ) {
 }
 
 $kindi_fields  = $checkout->get_checkout_fields( 'billing' );
-$kindi_contact = array( 'billing_email', 'billing_phone' );
+$kindi_contact = array( 'billing_first_name', 'billing_last_name', 'billing_phone', 'billing_email' );
 ?>
 <div class="woocommerce-billing-fields">
 	<?php do_action( 'woocommerce_before_checkout_billing_form', $checkout ); ?>

@@ -126,10 +126,10 @@ function kindi_checkout_field_layout( array $fields ): array {
 		$b[ $key ]['class']       = array( $row );
 	};
 
-	$set( $b, 'billing_email', 'אימייל', 'name@example.com', 10, 'form-row-first' );
-	$set( $b, 'billing_phone', 'טלפון נייד', '050-1234567', 20, 'form-row-last' );
-	$set( $b, 'billing_first_name', 'שם פרטי', 'ישראלה', 30, 'form-row-first' );
-	$set( $b, 'billing_last_name', 'שם משפחה', 'ישראלי', 40, 'form-row-last' );
+	$set( $b, 'billing_first_name', 'שם פרטי', 'ישראלה', 10, 'form-row-first' );
+	$set( $b, 'billing_last_name', 'שם משפחה', 'ישראלי', 20, 'form-row-last' );
+	$set( $b, 'billing_phone', 'טלפון נייד', '050-1234567', 30, 'form-row-first' );
+	$set( $b, 'billing_email', 'אימייל', 'name@example.com', 40, 'form-row-last' );
 	$set( $b, 'billing_address_1', 'רחוב ומספר', 'הרצל 12', 50, 'form-row-first' );
 	$set( $b, 'billing_address_2', 'דירה / כניסה', 'דירה 4, קומה 2', 60, 'form-row-last' );
 	$set( $b, 'billing_city', 'עיר', 'תל אביב', 70, 'form-row-first' );
