@@ -94,8 +94,8 @@ function kindi_checkout_club_banner(): void {
 		. '</div>'
 		// `kindi-club-trigger` is the hook for Simply Club: set this class as the
 		// pop-up trigger in the plugin's panel and clicking opens the login/offers
-		// popup. The my-account href stays as a graceful fallback when unset.
-		. '<a class="kindi-club__btn kindi-club-trigger" href="' . esc_url( wc_get_page_permalink( 'myaccount' ) ) . '">' . esc_html__( 'התחברות / הצטרפות', 'kindi' ) . '</a>'
+		// popup. A button (not a link) so it never navigates away on click.
+		. '<button type="button" class="kindi-club__btn kindi-club-trigger">' . esc_html__( 'התחברות / הצטרפות', 'kindi' ) . '</button>'
 		. '<button type="button" class="kindi-club__toggle" data-kindi-club-toggle aria-label="' . esc_attr__( 'כיווץ', 'kindi' ) . '">' . $chevron . '</button>' // phpcs:ignore WordPress.Security.EscapeOutput
 		. '</div>';
 }
@@ -724,24 +724,12 @@ add_filter( 'woocommerce_available_payment_gateways', 'kindi_order_payment_gatew
  * @return void
  */
 function kindi_gifta_coupon_notice(): void {
-	if ( ! function_exists( 'WC' ) || ! WC()->payment_gateways() ) {
-		return;
-	}
-	$has_gifta = false;
-	foreach ( WC()->payment_gateways()->payment_gateways() as $gateway ) {
-		if ( 'yes' === ( $gateway->enabled ?? 'no' ) && kindi_is_gifta_gateway( (string) $gateway->id, (string) $gateway->get_method_title() ) ) {
-			$has_gifta = true;
-			break;
-		}
-	}
-	if ( ! $has_gifta ) {
-		return;
-	}
-	echo '<p class="kindi-gifta-note custom-payment-text">'
+	echo '<p class="kindi-gifta-note">'
 		. esc_html__( 'לתשומת ליבכם: לא ניתן לממש כרטיס Gifta יחד עם קופון. לשימוש בכרטיס Gifta הסירו את הקופון; לשימוש בקופון בחרו אמצעי תשלום אחר.', 'kindi' )
 		. '</p>';
 }
-add_action( 'woocommerce_review_order_before_payment', 'kindi_gifta_coupon_notice' );
+// Render directly below the coupon box in the order-summary column.
+add_action( 'kindi_summary_after_coupon', 'kindi_gifta_coupon_notice' );
 
 /**
  * Safety net: block placing the order with Gifta while a coupon is applied.

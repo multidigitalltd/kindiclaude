@@ -530,9 +530,9 @@
 		if ( ! side || document.querySelector( '.kindi-giftcard-relocated' ) ) { return; }
 		var hit;
 		try {
-			hit = document.querySelector( '[class*="gifta" i],[id*="gifta" i],[class*="ywgc" i],.simply-offerbox,.simply_offerbox' );
+			hit = document.querySelector( '[class*="gifta" i],[id*="gifta" i],.simply-offerbox,.simply_offerbox' );
 		} catch ( err ) {
-			hit = document.querySelector( '.ywgc_enter_code, .simply-offerbox, .simply_offerbox' );
+			hit = document.querySelector( '.simply-offerbox, .simply_offerbox' );
 		}
 		if ( ! hit || side.contains( hit ) ) { return; }
 		var box = hit;
