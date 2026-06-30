@@ -40,6 +40,19 @@ function kindi_woocommerce_setup(): void {
 add_action( 'after_setup_theme', 'kindi_woocommerce_setup' );
 
 /**
+ * Belt-and-braces: make sure the hover-zoom never runs even if another plugin
+ * (or a cached page) re-enables it — dequeue the zoom library on product pages.
+ *
+ * @return void
+ */
+function kindi_dequeue_zoom(): void {
+	if ( function_exists( 'is_product' ) && is_product() ) {
+		wp_dequeue_script( 'zoom' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'kindi_dequeue_zoom', 100 );
+
+/**
  * Products per row on shop/category archives (matches the 4-up design grid).
  *
  * @return int

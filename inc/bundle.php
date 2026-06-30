@@ -167,8 +167,16 @@ add_action( 'rest_api_init', 'kindi_bundle_rest_init' );
  * @return WP_REST_Response|WP_Error
  */
 function kindi_bundle_add_cb( WP_REST_Request $request ) {
-	if ( ! class_exists( 'WooCommerce' ) || ! WC()->cart ) {
+	if ( ! class_exists( 'WooCommerce' ) ) {
 		return new WP_Error( 'kindi_no_wc', __( 'החנות אינה זמינה.', 'kindi' ), array( 'status' => 400 ) );
+	}
+	// WooCommerce doesn't boot the cart/session on REST requests — load it so
+	// add_to_cart works (otherwise WC()->cart is null and the add fails).
+	if ( ( null === WC()->cart || ! WC()->cart ) && function_exists( 'wc_load_cart' ) ) {
+		wc_load_cart();
+	}
+	if ( ! WC()->cart ) {
+		return new WP_Error( 'kindi_no_cart', __( 'העגלה אינה זמינה.', 'kindi' ), array( 'status' => 400 ) );
 	}
 
 	$items = $request->get_param( 'items' );

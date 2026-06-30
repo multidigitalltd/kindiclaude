@@ -886,3 +886,28 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   .kindi-archive.is-filters-open::before { content: ""; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 214; }
   .kindi-side__close { display: inline-grid; place-items: center; }
 }
+
+/* ====================================================================== */
+/* PDP + mini-cart tweaks                                                 */
+/* ====================================================================== */
+/* Belt-and-braces: never show the hover-zoom magnifier overlay. */
+.woocommerce-product-gallery .zoomImg { display: none !important; }
+
+/* Product gallery main image — cap the height so it doesn't dominate. */
+.woocommerce div.product.kindi-pdp .woocommerce-product-gallery__image img,
+.woocommerce div.product.kindi-pdp .woocommerce-product-gallery__wrapper img {
+  max-height: 460px; width: auto; max-width: 100%; margin-inline: auto; object-fit: contain;
+}
+
+/* "מידע נוסף" — always its own line below the short description, never beside the price. */
+.kindi-pdp__more { display: inline-flex; clear: both; }
+.kindi-pdp__excerpt + .kindi-pdp__more { margin-top: 0.5rem; }
+
+/* Mini-cart: tidy price + per-item quantity stepper. */
+.kindi-cartdrawer .woocommerce-mini-cart-item { flex-wrap: wrap; }
+.kindi-mcline { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; width: 100%; margin-top: 0.4rem; }
+.kindi-mcprice { font-weight: 800; color: var(--brand-red); white-space: nowrap; }
+.kindi-mcqty { display: inline-flex; align-items: center; border: 1.5px solid var(--border); border-radius: 0.6rem; overflow: hidden; }
+.kindi-mcqty__b { width: 1.9rem; height: 1.9rem; border: 0; background: var(--muted); color: var(--brand-navy); font-size: 1.05rem; line-height: 1; cursor: pointer; display: grid; place-items: center; }
+.kindi-mcqty__b:hover { background: var(--brand-red); color: #fff; }
+.kindi-mcqty__n { min-width: 2rem; text-align: center; font-weight: 700; color: var(--brand-navy); }

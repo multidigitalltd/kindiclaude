@@ -32,9 +32,43 @@ function kindi_store_assets(): void {
 			'subscribeUrl' => esc_url_raw( rest_url( 'kindi/v1/subscribe' ) ),
 			'ajaxUrl'      => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
 			'nonce'        => wp_create_nonce( 'wp_rest' ),
+			'qtyNonce'     => wp_create_nonce( 'kindi_cart_qty' ),
 		)
 	);
 }
+
+/**
+ * AJAX: change a cart item's quantity from the mini-cart drawer (0 = remove).
+ * Returns the refreshed cart fragments + count.
+ *
+ * @return void
+ */
+function kindi_cart_qty(): void {
+	check_ajax_referer( 'kindi_cart_qty', 'nonce' );
+	if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+		wp_send_json_error( array( 'message' => 'cart' ), 400 );
+	}
+	$key = isset( $_POST['key'] ) ? sanitize_text_field( wp_unslash( $_POST['key'] ) ) : '';
+	$qty = isset( $_POST['qty'] ) ? (int) $_POST['qty'] : 0;
+	if ( '' === $key || ! WC()->cart->get_cart_item( $key ) ) {
+		wp_send_json_error( array( 'message' => 'key' ), 400 );
+	}
+	if ( $qty <= 0 ) {
+		WC()->cart->remove_cart_item( $key );
+	} else {
+		WC()->cart->set_quantity( $key, $qty, true );
+	}
+	WC()->cart->calculate_totals();
+
+	wp_send_json_success(
+		array(
+			'fragments' => apply_filters( 'woocommerce_add_to_cart_fragments', array() ),
+			'count'     => WC()->cart->get_cart_contents_count(),
+		)
+	);
+}
+add_action( 'wp_ajax_kindi_cart_qty', 'kindi_cart_qty' );
+add_action( 'wp_ajax_nopriv_kindi_cart_qty', 'kindi_cart_qty' );
 add_action( 'wp_enqueue_scripts', 'kindi_store_assets' );
 
 /**

@@ -408,3 +408,110 @@
 		new MutationObserver( scrub ).observe( document.body, { childList: true, subtree: true } );
 	} catch ( e ) {}
 }() );
+
+/* ---------------- Mini-cart quantity steppers + single-product AJAX add ----- */
+( function () {
+	'use strict';
+	var cfg = window.kindiStore || {};
+
+	function openDrawer() {
+		var link = document.querySelector( '.kindi-cart' );
+		if ( link ) { link.click(); }
+	}
+
+	function applyFragments( fragments ) {
+		if ( ! fragments ) { return; }
+		Object.keys( fragments ).forEach( function ( sel ) {
+			try {
+				document.querySelectorAll( sel ).forEach( function ( el ) {
+					var tmp = document.createElement( 'div' );
+					tmp.innerHTML = fragments[ sel ];
+					if ( tmp.firstElementChild ) { el.replaceWith( tmp.firstElementChild ); }
+				} );
+			} catch ( e ) {}
+		} );
+		wireMiniCartQty();
+	}
+
+	function postQty( key, qty ) {
+		var body = new URLSearchParams();
+		body.append( 'action', 'kindi_cart_qty' );
+		body.append( 'nonce', cfg.qtyNonce || '' );
+		body.append( 'key', key );
+		body.append( 'qty', qty );
+		fetch( cfg.ajaxUrl, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() } )
+			.then( function ( r ) { return r.json(); } )
+			.then( function ( d ) { if ( d && d.success ) { applyFragments( d.data.fragments ); } } )
+			.catch( function () {} );
+	}
+
+	function wireMiniCartQty() {
+		document.querySelectorAll( '.kindi-cartdrawer .woocommerce-mini-cart-item' ).forEach( function ( item ) {
+			if ( item.dataset.kqty ) { return; }
+			var remove = item.querySelector( 'a.remove[data-cart_item_key]' );
+			var qEl = item.querySelector( '.quantity' );
+			if ( ! remove || ! qEl ) { return; }
+			item.dataset.kqty = '1';
+			var key = remove.getAttribute( 'data-cart_item_key' );
+			var cur = parseInt( ( qEl.textContent || '' ).replace( /[^\d]/g, '' ), 10 ) || 1;
+			var amount = qEl.querySelector( '.woocommerce-Price-amount, .amount' );
+
+			var line = document.createElement( 'div' );
+			line.className = 'kindi-mcline';
+			line.innerHTML =
+				'<span class="kindi-mcqty"><button type="button" class="kindi-mcqty__b" data-d="-1" aria-label="הפחתת כמות">&#8722;</button>' +
+				'<span class="kindi-mcqty__n">' + cur + '</span>' +
+				'<button type="button" class="kindi-mcqty__b" data-d="1" aria-label="הוספת כמות">&#43;</button></span>' +
+				'<span class="kindi-mcprice">' + ( amount ? amount.outerHTML : '' ) + '</span>';
+			qEl.style.display = 'none';
+			qEl.parentNode.insertBefore( line, qEl.nextSibling );
+
+			var num = line.querySelector( '.kindi-mcqty__n' );
+			line.addEventListener( 'click', function ( e ) {
+				var b = e.target.closest( '.kindi-mcqty__b' );
+				if ( ! b ) { return; }
+				var q = ( parseInt( num.textContent, 10 ) || 1 ) + parseInt( b.getAttribute( 'data-d' ), 10 );
+				if ( q < 0 ) { q = 0; }
+				num.textContent = q;
+				postQty( key, q );
+			} );
+		} );
+	}
+
+	wireMiniCartQty();
+	if ( window.jQuery ) {
+		window.jQuery( document.body ).on( 'wc_fragments_refreshed wc_fragments_loaded added_to_cart', wireMiniCartQty );
+	}
+
+	/* Single-product add-to-cart via AJAX so the drawer opens (no full reload).
+	   Buy-now (flag set) and grouped forms fall through to a normal submit. */
+	document.addEventListener( 'submit', function ( e ) {
+		var form = e.target;
+		if ( ! ( form instanceof HTMLFormElement ) || ! form.classList.contains( 'cart' ) || form.classList.contains( 'grouped_form' ) ) {
+			return;
+		}
+		var flag = form.querySelector( '[data-kindi-buynow-flag]' );
+		if ( flag && '1' === flag.value ) { return; }
+		var fd = new FormData( form );
+		var pid = fd.get( 'product_id' ) || fd.get( 'add-to-cart' );
+		if ( ! pid ) { return; }
+		e.preventDefault();
+		if ( ! fd.get( 'product_id' ) ) { fd.set( 'product_id', pid ); }
+		if ( ! fd.get( 'add-to-cart' ) ) { fd.set( 'add-to-cart', pid ); }
+
+		var base = ( window.wc_cart_fragments_params && window.wc_cart_fragments_params.wc_ajax_url ) || '/?wc-ajax=%%endpoint%%';
+		fetch( base.replace( '%%endpoint%%', 'add_to_cart' ), { method: 'POST', body: fd, credentials: 'same-origin' } )
+			.then( function ( r ) { return r.json(); } )
+			.then( function ( d ) {
+				if ( ! d ) { form.submit(); return; }
+				if ( d.error && d.product_url ) { window.location = d.product_url; return; }
+				applyFragments( d.fragments );
+				if ( window.jQuery ) {
+					window.jQuery( document.body ).trigger( 'added_to_cart', [ d.fragments, d.cart_hash ] );
+				} else {
+					openDrawer();
+				}
+			} )
+			.catch( function () { form.submit(); } );
+	} );
+}() );
