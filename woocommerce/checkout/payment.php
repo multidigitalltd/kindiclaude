@@ -23,6 +23,11 @@ if ( ! wp_doing_ajax() ) {
 			<?php
 			if ( ! empty( $available_gateways ) ) {
 				foreach ( $available_gateways as $gateway ) {
+					// Skip blank/misconfigured gateways (no title and no icon)
+					// so they don't render as an empty card in the grid.
+					if ( '' === trim( wp_strip_all_tags( (string) $gateway->get_title() ) ) && '' === trim( (string) $gateway->get_icon() ) ) {
+						continue;
+					}
 					?>
 					<li class="wc_payment_method payment_method_<?php echo esc_attr( $gateway->id ); ?>">
 						<input id="payment_method_<?php echo esc_attr( $gateway->id ); ?>" type="radio" class="input-radio" name="payment_method" value="<?php echo esc_attr( $gateway->id ); ?>" <?php checked( $gateway->chosen, true ); ?> data-order_button_text="<?php echo esc_attr( $gateway->order_button_text ); ?>" />

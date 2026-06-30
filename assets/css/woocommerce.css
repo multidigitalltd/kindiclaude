@@ -431,6 +431,8 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-optin input[type="checkbox"], .kindi-billsame input[type="checkbox"] { width: 1.2rem; height: 1.2rem; accent-color: var(--brand-red); margin: 0; }
 .kindi-optin__gift { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--brand-red); font-weight: 800; font-size: 0.85rem; }
 .kindi-billsame { color: var(--brand-navy); }
+/* Opt-in relocated just above the place-order button. */
+.kindi-summary__place .kindi-optin--place { margin: 0 0 0.85rem; font-size: 0.9rem; }
 
 /* ---------- Box 3: shipping-method cards ---------- */
 .kindi-ship { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; }

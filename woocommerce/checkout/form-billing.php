@@ -67,17 +67,12 @@ $kindi_render = static function ( $key ) use ( $checkout, $kindi_fields, $kindi_
 			</header>
 			<div class="kindi-cobox__body kindi-cobox__grid">
 				<?php
+				// Marketing opt-in is rendered just above the place-order button
+				// instead (see inc/checkout.php → kindi_marketing_optin_field).
 				foreach ( $kindi_contact as $kindi_key ) {
 					$kindi_render( $kindi_key );
 				}
 				?>
-				<p class="form-row kindi-optin" id="kindi_optin_field">
-					<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
-						<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" name="kindi_marketing_optin" value="1" checked />
-						<span><?php esc_html_e( 'שלחו לי מבצעים והטבות', 'kindi' ); ?></span>
-					</label>
-					<span class="kindi-optin__gift">🎁 <?php esc_html_e( '10% הנחה במייל הראשון', 'kindi' ); ?></span>
-				</p>
 			</div>
 		</section>
 
@@ -104,12 +99,6 @@ $kindi_render = static function ( $key ) use ( $checkout, $kindi_fields, $kindi_
 					$kindi_render( $kindi_key );
 				}
 				?>
-				<p class="form-row kindi-billsame" id="kindi_billsame_field">
-					<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
-						<input type="checkbox" class="input-checkbox" checked disabled />
-						<span><?php esc_html_e( 'כתובת החיוב זהה לכתובת המשלוח', 'kindi' ); ?></span>
-					</label>
-				</p>
 			</div>
 		</section>
 

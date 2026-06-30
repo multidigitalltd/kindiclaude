@@ -167,6 +167,12 @@ function kindi_checkout_field_layout( array $fields ): array {
 		$fields['billing']['billing_state']['required'] = false;
 		$fields['billing']['billing_state']['class']    = array( 'kindi-hidden-field' );
 	}
+
+	// Single-country store: keep the country field in the DOM (so the order still
+	// submits "IL") but hide it from view — there is nothing to choose.
+	if ( isset( $fields['billing']['billing_country'] ) ) {
+		$fields['billing']['billing_country']['class'] = array( 'kindi-hidden-field' );
+	}
 	if ( isset( $fields['billing']['billing_email'] ) ) {
 		$fields['billing']['billing_email']['type'] = 'email';
 	}
@@ -188,6 +194,26 @@ function kindi_save_marketing_optin( WC_Order $order ): void {
 	$order->update_meta_data( '_kindi_marketing_optin', $optin ? 'yes' : 'no' );
 }
 add_action( 'woocommerce_checkout_create_order', 'kindi_save_marketing_optin' );
+
+/**
+ * Marketing opt-in checkbox, rendered just above the place-order button. It
+ * lives inside the checkout form (the order-review column), so it still posts
+ * to kindi_save_marketing_optin. Moved out of the contact card per the design.
+ *
+ * @return void
+ */
+function kindi_marketing_optin_field(): void {
+	?>
+	<p class="form-row kindi-optin kindi-optin--place" id="kindi_optin_field">
+		<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
+			<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" name="kindi_marketing_optin" value="1" checked />
+			<span><?php esc_html_e( 'שלחו לי מבצעים והטבות', 'kindi' ); ?></span>
+		</label>
+		<span class="kindi-optin__gift">🎁 <?php esc_html_e( '10% הנחה במייל הראשון', 'kindi' ); ?></span>
+	</p>
+	<?php
+}
+add_action( 'woocommerce_review_order_before_submit', 'kindi_marketing_optin_field' );
 
 /**
  * Shipping-method card (box 3) HTML, rendered in the main process column and
@@ -234,11 +260,12 @@ function kindi_shipping_section_html(): string {
 						foreach ( $available as $method ) :
 							$cost = (float) $method->get_cost();
 							$rid  = 'shipping_method_' . $i . '_' . sanitize_title( $method->get_id() );
+							$icon = kindi_shipping_icon_name( $method );
 							?>
 							<li class="kindi-ship__item">
 								<input type="radio" name="shipping_method[<?php echo esc_attr( (string) $i ); ?>]" data-index="<?php echo esc_attr( (string) $i ); ?>" id="<?php echo esc_attr( $rid ); ?>" value="<?php echo esc_attr( $method->get_id() ); ?>" class="shipping_method" <?php checked( $method->get_id(), $picked ); ?> />
 								<label for="<?php echo esc_attr( $rid ); ?>">
-									<span class="kindi-ship__ic"><?php echo kindi_icon( 'truck', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+									<span class="kindi-ship__ic"><?php echo kindi_icon( $icon, 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 									<span class="kindi-ship__main">
 										<span class="kindi-ship__title"><?php echo esc_html( wp_strip_all_tags( $method->get_label() ) ); ?></span>
 									</span>
@@ -502,15 +529,40 @@ function kindi_checkout_cols_close(): void {
 add_action( 'woocommerce_checkout_after_order_review', 'kindi_checkout_cols_close', 50 );
 
 /**
- * Prepend a truck icon to each shipping-method label (cart & checkout) so the
- * methods can render as cards with an icon + title + price.
+ * Pick the icon for a shipping rate: a storefront for self-pickup, a truck for
+ * everything else. Pickup is detected by WooCommerce's local_pickup method id
+ * or a Hebrew/English "pickup" hint in the rate id or label.
+ *
+ * @param mixed $method Shipping rate (WC_Shipping_Rate) or null.
+ * @return string Icon key for kindi_icon().
+ */
+function kindi_shipping_icon_name( $method = null ): string {
+	if ( ! is_object( $method ) ) {
+		return 'truck';
+	}
+	$method_id = method_exists( $method, 'get_method_id' ) ? (string) $method->get_method_id() : '';
+	$rate_id   = method_exists( $method, 'get_id' ) ? (string) $method->get_id() : '';
+	$label     = method_exists( $method, 'get_label' ) ? wp_strip_all_tags( (string) $method->get_label() ) : '';
+
+	$is_pickup = 'local_pickup' === $method_id
+		|| false !== stripos( $rate_id, 'pickup' )
+		|| false !== stripos( $rate_id, 'local_pickup' )
+		|| ( '' !== $label && false !== mb_stripos( $label, 'איסוף' ) );
+
+	return $is_pickup ? 'store' : 'truck';
+}
+
+/**
+ * Prepend an icon to each shipping-method label (cart & checkout) so the
+ * methods can render as cards with an icon + title + price. Self-pickup gets a
+ * storefront icon; all other methods get a truck.
  *
  * @param string $label  Method label HTML (title + cost).
- * @param mixed  $method Shipping rate (unused).
+ * @param mixed  $method Shipping rate.
  * @return string
  */
 function kindi_shipping_method_icon( string $label, $method = null ): string {
-	return '<span class="kindi-ship__ic">' . kindi_icon( 'truck', 'kindi-icon--md' ) . '</span>' // phpcs:ignore WordPress.Security.EscapeOutput
+	return '<span class="kindi-ship__ic">' . kindi_icon( kindi_shipping_icon_name( $method ), 'kindi-icon--md' ) . '</span>' // phpcs:ignore WordPress.Security.EscapeOutput
 		. '<span class="kindi-ship__txt">' . $label . '</span>';
 }
 add_filter( 'woocommerce_cart_shipping_method_full_label', 'kindi_shipping_method_icon', 10, 2 );
