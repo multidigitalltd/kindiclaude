@@ -431,8 +431,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-optin input[type="checkbox"], .kindi-billsame input[type="checkbox"] { width: 1.2rem; height: 1.2rem; accent-color: var(--brand-red); margin: 0; }
 .kindi-optin__gift { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--brand-red); font-weight: 800; font-size: 0.85rem; }
 .kindi-billsame { color: var(--brand-navy); }
-/* Opt-in relocated just above the place-order button. */
-.kindi-summary__place .kindi-optin--place { margin: 0 0 0.85rem; font-size: 0.9rem; }
 
 /* ---------- Box 3: shipping-method cards ---------- */
 .kindi-ship { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; }
@@ -456,6 +454,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-ship__title { display: block; font-weight: 800; color: var(--brand-navy); line-height: 1.35; font-size: 0.92rem; }
 .kindi-ship__price { flex: 0 0 auto; font-weight: 800; color: var(--brand-navy); white-space: nowrap; }
 .kindi-ship__free { color: #16a34a; }
+.kindi-ship__coord { color: var(--brand-navy); font-weight: 700; font-size: 0.8rem; white-space: normal; text-align: end; max-width: 8.5rem; line-height: 1.25; }
 .kindi-ship__none { margin: 0; color: var(--muted-foreground); font-weight: 600; }
 
 /* Payment card wrapper resets — the #payment cards already styled below. */

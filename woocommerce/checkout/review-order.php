@@ -136,9 +136,13 @@ $kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place ord
 		</div>
 		<?php do_action( 'woocommerce_review_order_after_order_total' ); ?>
 		<?php do_action( 'woocommerce_review_order_before_submit' ); ?>
+		<?php
+		// Marketing-consent + terms checkboxes render here, stacked just above the
+		// place-order button (terms moved up from below the button).
+		wc_get_template( 'checkout/terms.php' );
+		?>
 		<?php echo apply_filters( 'woocommerce_order_button_html', '<button type="submit" class="button alt kindi-placeorder" name="woocommerce_checkout_place_order" id="place_order" value="' . esc_attr( $kindi_btn_text ) . '" data-value="' . esc_attr( $kindi_btn_text ) . '">' . esc_html( $kindi_btn_text ) . '</button>' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 		<?php do_action( 'woocommerce_review_order_after_submit' ); ?>
 		<?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
-		<?php wc_get_template( 'checkout/terms.php' ); ?>
 	</div>
 </div>

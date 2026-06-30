@@ -142,8 +142,8 @@ function kindi_checkout_field_layout( array $fields ): array {
 		'billing_last_name'  => array( 'שם משפחה', 'ישראלי', 20, 'form-row-last' ),
 		'billing_phone'      => array( 'טלפון נייד', '050-1234567', 30, 'form-row-first' ),
 		'billing_email'      => array( 'אימייל', 'name@example.com', 40, 'form-row-last' ),
-		'billing_address_1'  => array( 'רחוב ומספר', 'הרצל 12', 50, 'form-row-first' ),
-		'billing_address_2'  => array( 'דירה / כניסה', 'דירה 4, קומה 2', 60, 'form-row-last' ),
+		'billing_address_1'  => array( 'רחוב', 'הרצל', 50, 'form-row-first' ),
+		'billing_address_2'  => array( 'מספר', '12', 60, 'form-row-last' ),
 		'billing_city'       => array( 'עיר', 'תל אביב', 70, 'form-row-first' ),
 		'billing_postcode'   => array( 'מיקוד', '6100000', 80, 'form-row-last' ),
 	);
@@ -177,43 +177,17 @@ function kindi_checkout_field_layout( array $fields ): array {
 		$fields['billing']['billing_email']['type'] = 'email';
 	}
 
+	// address_2 is repurposed as the (required) house-number field, so give it a
+	// visible label instead of WooCommerce's screen-reader-only optional one.
+	if ( isset( $fields['billing']['billing_address_2'] ) ) {
+		$fields['billing']['billing_address_2']['required']    = true;
+		$fields['billing']['billing_address_2']['label_class'] = array();
+	}
+
 	return $fields;
 }
 // Late priority so our labels/layout win over locale + plugin field filters.
 add_filter( 'woocommerce_checkout_fields', 'kindi_checkout_field_layout', 9999 );
-
-/**
- * Persist the marketing opt-in checkbox (from the contact card) onto the order.
- * The surrounding checkout flow has already verified the checkout nonce.
- *
- * @param WC_Order $order Order being created.
- * @return void
- */
-function kindi_save_marketing_optin( WC_Order $order ): void {
-	$optin = isset( $_POST['kindi_marketing_optin'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['kindi_marketing_optin'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-	$order->update_meta_data( '_kindi_marketing_optin', $optin ? 'yes' : 'no' );
-}
-add_action( 'woocommerce_checkout_create_order', 'kindi_save_marketing_optin' );
-
-/**
- * Marketing opt-in checkbox, rendered just above the place-order button. It
- * lives inside the checkout form (the order-review column), so it still posts
- * to kindi_save_marketing_optin. Moved out of the contact card per the design.
- *
- * @return void
- */
-function kindi_marketing_optin_field(): void {
-	?>
-	<p class="form-row kindi-optin kindi-optin--place" id="kindi_optin_field">
-		<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
-			<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" name="kindi_marketing_optin" value="1" checked />
-			<span><?php esc_html_e( 'שלחו לי מבצעים והטבות', 'kindi' ); ?></span>
-		</label>
-		<span class="kindi-optin__gift">🎁 <?php esc_html_e( '10% הנחה במייל הראשון', 'kindi' ); ?></span>
-	</p>
-	<?php
-}
-add_action( 'woocommerce_review_order_before_submit', 'kindi_marketing_optin_field' );
 
 /**
  * Shipping-method card (box 3) HTML, rendered in the main process column and
@@ -271,7 +245,9 @@ function kindi_shipping_section_html(): string {
 									</span>
 									<span class="kindi-ship__price">
 										<?php
-										if ( $cost > 0 ) {
+										if ( kindi_shipping_is_coordinated( $method ) ) {
+											echo '<span class="kindi-ship__coord">' . esc_html__( 'עלות בתיאום טלפוני', 'kindi' ) . '</span>';
+										} elseif ( $cost > 0 ) {
 											echo wp_kses_post( wc_price( $cost ) );
 										} else {
 											echo '<span class="kindi-ship__free">' . esc_html__( 'חינם', 'kindi' ) . '</span>';
@@ -453,6 +429,10 @@ function kindi_checkout_relocate_payment(): void {
 	}
 	remove_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_payment', 20 );
 	add_action( 'woocommerce_checkout_after_customer_details', 'woocommerce_checkout_payment', 20 );
+
+	// Drop the native "Have a coupon?" form at the top of the checkout — coupons
+	// are entered in the order-summary coupon box instead (review-order.php).
+	remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
 }
 add_action( 'wp', 'kindi_checkout_relocate_payment' );
 
@@ -537,19 +517,39 @@ add_action( 'woocommerce_checkout_after_order_review', 'kindi_checkout_cols_clos
  * @return string Icon key for kindi_icon().
  */
 function kindi_shipping_icon_name( $method = null ): string {
-	if ( ! is_object( $method ) ) {
+	if ( ! is_object( $method ) || ! method_exists( $method, 'get_label' ) ) {
 		return 'truck';
 	}
-	$method_id = method_exists( $method, 'get_method_id' ) ? (string) $method->get_method_id() : '';
-	$rate_id   = method_exists( $method, 'get_id' ) ? (string) $method->get_id() : '';
-	$label     = method_exists( $method, 'get_label' ) ? wp_strip_all_tags( (string) $method->get_label() ) : '';
+	$label = wp_strip_all_tags( (string) $method->get_label() );
 
-	$is_pickup = 'local_pickup' === $method_id
-		|| false !== stripos( $rate_id, 'pickup' )
-		|| false !== stripos( $rate_id, 'local_pickup' )
-		|| ( '' !== $label && false !== mb_stripos( $label, 'איסוף' ) );
+	// Detect self-pickup by the label text, NOT the WooCommerce method id: this
+	// store configures extra "local_pickup" instances for delivery too, so only
+	// a real "איסוף" / "pickup" label should get the storefront icon.
+	$is_pickup = '' !== $label
+		&& ( false !== mb_stripos( $label, 'איסוף' ) || false !== stripos( $label, 'pickup' ) );
 
 	return $is_pickup ? 'store' : 'truck';
+}
+
+/**
+ * Whether a shipping rate's real cost is arranged by phone rather than free:
+ * its WooCommerce cost is 0 but the label states a separate/coordinated cost
+ * ("עלות … בתיאום טלפוני"). Such methods show that note instead of "חינם".
+ * The free self-pickup label also mentions "בתיאום" but never "עלות", so the
+ * "עלות" check keeps pickup showing as free.
+ *
+ * @param mixed $method Shipping rate.
+ * @return bool
+ */
+function kindi_shipping_is_coordinated( $method = null ): bool {
+	if ( ! is_object( $method ) || ! method_exists( $method, 'get_label' ) ) {
+		return false;
+	}
+	$label = wp_strip_all_tags( (string) $method->get_label() );
+	if ( '' === $label || false === mb_stripos( $label, 'עלות' ) ) {
+		return false;
+	}
+	return false !== mb_stripos( $label, 'תיאום' ) || false !== mb_stripos( $label, 'טלפוני' );
 }
 
 /**
@@ -594,42 +594,6 @@ function kindi_order_button_text(): string {
 	return __( 'אישור הזמנה ותשלום', 'kindi' );
 }
 add_filter( 'woocommerce_order_button_text', 'kindi_order_button_text' );
-
-/**
- * Remove the Gifta "connect / login" payment gateway from the checkout — Gifta
- * gift cards are redeemed via the gift-card box in the summary, not as a payment
- * method. Matches any gateway whose id or title mentions Gifta.
- *
- * @param array<string,WC_Payment_Gateway> $gateways Available gateways.
- * @return array<string,WC_Payment_Gateway>
- */
-function kindi_remove_gifta_gateway( array $gateways ): array {
-	if ( is_admin() ) {
-		return $gateways;
-	}
-	foreach ( $gateways as $id => $gateway ) {
-		$title = is_object( $gateway ) && method_exists( $gateway, 'get_title' ) ? (string) $gateway->get_title() : '';
-		if ( false !== stripos( (string) $id, 'gifta' ) || ( '' !== $title && false !== mb_stripos( $title, 'gifta' ) ) || ( '' !== $title && false !== mb_stripos( $title, 'גיפט' ) ) ) {
-			unset( $gateways[ $id ] );
-		}
-	}
-	return $gateways;
-}
-add_filter( 'woocommerce_available_payment_gateways', 'kindi_remove_gifta_gateway' );
-
-/**
- * Notice before the payment methods: Gifta gift-cards can't be combined with
- * coupons. Escaped + translatable; keeps the original `custom-payment-text`
- * class so existing styling still applies.
- *
- * @return void
- */
-function kindi_gifta_coupon_notice(): void {
-	echo '<p class="kindi-gifta-note custom-payment-text">'
-		. esc_html__( 'בתשלום עם כרטיס Gifta לא ניתן להשתמש בקופונים. רוצים להשתמש בקופון? פשוט בחרו אמצעי תשלום אחר.', 'kindi' )
-		. '</p>';
-}
-// Gifta removed from checkout — the coupon-combination notice is no longer shown.
 
 /*
  * ---------------------------------------------------------------------------

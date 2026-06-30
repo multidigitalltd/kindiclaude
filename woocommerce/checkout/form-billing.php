@@ -30,8 +30,8 @@ $kindi_overrides = array(
 	'billing_last_name'  => array( 'שם משפחה', 'ישראלי', 'form-row-last' ),
 	'billing_email'      => array( 'אימייל', 'name@example.com', 'form-row-first' ),
 	'billing_phone'      => array( 'טלפון נייד', '050-1234567', 'form-row-last' ),
-	'billing_address_1'  => array( 'רחוב ומספר', 'הרצל 12', 'form-row-first' ),
-	'billing_address_2'  => array( 'דירה / כניסה', 'דירה 4, קומה 2', 'form-row-last' ),
+	'billing_address_1'  => array( 'רחוב', 'הרצל', 'form-row-first' ),
+	'billing_address_2'  => array( 'מספר', '12', 'form-row-last' ),
 	'billing_city'       => array( 'עיר', 'תל אביב', 'form-row-first' ),
 	'billing_postcode'   => array( 'מיקוד', '6100000', 'form-row-last' ),
 );
@@ -67,8 +67,6 @@ $kindi_render = static function ( $key ) use ( $checkout, $kindi_fields, $kindi_
 			</header>
 			<div class="kindi-cobox__body kindi-cobox__grid">
 				<?php
-				// Marketing opt-in is rendered just above the place-order button
-				// instead (see inc/checkout.php → kindi_marketing_optin_field).
 				foreach ( $kindi_contact as $kindi_key ) {
 					$kindi_render( $kindi_key );
 				}
