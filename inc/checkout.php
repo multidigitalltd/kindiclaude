@@ -110,6 +110,9 @@ add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_club_banner', 4 
  */
 add_filter( 'simply_offerbox_checkout_action', static fn(): string => 'woocommerce_before_checkout_form' );
 
+// Hide the Simply gift-card plugin's own top bar (no-op when the plugin is absent).
+add_filter( 'simply_show_top_bar', '__return_false' );
+
 /**
  * Notice before the payment methods: Gifta gift-cards can't be combined with
  * coupons. Escaped + translatable; keeps the original `custom-payment-text`

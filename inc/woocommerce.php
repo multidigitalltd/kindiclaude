@@ -49,6 +49,22 @@ function kindi_wc_loop_columns(): int {
 add_filter( 'loop_shop_columns', 'kindi_wc_loop_columns' );
 
 /**
+ * Render product search results with the product-archive template, so a search
+ * for products looks exactly like the shop/category archive (product-card grid,
+ * filters, ordering) instead of the generic post search layout.
+ *
+ * @param string[] $templates Candidate template slugs.
+ * @return string[]
+ */
+function kindi_product_search_template( array $templates ): array {
+	if ( class_exists( 'WooCommerce' ) && is_search() && 'product' === get_query_var( 'post_type' ) ) {
+		array_unshift( $templates, 'archive-product' );
+	}
+	return $templates;
+}
+add_filter( 'search_template_hierarchy', 'kindi_product_search_template' );
+
+/**
  * Products per page on archives.
  *
  * @return int
