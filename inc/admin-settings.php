@@ -90,6 +90,7 @@ function kindi_settings_tabs(): array {
 					'whatsapp_to'          => array( 'type' => 'number', 'label' => 'וואטסאפ — שעת סגירה (0-23)' ),
 					'whatsapp_product_msg' => array( 'type' => 'textarea', 'label' => 'הודעת וואטסאפ מעמוד מוצר', 'help' => 'אפשר להשתמש ב-{product} ו-{url}.' ),
 					'free_shipping'        => array( 'type' => 'number', 'label' => 'סף משלוח חינם (₪)' ),
+					'bundle_coupon'        => array( 'type' => 'text', 'label' => 'קוד קופון לחבילה "נקנה יחד"', 'help' => 'אופציונלי — אם יוגדר, הקופון יוחל אוטומטית בלחיצה על "הוספת הנבחרים לסל" בעמוד המוצר.' ),
 				),
 				'משלוח והחזרות (Schema)' => array(
 					'ship_cost'     => array( 'type' => 'number', 'label' => 'עלות משלוח רגיל (₪)', 'help' => 'מוצג בנתונים המובנים של גוגל. 0 = משלוח חינם תמיד.' ),
