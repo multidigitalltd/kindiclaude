@@ -128,6 +128,8 @@ body {
 .kindi-a11y-statement a { color: var(--brand-red); font-weight: 600; }
 .kindi-a11y-statement__date { margin-top: 2rem; font-size: 0.875rem; color: var(--muted-foreground); }
 
-/* Prevent accidental horizontal scroll on mobile (clip doesn't break position:sticky) */
+/* Prevent accidental horizontal scroll at the root only. A clip on <body> would
+   become the scroll container for the (display:contents header) sticky category
+   nav and stop it sticking in some browsers — so keep the guard on <html>. */
 html { overflow-x: clip; }
-body { overflow-x: clip; max-width: 100%; }
+body { max-width: 100%; }

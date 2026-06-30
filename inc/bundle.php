@@ -91,7 +91,7 @@ function kindi_render_bundle(): void {
 	echo '</div>';
 	echo '</section>';
 }
-add_action( 'woocommerce_after_single_product_summary', 'kindi_render_bundle', 15 );
+add_action( 'woocommerce_after_single_product_summary', 'kindi_render_bundle', 9 );
 
 /**
  * Enqueue the bundle script on product pages.
