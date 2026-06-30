@@ -180,3 +180,28 @@ function kindi_wishlist_shortcode(): string {
 	return '<div class="kindi-section"><h2 class="kindi-sec-title">המועדפים שלי</h2><div class="kindi-wish-grid" data-kindi-wishlist-grid><p class="kindi-prod-empty">טוען…</p></div></div>';
 }
 add_shortcode( 'kindi_wishlist', 'kindi_wishlist_shortcode' );
+
+/**
+ * Render the wishlist grid automatically on the /wishlist/ page, so it works
+ * even when the page content has no [kindi_wishlist] shortcode.
+ *
+ * @param string $content Post content.
+ * @return string
+ */
+function kindi_wishlist_auto_content( string $content ): string {
+	if ( ! is_page() || ! in_the_loop() || ! is_main_query() ) {
+		return $content;
+	}
+	$post = get_post();
+	if ( ! $post instanceof WP_Post ) {
+		return $content;
+	}
+	$path     = trim( (string) wp_parse_url( get_permalink( $post ), PHP_URL_PATH ), '/' );
+	$is_wish  = 'wishlist' === $post->post_name || 'wishlist' === substr( $path, -8 );
+	$has_grid = false !== strpos( $content, 'data-kindi-wishlist-grid' );
+	if ( $is_wish && ! $has_grid ) {
+		return $content . kindi_wishlist_shortcode();
+	}
+	return $content;
+}
+add_filter( 'the_content', 'kindi_wishlist_auto_content', 20 );

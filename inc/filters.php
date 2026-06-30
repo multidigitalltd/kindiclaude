@@ -189,7 +189,7 @@ function kindi_archive_attribute_terms(): array {
  * @return void
  */
 function kindi_archive_filters(): void {
-	if ( ! function_exists( 'is_shop' ) || ! ( is_shop() || is_product_taxonomy() ) ) {
+	if ( ! function_exists( 'is_shop' ) || ! ( is_shop() || is_product_taxonomy() || is_search() ) ) {
 		return;
 	}
 
