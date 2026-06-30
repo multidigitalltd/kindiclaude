@@ -85,17 +85,6 @@ add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_top', 5 );
  * @return void
  */
 function kindi_checkout_club_banner(): void {
-	// Simply Club provides the login popup (logged out) and the redemption
-	// offers box (logged in) through this shortcode. Render it so the strip is
-	// functional; fall back to the static branded strip when the plugin is off.
-	if ( shortcode_exists( 'simply_club_offerbox' ) ) {
-		$club = trim( do_shortcode( '[simply_club_offerbox]' ) );
-		if ( '' !== $club ) {
-			echo '<div class="kindi-club kindi-club--simply" data-kindi-club>' . $club . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- Simply Club shortcode output.
-			return;
-		}
-	}
-
 	$chevron = '<svg class="kindi-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 	echo '<div class="kindi-club" data-kindi-club>'
 		. '<span class="kindi-club__ic">' . kindi_icon( 'crown', 'kindi-icon--lg kindi-icon--white' ) . '</span>' // phpcs:ignore WordPress.Security.EscapeOutput
@@ -323,38 +312,42 @@ function kindi_payment_box_close(): void {
 add_action( 'woocommerce_checkout_after_customer_details', 'kindi_payment_box_close', 22 );
 
 /**
- * Gift-wrap add-on box below the payment card: an optional "wrap it + add a
- * card" upsell with a personal-greeting textarea.
+ * Greeting-card add-on fee (₪). Gift wrapping itself is free.
  *
- * @return int Gift-wrap fee (₪).
+ * @return int
  */
-function kindi_gift_wrap_fee(): int {
-	return (int) apply_filters( 'kindi_gift_wrap_fee', 19 );
+function kindi_gift_card_fee(): int {
+	return (int) apply_filters( 'kindi_gift_card_fee', 10 );
 }
 
 /**
- * Render the gift-wrap box.
+ * Render the gift box below the payment card: two independent add-ons — free
+ * gift wrapping and a paid greeting card — plus a personal-greeting textarea.
  *
  * @return void
  */
 function kindi_gift_wrap_box(): void {
-	$fee     = kindi_gift_wrap_fee();
-	$chevron = '<svg class="kindi-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
-	$message = isset( $_POST['kindi_gift_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['kindi_gift_message'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$card_fee = kindi_gift_card_fee();
+	$chevron  = '<svg class="kindi-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+	$message  = isset( $_POST['kindi_gift_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['kindi_gift_message'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	?>
 	<section class="kindi-cobox kindi-giftbox" data-kindi-gift>
 		<header class="kindi-cobox__head kindi-giftbox__head">
 			<span class="kindi-giftbox__ic"><?php echo kindi_icon( 'gift', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			<div class="kindi-cobox__heading">
 				<h3 class="kindi-giftbox__title"><?php esc_html_e( 'זו מתנה? נארוז ונוסיף ברכה', 'kindi' ); ?> <span aria-hidden="true">❤️</span></h3>
-				<p class="kindi-cobox__sub"><?php printf( esc_html__( 'אריזת מתנה מהודרת + כרטיס ברכה — %d₪', 'kindi' ), $fee ); ?></p>
+				<p class="kindi-cobox__sub"><?php printf( esc_html__( 'אריזת מתנה חינם • כרטיס ברכה %d₪', 'kindi' ), $card_fee ); ?></p>
 			</div>
 			<button type="button" class="kindi-giftbox__toggle" data-kindi-gift-toggle aria-label="<?php esc_attr_e( 'כיווץ', 'kindi' ); ?>"><?php echo $chevron; // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
 		</header>
 		<div class="kindi-cobox__body kindi-giftbox__body">
 			<label class="kindi-giftbox__check">
 				<input type="checkbox" name="kindi_gift_wrap" value="1" <?php checked( ! empty( $_POST['kindi_gift_wrap'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing ?> />
-				<span><?php printf( esc_html__( 'הוסף אריזת מתנה (%d₪)', 'kindi' ), $fee ); ?></span>
+				<span><?php esc_html_e( 'הוסף אריזת מתנה (חינם)', 'kindi' ); ?></span>
+			</label>
+			<label class="kindi-giftbox__check">
+				<input type="checkbox" name="kindi_gift_card" value="1" <?php checked( ! empty( $_POST['kindi_gift_card'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing ?> />
+				<span><?php printf( esc_html__( 'הוסף כרטיס ברכה (%d₪)', 'kindi' ), $card_fee ); ?></span>
 			</label>
 			<textarea class="kindi-giftbox__msg" name="kindi_gift_message" rows="3" placeholder="<?php esc_attr_e( 'כתבו ברכה אישית…', 'kindi' ); ?>"><?php echo esc_textarea( $message ); ?></textarea>
 		</div>
@@ -364,25 +357,27 @@ function kindi_gift_wrap_box(): void {
 add_action( 'woocommerce_checkout_after_customer_details', 'kindi_gift_wrap_box', 24 );
 
 /**
- * Whether gift-wrap is currently selected, reading either the direct POST (order
- * submit) or the serialised checkout form (`post_data`, sent on AJAX recalcs).
- * Both flows are nonce-verified by WooCommerce before this runs.
+ * Whether a gift add-on checkbox is selected, reading either the direct POST
+ * (order submit) or the serialised checkout form (`post_data`, sent on AJAX
+ * recalcs). Both flows are nonce-verified by WooCommerce before this runs.
  *
+ * @param string $field Field name (kindi_gift_wrap | kindi_gift_card).
  * @return bool
  */
-function kindi_gift_wrap_selected(): bool {
-	if ( isset( $_POST['kindi_gift_wrap'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		return '1' === sanitize_text_field( wp_unslash( $_POST['kindi_gift_wrap'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+function kindi_gift_option_selected( string $field ): bool {
+	if ( isset( $_POST[ $field ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		return '1' === sanitize_text_field( wp_unslash( $_POST[ $field ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	}
 	if ( isset( $_POST['post_data'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		parse_str( sanitize_text_field( wp_unslash( $_POST['post_data'] ) ), $data ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		return ! empty( $data['kindi_gift_wrap'] );
+		return ! empty( $data[ $field ] );
 	}
 	return false;
 }
 
 /**
- * Add the gift-wrap fee when selected.
+ * Add the greeting-card fee when selected. Gift wrapping is free, so it adds
+ * no fee.
  *
  * @param WC_Cart $cart Cart.
  * @return void
@@ -391,22 +386,24 @@ function kindi_gift_wrap_fee_add( WC_Cart $cart ): void {
 	if ( is_admin() && ! wp_doing_ajax() ) {
 		return;
 	}
-	if ( kindi_gift_wrap_selected() ) {
-		$cart->add_fee( __( 'אריזת מתנה', 'kindi' ), kindi_gift_wrap_fee() );
+	if ( kindi_gift_option_selected( 'kindi_gift_card' ) ) {
+		$cart->add_fee( __( 'כרטיס ברכה', 'kindi' ), kindi_gift_card_fee() );
 	}
 }
 add_action( 'woocommerce_cart_calculate_fees', 'kindi_gift_wrap_fee_add' );
 
 /**
- * Persist the gift-wrap choice + greeting onto the order.
+ * Persist the gift-wrap / greeting-card choices + greeting onto the order.
  *
  * @param WC_Order $order Order.
  * @return void
  */
 function kindi_save_gift_wrap( WC_Order $order ): void {
 	$wrap = isset( $_POST['kindi_gift_wrap'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['kindi_gift_wrap'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$card = isset( $_POST['kindi_gift_card'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['kindi_gift_card'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$msg  = isset( $_POST['kindi_gift_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['kindi_gift_message'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$order->update_meta_data( '_kindi_gift_wrap', $wrap ? 'yes' : 'no' );
+	$order->update_meta_data( '_kindi_gift_card', $card ? 'yes' : 'no' );
 	if ( '' !== $msg ) {
 		$order->update_meta_data( '_kindi_gift_message', $msg );
 	}

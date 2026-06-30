@@ -377,9 +377,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-club__toggle:hover { background: rgba(255, 255, 255, 0.28); }
 .kindi-club.is-collapsed .kindi-club__text span { display: none; }
 .kindi-club.is-collapsed .kindi-club__toggle { transform: rotate(180deg); }
-/* Simply Club shortcode wrapper: keep the full-bleed/container alignment but
-   drop the red bar + flex so the plugin's own login/offers UI renders cleanly. */
-.kindi-club--simply { display: block; background: none; color: inherit; padding-top: 0; padding-bottom: 1.25rem; }
 @media (max-width: 600px) {
   .kindi-club { flex-wrap: wrap; gap: 0.6rem 0.85rem; padding: 0.85rem 1rem; }
   .kindi-club__text { flex: 1 1 60%; }
@@ -697,15 +694,11 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
 .kindi-summary .simply-offerbox,
 .kindi-summary .simply_offerbox { margin: 1rem 0 0; }
 .kindi-summary .kindi-gifta-note { margin: 0.85rem 0 0; }
-/* Gift-card boxes — removed from checkout per request. */
-/* Gifta: matched by class/id substring; YITH: specific class names. */
-.woocommerce-checkout [class*="gifta" i],
-.woocommerce-checkout [id*="gifta" i],
+/* Hide stray YITH gift-card UI only. The Simply gift-card redemption box stays
+   visible (styled above) so customers can redeem cards bought on the site. */
 .woocommerce-checkout .ywgc_have_code,
 .woocommerce-checkout .ywgc_enter_code,
 .woocommerce-checkout .woocommerce-form-coupon-toggle:has(+ .ywgc_enter_code),
-.woocommerce-checkout .simply-offerbox,
-.woocommerce-checkout .simply_offerbox,
 .kindi-giftcard-relocated { display: none !important; }
 
 /* Gifta + coupon notice before the payment methods. */
