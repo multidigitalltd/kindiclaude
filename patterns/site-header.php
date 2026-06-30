@@ -52,7 +52,7 @@ $kindi_nav = kindi_nav_items();
 		<?php echo kindi_icon( 'search', 'kindi-icon--md kindi-search__ic' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 		<input id="kindi-q" type="search" name="s" placeholder="חפשו משחקים, מותגים או קטגוריות…" autocomplete="off">
 		<?php if ( class_exists( 'WooCommerce' ) ) : ?><input type="hidden" name="post_type" value="product"><?php endif; ?>
-		<button type="submit" class="kindi-search__btn"><?php echo kindi_icon( 'sparkles', 'kindi-icon--xs kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>חיפוש</button>
+		<button type="submit" class="kindi-search__btn">חיפוש</button>
 	</form>
 
 	<div class="kindi-bar__actions">

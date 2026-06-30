@@ -56,6 +56,8 @@ function kindi_nav_icon( string $icon ): string {
 function kindi_guess_category_icon( string $label ): string {
 	$rules = array(
 		'קטגוריות' => 'grid',
+		'חדש'      => 'sparkles',
+		'מומלצ'    => 'star',
 		'חצר'      => 'ball',
 		'גינה'     => 'ball',
 		'ספורט'    => 'ball',

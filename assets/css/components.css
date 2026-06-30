@@ -9,6 +9,9 @@
 .kindi-header { display: contents; }
 .kindi-promobar { background: var(--brand-navy); color: #fff; text-align: center; padding-block: 0.45rem; font-size: 13px; font-weight: 600; }
 .kindi-promobar__item { display: inline-flex; align-items: center; gap: 0.5rem; padding-inline: 1rem; }
+/* display:contents promotes the bars into the root flow, which injects block-gap
+   margins between them — zero those out so the strips sit flush. */
+.kindi-topbar, .kindi-promobar, .kindi-bar, .kindi-msearch, .kindi-nav { margin-block: 0; }
 
 .kindi-topbar { background: linear-gradient(to left, var(--brand-red), var(--brand-red-dark) 55%, var(--brand-navy)); color: #fff; overflow: hidden; }
 .kindi-topbar__track { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.25rem 0; padding-block: 0.5rem; padding-inline: 1rem; width: auto; }
@@ -18,7 +21,7 @@
 .kindi-bar {
   position: relative; z-index: 110;
   background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
-  max-width: 1440px; margin-inline: auto; height: 5rem; display: flex; align-items: center;
+  width: 100%; height: 5rem; display: flex; align-items: center;
   gap: 1rem; padding-inline: 1rem;
 }
 @media (min-width: 640px) { .kindi-bar { gap: 2rem; padding-inline: 1.5rem; } }
@@ -34,13 +37,15 @@
 .kindi-search input {
   width: 100%; height: 3rem; padding-inline: 3rem 8rem; background: #fff;
   border: 2px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); border-radius: 1rem;
-  font-size: 0.875rem; font-weight: 600; box-shadow: var(--shadow-card); transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: var(--wp--preset--font-family--sans); font-size: 0.875rem; font-weight: 600; box-shadow: var(--shadow-card); transition: border-color 0.2s, box-shadow 0.2s;
 }
 .kindi-search input::placeholder { color: color-mix(in oklab, var(--brand-navy) 50%, transparent); font-weight: 500; }
 .kindi-search input:hover { border-color: color-mix(in oklab, var(--brand-red) 40%, transparent); }
 .kindi-search input:focus { outline: none; border-color: var(--brand-red); box-shadow: 0 0 0 4px color-mix(in oklab, var(--brand-red) 15%, transparent); }
-.kindi-search__btn { position: absolute; left: 0.375rem; top: 50%; transform: translateY(-50%); display: inline-flex; align-items: center; gap: 0.375rem; background: var(--brand-red); color: #fff; height: 2.25rem; padding-inline: 1.25rem; border: 0; border-radius: 0.75rem; font-weight: 800; font-size: 0.875rem; cursor: pointer; transition: background 0.2s; }
-.kindi-search__btn:hover { background: var(--brand-red-dark); }
+.kindi-search__btn { position: absolute; left: 0.375rem; top: 50%; transform: translateY(-50%); display: inline-flex; align-items: center; gap: 0.375rem; background: var(--brand-red); color: #fff; height: 2.25rem; padding-inline: 1.25rem; border: 0; border-radius: 0.75rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 0.875rem; cursor: pointer; transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; }
+.kindi-search__btn:hover { background: var(--brand-red-dark); transform: translateY(-50%) scale(1.05); box-shadow: 0 6px 16px color-mix(in oklab, var(--brand-red) 40%, transparent); }
+.kindi-search__btn:active { transform: translateY(-50%) scale(0.98); }
+@media (prefers-reduced-motion: reduce) { .kindi-search__btn { transition: background 0.2s ease; } .kindi-search__btn:hover, .kindi-search__btn:active { transform: translateY(-50%); } }
 
 .kindi-bar__actions { display: flex; align-items: center; gap: 0.25rem; margin-inline-start: auto; }
 @media (min-width: 640px) { .kindi-bar__actions { gap: 0.5rem; } }
