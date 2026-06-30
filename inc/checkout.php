@@ -115,6 +115,27 @@ function kindi_checkout_field_layout( array $fields ): array {
 		return $fields;
 	}
 
+	// Guarantee the contact fields exist. Some stores/plugins strip
+	// billing_phone (or billing_email) from the checkout, which leaves the
+	// design's "פרטי קשר" card without a phone input. Re-add them so they both
+	// render and save onto the order.
+	if ( ! isset( $fields['billing']['billing_phone'] ) ) {
+		$fields['billing']['billing_phone'] = array(
+			'type'         => 'tel',
+			'required'     => true,
+			'validate'     => array( 'phone' ),
+			'autocomplete' => 'tel',
+		);
+	}
+	if ( ! isset( $fields['billing']['billing_email'] ) ) {
+		$fields['billing']['billing_email'] = array(
+			'type'         => 'email',
+			'required'     => true,
+			'validate'     => array( 'email' ),
+			'autocomplete' => 'email username',
+		);
+	}
+
 	// label, placeholder, priority, row-class.
 	$map = array(
 		'billing_first_name' => array( 'שם פרטי', 'ישראלה', 10, 'form-row-first' ),
