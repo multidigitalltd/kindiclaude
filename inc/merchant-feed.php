@@ -288,15 +288,18 @@ add_action( 'woocommerce_update_product', 'kindi_flush_feed_cache' );
  * @return void
  */
 function kindi_feeds_admin_panel(): void {
+	// Only on the "פיקסל ומעקב" tab — the feeds live there now.
+	$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'promos'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( 'pixel' !== $tab ) {
+		return;
+	}
+
 	$rows = array(
 		array( 'Google Merchant — פיד מוצרים', kindi_feed_url( 'google' ), 'מתאים ל-Google Merchant Center (Shopping / רישומים חינמיים).' ),
 		array( 'Facebook / Meta — פיד קטלוג', kindi_feed_url( 'facebook' ), 'הדביקו ב-Meta Commerce Manager → קטלוג → מקור נתונים → Data Feed.' ),
 	);
-	if ( function_exists( 'kindi_product_sitemap_url' ) ) {
-		$rows[] = array( 'Sitemap מוצרים (XML)', kindi_product_sitemap_url(), 'מפת אתר מוצרים עם תמונות — Google Search Console.' );
-	}
 
-	echo '<hr><h2>' . esc_html__( 'פידים ומפות אתר', 'kindi' ) . '</h2>';
+	echo '<hr><h2>' . esc_html__( 'פידים למוצרים', 'kindi' ) . '</h2>';
 	echo '<p class="description">' . esc_html__( 'העתיקו את הכתובות והדביקו במערכות הפרסום. הפיד מתעדכן אוטומטית בכל שינוי מוצר.', 'kindi' ) . '</p>';
 	echo '<table class="form-table" role="presentation"><tbody>';
 	foreach ( $rows as $i => $row ) {

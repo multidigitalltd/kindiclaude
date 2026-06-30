@@ -96,3 +96,24 @@ function kindi_wc_email_header_image( string $image ): string {
 	return (string) kindi_img( 'logo.png' );
 }
 add_filter( 'woocommerce_email_header_image', 'kindi_wc_email_header_image' );
+
+/**
+ * Make WooCommerce's HTML emails right-to-left (they ship LTR). Appends RTL
+ * rules to the email stylesheet so order confirmations etc. read correctly in
+ * Hebrew.
+ *
+ * @param string $css Existing email CSS.
+ * @return string
+ */
+function kindi_wc_email_rtl( string $css ): string {
+	if ( ! apply_filters( 'kindi_brand_all_emails', true ) ) {
+		return $css;
+	}
+	return $css . '
+		body, #wrapper, #template_container, #template_header, #body_content,
+		#body_content_inner, #template_footer, .td, td, th, p, h1, h2, h3, ul, ol,
+		.address, .order_item, .wc-item-meta { direction: rtl !important; text-align: right !important; }
+		#template_footer td { text-align: center !important; }
+	';
+}
+add_filter( 'woocommerce_email_styles', 'kindi_wc_email_rtl', 99 );

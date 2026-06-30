@@ -131,10 +131,11 @@ function kindi_settings_tabs(): array {
 				),
 				'עגלה שמורה — מיילים' => array(
 					'cart_reminder_delay'   => array( 'type' => 'number', 'label' => 'תזכורת לאחר (שעות)', 'help' => 'כמה שעות אחרי השמירה תישלח תזכורת. ברירת מחדל: 24.' ),
-					'cart_email_subject'    => array( 'type' => 'text', 'label' => 'מייל מיידי — נושא', 'help' => 'אפשר: {site}, {url}' ),
-					'cart_email_body'       => array( 'type' => 'textarea', 'label' => 'מייל מיידי — תוכן' ),
-					'cart_reminder_subject' => array( 'type' => 'text', 'label' => 'תזכורת — נושא' ),
-					'cart_reminder_body'    => array( 'type' => 'textarea', 'label' => 'תזכורת — תוכן' ),
+					'_cart_vars_note'       => array( 'type' => 'note', 'label' => '', 'help' => 'משתנים דינמיים בנושא ובתוכן: {site} שם האתר · {name} שם הלקוח · {url} קישור לשחזור העגלה · {count} מספר הפריטים · {total} סכום העגלה. רשימת המוצרים מתווספת אוטומטית מתחת לתוכן.' ),
+					'cart_email_subject'    => array( 'type' => 'text', 'label' => 'מייל מיידי — נושא', 'help' => 'אפשר: {site}, {name}, {url}, {count}, {total}' ),
+					'cart_email_body'       => array( 'type' => 'textarea', 'label' => 'מייל מיידי — תוכן', 'help' => 'אפשר: {site}, {name}, {url}, {count}, {total}' ),
+					'cart_reminder_subject' => array( 'type' => 'text', 'label' => 'תזכורת — נושא', 'help' => 'אפשר: {site}, {name}, {url}, {count}, {total}' ),
+					'cart_reminder_body'    => array( 'type' => 'textarea', 'label' => 'תזכורת — תוכן', 'help' => 'אפשר: {site}, {name}, {url}, {count}, {total}' ),
 				),
 				'ניוזלטר ודיוור' => array(
 					'newsletter_webhook' => array( 'type' => 'text', 'label' => 'Webhook URL', 'help' => 'כתובת ה-webhook של מערכת הדיוור (Zapier / Make / ActiveTrail / smoove ועוד). בכל הרשמה תישלח אליה בקשת POST עם האימייל בפורמט JSON.' ),
@@ -281,6 +282,15 @@ function kindi_settings_menu(): void {
 		'dashicons-store',
 		59
 	);
+	// Rename the auto-created first submenu (same slug) from "קינדי" to "ניהול".
+	add_submenu_page(
+		'kindi-settings',
+		__( 'קינדי — ניהול תוכן האתר', 'kindi' ),
+		__( 'ניהול', 'kindi' ),
+		'manage_options',
+		'kindi-settings',
+		'kindi_settings_render'
+	);
 }
 add_action( 'admin_menu', 'kindi_settings_menu' );
 
@@ -411,7 +421,8 @@ function kindi_settings_render(): void {
 				} elseif ( 'taxonomy_multi' === $field['type'] ) {
 				$selected_ids = is_array( $value ) ? array_map( 'intval', $value ) : array();
 				echo '<input type="hidden" name="kindi__multi[' . esc_attr( $key ) . ']" value="1">';
-				echo '<div style="max-height:220px;overflow:auto;border:1px solid #dcdcde;border-radius:6px;padding:8px;column-count:2">';
+				echo '<input type="search" class="kindi-catsearch regular-text" style="display:block;margin-bottom:8px;max-width:760px" placeholder="' . esc_attr__( 'חיפוש קטגוריה…', 'kindi' ) . '" aria-controls="' . esc_attr( $id ) . '-list" autocomplete="off">';
+					echo '<div id="' . esc_attr( $id ) . '-list" class="kindi-catlist" style="max-height:220px;overflow:auto;border:1px solid #dcdcde;border-radius:6px;padding:8px;column-count:2">';
 				foreach ( kindi_admin_product_cats() as $tid => $tname ) {
 					printf(
 						'<label style="display:block;margin:2px 0"><input type="checkbox" name="kindi[%1$s][]" value="%2$d"%3$s> %4$s</label>',
@@ -484,6 +495,18 @@ function kindi_settings_render(): void {
 					var w = btn.closest( '.kindi-imgfield' );
 					w.querySelector( '.kindi-imgfield__url' ).value = '';
 					w.querySelector( '.kindi-imgfield__preview' ).innerHTML = '';
+				} );
+			} );
+			document.querySelectorAll( '.kindi-catsearch' ).forEach( function ( s ) {
+				if ( s.dataset.wired ) { return; }
+				s.dataset.wired = '1';
+				s.addEventListener( 'input', function () {
+					var q = s.value.trim().toLowerCase();
+					var list = document.getElementById( s.getAttribute( 'aria-controls' ) );
+					if ( ! list ) { return; }
+					list.querySelectorAll( 'label' ).forEach( function ( l ) {
+						l.style.display = l.textContent.toLowerCase().indexOf( q ) > -1 ? '' : 'none';
+					} );
 				} );
 			} );
 		}

@@ -250,7 +250,19 @@ function kindi_saved_cart_email( int $post_id, string $type ): void {
 		$body    = (string) kindi_opt( 'cart_email_body' );
 	}
 
-	$vars    = array( 'site' => get_bloginfo( 'name' ), 'url' => $url );
+	$user  = get_user_by( 'email', $email );
+	$name  = $user instanceof WP_User ? $user->display_name : '';
+	$count = (string) get_post_meta( $post_id, '_kindi_cart_count', true );
+	$total = wp_strip_all_tags( (string) get_post_meta( $post_id, '_kindi_cart_total', true ) );
+
+	$vars = array(
+		'site'  => get_bloginfo( 'name' ),
+		'url'   => $url,
+		'name'  => $name,
+		'count' => $count,
+		'total' => $total,
+	);
+
 	$subject = kindi_email_fill( $subject, $vars );
 	$body    = kindi_email_fill( $body, $vars );
 
