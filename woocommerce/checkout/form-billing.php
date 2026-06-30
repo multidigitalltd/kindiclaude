@@ -22,14 +22,14 @@ if ( ! isset( $checkout ) || ! $checkout instanceof WC_Checkout ) {
 
 $kindi_fields = $checkout->get_checkout_fields( 'billing' );
 
-$kindi_contact = array( 'billing_first_name', 'billing_last_name', 'billing_phone', 'billing_email' );
+$kindi_contact = array( 'billing_first_name', 'billing_last_name', 'billing_email', 'billing_phone' );
 $kindi_address = array( 'billing_address_1', 'billing_address_2', 'billing_city', 'billing_postcode' );
 
 $kindi_overrides = array(
 	'billing_first_name' => array( 'שם פרטי', 'ישראלה', 'form-row-first' ),
 	'billing_last_name'  => array( 'שם משפחה', 'ישראלי', 'form-row-last' ),
-	'billing_phone'      => array( 'טלפון נייד', '050-1234567', 'form-row-first' ),
-	'billing_email'      => array( 'אימייל', 'name@example.com', 'form-row-last' ),
+	'billing_email'      => array( 'אימייל', 'name@example.com', 'form-row-first' ),
+	'billing_phone'      => array( 'טלפון נייד', '050-1234567', 'form-row-last' ),
 	'billing_address_1'  => array( 'רחוב ומספר', 'הרצל 12', 'form-row-first' ),
 	'billing_address_2'  => array( 'דירה / כניסה', 'דירה 4, קומה 2', 'form-row-last' ),
 	'billing_city'       => array( 'עיר', 'תל אביב', 'form-row-first' ),

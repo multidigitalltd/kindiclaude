@@ -397,8 +397,10 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 
 /* Two-up field grid inside the contact/address cards. */
 .kindi-cobox__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.25rem; }
-.kindi-cobox__grid .form-row { width: auto; float: none; margin: 0; padding: 0; min-width: 0; }
-/* Each field fills its grid cell (so the two fields span the full row width). */
+/* Override WooCommerce's float-based form-row-first/last (47% wide) so each
+   field is a full-width grid cell and the two fields span the whole row. */
+.kindi-cobox__grid > .form-row,
+.kindi-cobox__grid .form-row { width: 100% !important; max-width: 100% !important; float: none !important; clear: none !important; margin: 0 !important; padding: 0; min-width: 0; }
 .kindi-cobox__grid .form-row .woocommerce-input-wrapper { display: block; width: 100%; }
 .kindi-cobox__grid .form-row input,
 .kindi-cobox__grid .form-row select,
