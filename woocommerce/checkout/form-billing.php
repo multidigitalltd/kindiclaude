@@ -3,13 +3,13 @@
  * Checkout billing form — Kindi override.
  *
  * Splits the billing fields into two numbered cards matching the design:
- *   1. "פרטי קשר"   — email + phone + a marketing opt-in.
- *   2. "כתובת למשלוח" — name + street + apartment + city + postcode.
+ *   1. "פרטי קשר"    — first name + last name + phone + email + marketing opt-in.
+ *   2. "כתובת למשלוח" — street + apartment + city + postcode (+ billing-same note).
  *
- * Field labels/placeholders/ordering are set in inc/checkout.php via the
- * `woocommerce_checkout_fields` filter; in-field icons are applied in
- * woocommerce.css. Shipping is collected on the billing address
- * (ship-to-billing), so there is no separate shipping-fields form.
+ * Labels/placeholders/ordering are forced HERE (locally), not via the
+ * `woocommerce_checkout_fields` filter, because locale/checkout plugins can
+ * override that filter. Country/state are still rendered (hidden) so the order
+ * validates and submits. In-field icons live in woocommerce.css.
  *
  * @package Kindi
  */
@@ -20,8 +20,37 @@ if ( ! isset( $checkout ) || ! $checkout instanceof WC_Checkout ) {
 	$checkout = WC()->checkout();
 }
 
-$kindi_fields  = $checkout->get_checkout_fields( 'billing' );
+$kindi_fields = $checkout->get_checkout_fields( 'billing' );
+
 $kindi_contact = array( 'billing_first_name', 'billing_last_name', 'billing_phone', 'billing_email' );
+$kindi_address = array( 'billing_address_1', 'billing_address_2', 'billing_city', 'billing_postcode' );
+
+$kindi_overrides = array(
+	'billing_first_name' => array( 'שם פרטי', 'ישראלה', 'form-row-first' ),
+	'billing_last_name'  => array( 'שם משפחה', 'ישראלי', 'form-row-last' ),
+	'billing_phone'      => array( 'טלפון נייד', '050-1234567', 'form-row-first' ),
+	'billing_email'      => array( 'אימייל', 'name@example.com', 'form-row-last' ),
+	'billing_address_1'  => array( 'רחוב ומספר', 'הרצל 12', 'form-row-first' ),
+	'billing_address_2'  => array( 'דירה / כניסה', 'דירה 4, קומה 2', 'form-row-last' ),
+	'billing_city'       => array( 'עיר', 'תל אביב', 'form-row-first' ),
+	'billing_postcode'   => array( 'מיקוד', '6100000', 'form-row-last' ),
+);
+
+/**
+ * Render one billing field with the Kindi label/placeholder/row class forced.
+ */
+$kindi_render = static function ( $key ) use ( $checkout, $kindi_fields, $kindi_overrides ) {
+	if ( ! isset( $kindi_fields[ $key ] ) ) {
+		return;
+	}
+	$field = $kindi_fields[ $key ];
+	if ( isset( $kindi_overrides[ $key ] ) ) {
+		$field['label']       = $kindi_overrides[ $key ][0];
+		$field['placeholder'] = $kindi_overrides[ $key ][1];
+		$field['class']       = array( $kindi_overrides[ $key ][2] );
+	}
+	woocommerce_form_field( $key, $field, $checkout->get_value( $key ) );
+};
 ?>
 <div class="woocommerce-billing-fields">
 	<?php do_action( 'woocommerce_before_checkout_billing_form', $checkout ); ?>
@@ -39,9 +68,7 @@ $kindi_contact = array( 'billing_first_name', 'billing_last_name', 'billing_phon
 			<div class="kindi-cobox__body kindi-cobox__grid">
 				<?php
 				foreach ( $kindi_contact as $kindi_key ) {
-					if ( isset( $kindi_fields[ $kindi_key ] ) ) {
-						woocommerce_form_field( $kindi_key, $kindi_fields[ $kindi_key ], $checkout->get_value( $kindi_key ) );
-					}
+					$kindi_render( $kindi_key );
 				}
 				?>
 				<p class="form-row kindi-optin" id="kindi_optin_field">
@@ -64,8 +91,15 @@ $kindi_contact = array( 'billing_first_name', 'billing_last_name', 'billing_phon
 			</header>
 			<div class="kindi-cobox__body kindi-cobox__grid">
 				<?php
+				foreach ( $kindi_address as $kindi_key ) {
+					$kindi_render( $kindi_key );
+				}
+
+				// Render any remaining billing fields (country, state, …) so the order
+				// still validates/submits. These are hidden (single-country store +
+				// the kindi-hidden-field class on state) so the card shows 4 fields.
 				foreach ( $kindi_fields as $kindi_key => $kindi_field ) {
-					if ( in_array( $kindi_key, $kindi_contact, true ) ) {
+					if ( in_array( $kindi_key, $kindi_contact, true ) || in_array( $kindi_key, $kindi_address, true ) || 'billing_company' === $kindi_key ) {
 						continue;
 					}
 					woocommerce_form_field( $kindi_key, $kindi_field, $checkout->get_value( $kindi_key ) );

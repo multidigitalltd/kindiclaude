@@ -521,6 +521,37 @@
 		if ( e.target.closest( 'input[name="kindi_gift_wrap"]' ) ) { refreshCheckout(); }
 	} );
 
+	/* Relocate a Gifta / gift-card redemption box into the summary column, just
+	   below the coupon. Plugin markup varies, so match a few likely hooks and
+	   climb to the wrapper that holds the input + button. If nothing matches, the
+	   box stays where the plugin put it (no harm). */
+	function relocateGiftCard() {
+		var side = document.querySelector( '.kindi-co__side' );
+		if ( ! side || document.querySelector( '.kindi-giftcard-relocated' ) ) { return; }
+		var hit;
+		try {
+			hit = document.querySelector( '[class*="gifta" i],[id*="gifta" i],.simply-offerbox,.simply_offerbox' );
+		} catch ( err ) {
+			hit = document.querySelector( '.simply-offerbox, .simply_offerbox' );
+		}
+		if ( ! hit || side.contains( hit ) ) { return; }
+		var box = hit;
+		for ( var i = 0; i < 5 && box.parentElement; i++ ) {
+			if ( box.querySelector( 'input' ) && box.querySelector( 'button, a.button, input[type="submit"], input[type="button"]' ) ) { break; }
+			box = box.parentElement;
+		}
+		if ( ! box || box === document.body ||
+			box.matches( 'form.checkout, #order_review, .kindi-co, .kindi-co__main, .kindi-co__side' ) ||
+			box.contains( side ) || box.querySelector( '#place_order' ) ) { return; }
+		box.classList.add( 'kindi-giftcard-relocated' );
+		var anchor = side.querySelector( '#order_review' );
+		if ( anchor && anchor.nextSibling ) { side.insertBefore( box, anchor.nextSibling ); }
+		else { side.appendChild( box ); }
+	}
+	relocateGiftCard();
+	setTimeout( relocateGiftCard, 800 );
+	if ( window.jQuery ) { window.jQuery( document.body ).on( 'updated_checkout', relocateGiftCard ); }
+
 	function wireMiniCartQty() {
 		document.querySelectorAll( '.kindi-cartdrawer .woocommerce-mini-cart-item' ).forEach( function ( item ) {
 			if ( item.dataset.kqty ) { return; }

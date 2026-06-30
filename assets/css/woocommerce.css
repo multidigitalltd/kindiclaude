@@ -397,7 +397,13 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 
 /* Two-up field grid inside the contact/address cards. */
 .kindi-cobox__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.25rem; }
-.kindi-cobox__grid .form-row { width: auto; float: none; margin: 0; padding: 0; }
+.kindi-cobox__grid .form-row { width: auto; float: none; margin: 0; padding: 0; min-width: 0; }
+/* Each field fills its grid cell (so the two fields span the full row width). */
+.kindi-cobox__grid .form-row .woocommerce-input-wrapper { display: block; width: 100%; }
+.kindi-cobox__grid .form-row input,
+.kindi-cobox__grid .form-row select,
+.kindi-cobox__grid .form-row textarea,
+.kindi-cobox__grid .form-row .select2-container { width: 100% !important; box-sizing: border-box; max-width: none; }
 .kindi-cobox__grid .form-row-wide,
 .kindi-cobox__grid .kindi-optin,
 .kindi-cobox__grid .kindi-billsame,
@@ -669,6 +675,8 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
 .kindi-summary .simply-offerbox,
 .kindi-summary .simply_offerbox { margin: 1rem 0 0; }
 .kindi-summary .kindi-gifta-note { margin: 0.85rem 0 0; }
+/* Gift-card box relocated into the side column (JS) — full width of the column. */
+.kindi-co__side .kindi-giftcard-relocated { width: 100%; max-width: none; margin: 1rem 0 0; box-sizing: border-box; }
 
 /* Gifta + coupon notice before the payment methods. */
 .woocommerce-checkout .kindi-gifta-note {
