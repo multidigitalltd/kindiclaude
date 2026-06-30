@@ -677,8 +677,12 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
 .kindi-summary .simply-offerbox,
 .kindi-summary .simply_offerbox { margin: 1rem 0 0; }
 .kindi-summary .kindi-gifta-note { margin: 0.85rem 0 0; }
-/* Gift-card box relocated into the side column (JS) — full width of the column. */
-.kindi-co__side .kindi-giftcard-relocated { width: 100%; max-width: none; margin: 1rem 0 0; box-sizing: border-box; }
+/* Gift-card (Gifta) redemption box — removed from checkout per request. */
+.woocommerce-checkout [class*="gifta" i],
+.woocommerce-checkout [id*="gifta" i],
+.woocommerce-checkout .simply-offerbox,
+.woocommerce-checkout .simply_offerbox,
+.kindi-giftcard-relocated { display: none !important; }
 
 /* Gifta + coupon notice before the payment methods. */
 .woocommerce-checkout .kindi-gifta-note {

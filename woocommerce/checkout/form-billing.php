@@ -91,18 +91,17 @@ $kindi_render = static function ( $key ) use ( $checkout, $kindi_fields, $kindi_
 			</header>
 			<div class="kindi-cobox__body kindi-cobox__grid">
 				<?php
-				foreach ( $kindi_address as $kindi_key ) {
-					$kindi_render( $kindi_key );
-				}
-
-				// Render any remaining billing fields (country, state, …) so the order
-				// still validates/submits. These are hidden (single-country store +
-				// the kindi-hidden-field class on state) so the card shows 4 fields.
+				// Country/region (and any other remaining billing fields) first, right
+				// under the heading; then street · apartment · city · postcode.
 				foreach ( $kindi_fields as $kindi_key => $kindi_field ) {
 					if ( in_array( $kindi_key, $kindi_contact, true ) || in_array( $kindi_key, $kindi_address, true ) || 'billing_company' === $kindi_key ) {
 						continue;
 					}
 					woocommerce_form_field( $kindi_key, $kindi_field, $checkout->get_value( $kindi_key ) );
+				}
+
+				foreach ( $kindi_address as $kindi_key ) {
+					$kindi_render( $kindi_key );
 				}
 				?>
 				<p class="form-row kindi-billsame" id="kindi_billsame_field">

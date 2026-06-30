@@ -548,7 +548,7 @@ function kindi_gifta_coupon_notice(): void {
 		. esc_html__( 'בתשלום עם כרטיס Gifta לא ניתן להשתמש בקופונים. רוצים להשתמש בקופון? פשוט בחרו אמצעי תשלום אחר.', 'kindi' )
 		. '</p>';
 }
-add_action( 'kindi_summary_after_coupon', 'kindi_gifta_coupon_notice', 20 );
+// Gifta removed from checkout — the coupon-combination notice is no longer shown.
 
 /*
  * ---------------------------------------------------------------------------
