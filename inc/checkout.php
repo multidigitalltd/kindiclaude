@@ -415,6 +415,7 @@ add_action( 'wp', 'kindi_checkout_relocate_payment' );
  */
 function kindi_checkout_cols_open(): void {
 	echo '<div class="kindi-co"><div class="kindi-co__main">';
+	$GLOBALS['kindi_co_open'] = true;
 }
 add_action( 'woocommerce_checkout_before_customer_details', 'kindi_checkout_cols_open', 5 );
 
@@ -425,6 +426,9 @@ add_action( 'woocommerce_checkout_before_customer_details', 'kindi_checkout_cols
  * @return void
  */
 function kindi_checkout_cols_mid(): void {
+	if ( empty( $GLOBALS['kindi_co_open'] ) ) {
+		return;
+	}
 	echo '</div><div class="kindi-co__side">';
 }
 add_action( 'woocommerce_checkout_after_customer_details', 'kindi_checkout_cols_mid', 30 );
@@ -468,7 +472,11 @@ add_action( 'woocommerce_checkout_after_order_review', 'kindi_checkout_side_extr
  * @return void
  */
 function kindi_checkout_cols_close(): void {
+	if ( empty( $GLOBALS['kindi_co_open'] ) ) {
+		return;
+	}
 	echo '</div></div>';
+	$GLOBALS['kindi_co_open'] = false;
 }
 add_action( 'woocommerce_checkout_after_order_review', 'kindi_checkout_cols_close', 50 );
 

@@ -558,8 +558,24 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
 .simply-top-bar, .simply_top_bar, .simply-offerbox-bar { display: none !important; }
 
+/* ---------- Checkout: let the page use the full width ----------
+   Block themes constrain content (~650px) via .is-layout-constrained, which
+   squashes the two columns. Widen the checkout content wrappers so the 2/3 + 1/3
+   grid has room. Scoped to the checkout body class only. */
+.woocommerce-checkout .is-layout-constrained > .woocommerce,
+.woocommerce-checkout .wp-block-post-content > .woocommerce,
+.woocommerce-checkout .entry-content > .woocommerce,
+.woocommerce-checkout .wp-block-woocommerce-checkout,
+.woocommerce-checkout .woocommerce,
+.woocommerce-checkout .entry-content,
+.woocommerce-checkout .wp-block-post-content,
+.woocommerce-checkout .is-layout-constrained > * {
+  max-width: min(1240px, 94vw) !important;
+}
+.woocommerce-checkout .woocommerce { margin-inline: auto; width: 100%; }
+
 /* ---------- Checkout layout — process (2/3) + sticky summary (1/3) ---------- */
-.woocommerce-checkout form.checkout.woocommerce-checkout { display: block; max-width: 1180px; margin-inline: auto; }
+.woocommerce-checkout form.checkout.woocommerce-checkout { display: block; max-width: 1240px; margin-inline: auto; }
 /* Neutralise WooCommerce's float-based columns — billing + shipping stack
    inside the process column; the .kindi-co wrappers drive the two-column grid. */
 .woocommerce-checkout form.checkout #customer_details,
