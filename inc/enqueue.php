@@ -95,9 +95,13 @@ function kindi_enqueue_styles(): void {
 		}
 	}
 
+	// The wishlist page renders the section wrapper + product cards even without
+	// a shortcode in its content, so it needs the section + WooCommerce styles.
+	$is_wishlist = is_page() && 'wishlist' === get_post_field( 'post_name', get_queried_object_id() );
+
 	// Homepage section styles — front page, any page using a section shortcode,
-	// or the cart/checkout (which now show the reviews + "why choose us" bands).
-	$needs_sections = is_front_page() || $has_section_shortcode
+	// the cart/checkout (reviews + "why choose us" bands), or the wishlist.
+	$needs_sections = is_front_page() || $has_section_shortcode || $is_wishlist
 		|| ( function_exists( 'is_cart' ) && is_cart() )
 		|| ( function_exists( 'is_checkout' ) && is_checkout() );
 	if ( $needs_sections ) {
@@ -110,7 +114,7 @@ function kindi_enqueue_styles(): void {
 	}
 
 	// WooCommerce store styling — store views, the front page, or shortcode pages.
-	if ( class_exists( 'WooCommerce' ) && ( is_front_page() || kindi_is_wc_view() || $has_section_shortcode ) ) {
+	if ( class_exists( 'WooCommerce' ) && ( is_front_page() || kindi_is_wc_view() || $has_section_shortcode || $is_wishlist ) ) {
 		wp_enqueue_style(
 			'kindi-woocommerce',
 			KINDI_URI . 'assets/css/woocommerce.css',

@@ -434,6 +434,22 @@ add_filter( 'woocommerce_output_related_products_args', 'kindi_pdp_related_args'
 add_filter( 'woocommerce_upsell_display_args', 'kindi_pdp_related_args' );
 
 /**
+ * Drop the "מידע נוסף" (Read more) button for out-of-stock products — nothing to
+ * do with them, so the button is just noise (e.g. in a grouped product's list).
+ *
+ * @param string     $html    Button HTML.
+ * @param WC_Product $product Product.
+ * @return string
+ */
+function kindi_hide_oos_loop_button( $html, $product ): string {
+	if ( $product instanceof WC_Product && ! $product->is_in_stock() ) {
+		return '';
+	}
+	return (string) $html;
+}
+add_filter( 'woocommerce_loop_add_to_cart_link', 'kindi_hide_oos_loop_button', 10, 2 );
+
+/**
  * Add a "משלוחים והחזרות" product tab (between specs and reviews), built from the
  * shipping/return options so the content stays in sync with the panel.
  *

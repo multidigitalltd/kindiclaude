@@ -248,7 +248,14 @@
 				headers: { 'X-WP-Nonce': window.kindiStore.nonce },
 			} )
 				.then( function ( r ) { return r.json(); } )
-				.then( function ( items ) {
+				.then( function ( data ) {
+					// New shape: { items, html }. Prefer the rendered grid (identical
+					// to the shop archive); fall back to simple cards if absent.
+					var items = ( data && data.items ) ? data.items : ( Array.isArray( data ) ? data : [] );
+					if ( data && data.html ) {
+						wrap.innerHTML = data.html;
+						return;
+					}
 					if ( ! items.length ) {
 						wrap.innerHTML = '<p class="kindi-prod-empty">המוצרים אינם זמינים יותר.</p>';
 						return;

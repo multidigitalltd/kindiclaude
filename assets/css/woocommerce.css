@@ -736,3 +736,12 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-bundle__add:hover { background: var(--brand-navy-dark); transform: translateY(-1px); }
 .kindi-bundle__add.is-loading { opacity: 0.7; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .kindi-bundle__add:hover { transform: none; } }
+
+/* Grouped product children list: hide the in-stock/quantity text (the row keeps
+   the price, title and qty stepper; out-of-stock rows keep "אזל המלאי"). */
+.woocommerce div.product .grouped_form .stock.in-stock,
+.woocommerce div.product .woocommerce-grouped-product-list .stock.in-stock { display: none; }
+
+/* Wishlist page now injects a real product-card grid — let it control layout. */
+.kindi-wish-grid { display: block; }
+.kindi-wish-grid > ul.products { margin: 0; }

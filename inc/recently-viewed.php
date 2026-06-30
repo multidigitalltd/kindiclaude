@@ -56,10 +56,11 @@ function kindi_recently_viewed_shortcode(): string {
 		return '';
 	}
 
-	$list = implode( ',', array_slice( $ids, 0, 6 ) );
+	$list = implode( ',', array_slice( $ids, 0, 5 ) );
 
-	return '<section class="kindi-section kindi-rv"><h2 class="kindi-sec-title">נצפו לאחרונה</h2>'
-		. do_shortcode( '[products ids="' . esc_attr( $list ) . '" columns="6" limit="6" orderby="post__in"]' )
+	// Same markup/columns as the "related products" row so the two look identical.
+	return '<section class="kindi-section related products kindi-rv"><h2>נצפו לאחרונה</h2>'
+		. do_shortcode( '[products ids="' . esc_attr( $list ) . '" columns="5" limit="5" orderby="post__in"]' )
 		. '</section>';
 }
 add_shortcode( 'kindi_recently_viewed', 'kindi_recently_viewed_shortcode' );

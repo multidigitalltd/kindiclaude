@@ -154,12 +154,14 @@ function kindi_rest_products( WP_REST_Request $request ): WP_REST_Response {
 		return rest_ensure_response( $out );
 	}
 
+	$visible = array();
 	foreach ( array_slice( $ids, 0, 40 ) as $id ) {
 		$product = wc_get_product( $id );
 		if ( ! $product || ! $product->is_visible() ) {
 			continue;
 		}
-		$out[] = array(
+		$visible[] = $id;
+		$out[]     = array(
 			'id'    => $id,
 			'title' => $product->get_name(),
 			'url'   => get_permalink( $id ),
@@ -168,7 +170,56 @@ function kindi_rest_products( WP_REST_Request $request ): WP_REST_Response {
 		);
 	}
 
-	return rest_ensure_response( $out );
+	// Rendered product-card grid (identical to the shop archive) for the wishlist.
+	$html = kindi_render_products_grid( $visible );
+
+	return rest_ensure_response( array( 'items' => $out, 'html' => $html ) );
+}
+
+/**
+ * Render a product-card grid for the given IDs using the standard WooCommerce
+ * loop (so the cards match the shop archive exactly).
+ *
+ * @param int[] $ids Product IDs, in order.
+ * @return string
+ */
+function kindi_render_products_grid( array $ids ): string {
+	if ( ! $ids ) {
+		return '';
+	}
+	$query = new WP_Query(
+		array(
+			'post_type'           => 'product',
+			'post__in'            => $ids,
+			'orderby'             => 'post__in',
+			'posts_per_page'      => count( $ids ),
+			'ignore_sticky_posts' => true,
+			'no_found_rows'       => true,
+		)
+	);
+	if ( ! $query->have_posts() ) {
+		wp_reset_postdata();
+		return '';
+	}
+
+	if ( function_exists( 'wc_setup_loop' ) ) {
+		wc_setup_loop( array( 'columns' => 4 ) );
+	}
+	ob_start();
+	woocommerce_product_loop_start();
+	while ( $query->have_posts() ) {
+		$query->the_post();
+		wc_get_template_part( 'content', 'product' );
+	}
+	woocommerce_product_loop_end();
+	$html = (string) ob_get_clean();
+
+	if ( function_exists( 'wc_reset_loop' ) ) {
+		wc_reset_loop();
+	}
+	wp_reset_postdata();
+
+	return $html;
 }
 
 /**
