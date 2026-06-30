@@ -694,12 +694,11 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
 .kindi-summary .simply-offerbox,
 .kindi-summary .simply_offerbox { margin: 1rem 0 0; }
 .kindi-summary .kindi-gifta-note { margin: 0.85rem 0 0; }
-/* Hide stray YITH gift-card UI only. The Simply gift-card redemption box stays
-   visible (styled above) so customers can redeem cards bought on the site. */
-.woocommerce-checkout .ywgc_have_code,
-.woocommerce-checkout .ywgc_enter_code,
-.woocommerce-checkout .woocommerce-form-coupon-toggle:has(+ .ywgc_enter_code),
-.kindi-giftcard-relocated { display: none !important; }
+/* Gift-card redemption (YITH / Simply) stays visible and is relocated next to
+   the coupon box in the summary by store.js (.kindi-giftcard-relocated). */
+.kindi-co__side .kindi-giftcard-relocated,
+.kindi-co__side .ywgc_have_code,
+.kindi-co__side .ywgc_enter_code { max-width: none; width: 100%; margin: 1rem 0 0; }
 
 /* Gifta + coupon notice before the payment methods. */
 .woocommerce-checkout .kindi-gifta-note {
@@ -770,6 +769,13 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
 .woocommerce-checkout #payment .place-order { padding: 1rem 0 0; }
 .woocommerce-checkout #place_order { width: 100%; padding: 1rem 1.5rem; font-size: 1.1rem; font-weight: 800; border-radius: 0.95rem; }
 .woocommerce-checkout #payment .woocommerce-terms-and-conditions-wrapper { margin-bottom: 1rem; }
+
+/* Cart: shipping method is chosen at checkout, so hide the shipping row +
+   calculator from the cart totals (no method-changing on the cart page). */
+.woocommerce-cart .cart_totals .woocommerce-shipping-totals,
+.woocommerce-cart .cart_totals tr.shipping,
+.woocommerce-cart .cart_totals .shipping-calculator-form,
+.woocommerce-cart .cart_totals .woocommerce-shipping-calculator { display: none !important; }
 
 /* ---------- Cart layout — keep the checkout button always in view ---------- */
 /* Desktop: items in a scrolling main column, totals + checkout in a sticky

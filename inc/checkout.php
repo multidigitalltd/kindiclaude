@@ -92,7 +92,10 @@ function kindi_checkout_club_banner(): void {
 		. '<strong>' . esc_html__( 'כבר חברי מועדון קינדי טויס? התחברו וקבלו הנחות ונקודות', 'kindi' ) . '</strong>'
 		. '<span>' . esc_html__( 'חברי מועדון צוברים נקודות על כל קנייה, מקבלים מתנות יום הולדת והטבות בלעדיות', 'kindi' ) . '</span>'
 		. '</div>'
-		. '<a class="kindi-club__btn" href="' . esc_url( wc_get_page_permalink( 'myaccount' ) ) . '">' . esc_html__( 'התחברות / הצטרפות', 'kindi' ) . '</a>'
+		// `kindi-club-trigger` is the hook for Simply Club: set this class as the
+		// pop-up trigger in the plugin's panel and clicking opens the login/offers
+		// popup. The my-account href stays as a graceful fallback when unset.
+		. '<a class="kindi-club__btn kindi-club-trigger" href="' . esc_url( wc_get_page_permalink( 'myaccount' ) ) . '">' . esc_html__( 'התחברות / הצטרפות', 'kindi' ) . '</a>'
 		. '<button type="button" class="kindi-club__toggle" data-kindi-club-toggle aria-label="' . esc_attr__( 'כיווץ', 'kindi' ) . '">' . $chevron . '</button>' // phpcs:ignore WordPress.Security.EscapeOutput
 		. '</div>';
 }
