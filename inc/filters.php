@@ -53,7 +53,9 @@ function kindi_category_chips(): array {
 	$term = ( function_exists( 'is_tax' ) && is_tax( 'product_cat' ) ) ? get_queried_object() : null;
 	$ctx  = ( $term instanceof WP_Term ) ? 'term_' . $term->term_id : 'shop';
 	$ver  = (int) get_option( 'kindi_term_ver', 1 );
-	$key  = 'kindi_catchips_v' . $ver . '_' . $ctx;
+	// New cache namespace (v2 structure: name/url/count/icon/id) so any stale
+	// pre-update cache is ignored.
+	$key  = 'kindi_subcats_v' . $ver . '_' . $ctx;
 
 	$cached = get_transient( $key );
 	if ( is_array( $cached ) ) {
@@ -223,8 +225,8 @@ function kindi_archive_hero(): void {
 		foreach ( $chips as $chip ) {
 			printf(
 				'<a class="kindi-chip" href="%s">%s</a>',
-				esc_url( $chip['url'] ),
-				esc_html( $chip['name'] )
+				esc_url( (string) ( $chip['url'] ?? '' ) ),
+				esc_html( (string) ( $chip['name'] ?? '' ) )
 			);
 		}
 		echo '</div>';
@@ -335,10 +337,10 @@ function kindi_archive_sidebar(): void {
 		foreach ( $subcats as $c ) {
 			printf(
 				'<a class="kindi-side__cat" href="%s"><span class="kindi-side__cat-ic">%s</span><span class="kindi-side__cat-name">%s</span><span class="kindi-side__cat-count">(%d)</span></a>',
-				esc_url( $c['url'] ),
-				kindi_nav_icon( $c['icon'] ), // phpcs:ignore WordPress.Security.EscapeOutput
-				esc_html( $c['name'] ),
-				(int) $c['count']
+				esc_url( (string) ( $c['url'] ?? '' ) ),
+				kindi_nav_icon( (string) ( $c['icon'] ?? 'grid' ) ), // phpcs:ignore WordPress.Security.EscapeOutput
+				esc_html( (string) ( $c['name'] ?? '' ) ),
+				(int) ( $c['count'] ?? 0 )
 			);
 		}
 		echo '</div></details>';
