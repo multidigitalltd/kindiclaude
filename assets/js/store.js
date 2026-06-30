@@ -501,12 +501,24 @@
 		if ( btn ) { btn.click(); }
 	} );
 
-	/* Club banner collapse toggle (checkout). */
+	/* Club banner + gift-wrap box collapse toggles (checkout). */
 	document.addEventListener( 'click', function ( e ) {
-		var t = e.target.closest( '[data-kindi-club-toggle]' );
-		if ( ! t ) { return; }
-		var club = t.closest( '[data-kindi-club]' );
-		if ( club ) { club.classList.toggle( 'is-collapsed' ); }
+		var club = e.target.closest( '[data-kindi-club-toggle]' );
+		if ( club ) {
+			var c = club.closest( '[data-kindi-club]' );
+			if ( c ) { c.classList.toggle( 'is-collapsed' ); }
+			return;
+		}
+		var gift = e.target.closest( '[data-kindi-gift-toggle]' );
+		if ( gift ) {
+			var g = gift.closest( '[data-kindi-gift]' );
+			if ( g ) { g.classList.toggle( 'is-collapsed' ); }
+		}
+	} );
+
+	/* Toggling gift-wrap recalculates the order (adds/removes the wrap fee). */
+	document.addEventListener( 'change', function ( e ) {
+		if ( e.target.closest( 'input[name="kindi_gift_wrap"]' ) ) { refreshCheckout(); }
 	} );
 
 	function wireMiniCartQty() {
