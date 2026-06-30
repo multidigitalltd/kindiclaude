@@ -1,7 +1,7 @@
 /*
- * Kindi instant archive filters — Vanilla JS, progressive enhancement.
- * Intercepts filter / pagination / sort actions, fetches the SAME server-rendered
- * URL the link already points to, and swaps just the results region (no full
+ * Kindi instant archive filters + view toggle — Vanilla JS, progressive
+ * enhancement. Intercepts sidebar filter / pagination / sort actions, fetches
+ * the same server-rendered URL and swaps just the results regions (no full
  * reload). Falls back to normal navigation if anything fails or JS is off.
  */
 ( function () {
@@ -9,9 +9,8 @@
 
 	// Regions replaced from the fetched document, in document order.
 	var SWAP = [
-		'.woocommerce-result-count',
-		'.woocommerce-ordering',
-		'.kindi-filters',
+		'.kindi-archive__toolbar',
+		'.kindi-archive__side',
 		'ul.products',
 		'.woocommerce-pagination',
 	];
@@ -21,6 +20,29 @@
 		return;
 	}
 
+	var VIEW_KEY = 'kindi_view';
+
+	/* ---- List / grid view toggle ---------------------------------------- */
+	function applyView() {
+		var root = document.querySelector( '.kindi-archive' );
+		var view = 'list';
+		try { view = localStorage.getItem( VIEW_KEY ) === 'list' ? 'list' : 'grid'; } catch ( e ) { view = 'grid'; }
+		if ( root ) {
+			root.classList.toggle( 'is-list', 'list' === view );
+		}
+		document.querySelectorAll( '[data-kindi-view] .kindi-view__btn' ).forEach( function ( b ) {
+			b.classList.toggle( 'is-active', b.getAttribute( 'data-view' ) === view );
+		} );
+	}
+	document.addEventListener( 'click', function ( e ) {
+		var btn = e.target.closest( '[data-kindi-view] .kindi-view__btn' );
+		if ( ! btn ) { return; }
+		try { localStorage.setItem( VIEW_KEY, btn.getAttribute( 'data-view' ) ); } catch ( e2 ) {}
+		applyView();
+	} );
+	applyView();
+
+	/* ---- AJAX filtering -------------------------------------------------- */
 	var sameOrigin = function ( href ) {
 		try {
 			return new URL( href, location.href ).origin === location.origin;
@@ -56,7 +78,8 @@
 					history.pushState( { kindiFilter: true }, '', url );
 				}
 				setBusy( false );
-				var top = scope.querySelector( '.kindi-filters' ) || scope.querySelector( 'ul.products' );
+				applyView();
+				var top = scope.querySelector( '.kindi-archive__toolbar' ) || scope.querySelector( 'ul.products' );
 				if ( top ) {
 					var y = top.getBoundingClientRect().top + window.pageYOffset - 120;
 					window.scrollTo( { top: y > 0 ? y : 0, behavior: 'auto' } );
@@ -65,9 +88,10 @@
 			.catch( function () { window.location.href = url; } );
 	};
 
-	// Filter chips/options + pagination links.
+	// Sidebar filter/option links + pagination (NOT the hero category chips —
+	// those change the whole context, so they navigate normally).
 	document.addEventListener( 'click', function ( e ) {
-		var a = e.target.closest( '.kindi-filters a, .woocommerce-pagination a' );
+		var a = e.target.closest( '.kindi-archive__side a, .woocommerce-pagination a' );
 		if ( ! a || a.target === '_blank' ) {
 			return;
 		}
@@ -81,7 +105,7 @@
 
 	// Price form (explicit submit via the "סינון" button).
 	document.addEventListener( 'submit', function ( e ) {
-		var form = e.target.closest( '.kindi-filters form' );
+		var form = e.target.closest( '.kindi-archive__side form' );
 		if ( ! form ) {
 			return;
 		}
@@ -99,8 +123,7 @@
 		load( u.href, true );
 	} );
 
-	// Sort dropdown — WooCommerce submits programmatically (no submit event),
-	// so listen on the select's change directly.
+	// Sort dropdown — WooCommerce submits programmatically (no submit event).
 	document.addEventListener( 'change', function ( e ) {
 		var sel = e.target.closest( '.woocommerce-ordering select.orderby' );
 		if ( ! sel ) {

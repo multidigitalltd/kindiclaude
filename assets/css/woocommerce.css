@@ -745,3 +745,65 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 /* Wishlist page now injects a real product-card grid — let it control layout. */
 .kindi-wish-grid { display: block; }
 .kindi-wish-grid > ul.products { margin: 0; }
+
+/* ====================================================================== */
+/* Product archive — hero, two-column layout, toolbar, view toggle        */
+/* ====================================================================== */
+/* Hide WooCommerce's default products header (the hero replaces it). */
+.woocommerce-products-header { display: none; }
+
+/* Hero band — full-bleed soft background, thin red top accent. */
+.kindi-archhero { position: relative; margin-block: -1.5rem 1.5rem; width: 100vw; margin-inline-start: calc(50% - 50vw);
+  background: linear-gradient(120deg, color-mix(in oklab, var(--brand-blue) 7%, #fff), #fff 55%, color-mix(in oklab, var(--brand-red) 6%, #fff));
+  border-top: 3px solid var(--brand-red); }
+.kindi-archhero__inner { max-width: 1440px; margin-inline: auto; padding: 2rem 1rem; display: flex; flex-wrap: wrap;
+  align-items: flex-start; justify-content: space-between; gap: 1.25rem; }
+@media (min-width: 1024px) { .kindi-archhero__inner { padding-inline: 1.5rem; flex-wrap: nowrap; } }
+.kindi-archhero__text { min-width: 0; }
+.kindi-archhero__crumbs { font-size: 0.8rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem; }
+.kindi-archhero__crumbs a { color: var(--brand-navy); text-decoration: none; }
+.kindi-archhero__crumbs a:hover { color: var(--brand-red); }
+.kindi-archhero__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy);
+  font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.4rem); line-height: 1.1; margin: 0 0 0.5rem; }
+.kindi-archhero__desc { color: var(--foreground); font-size: 0.95rem; line-height: 1.6; max-width: 60ch; margin: 0; }
+.kindi-archhero__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; align-content: flex-start; justify-content: flex-start; flex-shrink: 0; max-width: 100%; }
+@media (min-width: 1024px) { .kindi-archhero__chips { max-width: 48%; justify-content: flex-end; } }
+
+/* Two-column layout: products (main) + filter sidebar (aside, right in RTL). */
+.kindi-archive { display: grid; grid-template-columns: 1fr; gap: 1.5rem; align-items: start; }
+@media (min-width: 1024px) { .kindi-archive { grid-template-columns: 17rem minmax(0, 1fr); } }
+.kindi-archive__main { min-width: 0; }
+.kindi-archive__side { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.25rem; box-shadow: var(--shadow-card); }
+@media (min-width: 1024px) { .kindi-archive__side { position: sticky; top: calc(var(--kindi-header-h, 4rem) + 1rem); } }
+.kindi-side__head { display: flex; align-items: center; gap: 0.5rem; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.1rem; padding-bottom: 0.75rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+.kindi-side__group { border-bottom: 1px solid var(--border); padding: 0.6rem 0; }
+.kindi-side__group > summary { list-style: none; cursor: pointer; font-weight: 800; color: var(--brand-navy); padding: 0.3rem 0; display: flex; align-items: center; justify-content: space-between; }
+.kindi-side__group > summary::-webkit-details-marker { display: none; }
+.kindi-side__group > summary::after { content: "⌄"; color: var(--muted-foreground); }
+.kindi-side__group[open] > summary::after { transform: rotate(180deg); }
+.kindi-side__opts { display: flex; flex-direction: column; gap: 0.2rem; padding-top: 0.4rem; }
+.kindi-fopt { padding: 0.35rem 0.5rem; border-radius: 0.5rem; color: var(--foreground); text-decoration: none; font-size: 0.9rem; }
+.kindi-fopt:hover { background: var(--brand-blue-soft); color: var(--brand-navy); }
+.kindi-fopt.is-active { background: var(--brand-red-soft); color: var(--brand-red); font-weight: 700; }
+.kindi-side__price { display: flex; flex-wrap: wrap; gap: 0.5rem; padding-top: 0.5rem; }
+.kindi-side__price input { flex: 1 1 5rem; min-width: 0; height: 2.5rem; padding-inline: 0.6rem; border: 1.5px solid var(--border); border-radius: 0.6rem; }
+.kindi-side__price .kindi-chip--go { flex-basis: 100%; justify-content: center; }
+.kindi-archive__side .kindi-chip--reset { margin-top: 0.85rem; }
+
+/* Toolbar above the grid. */
+.kindi-archive__toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.kindi-archive__count { font-weight: 800; color: var(--brand-red); }
+.kindi-archive__tools { display: flex; align-items: center; gap: 0.6rem; }
+.kindi-view { display: inline-flex; border: 1.5px solid var(--border); border-radius: 0.75rem; overflow: hidden; }
+.kindi-view__btn { width: 2.5rem; height: 2.5rem; display: grid; place-items: center; background: #fff; border: 0; cursor: pointer; color: var(--brand-navy); }
+.kindi-view__btn.is-active { background: var(--brand-navy); color: #fff; }
+.woocommerce .kindi-archive__toolbar .woocommerce-ordering { margin: 0; }
+.woocommerce .kindi-archive__toolbar .woocommerce-ordering select { height: 2.75rem; border: 1.5px solid var(--border); border-radius: 999px; padding-inline: 1.1rem; font-weight: 700; color: var(--brand-navy); background: #fff; }
+
+/* 4-up product grid in the archive main column. */
+@media (min-width: 1024px) { .kindi-archive__main ul.products, .woocommerce .kindi-archive__main ul.products { grid-template-columns: repeat(4, 1fr); } }
+
+/* List view (toggle). */
+.kindi-archive.is-list ul.products { grid-template-columns: 1fr !important; }
+.kindi-archive.is-list ul.products li.product { display: grid; grid-template-columns: 13rem 1fr; align-items: center; }
+@media (max-width: 640px) { .kindi-archive.is-list ul.products li.product { grid-template-columns: 7rem 1fr; } }

@@ -173,8 +173,8 @@ function kindi_enqueue_scripts(): void {
 			)
 		);
 
-		// Instant archive filtering (progressive enhancement) — shop/category only.
-		if ( ( function_exists( 'is_shop' ) && is_shop() ) || ( function_exists( 'is_product_taxonomy' ) && is_product_taxonomy() ) ) {
+		// Instant archive filtering + view toggle — shop / category / search.
+		if ( ( function_exists( 'is_shop' ) && is_shop() ) || ( function_exists( 'is_product_taxonomy' ) && is_product_taxonomy() ) || is_search() ) {
 			wp_enqueue_script(
 				'kindi-filters',
 				KINDI_URI . 'assets/js/filters.js',

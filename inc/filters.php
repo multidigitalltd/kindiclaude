@@ -184,22 +184,52 @@ function kindi_archive_attribute_terms(): array {
 }
 
 /**
- * Render the filter bar above the product loop.
+ * Is the current view one of our product archives (shop / category / search)?
+ *
+ * @return bool
+ */
+function kindi_is_product_archive(): bool {
+	return function_exists( 'is_shop' ) && ( is_shop() || is_product_taxonomy() || is_search() );
+}
+
+/**
+ * Archive hero band: breadcrumb, title, description (right) + sub-category chips
+ * (left), on a soft full-width background. Replaces WooCommerce's default
+ * breadcrumb + products-header (suppressed in kindi_archive_dechrome).
  *
  * @return void
  */
-function kindi_archive_filters(): void {
-	if ( ! function_exists( 'is_shop' ) || ! ( is_shop() || is_product_taxonomy() || is_search() ) ) {
+function kindi_archive_hero(): void {
+	if ( ! kindi_is_product_archive() ) {
 		return;
 	}
 
-	echo '<div class="kindi-filters">';
+	$desc = '';
+	if ( is_search() ) {
+		/* translators: %s: search term. */
+		$title = sprintf( __( 'תוצאות חיפוש: %s', 'kindi' ), get_search_query() );
+	} elseif ( is_product_taxonomy() ) {
+		$term  = get_queried_object();
+		$title = $term instanceof WP_Term ? $term->name : wp_strip_all_tags( woocommerce_page_title( false ) );
+		$desc  = $term instanceof WP_Term ? wp_strip_all_tags( term_description( $term ) ) : '';
+	} else {
+		$title = wp_strip_all_tags( woocommerce_page_title( false ) );
+	}
 
-	// Category chips — hierarchy aware (parent + sub-categories of the current
-	// category; top categories on the shop). Cached per context (see helper).
+	echo '<section class="kindi-archhero"><div class="kindi-archhero__inner">';
+	echo '<div class="kindi-archhero__text">';
+	if ( function_exists( 'woocommerce_breadcrumb' ) ) {
+		woocommerce_breadcrumb( array( 'wrap_before' => '<nav class="kindi-archhero__crumbs">', 'wrap_after' => '</nav>' ) );
+	}
+	echo '<h1 class="kindi-archhero__title">' . esc_html( $title ) . '</h1>';
+	if ( '' !== $desc ) {
+		echo '<p class="kindi-archhero__desc">' . esc_html( $desc ) . '</p>';
+	}
+	echo '</div>';
+
 	$chips = kindi_category_chips();
 	if ( $chips ) {
-		echo '<div class="kindi-filters__cats">';
+		echo '<div class="kindi-archhero__chips">';
 		$shop_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
 		printf( '<a class="kindi-chip%s" href="%s">%s</a>', is_shop() ? ' is-active' : '', esc_url( $shop_url ), esc_html__( 'הכל', 'kindi' ) );
 		foreach ( $chips as $chip ) {
@@ -214,17 +244,107 @@ function kindi_archive_filters(): void {
 		}
 		echo '</div>';
 	}
+	echo '</div></section>';
+}
+add_action( 'woocommerce_before_main_content', 'kindi_archive_hero', 5 );
 
-	echo '<div class="kindi-filters__row">';
+/**
+ * Suppress WooCommerce's default breadcrumb + page title on archives (the hero
+ * renders them). Single-product pages keep their breadcrumb.
+ *
+ * @return void
+ */
+function kindi_archive_dechrome(): void {
+	if ( kindi_is_product_archive() ) {
+		remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
+		add_filter( 'woocommerce_show_page_title', '__return_false' );
+	}
+}
+add_action( 'wp', 'kindi_archive_dechrome' );
 
-	// Attribute facets — only the attributes/terms that actually exist among the
-	// CURRENT category's products (all attributes on the shop). Cached per
-	// context, so the per-category computation runs rarely.
+/**
+ * Open the two-column archive layout: products (main, left) + filters (aside,
+ * right). Fires inside the loop area, before the toolbar/products.
+ *
+ * @return void
+ */
+function kindi_archive_open(): void {
+	if ( ! kindi_is_product_archive() ) {
+		return;
+	}
+	echo '<div class="kindi-archive">';
+	echo '<aside class="kindi-archive__side">';
+	kindi_archive_sidebar();
+	echo '</aside>';
+	echo '<div class="kindi-archive__main">';
+}
+add_action( 'woocommerce_before_shop_loop', 'kindi_archive_open', 1 );
+
+/**
+ * Close the two-column layout after the loop + pagination.
+ *
+ * @return void
+ */
+function kindi_archive_close(): void {
+	if ( ! kindi_is_product_archive() ) {
+		return;
+	}
+	echo '</div></div>';
+}
+add_action( 'woocommerce_after_shop_loop', 'kindi_archive_close', 999 );
+
+/**
+ * Toolbar above the grid: result count (right) + view toggle and sort (left).
+ *
+ * @return void
+ */
+function kindi_archive_toolbar(): void {
+	if ( ! kindi_is_product_archive() ) {
+		return;
+	}
+	$query = $GLOBALS['wp_query'] ?? null;
+	$total = function_exists( 'wc_get_loop_prop' ) ? (int) wc_get_loop_prop( 'total' ) : 0;
+	$shown = $query instanceof WP_Query ? (int) $query->post_count : 0;
+
+	echo '<div class="kindi-archive__toolbar">';
+	echo '<span class="kindi-archive__count">' . esc_html( sprintf( /* translators: 1: shown, 2: total. */ __( '%1$d מוצרים מתוך %2$d', 'kindi' ), $shown, $total ) ) . '</span>';
+	echo '<div class="kindi-archive__tools">';
+	echo '<div class="kindi-view" data-kindi-view>'
+		. '<button type="button" class="kindi-view__btn" data-view="list" aria-label="' . esc_attr__( 'תצוגת רשימה', 'kindi' ) . '">' . kindi_icon( 'menu', 'kindi-icon--sm' ) . '</button>' // phpcs:ignore WordPress.Security.EscapeOutput
+		. '<button type="button" class="kindi-view__btn is-active" data-view="grid" aria-label="' . esc_attr__( 'תצוגת קוביות', 'kindi' ) . '">' . kindi_icon( 'grid', 'kindi-icon--sm' ) . '</button>' // phpcs:ignore WordPress.Security.EscapeOutput
+		. '</div>';
+	woocommerce_catalog_ordering();
+	echo '</div>';
+	echo '</div>';
+}
+add_action( 'woocommerce_before_shop_loop', 'kindi_archive_toolbar', 20 );
+
+/**
+ * Move the default result count + ordering out of the loop (the toolbar renders
+ * them), and render the filter sidebar content (facets + price + clear).
+ *
+ * @return void
+ */
+function kindi_archive_dechrome_loop(): void {
+	remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
+	remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
+}
+add_action( 'init', 'kindi_archive_dechrome_loop' );
+
+/**
+ * The filter sidebar: attribute facets, price range and a "clear" link.
+ *
+ * @return void
+ */
+function kindi_archive_sidebar(): void {
+	echo '<div class="kindi-side__head">' . kindi_icon( 'grid', 'kindi-icon--sm' ) . '<span>' . esc_html__( 'סינון וחיפוש', 'kindi' ) . '</span></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
+
+	// Attribute facets present among the current view's products.
 	foreach ( kindi_archive_attribute_terms() as $facet ) {
 		$param  = 'filter_' . $facet['attribute_name'];
 		$chosen = isset( $_GET[ $param ] ) ? array_filter( explode( ',', sanitize_text_field( wp_unslash( $_GET[ $param ] ) ) ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		echo '<details class="kindi-filters__att"><summary>' . esc_html( $facet['label'] ) . '</summary><div class="kindi-filters__opts">';
+		echo '<details class="kindi-side__group" open><summary>' . esc_html( $facet['label'] ) . '</summary><div class="kindi-side__opts">';
 		foreach ( $facet['terms'] as $t ) {
 			$is_on = in_array( $t['slug'], $chosen, true );
 			$new   = $is_on ? array_diff( $chosen, array( $t['slug'] ) ) : array_merge( $chosen, array( $t['slug'] ) );
@@ -242,19 +362,19 @@ function kindi_archive_filters(): void {
 	// Price range.
 	$min_v = isset( $_GET['min_price'] ) ? esc_attr( sanitize_text_field( wp_unslash( $_GET['min_price'] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$max_v = isset( $_GET['max_price'] ) ? esc_attr( sanitize_text_field( wp_unslash( $_GET['max_price'] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	echo '<form class="kindi-filters__price" method="get">';
+	echo '<details class="kindi-side__group" open><summary>' . esc_html__( 'טווח מחירים', 'kindi' ) . '</summary>';
+	echo '<form class="kindi-side__price" method="get">';
 	foreach ( array( 'orderby', 'post_type', 's' ) as $keep ) {
 		if ( isset( $_GET[ $keep ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			printf( '<input type="hidden" name="%s" value="%s">', esc_attr( $keep ), esc_attr( sanitize_text_field( wp_unslash( $_GET[ $keep ] ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 	}
-	printf( '<input type="number" name="min_price" inputmode="numeric" placeholder="ממחיר" value="%s">', $min_v );
-	printf( '<input type="number" name="max_price" inputmode="numeric" placeholder="עד מחיר" value="%s">', $max_v );
-	echo '<button type="submit" class="kindi-chip kindi-chip--go">סינון</button>';
-	echo '</form>';
+	printf( '<input type="number" name="min_price" inputmode="numeric" placeholder="%s" value="%s">', esc_attr__( 'ממחיר', 'kindi' ), $min_v );
+	printf( '<input type="number" name="max_price" inputmode="numeric" placeholder="%s" value="%s">', esc_attr__( 'עד מחיר', 'kindi' ), $max_v );
+	echo '<button type="submit" class="kindi-chip kindi-chip--go">' . esc_html__( 'סינון', 'kindi' ) . '</button>';
+	echo '</form></details>';
 
-	// "Clear filters" — shown only when an attribute/price filter is active. It
-	// removes those query args while keeping the current category context.
+	// "Clear filters" when any attribute/price filter is active.
 	$remove = array();
 	foreach ( array_keys( $_GET ) as $gk ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( 0 === strpos( (string) $gk, 'filter_' ) ) {
@@ -277,10 +397,7 @@ function kindi_archive_filters(): void {
 			esc_html__( 'ביטול סינון', 'kindi' )
 		);
 	}
-
-	echo '</div></div>';
 }
-add_action( 'woocommerce_before_shop_loop', 'kindi_archive_filters', 5 );
 
 /**
  * Flush a cached attribute-facet list when its terms change.
