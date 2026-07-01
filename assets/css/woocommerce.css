@@ -390,22 +390,26 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-cobox__grid #billing_address_1_field input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E"); }
 
 /* Simply Club box in the contact card (step 1) — centred, with its button
-   recoloured to the brand blue instead of the plugin's black. */
+   (a#open-auth-popup.clubBtnSty) recoloured to the brand blue, not black. */
 .kindi-clublogin { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; margin: 0 0 1rem; }
+.kindi-clublogin .clubBtnSty,
+.kindi-clublogin #open-auth-popup,
 .kindi-clublogin button,
 .kindi-clublogin input[type="submit"],
 .kindi-clublogin a.button,
-.kindi-clublogin [class*="button"],
-.kindi-clublogin [class*="btn"] {
+.kindi-clublogin [class*="button" i],
+.kindi-clublogin [class*="btn" i] {
   background: var(--brand-blue) !important;
   border-color: var(--brand-blue) !important;
   color: #fff !important;
 }
+.kindi-clublogin .clubBtnSty:hover,
+.kindi-clublogin #open-auth-popup:hover,
 .kindi-clublogin button:hover,
 .kindi-clublogin input[type="submit"]:hover,
 .kindi-clublogin a.button:hover,
-.kindi-clublogin [class*="button"]:hover,
-.kindi-clublogin [class*="btn"]:hover {
+.kindi-clublogin [class*="button" i]:hover,
+.kindi-clublogin [class*="btn" i]:hover {
   background: var(--brand-navy) !important;
   border-color: var(--brand-navy) !important;
 }
