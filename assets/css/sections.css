@@ -81,19 +81,29 @@
 .kindi-hero__pill--top { top: 0.5rem; right: 0; background: rgba(255,255,255,0.95); color: var(--brand-navy); border: 1px solid color-mix(in oklab, var(--brand-blue) 20%, transparent); }
 .kindi-hero__pill--bottom { bottom: 1.5rem; left: 0; background: var(--brand-navy); color: #fff; }
 .kindi-hero__pill--bottom small { opacity: 0.8; }
-/* Mobile: show the Kindi mascot below the copy (clean — no floating pills/sparks
-   overlapping the smaller image) and dial the hero text back a touch. Desktop is
-   untouched. */
+/* Mobile: reorder the hero — badge → title → lead → CTA → mascot → rating/trust.
+   The grid becomes a flex column and the copy is flattened (display:contents) so
+   the mascot can sit between the buttons and the trust row; the copy children
+   keep a z-index so they stay above the decorative blobs. Desktop is untouched. */
 @media (max-width: 1023.98px) {
+  .kindi-hero__grid { display: flex; flex-direction: column; gap: 0.9rem; }
+  .kindi-hero__copy { display: contents; }
+  .kindi-hero__badge, .kindi-hero__title, .kindi-hero__lead,
+  .kindi-hero__cta, .kindi-hero__trust { position: relative; z-index: 10; }
+  .kindi-hero__badge { order: 1; font-size: 0.8rem; padding: 0.4rem 1rem; }
+  .kindi-hero__title { order: 2; font-size: clamp(1.9rem, 6vw, 2.4rem); }
+  .kindi-hero__lead  { order: 3; font-size: 1.02rem; }
+  /* CTA buttons side by side + smaller. */
+  .kindi-hero__cta { order: 4; flex-wrap: nowrap; gap: 0.5rem; }
+  .kindi-hero__cta .kindi-btn { flex: 1 1 0; justify-content: center; text-align: center; line-height: 1.2; padding: 0.55rem 0.5rem; font-size: 0.82rem; gap: 0.3rem; }
+  /* Mascot below the buttons — a bit larger, tight spacing. */
   .kindi-hero__visual {
-    display: block; position: relative; aspect-ratio: 1;
-    width: 62%; max-width: 260px; margin: 0.25rem auto 0;
+    order: 5; display: block; position: relative; z-index: 10; aspect-ratio: 1;
+    width: 78%; max-width: 300px; margin: -0.6rem auto -0.6rem;
   }
-  .kindi-hero__visual .kindi-spark,
-  .kindi-hero__pill { display: none; }
-  .kindi-hero__title { font-size: clamp(1.9rem, 6vw, 2.4rem); }
-  .kindi-hero__lead { font-size: 1.02rem; }
-  .kindi-hero__badge { font-size: 0.8rem; padding: 0.4rem 1rem; }
+  .kindi-hero__visual .kindi-spark, .kindi-hero__pill { display: none; }
+  /* Rating + trust row below the mascot. */
+  .kindi-hero__trust { order: 6; }
 }
 
 /* ============================ USP strip ============================ */
@@ -383,6 +393,8 @@
   }
   .kindi-promo__body,
   .kindi-promo--big .kindi-promo__body { max-width: 100%; }
+  /* Show only the big banner on mobile — hide the two small promo cards. */
+  .kindi-promo--sm { display: none; }
 }
 @media (max-width: 639px) {
   /* Age cards: one horizontally-scrolling row instead of a tall 2-up grid. */
