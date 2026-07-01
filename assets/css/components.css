@@ -9,6 +9,12 @@
 .kindi-header { display: contents; }
 .kindi-promobar { background: var(--brand-navy); color: #fff; text-align: center; padding-block: 0.45rem; font-size: 13px; font-weight: 600; }
 .kindi-promobar__item { display: inline-flex; align-items: center; gap: 0.5rem; padding-inline: 1rem; }
+/* Mobile: the message wraps to two lines — keep the truck icon undistorted and
+   neatly beside the text (it was getting squished / misaligned). */
+@media (max-width: 767px) {
+  .kindi-promobar__item { padding-inline: 0.75rem; gap: 0.45rem; line-height: 1.35; }
+  .kindi-promobar__item > .kindi-icon { flex-shrink: 0; }
+}
 /* display:contents promotes the bars into the root flow, which injects block-gap
    margins between them — zero those out so the strips sit flush. */
 .kindi-topbar, .kindi-promobar, .kindi-bar, .kindi-msearch, .kindi-nav { margin-block: 0; }
@@ -76,7 +82,15 @@
 @media (min-width: 640px) { .kindi-cart__txt { display: block; } }
 /* Mobile: only the icon shows, so make the white pill's padding symmetric — the
    icon sits centred with equal space on both sides. */
-@media (max-width: 639px) { .kindi-cart { padding-inline: 0.4rem; } }
+@media (max-width: 639px) {
+  .kindi-cart { padding-inline: 0.4rem; }
+  /* Show the favourites + phone (dial) icons in the header — icon-only (their
+     text labels stay hidden). Both are already in the DOM, just revealed here. */
+  .kindi-bar__actions .kindi-wish-link { display: inline-flex; }
+  .kindi-bar__actions .kindi-wish-link > span:last-child { display: none; }
+  .kindi-bar__phone { display: inline-flex; }
+  .kindi-bar__phone > span { display: none; }
+}
 .kindi-cart__txt small { font-size: 10px; color: var(--muted-foreground); }
 .kindi-cart__txt b { display: block; font-size: 0.75rem; font-weight: 800; color: var(--brand-navy); }
 .kindi-cart__ic { position: relative; width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; background: var(--brand-red); display: grid; place-items: center; transition: background 0.2s; overflow: visible; }

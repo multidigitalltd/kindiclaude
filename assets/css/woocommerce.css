@@ -893,6 +893,16 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 }
 .woocommerce-cart table.cart td.actions .button { border-radius: 0.875rem; }
 .woocommerce-cart .quantity { border-radius: 0.6rem; }
+/* Mobile: keep the qty stepper a tight single row (it was wrapping in the narrow
+   cart cell) — sized to content with slightly smaller controls. */
+@media (max-width: 767px) {
+  .woocommerce-cart .quantity {
+    display: inline-flex !important; flex-wrap: nowrap !important;
+    width: max-content !important; max-width: max-content !important;
+  }
+  .woocommerce-cart .quantity .qty { width: 2.4rem; min-width: 2.4rem; }
+  .woocommerce-cart .kindi-qbtn { width: 2.2rem; }
+}
 .woocommerce a.remove { color: var(--brand-red) !important; border-radius: 999px; font-weight: 700; }
 .woocommerce a.remove:hover { background: var(--brand-red) !important; color: #fff !important; }
 
@@ -1288,7 +1298,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-priceslider__pill { background: var(--brand-red-soft); color: var(--brand-red); border-radius: 999px; padding: 0.2rem 0.7rem; font-weight: 800; }
 
 /* Mobile: filter button + sidebar as a drawer. */
-.kindi-archive__filterbtn { display: none; align-items: center; gap: 0.4rem; background: var(--brand-navy); color: #fff; border: 0; border-radius: 999px; padding: 0.55rem 1.1rem; font-weight: 800; cursor: pointer; }
+.kindi-archive__filterbtn { display: none; align-items: center; gap: 0.4rem; background: var(--brand-navy); color: #fff; border: 0; border-radius: 999px; padding: 0.55rem 1.1rem; font-weight: 800; cursor: pointer; font-family: var(--wp--preset--font-family--sans); font-size: 0.95rem; }
 .kindi-side__close { display: none; background: none; border: 0; color: var(--brand-navy); cursor: pointer; margin-inline-start: auto; }
 @media (max-width: 1023.98px) {
   .kindi-archive__filterbtn { display: inline-flex; }

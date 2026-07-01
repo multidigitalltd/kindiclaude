@@ -300,7 +300,7 @@ function kindi_archive_toolbar(): void {
 	echo '<span class="kindi-archive__count">' . esc_html( sprintf( /* translators: 1: shown, 2: total. */ __( '%1$d מוצרים מתוך %2$d', 'kindi' ), $shown, $total ) ) . '</span>';
 	echo '<div class="kindi-archive__tools">';
 	// Mobile-only "filter" button — opens the sidebar as a drawer.
-	echo '<button type="button" class="kindi-archive__filterbtn" data-kindi-filters-open>' . kindi_icon( 'grid', 'kindi-icon--sm' ) . esc_html__( 'סינון', 'kindi' ) . '</button>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	echo '<button type="button" class="kindi-archive__filterbtn" data-kindi-filters-open>' . kindi_icon( 'filter', 'kindi-icon--sm' ) . esc_html__( 'סינון', 'kindi' ) . '</button>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	echo '<div class="kindi-view" data-kindi-view>'
 		. '<button type="button" class="kindi-view__btn" data-view="list" aria-label="' . esc_attr__( 'תצוגת רשימה', 'kindi' ) . '">' . kindi_icon( 'menu', 'kindi-icon--sm' ) . '</button>' // phpcs:ignore WordPress.Security.EscapeOutput
 		. '<button type="button" class="kindi-view__btn is-active" data-view="grid" aria-label="' . esc_attr__( 'תצוגת קוביות', 'kindi' ) . '">' . kindi_icon( 'grid', 'kindi-icon--sm' ) . '</button>' // phpcs:ignore WordPress.Security.EscapeOutput
