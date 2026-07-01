@@ -9,10 +9,45 @@
  * @package Kindi
  */
 
-$kindi_foot_cols = array(
-	'קטגוריות'     => array( 'צעצועים', 'משחקי קופסה', 'חזרה לבית הספר', 'יצירה ואומנות', 'תינוקות', 'משחקי יהדות' ),
-	'שירות לקוחות' => array( 'צור קשר', 'משלוחים', 'החזרות', 'שאלות נפוצות', 'מעקב הזמנה', 'תקנון' ),
-	'עלינו'        => array( 'אודות', 'מועדון קינדי', 'הסניף בבני ברק', 'לקוחות מספרים', 'בלוג' ),
+// Footer link columns. Each column shows its assigned WordPress menu when set
+// (Appearance → Menus), otherwise these default links. Titles + defaults follow
+// the store's footer; edit the links from the dashboard, no code needed.
+$kindi_foot_menus = array(
+	array(
+		'title'    => 'ראשי',
+		'location' => 'footer-main',
+		'links'    => array(
+			'הסיפור שלנו'       => home_url( '/about/' ),
+			'שאלות ותשובות'     => home_url( '/faq/' ),
+			'לקוחות מספרים'     => home_url( '/reviews/' ),
+			'מועדון לקוחות'     => home_url( '/my-account/' ),
+			'תקנון האתר'        => home_url( '/terms/' ),
+			'ביטול עסקה'        => home_url( '/refund_returns/' ),
+			'משלוחים והחזרות'   => home_url( '/shipping/' ),
+			'מדיניות פרטיות'    => home_url( '/privacy-policy/' ),
+			'הצהרת נגישות'      => home_url( '/accessibility-statement/' ),
+			'הבלוג שלנו'        => home_url( '/blog/' ),
+			'יצירת קשר'         => home_url( '/contact/' ),
+		),
+	),
+	array(
+		'title'    => 'גננות ומוסדות',
+		'location' => 'footer-institutions',
+		'links'    => array(
+			'התחבר / הרשם' => home_url( '/my-account/' ),
+			'משאלות'       => home_url( '/wishlist/' ),
+		),
+	),
+	array(
+		'title'    => 'חדשות ועדכונים',
+		'location' => 'footer-news',
+		'links'    => array(
+			'הבלוג שלנו'          => home_url( '/blog/' ),
+			'המבצעים החמים'       => home_url( '/sale/' ),
+			'החדשים והמומלצים'    => home_url( '/new/' ),
+			'gift card'           => home_url( '/gift-card/' ),
+		),
+	),
 );
 $kindi_pay = array( 'VISA', 'MC', 'ISRACARD', 'PayPal', 'Bit' );
 ?>
@@ -30,14 +65,10 @@ $kindi_pay = array( 'VISA', 'MC', 'ISRACARD', 'PayPal', 'Bit' );
 			</div>
 		</div>
 
-		<?php foreach ( $kindi_foot_cols as $title => $links ) : ?>
+		<?php foreach ( $kindi_foot_menus as $kindi_col ) : ?>
 		<div class="kindi-footer__col">
-			<h4><?php echo esc_html( $title ); ?></h4>
-			<ul>
-				<?php foreach ( $links as $l ) : ?>
-				<li><a href="#"><?php echo esc_html( $l ); ?></a></li>
-				<?php endforeach; ?>
-			</ul>
+			<h4><?php echo esc_html( $kindi_col['title'] ); ?></h4>
+			<?php kindi_footer_menu( $kindi_col['location'], $kindi_col['links'] ); ?>
 		</div>
 		<?php endforeach; ?>
 

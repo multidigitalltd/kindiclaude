@@ -23,11 +23,43 @@ defined( 'ABSPATH' ) || exit;
 function kindi_register_menus(): void {
 	register_nav_menus(
 		array(
-			'primary' => __( 'תפריט ראשי (קינדי)', 'kindi' ),
+			'primary'             => __( 'תפריט ראשי (קינדי)', 'kindi' ),
+			'footer-main'         => __( 'פוטר — ראשי', 'kindi' ),
+			'footer-institutions' => __( 'פוטר — גננות ומוסדות', 'kindi' ),
+			'footer-news'         => __( 'פוטר — חדשות ועדכונים', 'kindi' ),
 		)
 	);
 }
 add_action( 'after_setup_theme', 'kindi_register_menus' );
+
+/**
+ * Render one footer link column: the assigned WordPress menu when set (edit it
+ * under Appearance → Menus), otherwise a sensible default link list. Lets the
+ * store control the footer links from the dashboard without touching code.
+ *
+ * @param string                     $location Registered menu location.
+ * @param array<string,string>       $fallback label => URL default links.
+ * @return void
+ */
+function kindi_footer_menu( string $location, array $fallback ): void {
+	if ( has_nav_menu( $location ) ) {
+		wp_nav_menu(
+			array(
+				'theme_location' => $location,
+				'container'      => false,
+				'menu_class'     => '',
+				'depth'          => 1,
+				'fallback_cb'    => false,
+			)
+		);
+		return;
+	}
+	echo '<ul>';
+	foreach ( $fallback as $label => $url ) {
+		printf( '<li><a href="%s">%s</a></li>', esc_url( $url ), esc_html( $label ) );
+	}
+	echo '</ul>';
+}
 
 /**
  * Render a top-level nav item's icon. The default is a small Kindi face image;

@@ -212,22 +212,29 @@
 		} );
 	} );
 
-	/* Hot-products quick-filter tabs — fetch the grid for the chosen source and
-	 * swap it in, no full reload. */
+	/* Hot-products quick-filter tabs — accessible tablist. Click or keyboard:
+	 * arrow keys move focus with roving tabindex (RTL-aware); Enter/Space (native
+	 * <button>) activates and swaps the grid in with no full reload. */
 	var tabsWrap = document.querySelector( '[data-kindi-hot-tabs]' );
 	var hotGrid = document.querySelector( '[data-kindi-hot-grid]' );
 	if ( tabsWrap && hotGrid && typeof window.kindiStore !== 'undefined' && window.kindiStore.hotUrl ) {
-		tabsWrap.addEventListener( 'click', function ( e ) {
-			var tab = e.target.closest( '.kindi-tab' );
+		var tabs = Array.prototype.slice.call( tabsWrap.querySelectorAll( '.kindi-tab' ) );
+
+		var activateTab = function ( tab ) {
 			if ( ! tab || tab.classList.contains( 'is-active' ) ) {
 				return;
 			}
-			tabsWrap.querySelectorAll( '.kindi-tab' ).forEach( function ( t ) {
+			tabs.forEach( function ( t ) {
 				t.classList.remove( 'is-active' );
 				t.setAttribute( 'aria-selected', 'false' );
+				t.setAttribute( 'tabindex', '-1' );
 			} );
 			tab.classList.add( 'is-active' );
 			tab.setAttribute( 'aria-selected', 'true' );
+			tab.setAttribute( 'tabindex', '0' );
+			if ( tab.id ) {
+				hotGrid.setAttribute( 'aria-labelledby', tab.id );
+			}
 
 			var source = tab.getAttribute( 'data-source' );
 			var sep = window.kindiStore.hotUrl.indexOf( '?' ) === -1 ? '?' : '&';
@@ -239,6 +246,34 @@
 					hotGrid.style.opacity = '';
 				} )
 				.catch( function () { hotGrid.style.opacity = ''; } );
+		};
+
+		tabsWrap.addEventListener( 'click', function ( e ) {
+			activateTab( e.target.closest( '.kindi-tab' ) );
+		} );
+
+		tabsWrap.addEventListener( 'keydown', function ( e ) {
+			var current = tabs.indexOf( document.activeElement );
+			if ( current === -1 ) {
+				return;
+			}
+			var next;
+			if ( 'ArrowLeft' === e.key ) {
+				next = current + 1; // RTL: left arrow → next tab.
+			} else if ( 'ArrowRight' === e.key ) {
+				next = current - 1; // RTL: right arrow → previous tab.
+			} else if ( 'Home' === e.key ) {
+				next = 0;
+			} else if ( 'End' === e.key ) {
+				next = tabs.length - 1;
+			} else {
+				return;
+			}
+			e.preventDefault();
+			next = ( next + tabs.length ) % tabs.length;
+			tabs[ current ].setAttribute( 'tabindex', '-1' );
+			tabs[ next ].setAttribute( 'tabindex', '0' );
+			tabs[ next ].focus();
 		} );
 	}
 

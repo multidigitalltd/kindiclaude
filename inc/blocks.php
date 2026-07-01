@@ -115,16 +115,17 @@ function kindi_block_featured_products(): string {
 	foreach ( $tabs as $src => $label ) {
 		$on         = $src === $default;
 		$tabs_html .= sprintf(
-			'<button type="button" class="kindi-tab%1$s" role="tab" aria-selected="%2$s" data-source="%3$s">%4$s</button>',
+			'<button type="button" id="kindi-tab-%3$s" class="kindi-tab%1$s" role="tab" aria-selected="%2$s" tabindex="%5$s" aria-controls="kindi-hot-grid" data-source="%3$s">%4$s</button>',
 			$on ? ' is-active' : '',
 			$on ? 'true' : 'false',
 			esc_attr( $src ),
-			esc_html( $label )
+			esc_html( $label ),
+			$on ? '0' : '-1'
 		);
 	}
 	$tabs_html .= '</div>';
 
-	$grid = '<div class="kindi-hot-grid" data-kindi-hot-grid aria-live="polite">'
+	$grid = '<div id="kindi-hot-grid" class="kindi-hot-grid" data-kindi-hot-grid role="tabpanel" aria-labelledby="kindi-tab-' . esc_attr( $default ) . '" tabindex="0" aria-live="polite">'
 		. ( function_exists( 'kindi_hot_products_html' ) ? kindi_hot_products_html( $default, $count ) : '' )
 		. '</div>';
 
