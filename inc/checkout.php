@@ -86,8 +86,14 @@ add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_top', 5 );
  * @return void
  */
 function kindi_checkout_login_row(): void {
-	$club   = shortcode_exists( 'simply_club_offerbox' ) ? trim( do_shortcode( '[simply_club_offerbox]' ) ) : '';
-	$social = shortcode_exists( 'nextend_social_login' ) ? trim( do_shortcode( '[nextend_social_login]' ) ) : '';
+	$club = shortcode_exists( 'simply_club_offerbox' ) ? trim( do_shortcode( '[simply_club_offerbox]' ) ) : '';
+
+	// Render Nextend without relying on shortcode_exists (registration timing can
+	// vary); if the plugin is inactive, do_shortcode returns the literal tag, so
+	// treat that as empty. Note: Nextend shows nothing for already-logged-in users.
+	$social_raw = do_shortcode( '[nextend_social_login]' );
+	$social     = ( false === strpos( $social_raw, '[nextend_social_login' ) ) ? trim( $social_raw ) : '';
+
 	if ( '' === $club && '' === $social ) {
 		return;
 	}
