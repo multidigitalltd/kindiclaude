@@ -86,6 +86,7 @@ $kindi_pay = array( 'VISA', 'MC', 'ISRACARD', 'PayPal', 'Bit' );
 
 	<div class="kindi-footer__bottom">
 		<div class="kindi-footer__copy">© 2026 קינדר טויס • כל הזכויות שמורות • <a href="/accessibility-statement">הצהרת נגישות</a></div>
+		<div class="kindi-footer__credit">UX/UI &amp; Dev by <a href="https://m-d.co.il" target="_blank" rel="noopener">Multi Digital</a></div>
 		<div class="kindi-footer__pay">
 			<span>תשלום מאובטח:</span>
 			<?php foreach ( $kindi_pay as $p ) : ?>

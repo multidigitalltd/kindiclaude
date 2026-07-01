@@ -276,6 +276,9 @@
 @media (min-width: 640px) { .kindi-footer__bottom { flex-direction: row; } }
 .kindi-footer__copy { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
 .kindi-footer__copy a { color: rgba(255,255,255,0.85); }
+.kindi-footer__credit { font-size: 0.75rem; color: rgba(255,255,255,0.55); }
+.kindi-footer__credit a { color: rgba(255,255,255,0.8); font-weight: 700; text-decoration: none; }
+.kindi-footer__credit a:hover { color: #fff; text-decoration: underline; }
 .kindi-footer__pay { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .kindi-footer__pay > span:first-child { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
 .kindi-footer__paychip { font-size: 10px; font-weight: 700; background: #fff; color: var(--brand-navy); padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
