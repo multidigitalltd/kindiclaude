@@ -31,6 +31,12 @@
 		root.classList.toggle( 'a11y-stop-motion', !! state.motion );
 		var step = state.font || 0;
 		root.style.fontSize = step ? ( 100 + step * 12.5 ) + '%' : '';
+		// Reflect each toggle's on/off state to screen readers.
+		if ( panel ) {
+			panel.querySelectorAll( '[data-a11y][aria-pressed]' ).forEach( function ( btn ) {
+				btn.setAttribute( 'aria-pressed', state[ btn.getAttribute( 'data-a11y' ) ] ? 'true' : 'false' );
+			} );
+		}
 	};
 
 	apply();

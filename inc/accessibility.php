@@ -65,7 +65,7 @@ function kindi_a11y_panel(): void {
 		</div>
 		<div class="kindi-a11y__grid">
 			<?php foreach ( $buttons as $action => $label ) : ?>
-			<button type="button" class="kindi-a11y__btn<?php echo 'reset' === $action ? ' kindi-a11y__btn--reset' : ''; ?>" data-a11y="<?php echo esc_attr( $action ); ?>"><?php echo esc_html( $label ); ?></button>
+			<button type="button" class="kindi-a11y__btn<?php echo 'reset' === $action ? ' kindi-a11y__btn--reset' : ''; ?>" data-a11y="<?php echo esc_attr( $action ); ?>"<?php echo 'reset' === $action ? '' : ' aria-pressed="false"'; ?>><?php echo esc_html( $label ); ?></button>
 			<?php endforeach; ?>
 		</div>
 		<a class="kindi-a11y__statement" href="<?php echo esc_url( home_url( '/accessibility-statement/' ) ); ?>">הצהרת הנגישות</a>

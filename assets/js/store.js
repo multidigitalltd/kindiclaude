@@ -515,8 +515,8 @@
 		if ( e.target.closest( 'input[name="kindi_gift_wrap"]' ) ) { refreshCheckout(); }
 	} );
 
-	/* Gift-card redemption boxes (Gifta / YITH) are left in their native plugin
-	   positions — JS relocation across third-party markup proved unreliable. */
+	/* Gift-card redemption boxes (YITH / Gifta) are positioned server-side, below
+	   the coupon, via the kindi_summary_after_coupon hook (see inc/checkout.php). */
 
 	function wireMiniCartQty() {
 		document.querySelectorAll( '.kindi-cartdrawer .woocommerce-mini-cart-item' ).forEach( function ( item ) {

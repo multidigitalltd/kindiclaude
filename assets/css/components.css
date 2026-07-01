@@ -161,8 +161,6 @@
 .kindi-drawer__acc > summary { list-style: none; cursor: pointer; }
 .kindi-drawer__acc > summary::-webkit-details-marker { display: none; }
 .kindi-drawer__acc > summary span { flex: 1; }
-.kindi-drawer__chev { margin-inline-start: auto; transition: transform 0.2s; }
-.kindi-drawer__acc[open] > summary .kindi-drawer__chev { transform: rotate(180deg); }
 .kindi-drawer__sub { padding: 0.25rem 0.5rem 0.75rem 2.25rem; display: flex; flex-direction: column; gap: 0.125rem; }
 .kindi-drawer__coltitle { font-size: 0.6875rem; font-weight: 800; color: var(--brand-red); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 0.5rem; }
 .kindi-drawer__sublink { padding: 0.4rem 0; font-size: 0.875rem; color: var(--foreground); text-decoration: none; }

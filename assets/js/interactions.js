@@ -1,6 +1,7 @@
 /*
- * Kindi interactions — Vanilla JS only (no jQuery). Mobile category drawer
- * and an accessibility-contrast toggle stub. Keep this tiny and dependency-free.
+ * Kindi interactions — Vanilla JS only (no jQuery). Mobile category drawer,
+ * nav auto-fit, load-more reviews, quantity steppers, variation swatches and the
+ * checkout gift-add-on recalc. Keep it tiny and dependency-free.
  */
 ( function () {
 	'use strict';

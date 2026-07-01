@@ -37,7 +37,7 @@ do_action( 'woocommerce_before_checkout_form', $checkout );
 
 	<?php endif; ?>
 
-	<div id="order_review" class="woocommerce-checkout-review-order">
+	<div id="order_review" class="woocommerce-checkout-review-order" aria-live="polite" aria-atomic="false">
 		<?php do_action( 'woocommerce_checkout_order_review' ); ?>
 	</div>
 

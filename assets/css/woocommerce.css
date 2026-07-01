@@ -312,12 +312,9 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-chip { display: inline-flex; align-items: center; padding: 0.4rem 0.9rem; border-radius: 999px; background: #fff; border: 1px solid var(--border); font-size: 0.8125rem; font-weight: 700; color: var(--brand-navy); text-decoration: none; cursor: pointer; transition: all 0.15s; }
 .kindi-chip:hover { border-color: var(--brand-blue); }
 .kindi-chip.is-active { background: var(--brand-navy); color: #fff; border-color: var(--brand-navy); }
-.kindi-chip--go { background: var(--brand-red); color: #fff; border: 0; }
 .kindi-chip--reset { color: var(--brand-red); border-color: color-mix(in oklab, var(--brand-red) 45%, transparent); gap: 0.25rem; }
 .kindi-chip--reset:hover { background: var(--brand-red); color: #fff; border-color: var(--brand-red); }
 .kindi-chip--reset .kindi-icon { width: 13px; height: 13px; }
-.kindi-chip--parent { background: var(--brand-blue-soft); border-color: color-mix(in oklab, var(--brand-blue) 30%, transparent); gap: 0.2rem; }
-.kindi-chip--parent .kindi-icon { width: 13px; height: 13px; }
 
 /* ---------- Newsletter done ---------- */
 .kindi-news__done { font-weight: 700; color: var(--brand-navy); padding: 0.75rem; text-align: center; margin: 0; }
@@ -326,12 +323,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-highlights { list-style: none; margin: 1rem 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .kindi-highlights li { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.9375rem; color: var(--foreground); font-weight: 600; }
 .kindi-highlights .kindi-icon { color: var(--brand-red); flex-shrink: 0; margin-top: 2px; }
-.kindi-pmeta { display: grid; gap: 1.5rem; margin: 1.5rem 0; grid-column: 1 / -1; }
-@media (min-width: 768px) { .kindi-pmeta { grid-template-columns: 1fr 1fr; } }
-.kindi-specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-.kindi-spec { background: var(--brand-blue-soft); border-radius: 1rem; padding: 0.85rem 1rem; text-align: center; }
-.kindi-spec__l { display: block; font-size: 0.75rem; color: var(--muted-foreground); font-weight: 600; }
-.kindi-spec__v { display: block; font-size: 1.125rem; font-weight: 900; color: var(--brand-navy); margin-top: 0.15rem; }
 .kindi-inbox { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.25rem; }
 .kindi-inbox h3 { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); margin: 0 0 0.5rem; font-size: 1.0625rem; }
 .kindi-inbox ul { margin: 0; padding-inline-start: 1.1rem; color: var(--foreground); }
@@ -462,7 +453,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-summary__controls { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.15rem; }
 .kindi-summary__remove { width: 1.8rem; height: 1.8rem; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid var(--border); background: #fff; border-radius: 999px; color: var(--muted-foreground); font-size: 1.1rem; line-height: 1; cursor: pointer; transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease; }
 .kindi-summary__remove:hover { background: var(--brand-red); color: #fff; border-color: var(--brand-red); }
-.kindi-summary__side { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; text-align: left; }
 .kindi-summary__price { font-weight: 800; color: var(--brand-red); white-space: nowrap; font-size: 0.95rem; }
 .kindi-summary__price del { display: block; color: var(--muted-foreground); font-weight: 600; font-size: 0.8rem; opacity: 0.8; }
 .kindi-summary__price ins { text-decoration: none; }
@@ -479,8 +469,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-summary__totals { margin-top: 0.5rem; padding-top: 0.5rem; }
 .kindi-summary__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; color: var(--brand-navy); font-weight: 600; }
 .kindi-summary__row--coupon { color: var(--brand-red); font-weight: 700; }
-.kindi-summary__row--total { margin-top: 0.35rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.2rem; }
-.kindi-summary__row--total .woocommerce-Price-amount { color: var(--brand-red); }
 
 /* Grand total + place-order button + terms, at the foot of the summary. */
 .kindi-summary__place { margin-top: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--border); }
@@ -926,13 +914,9 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-pdp__dic { width: 2.6rem; height: 2.6rem; border-radius: 999px; display: grid; place-items: center; flex: 0 0 auto; }
 .kindi-pdp__dic--blue { background: var(--brand-blue-soft); color: var(--brand-blue); }
 .kindi-pdp__dic--red { background: var(--brand-red-soft); color: var(--brand-red); }
-.kindi-pdp__dic--green { background: color-mix(in oklab, #25D366 16%, #fff); color: #128C3E; }
 .kindi-pdp__dtxt { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
 .kindi-pdp__dtxt strong { color: var(--brand-navy); font-weight: 800; font-size: 0.95rem; }
 .kindi-pdp__dtxt span { color: var(--muted-foreground); font-size: 0.82rem; display: flex; align-items: center; gap: 0.3rem; }
-.kindi-pdp__drow--link { transition: background 0.15s ease; cursor: pointer; }
-.kindi-pdp__drow--link:hover { background: var(--muted); }
-.kindi-pdp__dchev { margin-inline-start: auto; color: var(--muted-foreground); flex: 0 0 auto; }
 
 /* Shipping & returns tab. */
 .kindi-pdp-ship p { margin: 0 0 0.75rem; line-height: 1.7; }
@@ -1028,9 +1012,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-fopt { padding: 0.35rem 0.5rem; border-radius: 0.5rem; color: var(--foreground); text-decoration: none; font-size: 0.9rem; }
 .kindi-fopt:hover { background: var(--brand-blue-soft); color: var(--brand-navy); }
 .kindi-fopt.is-active { background: var(--brand-red-soft); color: var(--brand-red); font-weight: 700; }
-.kindi-side__price { display: flex; flex-wrap: wrap; gap: 0.5rem; padding-top: 0.5rem; }
-.kindi-side__price input { flex: 1 1 5rem; min-width: 0; height: 2.5rem; padding-inline: 0.6rem; border: 1.5px solid var(--border); border-radius: 0.6rem; }
-.kindi-side__price .kindi-chip--go { flex-basis: 100%; justify-content: center; }
 .kindi-archive__side .kindi-chip--reset { margin-top: 0.85rem; }
 
 /* Toolbar above the grid. */
@@ -1103,8 +1084,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-side__cats { display: flex; flex-direction: column; padding-top: 0.5rem; }
 .kindi-side__cat { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.25rem; border-radius: 0.6rem; text-decoration: none; color: var(--brand-navy); font-weight: 600; }
 .kindi-side__cat:hover { background: var(--brand-blue-soft); color: var(--brand-red); }
-.kindi-side__cat-ic { width: 1.6rem; height: 1.6rem; display: grid; place-items: center; color: var(--brand-navy); flex: 0 0 auto; }
-.kindi-side__cat-ic .kindi-icon { width: 1.1rem; height: 1.1rem; }
 .kindi-side__cat-name { flex: 1; min-width: 0; }
 .kindi-side__cat-count { color: var(--muted-foreground); font-weight: 600; font-size: 0.85rem; }
 
