@@ -80,33 +80,24 @@ function kindi_checkout_top(): void {
 add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_top', 5 );
 
 /**
- * Login options inside the "פרטי קשר" contact card (step 1): the Simply Club
- * box and the Nextend social-login buttons, side by side.
+ * Simply Club box inside the "פרטי קשר" contact card (step 1), centred.
  *
  * @return void
  */
 function kindi_checkout_login_row(): void {
-	$club = shortcode_exists( 'simply_club_offerbox' ) ? trim( do_shortcode( '[simply_club_offerbox]' ) ) : '';
-
-	// Render Nextend without relying on shortcode_exists (registration timing can
-	// vary); if the plugin is inactive, do_shortcode returns the literal tag, so
-	// treat that as empty. Note: Nextend shows nothing for already-logged-in users.
-	$social_raw = do_shortcode( '[nextend_social_login]' );
-	$social     = ( false === strpos( $social_raw, '[nextend_social_login' ) ) ? trim( $social_raw ) : '';
-
-	if ( '' === $club && '' === $social ) {
+	if ( ! shortcode_exists( 'simply_club_offerbox' ) ) {
 		return;
 	}
-	echo '<div class="kindi-clublogin">';
-	if ( '' !== $club ) {
-		echo '<div class="kindi-clublogin__col">' . $club . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- shortcode output.
+	$club = trim( do_shortcode( '[simply_club_offerbox]' ) );
+	if ( '' === $club ) {
+		return;
 	}
-	if ( '' !== $social ) {
-		echo '<div class="kindi-clublogin__col">' . $social . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- shortcode output.
-	}
-	echo '</div>';
+	echo '<div class="kindi-clublogin">' . $club . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- Simply Club shortcode output.
 }
 add_action( 'kindi_before_contact_fields', 'kindi_checkout_login_row' );
+
+// Hide Simply Club's own top bar (rendered site-wide by the plugin).
+add_filter( 'simply_show_top_bar', '__return_false' );
 
 /**
  * Relabel + reorder the billing fields to match the design (form-billing.php

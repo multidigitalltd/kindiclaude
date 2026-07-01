@@ -389,12 +389,26 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-cobox__grid #billing_last_name_field input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1'/%3E%3C/svg%3E"); }
 .kindi-cobox__grid #billing_address_1_field input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E"); }
 
-/* Login options in the contact card (step 1): Simply Club + Nextend social login,
-   side by side (stacking on mobile). */
-.kindi-clublogin { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0 0 1rem; align-items: stretch; }
-.kindi-clublogin__col { flex: 1 1 calc(50% - 0.4rem); min-width: 0; }
-.kindi-clublogin__col > * { max-width: 100%; }
-@media (max-width: 600px) { .kindi-clublogin__col { flex-basis: 100%; } }
+/* Simply Club box in the contact card (step 1) — centred, with its button
+   recoloured to the brand blue instead of the plugin's black. */
+.kindi-clublogin { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; margin: 0 0 1rem; }
+.kindi-clublogin button,
+.kindi-clublogin input[type="submit"],
+.kindi-clublogin a.button,
+.kindi-clublogin [class*="button"],
+.kindi-clublogin [class*="btn"] {
+  background: var(--brand-blue) !important;
+  border-color: var(--brand-blue) !important;
+  color: #fff !important;
+}
+.kindi-clublogin button:hover,
+.kindi-clublogin input[type="submit"]:hover,
+.kindi-clublogin a.button:hover,
+.kindi-clublogin [class*="button"]:hover,
+.kindi-clublogin [class*="btn"]:hover {
+  background: var(--brand-navy) !important;
+  border-color: var(--brand-navy) !important;
+}
 
 /* ---------- Box 3: shipping-method cards ---------- */
 .kindi-ship { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; }
