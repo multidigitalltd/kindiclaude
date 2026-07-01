@@ -521,69 +521,8 @@
 		if ( e.target.closest( 'input[name="kindi_gift_wrap"]' ) ) { refreshCheckout(); }
 	} );
 
-	/* Relocate the gift-card redemption boxes (Gifta + YITH) into a two-column
-	   row directly above the order-summary card. They render in fixed spots at
-	   unpredictable times, so we retry for a few seconds and on updated_checkout.
-	   Each box's whole wrapper (toggle + hidden code form) moves together so it
-	   stays usable; the Gifta coupon notice is tucked under the Gifta column. */
-	function kindiGiftBoxFrom( start ) {
-		if ( ! start ) { return null; }
-		var box = start;
-		for ( var i = 0; i < 6 && box.parentElement; i++ ) {
-			if ( box.querySelector && box.querySelector( 'input, textarea' ) ) { break; }
-			box = box.parentElement;
-		}
-		if ( ! box || box === document.body || 'FORM' === box.nodeName ) { return null; }
-		if ( box.matches( '#order_review, .kindi-co, .kindi-co__main, .kindi-co__side, .woocommerce-checkout-review-order' ) ) { return null; }
-		if ( box.querySelector( '#place_order, .kindi-giftcards' ) ) { return null; }
-		return box;
-	}
-
-	function relocateGiftCards() {
-		var anchor = document.querySelector( '#order_review' );
-		if ( ! anchor || ! anchor.parentElement ) { return; }
-		var container = anchor.parentElement;
-
-		var wrap = document.querySelector( '.kindi-giftcards' );
-		if ( ! wrap ) {
-			wrap = document.createElement( 'div' );
-			wrap.className = 'kindi-giftcards';
-			container.insertBefore( wrap, anchor );
-		}
-
-		function column( cls ) {
-			var col = wrap.querySelector( '.' + cls );
-			if ( ! col ) {
-				col = document.createElement( 'div' );
-				col.className = 'kindi-giftcards__col ' + cls;
-				wrap.appendChild( col );
-			}
-			return col;
-		}
-
-		var gifta = kindiGiftBoxFrom( document.querySelector( '.logoSvg' ) );
-		if ( gifta && ! wrap.contains( gifta ) ) {
-			column( 'kindi-giftcards__gifta' ).appendChild( gifta );
-		}
-		var yith = kindiGiftBoxFrom( document.querySelector( '.ywgc_have_code' ) );
-		if ( yith && ! wrap.contains( yith ) ) {
-			column( 'kindi-giftcards__yith' ).appendChild( yith );
-		}
-
-		var gcol = wrap.querySelector( '.kindi-giftcards__gifta' );
-		var note = document.querySelector( '#order_review .kindi-gifta-note' );
-		if ( gcol && note ) {
-			gcol.querySelectorAll( '.kindi-gifta-note' ).forEach( function ( n ) { if ( n !== note ) { n.remove(); } } );
-			gcol.appendChild( note );
-		}
-	}
-	var kindiGiftTries = 0;
-	var kindiGiftTimer = setInterval( function () {
-		kindiGiftTries++;
-		relocateGiftCards();
-		if ( kindiGiftTries > 20 ) { clearInterval( kindiGiftTimer ); }
-	}, 500 );
-	if ( window.jQuery ) { window.jQuery( document.body ).on( 'updated_checkout', relocateGiftCards ); }
+	/* Gift-card redemption boxes (Gifta / YITH) are left in their native plugin
+	   positions — JS relocation across third-party markup proved unreliable. */
 
 	function wireMiniCartQty() {
 		document.querySelectorAll( '.kindi-cartdrawer .woocommerce-mini-cart-item' ).forEach( function ( item ) {
