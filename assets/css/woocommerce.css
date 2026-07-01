@@ -155,20 +155,26 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-pdp__below { margin-top: 3rem; }
 .kindi-pdp__below .related.products, .kindi-pdp__below .upsells.products { margin-top: 3rem; }
 /* Gallery: a soft cream stage for the main image (rounded, generous padding),
-   with thumbnails as a horizontal strip on mobile and a vertical side column
-   on desktop. The active thumbnail gets a red ring to match the design. */
-.woocommerce div.product .woocommerce-product-gallery { margin: 0; float: none; width: auto; }
+   with the extra images as boxed thumbnails stacked one under the other in a
+   column to the RIGHT of the main image (RTL) at every viewport, navigable by
+   click. The active thumbnail gets a red ring to match the design. */
+.woocommerce div.product .woocommerce-product-gallery {
+  margin: 0; float: none; width: auto;
+  display: flex; flex-direction: row-reverse; gap: 0.75rem; align-items: flex-start;
+}
 .woocommerce div.product .woocommerce-product-gallery .woocommerce-product-gallery__wrapper {
+  flex: 1 1 auto; min-width: 0;
   margin: 0; background: var(--brand-cream, #FBF6EC); border-radius: 1.5rem;
   border: 1px solid color-mix(in oklab, var(--brand-navy) 8%, transparent);
   padding: clamp(1rem, 0.5rem + 3vw, 2.5rem);
 }
 .woocommerce div.product .woocommerce-product-gallery__wrapper img { border-radius: 1rem; mix-blend-mode: multiply; }
 .woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs {
-  display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.9rem 0 0; padding: 0; list-style: none;
+  flex: 0 0 3.75rem; display: flex; flex-direction: column; flex-wrap: nowrap;
+  gap: 0.6rem; margin: 0; padding: 0; list-style: none;
 }
 .woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs li {
-  width: 4.5rem; margin: 0; list-style: none;
+  width: 100%; margin: 0; list-style: none;
 }
 .woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs img {
   border-radius: 0.85rem; border: 2px solid transparent; padding: 0.25rem;
@@ -180,13 +186,39 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   border-color: var(--brand-red); opacity: 1;
 }
 @media (min-width: 1024px) {
-  .woocommerce div.product .woocommerce-product-gallery { display: flex; flex-direction: row-reverse; gap: 1rem; align-items: flex-start; }
-  .woocommerce div.product .woocommerce-product-gallery .woocommerce-product-gallery__wrapper { flex: 1 1 auto; min-width: 0; }
-  .woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs {
-    flex: 0 0 4.75rem; flex-direction: column; flex-wrap: nowrap; margin: 0;
-  }
-  .woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs li { width: 100%; }
+  .woocommerce div.product .woocommerce-product-gallery { gap: 1rem; }
+  .woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs { flex-basis: 4.75rem; }
 }
+/* Gallery arrows: subtle round prev/next over the main image (never over the
+   thumb column), fading in on hover/focus. FlexSlider disables both when the
+   gallery has a single image, so they show only when there's more than one. */
+.woocommerce div.product .woocommerce-product-gallery { position: relative; }
+.woocommerce div.product .flex-direction-nav {
+  position: absolute; inset: 0 calc(3.75rem + 1.35rem) 0 0; margin: 0; padding: 0;
+  list-style: none; pointer-events: none; z-index: 4;
+}
+.woocommerce div.product .flex-direction-nav li { position: static; margin: 0; list-style: none; }
+.woocommerce div.product .flex-direction-nav a {
+  pointer-events: auto; position: absolute; top: 50%; transform: translateY(-50%);
+  width: 2.5rem; height: 2.5rem; border-radius: 999px; display: grid; place-items: center;
+  background: color-mix(in oklab, #fff 88%, transparent);
+  border: 1px solid color-mix(in oklab, var(--brand-navy) 12%, transparent);
+  box-shadow: var(--shadow-card, 0 6px 16px rgba(20, 30, 60, 0.1));
+  color: var(--brand-navy); font-size: 0; text-indent: 0; overflow: hidden;
+  opacity: 0; transition: opacity 0.2s, background 0.15s, color 0.15s;
+}
+.woocommerce div.product .flex-direction-nav a::after {
+  content: ""; width: 0.55rem; height: 0.55rem; border: solid currentColor; border-width: 2px 2px 0 0;
+}
+.woocommerce div.product .flex-direction-nav a.flex-prev { inset-inline-start: 0.75rem; }
+.woocommerce div.product .flex-direction-nav a.flex-next { inset-inline-end: 0.75rem; }
+.woocommerce div.product .flex-direction-nav a.flex-prev::after { transform: rotate(45deg); margin-inline-start: 0.15rem; }
+.woocommerce div.product .flex-direction-nav a.flex-next::after { transform: rotate(-135deg); margin-inline-end: 0.15rem; }
+.woocommerce div.product .woocommerce-product-gallery:hover .flex-direction-nav a,
+.woocommerce div.product .flex-direction-nav a:focus-visible { opacity: 1; }
+.woocommerce div.product .flex-direction-nav a:hover { background: #fff; color: var(--brand-red); }
+/* Single-image galleries: FlexSlider disables both arrows — keep them hidden. */
+.woocommerce div.product .flex-direction-nav a.flex-disabled { opacity: 0 !important; pointer-events: none; }
 .woocommerce div.product .product_title {
   font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy);
   font-size: clamp(1.5rem, 1.2rem + 1.6vw, 2.25rem); line-height: 1.15;
@@ -812,6 +844,11 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-stickycart__price del { color: var(--muted-foreground); font-weight: 500; font-size: 0.8rem; margin-inline-start: 0.35rem; }
 .kindi-stickycart__btn { flex: 0 0 auto; padding-block: 0.7rem; }
 @media (min-width: 1024px) { .kindi-stickycart { display: none !important; } }
+/* When the mobile sticky add-to-cart bar is showing, lift the floating WhatsApp
+   + accessibility buttons above it so the bar never covers them. */
+@media (max-width: 1023.98px) {
+  body:has( .kindi-stickycart:not([hidden]) ) .kindi-float { bottom: calc(6rem + env(safe-area-inset-bottom)); }
+}
 
 /* ---------- WhatsApp enquiry button (product) ---------- */
 .kindi-wa-ask { display: flex; align-items: center; gap: 0.7rem; margin: 1rem 0; padding: 0.8rem 1rem; border-radius: 1rem; background: color-mix(in oklab, #25D366 12%, #fff); border: 1px solid color-mix(in oklab, #25D366 35%, transparent); color: var(--brand-navy); font-weight: 600; transition: background 0.15s ease; }

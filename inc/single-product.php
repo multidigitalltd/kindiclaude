@@ -377,6 +377,21 @@ function kindi_pdp_sale_flash( $html, $post, $product ): string {
 add_filter( 'woocommerce_sale_flash', 'kindi_pdp_sale_flash', 10, 3 );
 
 /**
+ * Enable FlexSlider's prev/next arrows on the product gallery so shoppers can
+ * page through the images straight from the main stage. FlexSlider marks the
+ * arrows disabled when there's a single image, so they only surface on
+ * multi-image galleries (styled subtly in woocommerce.css).
+ *
+ * @param array<string,mixed> $options FlexSlider options.
+ * @return array<string,mixed>
+ */
+function kindi_gallery_carousel_options( array $options ): array {
+	$options['directionNav'] = true;
+	return $options;
+}
+add_filter( 'woocommerce_single_product_carousel_options', 'kindi_gallery_carousel_options' );
+
+/**
  * "חדש בקינדי" badge in the gallery for recently-published products.
  *
  * @return void

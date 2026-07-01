@@ -219,7 +219,8 @@ function kindi_shipping_section_html(): string {
 				$available = $package['rates'];
 				$picked    = $chosen[ $i ] ?? '';
 				if ( '' === $picked && $available ) {
-					$picked = current( $available )->get_id();
+					// Default to free shipping when it's offered; otherwise the first rate.
+					$picked = kindi_default_shipping_rate_id( $available );
 				}
 				if ( empty( $available ) ) :
 					?>
@@ -513,6 +514,44 @@ function kindi_checkout_cols_close(): void {
 	$GLOBALS['kindi_co_open'] = false;
 }
 add_action( 'woocommerce_checkout_after_order_review', 'kindi_checkout_cols_close', 50 );
+
+/**
+ * The rate id we default to for a package: free shipping when it's available,
+ * otherwise the first offered rate. Rates are keyed by their id, and each rate's
+ * get_id() equals that key, so the returned string matches the radio values.
+ *
+ * @param array $rates Package rates (rate_id => WC_Shipping_Rate).
+ * @return string Rate id, or '' when the package has no rates.
+ */
+function kindi_default_shipping_rate_id( array $rates ): string {
+	foreach ( $rates as $rate_id => $rate ) {
+		if ( is_object( $rate ) && method_exists( $rate, 'get_method_id' ) && 'free_shipping' === $rate->get_method_id() ) {
+			return (string) $rate_id;
+		}
+	}
+	$first = reset( $rates );
+	return ( is_object( $first ) && method_exists( $first, 'get_id' ) ) ? (string) $first->get_id() : '';
+}
+
+/**
+ * Auto-select free shipping when it's offered. WooCommerce only calls this
+ * filter while no valid method is chosen for the package, so a shopper who picks
+ * a different option keeps it — we merely change the default from "first rate"
+ * to "free shipping when present". The $chosen_method guard is belt-and-braces.
+ *
+ * @param string $default       WooCommerce's default rate id.
+ * @param array  $rates         Package rates.
+ * @param string $chosen_method Currently chosen rate id (may be empty/invalid).
+ * @return string
+ */
+function kindi_prefer_free_shipping( $default, $rates, $chosen_method ) {
+	if ( $chosen_method && isset( $rates[ $chosen_method ] ) ) {
+		return $chosen_method;
+	}
+	$free = kindi_default_shipping_rate_id( (array) $rates );
+	return '' !== $free ? $free : $default;
+}
+add_filter( 'woocommerce_shipping_chosen_method', 'kindi_prefer_free_shipping', 10, 3 );
 
 /**
  * Pick the icon for a shipping rate: a storefront for self-pickup, a truck for
