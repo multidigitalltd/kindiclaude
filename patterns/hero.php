@@ -46,7 +46,7 @@
 			<img class="kindi-hero__mascot animate-mascot" src="<?php echo esc_url( kindi_mascot_src( 'hero_mascot', 'mascot/kindy-hero.webp' ) ); ?>" width="520" height="520" fetchpriority="high" decoding="async" alt="קינדי מציג את עולם המוצרים בקינדר טויס — צעצועים, ילקוטים, יצירה ומשחקי קופסה">
 
 			<span class="kindi-hero__pill kindi-hero__pill--top"><?php echo kindi_icon( 'sparkles', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><small>חדש השבוע</small><b>+120 מוצרים</b></span></span>
-			<span class="kindi-hero__pill kindi-hero__pill--bottom"><?php echo kindi_icon( 'truck', 'kindi-icon--lg kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><small>משלוח מחר</small><b>חינם מעל 299₪</b></span></span>
+			<span class="kindi-hero__pill kindi-hero__pill--bottom"><?php echo kindi_icon( 'truck', 'kindi-icon--lg kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><small>משלוח מהיר</small><b>חינם מעל 299 ש"ח</b></span></span>
 		</div>
 	</div>
 </section>
