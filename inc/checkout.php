@@ -85,20 +85,16 @@ add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_top', 5 );
  * @return void
  */
 function kindi_checkout_club_banner(): void {
-	$chevron = '<svg class="kindi-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
-	echo '<div class="kindi-club" data-kindi-club>'
-		. '<span class="kindi-club__ic">' . kindi_icon( 'crown', 'kindi-icon--lg kindi-icon--white' ) . '</span>' // phpcs:ignore WordPress.Security.EscapeOutput
-		. '<div class="kindi-club__text">'
-		. '<strong>' . esc_html__( 'כבר חברי מועדון קינדי טויס? התחברו וקבלו הנחות ונקודות', 'kindi' ) . '</strong>'
-		. '<span>' . esc_html__( 'חברי מועדון צוברים נקודות על כל קנייה, מקבלים מתנות יום הולדת והטבות בלעדיות', 'kindi' ) . '</span>'
-		. '</div>'
-		// id="clubcta" matches the trigger the Simply Club popup is wired to in the
-		// plugin panel, so clicking this button opens the login/offers popup. The
-		// site's own #clubcta (an Elementor button) is not present on checkout, so
-		// there is no duplicate-id clash here.
-		. '<button type="button" id="clubcta" class="kindi-club__btn kindi-club-trigger">' . esc_html__( 'התחברות / הצטרפות', 'kindi' ) . '</button>'
-		. '<button type="button" class="kindi-club__toggle" data-kindi-club-toggle aria-label="' . esc_attr__( 'כיווץ', 'kindi' ) . '">' . $chevron . '</button>' // phpcs:ignore WordPress.Security.EscapeOutput
-		. '</div>';
+	// Per request: render Simply Club's own shortcode (login popup for guests /
+	// redemption offers for members) and just wrap it for styling.
+	if ( ! shortcode_exists( 'simply_club_offerbox' ) ) {
+		return;
+	}
+	$box = trim( do_shortcode( '[simply_club_offerbox]' ) );
+	if ( '' === $box ) {
+		return;
+	}
+	echo '<div class="kindi-clubbox">' . $box . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- Simply Club shortcode output.
 }
 add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_club_banner', 4 );
 
@@ -735,16 +731,13 @@ add_action( 'kindi_summary_after_coupon', 'kindi_gifta_coupon_notice', 22 );
 add_filter( 'ywgc_gift_card_code_form_checkout_hook', static fn(): string => 'kindi_summary_after_coupon' );
 
 /**
- * Re-point Gifta's redemption form from before the payment methods to the
- * summary coupon area. Gifta hardcodes its hook, so we find its callback on
- * woocommerce_review_order_before_payment and move it.
+ * Remove Gifta's own redemption-form hook (it renders before the payment
+ * methods) so we can render it below the coupon instead — see
+ * kindi_render_gifta_form. Runs early (before the payment block renders).
  *
  * @return void
  */
-function kindi_move_gifta_form(): void {
-	if ( ! function_exists( 'is_checkout' ) || ! is_checkout() ) {
-		return;
-	}
+function kindi_unhook_gifta_form(): void {
 	global $wp_filter;
 	if ( empty( $wp_filter['woocommerce_review_order_before_payment'] ) ) {
 		return;
@@ -755,12 +748,28 @@ function kindi_move_gifta_form(): void {
 			if ( is_array( $fn ) && isset( $fn[0], $fn[1] ) && is_object( $fn[0] )
 				&& 'dropdown' === $fn[1] && false !== stripos( get_class( $fn[0] ), 'gifta' ) ) {
 				remove_action( 'woocommerce_review_order_before_payment', $fn, $prio );
-				add_action( 'kindi_summary_after_coupon', $fn, 20 );
 			}
 		}
 	}
 }
-add_action( 'wp', 'kindi_move_gifta_form', 20 );
+add_action( 'wp', 'kindi_unhook_gifta_form', 99 );
+
+/**
+ * Render the Gifta redemption form below the coupon. We call the plugin's own
+ * renderer on a fresh instance so the markup + its delegated JS stay intact.
+ *
+ * @return void
+ */
+function kindi_render_gifta_form(): void {
+	if ( ! class_exists( 'Gifta_Public' ) ) {
+		return;
+	}
+	$gifta = new Gifta_Public( 'gifta', '1' );
+	if ( method_exists( $gifta, 'dropdown' ) ) {
+		$gifta->dropdown( '' );
+	}
+}
+add_action( 'kindi_summary_after_coupon', 'kindi_render_gifta_form', 20 );
 
 /**
  * Open/close the two-column wrapper around the relocated gift-card forms.
