@@ -92,10 +92,11 @@ function kindi_checkout_club_banner(): void {
 		. '<strong>' . esc_html__( 'כבר חברי מועדון קינדי טויס? התחברו וקבלו הנחות ונקודות', 'kindi' ) . '</strong>'
 		. '<span>' . esc_html__( 'חברי מועדון צוברים נקודות על כל קנייה, מקבלים מתנות יום הולדת והטבות בלעדיות', 'kindi' ) . '</span>'
 		. '</div>'
-		// `kindi-club-trigger` is the hook for Simply Club: set this class as the
-		// pop-up trigger in the plugin's panel and clicking opens the login/offers
-		// popup. A button (not a link) so it never navigates away on click.
-		. '<button type="button" class="kindi-club__btn kindi-club-trigger">' . esc_html__( 'התחברות / הצטרפות', 'kindi' ) . '</button>'
+		// id="clubcta" matches the trigger the Simply Club popup is wired to in the
+		// plugin panel, so clicking this button opens the login/offers popup. The
+		// site's own #clubcta (an Elementor button) is not present on checkout, so
+		// there is no duplicate-id clash here.
+		. '<button type="button" id="clubcta" class="kindi-club__btn kindi-club-trigger">' . esc_html__( 'התחברות / הצטרפות', 'kindi' ) . '</button>'
 		. '<button type="button" class="kindi-club__toggle" data-kindi-club-toggle aria-label="' . esc_attr__( 'כיווץ', 'kindi' ) . '">' . $chevron . '</button>' // phpcs:ignore WordPress.Security.EscapeOutput
 		. '</div>';
 }
@@ -716,8 +717,67 @@ function kindi_gifta_coupon_notice(): void {
 		. esc_html__( 'לתשומת ליבכם: לא ניתן לממש כרטיס Gifta יחד עם קופון. לשימוש בכרטיס Gifta הסירו את הקופון; לשימוש בקופון בחרו אמצעי תשלום אחר.', 'kindi' )
 		. '</p>';
 }
-// Render directly below the coupon box in the order-summary column.
-add_action( 'kindi_summary_after_coupon', 'kindi_gifta_coupon_notice' );
+// Render inside the Gifta column, below the Gifta redemption box.
+add_action( 'kindi_summary_after_coupon', 'kindi_gifta_coupon_notice', 22 );
+
+/*
+ * ---------------------------------------------------------------------------
+ * Gift-card redemption forms next to the coupon. Instead of moving the plugin
+ * markup with JS (fragile), we re-point each plugin's own render hook to
+ * kindi_summary_after_coupon (fired right below the coupon box in
+ * review-order.php) and wrap them in a two-column row. YITH exposes a filter
+ * for its checkout hook; Gifta is re-hooked from the payment area.
+ * ---------------------------------------------------------------------------
+ */
+
+// YITH: render its checkout gift-card form below the coupon instead of at the
+// top of the checkout (woocommerce_before_checkout_form).
+add_filter( 'ywgc_gift_card_code_form_checkout_hook', static fn(): string => 'kindi_summary_after_coupon' );
+
+/**
+ * Re-point Gifta's redemption form from before the payment methods to the
+ * summary coupon area. Gifta hardcodes its hook, so we find its callback on
+ * woocommerce_review_order_before_payment and move it.
+ *
+ * @return void
+ */
+function kindi_move_gifta_form(): void {
+	if ( ! function_exists( 'is_checkout' ) || ! is_checkout() ) {
+		return;
+	}
+	global $wp_filter;
+	if ( empty( $wp_filter['woocommerce_review_order_before_payment'] ) ) {
+		return;
+	}
+	foreach ( $wp_filter['woocommerce_review_order_before_payment']->callbacks as $prio => $callbacks ) {
+		foreach ( $callbacks as $callback ) {
+			$fn = $callback['function'] ?? null;
+			if ( is_array( $fn ) && isset( $fn[0], $fn[1] ) && is_object( $fn[0] )
+				&& 'dropdown' === $fn[1] && false !== stripos( get_class( $fn[0] ), 'gifta' ) ) {
+				remove_action( 'woocommerce_review_order_before_payment', $fn, $prio );
+				add_action( 'kindi_summary_after_coupon', $fn, 20 );
+			}
+		}
+	}
+}
+add_action( 'wp', 'kindi_move_gifta_form', 20 );
+
+/**
+ * Open/close the two-column wrapper around the relocated gift-card forms.
+ * Priorities bracket YITH (10) and Gifta (20) on kindi_summary_after_coupon.
+ *
+ * @param string $html Literal wrapper markup.
+ * @return void
+ */
+function kindi_giftcards_markup( string $html ): void {
+	echo $html; // phpcs:ignore WordPress.Security.EscapeOutput -- literal wrapper markup.
+}
+add_action( 'kindi_summary_after_coupon', static fn() => kindi_giftcards_markup( '<div class="kindi-giftcards">' ), 6 );
+add_action( 'kindi_summary_after_coupon', static fn() => kindi_giftcards_markup( '<div class="kindi-giftcards__col kindi-giftcards__yith">' ), 8 );
+add_action( 'kindi_summary_after_coupon', static fn() => kindi_giftcards_markup( '</div>' ), 12 );
+add_action( 'kindi_summary_after_coupon', static fn() => kindi_giftcards_markup( '<div class="kindi-giftcards__col kindi-giftcards__gifta">' ), 14 );
+add_action( 'kindi_summary_after_coupon', static fn() => kindi_giftcards_markup( '</div>' ), 24 );
+add_action( 'kindi_summary_after_coupon', static fn() => kindi_giftcards_markup( '</div>' ), 90 );
 
 /**
  * Safety net: block placing the order with Gifta while a coupon is applied.

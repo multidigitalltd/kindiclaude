@@ -698,9 +698,18 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
    two columns side by side (each on half width, stacking on mobile). */
 .kindi-giftcards { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1rem 0 0; align-items: stretch; }
 .kindi-giftcards__col { flex: 1 1 calc(50% - 0.4rem); min-width: 0; background: #fff; border: 1px solid var(--border); border-radius: 0.875rem; padding: 0.85rem 0.95rem; }
-.kindi-giftcards__col > * { max-width: none; }
+.kindi-giftcards__col:empty { display: none; }
+.kindi-giftcards__col > *,
+.kindi-giftcards__col #gifta_coupon_section,
+.kindi-giftcards__col .ywgc_have_code,
+.kindi-giftcards__col .ywgc_enter_code { max-width: none; margin: 0; }
+.kindi-giftcards__col .ywgc_enter_code { margin-top: 0.6rem; }
 .kindi-giftcards__col input[type="text"],
-.kindi-giftcards__col input:not([type="checkbox"]):not([type="radio"]) { width: 100%; box-sizing: border-box; }
+.kindi-giftcards__col input:not([type="checkbox"]):not([type="radio"]) { width: 100%; box-sizing: border-box; margin: 0.35rem 0; }
+.kindi-giftcards__col .button,
+.kindi-giftcards__col .gifta_button,
+.kindi-giftcards__col .ywgc_apply_gift_card_button { width: 100%; margin: 0.25rem 0 0; }
+.kindi-giftcards__col .form-row { width: auto; margin: 0; padding: 0; float: none; }
 .kindi-giftcards .kindi-gifta-note { margin: 0.6rem 0 0; font-size: 0.82rem; }
 @media (max-width: 600px) { .kindi-giftcards__col { flex-basis: 100%; } }
 

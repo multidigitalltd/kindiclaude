@@ -260,20 +260,3 @@
 		}
 	} );
 }() );
-
-/* Club strip: the Simply Club login/offers popup is wired to the site's own
- * "#clubcta" trigger (an Elementor button). Forward clicks from our checkout
- * club button (.kindi-club-trigger) to that real trigger so the popup opens. */
-( function () {
-	document.addEventListener( 'click', function ( e ) {
-		var trigger = e.target.closest ? e.target.closest( '.kindi-club-trigger' ) : null;
-		if ( ! trigger ) {
-			return;
-		}
-		var real = document.querySelector( '#clubcta a' ) || document.querySelector( '#clubcta' );
-		if ( real ) {
-			e.preventDefault();
-			real.click();
-		}
-	} );
-}() );
