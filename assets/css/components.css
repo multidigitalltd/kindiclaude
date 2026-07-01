@@ -74,6 +74,9 @@
 .kindi-cart:hover { border-color: color-mix(in oklab, var(--brand-red) 40%, transparent); box-shadow: var(--shadow-card); }
 .kindi-cart__txt { text-align: right; line-height: 1.1; display: none; }
 @media (min-width: 640px) { .kindi-cart__txt { display: block; } }
+/* Mobile: only the icon shows, so make the white pill's padding symmetric — the
+   icon sits centred with equal space on both sides. */
+@media (max-width: 639px) { .kindi-cart { padding-inline: 0.4rem; } }
 .kindi-cart__txt small { font-size: 10px; color: var(--muted-foreground); }
 .kindi-cart__txt b { display: block; font-size: 0.75rem; font-weight: 800; color: var(--brand-navy); }
 .kindi-cart__ic { position: relative; width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; background: var(--brand-red); display: grid; place-items: center; transition: background 0.2s; overflow: visible; }
