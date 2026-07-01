@@ -1116,6 +1116,16 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 /* Wishlist page now injects a real product-card grid — let it control layout. */
 .kindi-wish-grid { display: block; }
 .kindi-wish-grid > ul.products { margin: 0; }
+/* Fixed archive-sized tiles (via auto-fill) so a single favourite stays a normal
+   card aligned to the start instead of stretching across the row. */
+.kindi-wish-grid ul.products {
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 15rem)) !important;
+  justify-content: start;
+}
+.kindi-wish-grid:has(.kindi-wish-card) {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 15rem));
+  gap: 1rem; justify-content: start;
+}
 
 /* ====================================================================== */
 /* Product archive — hero, two-column layout, toolbar, view toggle        */
