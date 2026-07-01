@@ -222,6 +222,22 @@ function kindi_dequeue_address_i18n(): void {
 add_action( 'wp_enqueue_scripts', 'kindi_dequeue_address_i18n', 999 );
 
 /**
+ * Hard backstop: never print the wc-address-i18n script tag. It re-orders and
+ * re-classes the billing address fields on load (making "עיר" jump out of
+ * place), which we never want on this fixed Israel-only layout. Blanking the tag
+ * at print time works regardless of dependency/registration timing, so it also
+ * covers cases where another plugin re-adds the script after the dequeue above.
+ *
+ * @param string $tag    Full script tag HTML.
+ * @param string $handle Script handle.
+ * @return string
+ */
+function kindi_block_address_i18n_tag( string $tag, string $handle ): string {
+	return 'wc-address-i18n' === $handle ? '' : $tag;
+}
+add_filter( 'script_loader_tag', 'kindi_block_address_i18n_tag', 10, 2 );
+
+/**
  * Add defer to theme scripts; never block rendering.
  *
  * @param string $tag    Script tag HTML.
