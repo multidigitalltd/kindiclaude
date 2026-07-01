@@ -571,18 +571,6 @@ add_filter( 'woocommerce_cart_shipping_method_full_label', 'kindi_shipping_metho
  */
 
 /**
- * Render the Simply gift-card redemption box on the same hook as the coupon
- * toggle (woocommerce_before_checkout_form) so the two sit together at the top
- * of the checkout instead of the box dropping into the billing column. The
- * filter only does anything when the gift-card plugin is active.
- */
-add_filter( 'simply_offerbox_checkout_action', static fn(): string => 'kindi_summary_after_coupon' );
-
-// Hide the Simply gift-card plugin's own top bar (no-op when the plugin is absent).
-add_filter( 'simply_show_top_bar', '__return_false' );
-add_filter( 'simply_offerbox_show_top_bar', '__return_false' );
-
-/**
  * Display title for a payment gateway. Falls back to the admin method title and
  * then a sensible default, because some gateways (e.g. Gifta) leave the
  * front-end title empty, which would render an empty payment card.

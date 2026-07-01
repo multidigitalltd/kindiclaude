@@ -553,12 +553,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-helpbox__wa { margin-inline-start: auto; flex: 0 0 auto; width: 2.75rem; height: 2.75rem; display: grid; place-items: center; background: #25D366; border-radius: 999px; }
 .kindi-helpbox__wa .kindi-icon { width: 1.5rem; height: 1.5rem; }
 
-/* Remove the Simply gift-card plugin's stray top bar (the box lives in the
-   summary now); keep the relocated offerbox inside .kindi-summary. */
-.woocommerce-checkout > .simply-offerbox, .woocommerce-checkout > .simply_offerbox,
-form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
-.simply-top-bar, .simply_top_bar, .simply-offerbox-bar { display: none !important; }
-
 /* ---------- Checkout: let the page use the full width ----------
    Block themes constrain content (~650px) via .is-layout-constrained, which
    squashes the two columns. Widen the checkout content wrappers so the 2/3 + 1/3
@@ -685,15 +679,6 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
 .woocommerce form.login .button {
   background: var(--brand-navy); color: #fff; border-radius: 0.75rem; padding: 0.65rem 1.4rem; font-weight: 800;
 }
-/* Gift-card redemption box (Simply offerbox), moved up to sit with the coupon
-   and Gifta fields — match the same info-card look. */
-/* Gifta gift-card box + its notice now live in the summary column, below the
-   coupon — full width of that column. */
-.woocommerce-checkout .simply-offerbox,
-.woocommerce-checkout .simply_offerbox { max-width: none; width: 100%; margin: 0 0 1rem; }
-.kindi-summary .simply-offerbox,
-.kindi-summary .simply_offerbox { margin: 1rem 0 0; }
-.kindi-summary .kindi-gifta-note { margin: 0.85rem 0 0; }
 /* Gift-card redemption (Gifta + YITH) relocated below the summary by store.js,
    two columns side by side (each on half width, stacking on mobile). */
 .kindi-giftcards { display: flex; flex-direction: column; gap: 0.75rem; margin: 1rem 0 0; }
