@@ -40,11 +40,6 @@ if ( post_password_required() ) {
 			 * @hooked woocommerce_show_product_images - 20
 			 */
 			do_action( 'woocommerce_before_single_product_summary' );
-
-			// Left-column toy blocks (trust strip, key facts, skills, in-the-box).
-			if ( function_exists( 'kindi_pdp_left_extras' ) ) {
-				kindi_pdp_left_extras( $product );
-			}
 			?>
 		</div>
 
@@ -68,6 +63,15 @@ if ( post_password_required() ) {
 			do_action( 'woocommerce_single_product_summary' );
 			?>
 		</div>
+
+		<?php
+		// Toy blocks (trust strip, key facts, skills, in-the-box). A direct grid
+		// child so it sits under the gallery on desktop but drops below the buy box
+		// on mobile (single column) — see the grid placement in woocommerce.css.
+		if ( function_exists( 'kindi_pdp_left_extras' ) ) {
+			kindi_pdp_left_extras( $product );
+		}
+		?>
 
 	</div>
 

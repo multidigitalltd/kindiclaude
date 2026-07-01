@@ -248,6 +248,17 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 }
 .kindi-qbtn:hover { background: var(--brand-navy); color: #fff; }
 .kindi-qbtn:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: -2px; }
+/* Mobile: the +/- stepper looked oversized next to "הוספה לסל". Match the qty
+   control's height to the add-to-cart button and slim the buttons so the whole
+   buy row reads as one size. */
+@media (max-width: 1023.98px) {
+  .woocommerce div.product form.cart .button.single_add_to_cart_button {
+    height: 3rem; padding-block: 0; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .woocommerce div.product .quantity { height: 3rem; box-sizing: border-box; }
+  .woocommerce div.product .quantity .qty { height: 100%; width: 2.5rem; min-width: 2.5rem; }
+  .woocommerce div.product .kindi-qbtn { width: 2.5rem; font-size: 1.25rem; }
+}
 /* Variation swatches — replace the attribute <select> with colour circles /
    pills. The select stays in the DOM (hidden) as WooCommerce's source of truth. */
 .kindi-select--hidden {
@@ -945,7 +956,13 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 /* PDP design alignment (Lovable)                                         */
 /* ====================================================================== */
 @media (min-width: 1024px) {
-  .kindi-pdp__grid { grid-template-columns: 1fr 1fr; }
+  /* Gallery top-left, extras under it (col 1), buy box spanning both rows (col 2).
+     On mobile the grid is a single column so DOM order applies: gallery → buy box
+     → extras, dropping the trust strip below the quick-buy button. */
+  .kindi-pdp__grid { grid-template-columns: 1fr 1fr; gap: 2rem 3rem; }
+  .kindi-pdp__grid > .kindi-pdp__media { grid-column: 1; grid-row: 1; }
+  .kindi-pdp__grid > .kindi-pdp__summary { grid-column: 2; grid-row: 1 / span 2; }
+  .kindi-pdp__grid > .kindi-pdp-extras { grid-column: 1; grid-row: 2; }
 }
 
 /* Short description: two-line clamp + "more info" toggle. */
