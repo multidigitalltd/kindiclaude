@@ -388,6 +388,11 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-cobox__grid #billing_postcode_field { order: 4; }
 @media (max-width: 600px) { .kindi-cobox__grid { grid-template-columns: 1fr; } }
 .kindi-hidden-field { display: none !important; }
+/* Hide stray technical/empty checkout fields (e.g. Datalogics platform id) that
+   carry no input — otherwise they take a grid cell and knock the address column
+   pairing out of place (leaving "רחוב" alone and "עיר" misaligned). */
+.kindi-cobox__grid .form-row:has(> .woocommerce-input-wrapper:empty),
+.woocommerce-checkout [id="datalogics_n_code_platform_id_field"] { display: none !important; }
 
 /* In-field icons (positioned at the trailing/left edge in RTL). */
 .kindi-cobox__grid #billing_email_field input,
