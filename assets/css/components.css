@@ -16,6 +16,8 @@
 .kindi-topbar { background: linear-gradient(to left, var(--brand-red), var(--brand-red-dark) 55%, var(--brand-navy)); color: #fff; overflow: hidden; }
 .kindi-topbar__track { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.25rem 0; padding-block: 0.5rem; padding-inline: 1rem; width: auto; }
 .kindi-topbar__item { display: inline-flex; align-items: center; gap: 0.5rem; padding-inline: 1.25rem; font-size: 13px; font-weight: 600; }
+/* Mobile: hide the red ticker strip to keep the header compact. */
+@media (max-width: 1023.98px) { .kindi-topbar { display: none; } }
 
 
 .kindi-bar {
@@ -97,6 +99,9 @@
 
 /* ============================ Category nav + mega ============================ */
 .kindi-nav { position: sticky; top: 0; z-index: 100; background: var(--brand-navy); color: #fff; display: block; }
+/* Mobile: the category/mega nav is replaced by the hamburger drawer (top-right),
+   so hide the strip itself to avoid a duplicate menu. */
+@media (max-width: 1023.98px) { .kindi-nav { display: none; } }
 /* One row. Mobile: swipe horizontally. Desktop: fit one line (JS shrinks --kindi-nav-fs if crowded). */
 .kindi-nav__inner { max-width: 1440px; margin-inline: auto; display: flex; flex-wrap: nowrap; align-items: center; gap: 0.25rem; min-height: 3rem; padding-inline: 1rem; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .kindi-nav__inner::-webkit-scrollbar { display: none; }

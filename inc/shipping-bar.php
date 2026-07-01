@@ -28,11 +28,12 @@ function kindi_free_shipping_progress(): void {
 	$remaining = $threshold - $total;
 	$pct       = max( 0, min( 100, ( $total / $threshold ) * 100 ) );
 
-	echo '<div class="kindi-freeship">';
-	if ( $remaining > 0 ) {
-		echo '<p>עוד <strong>' . wp_kses_post( wc_price( $remaining ) ) . '</strong> ותיהנו ממשלוח חינם! 🚚</p>';
+	$reached = $remaining <= 0;
+	echo '<div class="kindi-freeship' . ( $reached ? ' is-reached' : '' ) . '">';
+	if ( ! $reached ) {
+		echo '<p><span class="kindi-freeship__ic">' . kindi_icon( 'truck', 'kindi-icon--sm' ) . '</span>עוד <strong>' . wp_kses_post( wc_price( $remaining ) ) . '</strong> ותיהנו ממשלוח חינם!</p>'; // phpcs:ignore WordPress.Security.EscapeOutput -- kindi_icon returns escaped SVG.
 	} else {
-		echo '<p>🎉 כל הכבוד! יש לכם <strong>משלוח חינם</strong>.</p>';
+		echo '<p><span class="kindi-freeship__ic">' . kindi_icon( 'party', 'kindi-icon--sm' ) . '</span>איזה כייף! יש לכם <strong>משלוח חינם</strong>.</p>'; // phpcs:ignore WordPress.Security.EscapeOutput -- kindi_icon returns escaped SVG.
 	}
 	echo '<div class="kindi-freeship__bar"><span style="width:' . esc_attr( (string) $pct ) . '%"></span></div>';
 	echo '</div>';

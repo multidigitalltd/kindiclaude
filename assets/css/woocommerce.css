@@ -205,7 +205,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   border: 1px solid color-mix(in oklab, var(--brand-navy) 12%, transparent);
   box-shadow: var(--shadow-card, 0 6px 16px rgba(20, 30, 60, 0.1));
   color: var(--brand-navy); font-size: 0; text-indent: 0; overflow: hidden;
-  opacity: 0; transition: opacity 0.2s, background 0.15s, color 0.15s;
+  opacity: 1; transition: opacity 0.2s, background 0.15s, color 0.15s;
 }
 .woocommerce div.product .flex-direction-nav a::after {
   content: ""; width: 0.55rem; height: 0.55rem; border: solid currentColor; border-width: 2px 2px 0 0;
@@ -214,9 +214,8 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .woocommerce div.product .flex-direction-nav a.flex-next { inset-inline-end: 0.75rem; }
 .woocommerce div.product .flex-direction-nav a.flex-prev::after { transform: rotate(45deg); margin-inline-start: 0.15rem; }
 .woocommerce div.product .flex-direction-nav a.flex-next::after { transform: rotate(-135deg); margin-inline-end: 0.15rem; }
-.woocommerce div.product .woocommerce-product-gallery:hover .flex-direction-nav a,
-.woocommerce div.product .flex-direction-nav a:focus-visible { opacity: 1; }
-.woocommerce div.product .flex-direction-nav a:hover { background: #fff; color: var(--brand-red); }
+.woocommerce div.product .flex-direction-nav a:hover,
+.woocommerce div.product .flex-direction-nav a:focus-visible { background: #fff; color: var(--brand-red); }
 /* Single-image galleries: FlexSlider disables both arrows — keep them hidden. */
 .woocommerce div.product .flex-direction-nav a.flex-disabled { opacity: 0 !important; pointer-events: none; }
 .woocommerce div.product .product_title {
@@ -336,7 +335,9 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 
 /* ---------- Free-shipping progress ---------- */
 .kindi-freeship { background: var(--brand-blue-soft); border-radius: 1rem; padding: 0.75rem 1rem; margin-bottom: 1rem; }
-.kindi-freeship p { margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 600; color: var(--brand-navy); }
+.kindi-freeship p { display: flex; align-items: center; gap: 0.4rem; margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 600; color: var(--brand-navy); }
+.kindi-freeship__ic { display: inline-flex; flex: 0 0 auto; color: var(--brand-blue); }
+.kindi-freeship.is-reached .kindi-freeship__ic { color: var(--brand-red); }
 .kindi-freeship__bar { height: 8px; border-radius: 999px; background: #fff; overflow: hidden; }
 .kindi-freeship__bar span { display: block; height: 100%; background: linear-gradient(to left, var(--brand-red), var(--brand-navy)); transition: width 0.4s; }
 
