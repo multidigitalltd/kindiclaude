@@ -80,7 +80,7 @@ function kindi_checkout_top(): void {
 add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_top', 5 );
 
 /**
- * Club / benefits banner above the checkout form.
+ * Simply Club shortcode, rendered inside the "פרטי קשר" contact card (step 1).
  *
  * @return void
  */
@@ -88,7 +88,7 @@ function kindi_checkout_club_banner(): void {
 	// Print Simply Club's shortcode as-is, with no theme markup around it.
 	echo do_shortcode( '[simply_club_offerbox]' ); // phpcs:ignore WordPress.Security.EscapeOutput -- Simply Club shortcode output.
 }
-add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_club_banner', 4 );
+add_action( 'kindi_before_contact_fields', 'kindi_checkout_club_banner' );
 
 /**
  * Relabel + reorder the billing fields to match the design (form-billing.php

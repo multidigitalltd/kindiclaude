@@ -65,6 +65,7 @@ $kindi_render = static function ( $key ) use ( $checkout, $kindi_fields, $kindi_
 					<p class="kindi-cobox__sub"><?php esc_html_e( 'נשתמש בהם רק לעדכוני ההזמנה', 'kindi' ); ?></p>
 				</div>
 			</header>
+			<?php do_action( 'kindi_before_contact_fields' ); ?>
 			<div class="kindi-cobox__body kindi-cobox__grid">
 				<?php
 				foreach ( $kindi_contact as $kindi_key ) {
