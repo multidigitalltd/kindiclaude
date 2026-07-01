@@ -386,7 +386,10 @@ add_filter( 'woocommerce_sale_flash', 'kindi_pdp_sale_flash', 10, 3 );
  * @return array<string,mixed>
  */
 function kindi_gallery_carousel_options( array $options ): array {
-	$options['directionNav'] = true;
+	$options['directionNav']  = true;
+	// Loop so neither arrow is disabled on the first/last image — both stay
+	// visible on multi-image galleries (single-image galleries get no slider).
+	$options['animationLoop']  = true;
 	return $options;
 }
 add_filter( 'woocommerce_single_product_carousel_options', 'kindi_gallery_carousel_options' );
