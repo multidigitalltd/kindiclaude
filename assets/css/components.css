@@ -262,6 +262,14 @@
 .kindi-footer__pay { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .kindi-footer__pay > span:first-child { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
 .kindi-footer__paychip { font-size: 10px; font-weight: 700; background: #fff; color: var(--brand-navy); padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
+/* Mobile: tighten the footer — trim the oversized gaps + padding (desktop is
+   unchanged). */
+@media (max-width: 767px) {
+  .kindi-footer { margin-top: 2.5rem; }
+  .kindi-footer__inner { padding: 2rem 1.25rem; }
+  .kindi-footer__grid { gap: 1.5rem; }
+  .kindi-footer__bottom { padding-top: 1.25rem; margin-top: 1.5rem; }
+}
 
 /* ============================ Section title (legacy block helper) ============================ */
 .kindi-section-title { font-family: var(--wp--preset--font-family--display); color: var(--brand-navy); }
