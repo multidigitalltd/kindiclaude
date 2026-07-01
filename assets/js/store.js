@@ -548,7 +548,7 @@
 		if ( ! wrap ) {
 			wrap = document.createElement( 'div' );
 			wrap.className = 'kindi-giftcards';
-			if ( anchor && anchor.nextSibling ) { side.insertBefore( wrap, anchor.nextSibling ); }
+			if ( anchor ) { side.insertBefore( wrap, anchor ); }
 			else { side.appendChild( wrap ); }
 		}
 
@@ -568,12 +568,8 @@
 			column( 'kindi-giftcards__gifta' ).appendChild( gifta );
 		}
 
-		/* YITH — move the parent holding both the toggle and the code form. */
-		var yEl = document.querySelector( '.ywgc_have_code' );
-		var yith = yEl ? yEl.parentElement : null;
-		if ( yith && ( yith.matches( 'form.checkout, #order_review, .kindi-co__side, .kindi-co__main' ) || yith.querySelector( '#place_order' ) ) ) {
-			yith = null;
-		}
+		/* YITH — climb from the toggle to the wrapper that holds the code form. */
+		var yith = kindiGiftBoxFrom( document.querySelector( '.ywgc_have_code' ) );
 		if ( yith && ! wrap.contains( yith ) ) {
 			column( 'kindi-giftcards__yith' ).appendChild( yith );
 		}

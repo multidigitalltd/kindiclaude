@@ -679,8 +679,9 @@ function kindi_is_gifta_gateway( string $id, string $label = '' ): bool {
 }
 
 /**
- * Order the payment gateways so Gifta is always last, and remove it entirely
- * when a coupon is applied — a Gifta gift card cannot be combined with coupons.
+ * Remove Gifta's stray "connect/login" payment gateway. Gifta is a gift-card
+ * *redemption* box (rendered in the summary), not a payment method, so its
+ * gateway otherwise shows as an empty payment card.
  *
  * @param array<string,WC_Payment_Gateway> $gateways Available gateways.
  * @return array<string,WC_Payment_Gateway>
@@ -689,28 +690,15 @@ function kindi_order_payment_gateways( array $gateways ): array {
 	if ( is_admin() ) {
 		return $gateways;
 	}
-
-	$gifta = array();
 	foreach ( $gateways as $id => $gateway ) {
-		$label = is_object( $gateway ) && method_exists( $gateway, 'get_title' ) ? (string) $gateway->get_title() : '';
-		if ( kindi_is_gifta_gateway( (string) $id, $label ) ) {
-			$gifta[ $id ] = $gateway;
+		$label = '';
+		if ( is_object( $gateway ) ) {
+			$title  = method_exists( $gateway, 'get_title' ) ? (string) $gateway->get_title() : '';
+			$mtitle = method_exists( $gateway, 'get_method_title' ) ? (string) $gateway->get_method_title() : '';
+			$label  = trim( $title . ' ' . $mtitle );
 		}
-	}
-	if ( ! $gifta ) {
-		return $gateways;
-	}
-
-	$has_coupon = function_exists( 'WC' ) && WC()->cart && count( WC()->cart->get_applied_coupons() ) > 0;
-
-	// Drop Gifta from the list while a coupon is active.
-	foreach ( array_keys( $gifta ) as $id ) {
-		unset( $gateways[ $id ] );
-	}
-	// Otherwise re-append it so it sits last.
-	if ( ! $has_coupon ) {
-		foreach ( $gifta as $id => $gateway ) {
-			$gateways[ $id ] = $gateway;
+		if ( kindi_is_gifta_gateway( (string) $id, $label ) ) {
+			unset( $gateways[ $id ] );
 		}
 	}
 	return $gateways;
