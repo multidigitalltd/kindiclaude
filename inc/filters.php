@@ -213,7 +213,10 @@ function kindi_archive_hero(): void {
 	}
 	echo '<h1 class="kindi-archhero__title">' . esc_html( $title ) . '</h1>';
 	if ( '' !== $desc ) {
-		echo '<p class="kindi-archhero__desc">' . esc_html( $desc ) . '</p>';
+		echo '<div class="kindi-archhero__descwrap">';
+		echo '<p class="kindi-archhero__desc" data-kindi-clamp>' . esc_html( $desc ) . '</p>';
+		echo '<button type="button" class="kindi-archhero__more" data-kindi-clamp-toggle aria-expanded="false" data-more="' . esc_attr__( 'קרא עוד', 'kindi' ) . '" data-less="' . esc_attr__( 'הצג פחות', 'kindi' ) . '" hidden>' . esc_html__( 'קרא עוד', 'kindi' ) . '</button>';
+		echo '</div>';
 	}
 	echo '</div>';
 

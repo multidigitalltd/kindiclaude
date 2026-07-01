@@ -374,13 +374,18 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-cobox__grid .form-row .select2-container { width: 100% !important; box-sizing: border-box; max-width: none; }
 .kindi-cobox__grid .form-row-wide,
 .kindi-cobox__grid #order_comments_field { grid-column: 1 / -1; }
-/* Keep the address fields two-up whatever width class WooCommerce's locale JS
-   (wc-address-i18n) re-applies after load — locking the columns stops the
-   fields from jumping to full width on render. */
+/* Pin the address fields two-up in a fixed visual order (רחוב · מספר / עיר ·
+   מיקוד) regardless of the width class OR the DOM order WooCommerce's locale JS
+   applies — `order` fixes the layout even if the fields are reordered, and
+   `span 1` stops them jumping to full width. */
 .kindi-cobox__grid #billing_address_1_field,
 .kindi-cobox__grid #billing_address_2_field,
 .kindi-cobox__grid #billing_city_field,
 .kindi-cobox__grid #billing_postcode_field { grid-column: auto / span 1 !important; }
+.kindi-cobox__grid #billing_address_1_field { order: 1; }
+.kindi-cobox__grid #billing_address_2_field { order: 2; }
+.kindi-cobox__grid #billing_city_field { order: 3; }
+.kindi-cobox__grid #billing_postcode_field { order: 4; }
 @media (max-width: 600px) { .kindi-cobox__grid { grid-template-columns: 1fr; } }
 .kindi-hidden-field { display: none !important; }
 
@@ -1021,7 +1026,13 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-archhero__crumbs a:hover { color: var(--brand-red); }
 .kindi-archhero__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy);
   font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.4rem); line-height: 1.1; margin: 0 0 0.5rem; }
-.kindi-archhero__desc { color: var(--foreground); font-size: 0.95rem; line-height: 1.6; max-width: 60ch; margin: 0; }
+.kindi-archhero__descwrap { max-width: 60ch; }
+.kindi-archhero__desc { color: var(--foreground); font-size: 0.95rem; line-height: 1.6; margin: 0; }
+/* Clamp the category description to 4 lines until "קרא עוד" expands it. */
+.kindi-archhero__desc[data-kindi-clamp] { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; }
+.kindi-archhero__desc.is-expanded { display: block; -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; }
+.kindi-archhero__more { display: inline-block; margin-top: 0.35rem; padding: 0; background: none; border: 0; color: var(--brand-red); font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+.kindi-archhero__more:hover { text-decoration: underline; }
 .kindi-archhero__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; align-content: flex-start; justify-content: flex-start; flex-shrink: 0; max-width: 100%; }
 @media (min-width: 1024px) { .kindi-archhero__chips { max-width: 48%; justify-content: flex-end; } }
 

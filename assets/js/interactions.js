@@ -261,3 +261,25 @@
 		}
 	} );
 }() );
+
+/* Archive category description: reveal the "קרא עוד" toggle only when the text
+ * overflows the 4-line clamp, and expand/collapse on click. */
+( function () {
+	document.querySelectorAll( '[data-kindi-clamp]' ).forEach( function ( desc ) {
+		var wrap = desc.parentElement;
+		var btn = wrap ? wrap.querySelector( '[data-kindi-clamp-toggle]' ) : null;
+		if ( ! btn ) {
+			return;
+		}
+		if ( desc.scrollHeight - desc.clientHeight > 2 ) {
+			btn.hidden = false;
+		}
+		btn.addEventListener( 'click', function () {
+			var expanded = desc.classList.toggle( 'is-expanded' );
+			btn.setAttribute( 'aria-expanded', expanded ? 'true' : 'false' );
+			btn.textContent = expanded
+				? ( btn.getAttribute( 'data-less' ) || 'הצג פחות' )
+				: ( btn.getAttribute( 'data-more' ) || 'קרא עוד' );
+		} );
+	} );
+}() );
