@@ -132,3 +132,7 @@ body {
    nav and stop it sticking in some browsers — so keep the guard on <html>. */
 html { overflow-x: clip; }
 body { max-width: 100%; }
+/* Mobile: the sticky category nav is hidden here, so clipping <body> too is safe
+   and catches any horizontal overflow that escapes the <html> guard (e.g. a
+   full-bleed section) — no more sideways scroll on phones. */
+@media (max-width: 1023.98px) { body { overflow-x: clip; } }
