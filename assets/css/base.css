@@ -130,9 +130,10 @@ body {
 /* Prevent accidental horizontal scroll at the root only. A clip on <body> would
    become the scroll container for the (display:contents header) sticky category
    nav and stop it sticking in some browsers — so keep the guard on <html>. */
-html { overflow-x: clip; }
+/* Clip horizontal overflow on BOTH html and body. `overflow: clip` (unlike
+   hidden/auto) does NOT create a scroll container, so the sticky category nav
+   still works — but any element that reaches past the viewport (a full-bleed
+   hero, a 100vw band) is contained and can't widen the page or shove the header
+   content off the edge. */
+html, body { overflow-x: clip; }
 body { max-width: 100%; }
-/* Mobile: the sticky category nav is hidden here, so clipping <body> too is safe
-   and catches any horizontal overflow that escapes the <html> guard (e.g. a
-   full-bleed section) — no more sideways scroll on phones. */
-@media (max-width: 1023.98px) { body { overflow-x: clip; } }

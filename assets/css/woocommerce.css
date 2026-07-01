@@ -392,6 +392,18 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-waitlist__row input:focus { outline: none; border-color: var(--brand-red); }
 .kindi-waitlist__terms { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--brand-navy); }
 .kindi-waitlist__msg { margin: 0; font-weight: 700; color: var(--brand-navy); }
+/* The submit button in the site's language (sections.css .kindi-btn isn't loaded
+   on product pages, so the "notify me" button would fall back to a plain grey). */
+.kindi-waitlist .kindi-btn,
+.kindi-waitlist button[type="submit"] {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  width: 100%; box-sizing: border-box; height: 3rem; padding-inline: 1.5rem;
+  background: var(--brand-red); color: #fff; border: 0; border-radius: 0.95rem;
+  font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 1rem;
+  cursor: pointer; box-shadow: var(--shadow-pop); transition: background 0.15s ease;
+}
+.kindi-waitlist .kindi-btn:hover,
+.kindi-waitlist button[type="submit"]:hover { background: var(--brand-red-dark); color: #fff; }
 
 /* ---------- Checkout / cart progress steps ---------- */
 .kindi-steps { display: flex; align-items: center; justify-content: center; gap: 0; list-style: none; margin: 0 0 1.5rem; padding: 1rem; background: #fff; border: 1px solid var(--border); border-radius: 1rem; flex-wrap: wrap; box-shadow: var(--shadow-card); }
@@ -669,7 +681,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .woocommerce-checkout .form-row { margin-bottom: 1rem; }
 .woocommerce-checkout form.checkout #order_review { position: static; width: 100%; }
 .woocommerce-checkout h3, .woocommerce-checkout #order_review_heading { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); }
-.woocommerce-checkout #order_review, .woocommerce-cart .cart_totals { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.25rem; box-shadow: var(--shadow-card); }
+.woocommerce-checkout #order_review, .woocommerce-cart .cart_totals { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.25rem; box-shadow: var(--shadow-card); box-sizing: border-box; }
 .woocommerce-checkout #payment { background: transparent; border-radius: 1rem; }
 .woocommerce-checkout #payment ul.payment_methods { border: 0; padding: 0; }
 .woocommerce-checkout #payment div.payment_box { background: var(--brand-blue-soft); border-radius: 0.75rem; }
