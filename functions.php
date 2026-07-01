@@ -67,6 +67,7 @@ if ( is_admin() ) {
 kindi_require( 'enqueue.php' );
 kindi_require( 'performance.php' );
 kindi_require( 'security.php' );
+kindi_require( 'litespeed.php' );
 
 if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'woocommerce.php' );

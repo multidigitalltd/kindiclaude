@@ -77,7 +77,8 @@
 .kindi-suggest__group { padding: 0.5rem 1rem; font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--brand-red); background: color-mix(in oklab, var(--brand-red) 5%, #fff); }
 .kindi-suggest__cat { display: flex; justify-content: space-between; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; color: var(--brand-navy); text-decoration: none; }
 .kindi-suggest__cat span { color: var(--muted-foreground); font-weight: 400; }
-.kindi-suggest__cat:hover, .kindi-suggest__item:hover { background: var(--brand-blue-soft); }
+.kindi-suggest__cat:hover, .kindi-suggest__item:hover,
+.kindi-suggest [role="option"].is-active { background: var(--brand-blue-soft); }
 .kindi-suggest__item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; text-decoration: none; border-top: 1px solid var(--border); }
 .kindi-suggest__item img { width: 48px; height: 48px; object-fit: cover; border-radius: 0.5rem; flex-shrink: 0; }
 .kindi-suggest__t { flex: 1; font-size: 0.875rem; font-weight: 600; color: var(--foreground); }
