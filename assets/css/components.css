@@ -12,6 +12,10 @@
 /* display:contents promotes the bars into the root flow, which injects block-gap
    margins between them — zero those out so the strips sit flush. */
 .kindi-topbar, .kindi-promobar, .kindi-bar, .kindi-msearch, .kindi-nav { margin-block: 0; }
+/* The header is display:contents, so the WP flow-layout block-gap lands on these
+   strips and pushes them apart. Force them flush — the coloured bands stack with
+   no white gaps below the top strip, below the blue strip, or above the nav. */
+.kindi-header > * { margin-block: 0 !important; }
 
 .kindi-topbar { background: linear-gradient(to left, var(--brand-red), var(--brand-red-dark) 55%, var(--brand-navy)); color: #fff; overflow: hidden; }
 .kindi-topbar__track { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.25rem 0; padding-block: 0.5rem; padding-inline: 1rem; width: auto; }
@@ -65,9 +69,12 @@
 @media (min-width: 640px) { .kindi-cart__txt { display: block; } }
 .kindi-cart__txt small { font-size: 10px; color: var(--muted-foreground); }
 .kindi-cart__txt b { display: block; font-size: 0.75rem; font-weight: 800; color: var(--brand-navy); }
-.kindi-cart__ic { position: relative; width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; background: var(--brand-red); display: grid; place-items: center; transition: background 0.2s; }
+.kindi-cart__ic { position: relative; width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; background: var(--brand-red); display: grid; place-items: center; transition: background 0.2s; overflow: visible; }
 .kindi-cart:hover .kindi-cart__ic { background: var(--brand-red-dark); }
-.kindi-cart__badge { position: absolute; top: -6px; right: -6px; min-width: 20px; height: 20px; padding-inline: 4px; background: var(--brand-navy); color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; border-radius: 999px; box-shadow: 0 0 0 2px #fff; }
+/* Badge overhangs the icon's top-outer corner; keep the whole chain non-clipping
+   and the bar tall enough so the "3" bubble is never cut at the top. */
+.kindi-bar, .kindi-bar__actions, .kindi-cart { overflow: visible; }
+.kindi-cart__badge { position: absolute; top: -0.25rem; inset-inline-end: -0.25rem; z-index: 3; min-width: 20px; height: 20px; padding-inline: 4px; background: var(--brand-navy); color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; border-radius: 999px; box-shadow: 0 0 0 2px #fff; }
 
 /* Live search suggestions */
 .kindi-search { position: relative; }
