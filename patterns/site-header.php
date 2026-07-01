@@ -28,7 +28,7 @@ $kindi_nav = kindi_nav_items();
 <div class="kindi-topbar">
 	<div class="kindi-topbar__track">
 		<?php foreach ( $kindi_ticker as $t ) : ?>
-		<span class="kindi-topbar__item"><?php echo kindi_icon( $t['icon'], 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $t['text'] ); ?></span>
+		<span class="kindi-topbar__item"><span class="kindi-topbar__ic"><?php echo kindi_icon( $t['icon'], 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><?php echo esc_html( $t['text'] ); ?></span>
 		<?php endforeach; ?>
 	</div>
 </div>

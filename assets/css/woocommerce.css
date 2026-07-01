@@ -1062,6 +1062,11 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
    buy-now below it matches that row's width (not the whole column). */
 .woocommerce div.product form.cart:not(.variations_form) { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; width: fit-content; max-width: 100%; }
 .woocommerce div.product form.cart:not(.variations_form) .quantity { margin: 0 !important; }
+/* Variable products: the qty + add-to-cart sit in the variation area; lay them
+   out in a wrapping row so the full-width "קנייה מהירה" drops onto its own line
+   with a clear gap above it (it was stuck to the buttons above). */
+.woocommerce div.product .woocommerce-variation-add-to-cart { display: flex; flex-wrap: wrap; align-items: center; gap: 0.9rem; }
+.woocommerce div.product .woocommerce-variation-add-to-cart .kindi-buynow { margin-top: 0; }
 
 /* Force the gallery + summary to fill their 50% grid cells — WooCommerce core
    sets both to 48% floats, which would shrink the image to a quarter of the page. */

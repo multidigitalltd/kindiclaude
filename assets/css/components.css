@@ -20,6 +20,10 @@
 .kindi-topbar { background: linear-gradient(to left, var(--brand-red), var(--brand-red-dark) 55%, var(--brand-navy)); color: #fff; overflow: hidden; }
 .kindi-topbar__track { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.25rem 0; padding-block: 0.5rem; padding-inline: 1rem; width: auto; }
 .kindi-topbar__item { display: inline-flex; align-items: center; gap: 0.5rem; padding-inline: 1.25rem; font-size: 13px; font-weight: 600; }
+/* Icons sit in a white rounded-square chip — same style + colours as the
+   category-nav icons (.kindi-nav__ic), rather than a flat white outline. */
+.kindi-topbar__ic { flex: 0 0 auto; width: 1.5rem; height: 1.5rem; border-radius: 0.375rem; background: #fff; display: grid; place-items: center; }
+.kindi-topbar__ic .kindi-icon { width: 1.1em; height: 1.1em; }
 /* Mobile: hide the red ticker strip to keep the header compact. */
 @media (max-width: 1023.98px) { .kindi-topbar { display: none; } }
 
@@ -28,9 +32,13 @@
   position: relative; z-index: 110;
   background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
   width: 100%; height: 5rem; display: flex; align-items: center;
-  gap: 1rem; padding-inline: 1rem;
+  gap: 1rem;
+  /* Keep the white bar full-width but centre its content on the same 1440px rail
+     as the category nav — otherwise the cart (left-most in RTL) gets shoved to
+     the viewport edge and looks cut off on wide screens. */
+  padding-inline: max(1rem, calc((100% - 1440px) / 2));
 }
-@media (min-width: 640px) { .kindi-bar { gap: 2rem; padding-inline: 1.5rem; } }
+@media (min-width: 640px) { .kindi-bar { gap: 2rem; padding-inline: max(1.5rem, calc((100% - 1440px) / 2)); } }
 .kindi-bar__burger { display: inline-flex; background: none; border: 0; color: var(--brand-navy); cursor: pointer; padding: 0.5rem; }
 @media (min-width: 1024px) { .kindi-bar__burger { display: none; } }
 .kindi-bar__logo { flex-shrink: 0; display: flex; align-items: center; }
