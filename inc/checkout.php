@@ -768,23 +768,6 @@ add_action( 'kindi_summary_after_coupon', static fn() => kindi_giftcards_markup(
 add_action( 'kindi_summary_after_coupon', static fn() => kindi_giftcards_markup( '</div>' ), 24 );
 add_action( 'kindi_summary_after_coupon', static fn() => kindi_giftcards_markup( '</div>' ), 90 );
 
-/**
- * Safety net: block placing the order with Gifta while a coupon is applied.
- * WooCommerce verifies the checkout nonce before this validation hook runs.
- *
- * @return void
- */
-function kindi_block_gifta_with_coupon(): void {
-	$method = isset( $_POST['payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-	if ( '' === $method || ! kindi_is_gifta_gateway( $method ) ) {
-		return;
-	}
-	if ( function_exists( 'WC' ) && WC()->cart && count( WC()->cart->get_applied_coupons() ) > 0 ) {
-		wc_add_notice( __( 'לא ניתן לשלם עם כרטיס Gifta כאשר מופעל קופון. הסירו את הקופון או בחרו אמצעי תשלום אחר.', 'kindi' ), 'error' );
-	}
-}
-add_action( 'woocommerce_checkout_process', 'kindi_block_gifta_with_coupon' );
-
 /*
  * ---------------------------------------------------------------------------
  * Trust content on cart & checkout, above the footer: the homepage Google

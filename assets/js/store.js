@@ -501,14 +501,8 @@
 		if ( btn ) { btn.click(); }
 	} );
 
-	/* Club banner + gift-wrap box collapse toggles (checkout). */
+	/* Gift-wrap box collapse toggle (checkout). */
 	document.addEventListener( 'click', function ( e ) {
-		var club = e.target.closest( '[data-kindi-club-toggle]' );
-		if ( club ) {
-			var c = club.closest( '[data-kindi-club]' );
-			if ( c ) { c.classList.toggle( 'is-collapsed' ); }
-			return;
-		}
 		var gift = e.target.closest( '[data-kindi-gift-toggle]' );
 		if ( gift ) {
 			var g = gift.closest( '[data-kindi-gift]' );
