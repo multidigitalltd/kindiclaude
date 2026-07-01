@@ -399,8 +399,8 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-clublogin a.button,
 .kindi-clublogin [class*="button" i],
 .kindi-clublogin [class*="btn" i] {
-  background: var(--brand-blue) !important;
-  border-color: var(--brand-blue) !important;
+  background: var(--brand-navy) !important;
+  border-color: var(--brand-navy) !important;
   color: #fff !important;
 }
 .kindi-clublogin .clubBtnSty:hover,
@@ -410,8 +410,8 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-clublogin a.button:hover,
 .kindi-clublogin [class*="button" i]:hover,
 .kindi-clublogin [class*="btn" i]:hover {
-  background: var(--brand-navy) !important;
-  border-color: var(--brand-navy) !important;
+  background: var(--brand-navy-dark) !important;
+  border-color: var(--brand-navy-dark) !important;
 }
 
 /* ---------- Box 3: shipping-method cards ---------- */
