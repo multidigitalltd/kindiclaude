@@ -374,6 +374,13 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-cobox__grid .form-row .select2-container { width: 100% !important; box-sizing: border-box; max-width: none; }
 .kindi-cobox__grid .form-row-wide,
 .kindi-cobox__grid #order_comments_field { grid-column: 1 / -1; }
+/* Keep the address fields two-up whatever width class WooCommerce's locale JS
+   (wc-address-i18n) re-applies after load — locking the columns stops the
+   fields from jumping to full width on render. */
+.kindi-cobox__grid #billing_address_1_field,
+.kindi-cobox__grid #billing_address_2_field,
+.kindi-cobox__grid #billing_city_field,
+.kindi-cobox__grid #billing_postcode_field { grid-column: auto / span 1 !important; }
 @media (max-width: 600px) { .kindi-cobox__grid { grid-template-columns: 1fr; } }
 .kindi-hidden-field { display: none !important; }
 
