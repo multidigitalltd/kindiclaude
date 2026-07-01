@@ -382,15 +382,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   .kindi-club__text { flex: 1 1 60%; }
   .kindi-club__btn { margin-inline-start: 0; order: 3; flex: 1 1 100%; text-align: center; }
 }
-/* Simply Club shortcode wrapper — full-bleed soft-red band aligned to the page
-   container; the plugin's own login/offers UI renders inside. */
-.kindi-clubbox {
-  width: 100vw; margin: 0 calc(50% - 50vw) 1.25rem;
-  padding: 1rem max(1.25rem, calc(50vw - 590px));
-  background: var(--brand-red-soft, #fdecec);
-  border-block: 1px solid color-mix(in oklab, var(--brand-red) 20%, transparent);
-}
-.kindi-clubbox :is(a, button) { max-width: 100%; }
 
 /* ====================================================================== */
 /* Checkout — numbered section cards (1 contact · 2 address · 3 shipping ·  */
@@ -763,9 +754,10 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
    credit card …). All cards stay in the row; the fields for the selected method
    render in .kindi-payfields below the row (see checkout/payment.php). */
 .woocommerce-checkout #payment ul.payment_methods {
-  display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 0.7rem; margin: 0 0 1.25rem; border: 0; padding: 0; align-items: stretch;
+  display: flex !important; flex-wrap: wrap; justify-content: center; gap: 0.7rem; margin: 0 0 1.25rem; border: 0; padding: 0;
 }
 .woocommerce-checkout #payment ul.payment_methods li {
+  flex: 1 1 calc(33.333% - 0.47rem); max-width: calc(33.333% - 0.47rem);
   position: relative; margin: 0; background: #fff;
   border: 2px solid var(--border); border-radius: 1rem; padding: 1rem 0.85rem;
   transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
@@ -775,7 +767,7 @@ form.checkout > .simply-offerbox, form.checkout > .simply_offerbox,
   border-color: var(--brand-red); background: var(--brand-red-soft);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 12%, transparent);
 }
-@media (max-width: 720px) { .woocommerce-checkout #payment ul.payment_methods { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 720px) { .woocommerce-checkout #payment ul.payment_methods li { flex-basis: calc(50% - 0.35rem); max-width: calc(50% - 0.35rem); } }
 /* Hide the native radio — the whole card is the control. */
 .woocommerce-checkout #payment ul.payment_methods li > input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
 .woocommerce-checkout #payment ul.payment_methods li > label {

@@ -85,16 +85,17 @@ add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_top', 5 );
  * @return void
  */
 function kindi_checkout_club_banner(): void {
-	// Per request: render Simply Club's own shortcode (login popup for guests /
-	// redemption offers for members) and just wrap it for styling.
-	if ( ! shortcode_exists( 'simply_club_offerbox' ) ) {
-		return;
-	}
-	$box = trim( do_shortcode( '[simply_club_offerbox]' ) );
-	if ( '' === $box ) {
-		return;
-	}
-	echo '<div class="kindi-clubbox">' . $box . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- Simply Club shortcode output.
+	// Static branded strip. The button carries `kindi-club-trigger`; once the
+	// Simply Club popup markup is present on checkout, set `.kindi-club-trigger`
+	// as its trigger selector in the plugin panel to open the login/offers popup.
+	echo '<div class="kindi-club" data-kindi-club>'
+		. '<span class="kindi-club__ic">' . kindi_icon( 'crown', 'kindi-icon--lg kindi-icon--white' ) . '</span>' // phpcs:ignore WordPress.Security.EscapeOutput
+		. '<div class="kindi-club__text">'
+		. '<strong>' . esc_html__( 'כבר חברי מועדון קינדי טויס? התחברו וקבלו הנחות ונקודות', 'kindi' ) . '</strong>'
+		. '<span>' . esc_html__( 'חברי מועדון צוברים נקודות על כל קנייה, מקבלים מתנות יום הולדת והטבות בלעדיות', 'kindi' ) . '</span>'
+		. '</div>'
+		. '<button type="button" class="kindi-club__btn kindi-club-trigger">' . esc_html__( 'התחברות / הצטרפות', 'kindi' ) . '</button>'
+		. '</div>';
 }
 add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_club_banner', 4 );
 
