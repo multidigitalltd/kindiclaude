@@ -16,6 +16,11 @@ defined( 'ABSPATH' ) || exit;
  * @return void
  */
 function kindi_store_assets(): void {
+	// Store JS drives the mini-cart drawer, wishlist and AJAX sections — all of
+	// which only exist when WooCommerce is active. Skip it otherwise.
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
 	wp_enqueue_script(
 		'kindi-store',
 		KINDI_URI . 'assets/js/store.js',

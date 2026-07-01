@@ -387,10 +387,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-highlights { list-style: none; margin: 1rem 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .kindi-highlights li { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.9375rem; color: var(--foreground); font-weight: 600; }
 .kindi-highlights .kindi-icon { color: var(--brand-red); flex-shrink: 0; margin-top: 2px; }
-.kindi-inbox { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.25rem; }
-.kindi-inbox h3 { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); margin: 0 0 0.5rem; font-size: 1.0625rem; }
-.kindi-inbox ul { margin: 0; padding-inline-start: 1.1rem; color: var(--foreground); }
-.kindi-inbox li { margin: 0.25rem 0; }
 
 /* ---------- Waitlist ---------- */
 .kindi-hp { position: absolute !important; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; clip: rect(0 0 0 0); clip-path: inset(50%); }
