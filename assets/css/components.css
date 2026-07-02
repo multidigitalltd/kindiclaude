@@ -90,6 +90,9 @@
   .kindi-bar__actions .kindi-wish-link > span:last-child { display: none; }
   .kindi-bar__phone { display: inline-flex; }
   .kindi-bar__phone > span { display: none; }
+  /* Heart + phone icons the same, larger size. */
+  .kindi-bar__phone .kindi-icon,
+  .kindi-bar__actions .kindi-wish-link .kindi-icon { width: 1.5rem; height: 1.5rem; }
 }
 .kindi-cart__txt small { font-size: 10px; color: var(--muted-foreground); }
 .kindi-cart__txt b { display: block; font-size: 0.75rem; font-weight: 800; color: var(--brand-navy); }
@@ -209,7 +212,9 @@
 
 /* Mini-cart drawer. Use dynamic viewport height so the fixed footer (checkout
    button) stays visible above the mobile browser toolbar. */
-.kindi-cartdrawer { position: fixed; inset: 0; height: 100vh; height: 100dvh; z-index: 210; }
+/* Above the floating WhatsApp/accessibility buttons (z-index 210/220) so the
+   open cart covers them instead of the buttons overlapping its footer actions. */
+.kindi-cartdrawer { position: fixed; inset: 0; height: 100vh; height: 100dvh; z-index: 240; }
 .kindi-cartdrawer[hidden] { display: none; }
 .kindi-cartdrawer__overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
 .kindi-cartdrawer__panel { position: absolute; top: 0; bottom: 0; inset-inline-start: 0; width: 90%; max-width: 24rem; height: 100%; background: #fff; display: flex; flex-direction: column; box-shadow: 10px 0 40px rgba(0,0,0,0.25); }
@@ -290,7 +295,8 @@
   .kindi-footer__grid { gap: 1.5rem; }
   .kindi-footer__bottom { padding-top: 1.25rem; margin-top: 1.5rem; }
   /* Smaller logo box + minimal padding so the logo fills it, less space around. */
-  .kindi-footer__logo { height: 3.75rem; padding: 0.3rem; }
+  /* Force a small logo — override any global img sizing that was blowing it up. */
+  .kindi-footer__logo { height: 3.25rem !important; width: auto !important; max-width: 10rem; padding: 0.3rem; }
   .kindi-footer__brand { gap: 0.75rem; }
 }
 

@@ -914,7 +914,15 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-stickycart__title { font-weight: 700; font-size: 0.85rem; color: var(--brand-navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kindi-stickycart__price { font-weight: 700; font-size: 0.95rem; color: var(--brand-red); }
 .kindi-stickycart__price del { color: var(--muted-foreground); font-weight: 500; font-size: 0.8rem; margin-inline-start: 0.35rem; }
-.kindi-stickycart__btn { flex: 0 0 auto; padding-block: 0.7rem; }
+/* Brand-styled button in the site's font (sections.css .kindi-btn isn't loaded
+   on product pages, so style it here). */
+.kindi-stickycart__btn {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  background: var(--brand-red); color: #fff; border: 0; border-radius: 0.9rem;
+  padding: 0.7rem 1.4rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 1rem;
+  cursor: pointer; box-shadow: var(--shadow-pop); transition: background 0.15s ease;
+}
+.kindi-stickycart__btn:hover { background: var(--brand-red-dark); color: #fff; }
 @media (min-width: 1024px) { .kindi-stickycart { display: none !important; } }
 /* When the mobile sticky add-to-cart bar is showing, lift the floating WhatsApp
    + accessibility buttons above it so the bar never covers them. */
