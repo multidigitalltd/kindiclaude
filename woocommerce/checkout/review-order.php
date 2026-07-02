@@ -101,10 +101,11 @@ $kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place ord
 	?>
 
 	<div class="kindi-summary__totals">
-		<div class="kindi-summary__row"><span><?php esc_html_e( 'סכום ביניים', 'kindi' ); ?></span><span><?php wc_cart_totals_subtotal_html(); ?></span></div>
+		<?php // Core `cart-subtotal` class kept alongside BEM: third-party plugins (e.g. Simply Club) read the amount via `.cart-subtotal .woocommerce-Price-amount.amount`. ?>
+		<div class="kindi-summary__row cart-subtotal"><span><?php esc_html_e( 'סכום ביניים', 'kindi' ); ?></span><span><?php wc_cart_totals_subtotal_html(); ?></span></div>
 
 		<?php foreach ( $kindi_cart->get_coupons() as $kindi_code => $kindi_coupon ) : ?>
-		<div class="kindi-summary__row kindi-summary__row--coupon">
+		<div class="kindi-summary__row kindi-summary__row--coupon cart-discount coupon-<?php echo esc_attr( sanitize_title( $kindi_code ) ); ?>">
 			<span><?php wc_cart_totals_coupon_label( $kindi_coupon ); ?> <button type="button" class="kindi-coupon__remove" data-kindi-coupon-remove="<?php echo esc_attr( $kindi_code ); ?>" aria-label="<?php esc_attr_e( 'הסרת קופון', 'kindi' ); ?>">&times;</button></span>
 			<span><?php wc_cart_totals_coupon_html( $kindi_coupon ); ?></span>
 		</div>
@@ -130,7 +131,8 @@ $kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place ord
 	</div>
 
 	<div class="kindi-summary__place">
-		<div class="kindi-summary__grand">
+		<?php // Core `order-total` class kept alongside BEM: Simply Club's av-box.js resolves the order total via `.order-total .woocommerce-Price-amount` and crashes when absent. ?>
+		<div class="kindi-summary__grand order-total">
 			<span class="kindi-summary__grand-label"><?php esc_html_e( 'סה"כ לתשלום', 'kindi' ); ?><small><?php esc_html_e( 'כולל מע"מ', 'kindi' ); ?></small></span>
 			<span class="kindi-summary__grand-amount"><?php wc_cart_totals_order_total_html(); ?></span>
 		</div>
