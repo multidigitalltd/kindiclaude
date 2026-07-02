@@ -585,6 +585,12 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-summary__totals { margin-top: 0.5rem; padding-top: 0.5rem; }
 .kindi-summary__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; color: var(--brand-navy); font-weight: 600; }
 .kindi-summary__row--coupon { color: var(--brand-red); font-weight: 700; }
+/* The summary rows also carry WooCommerce's core classes (cart-subtotal /
+   cart-discount / order-total) for third-party plugins that read amounts from
+   the DOM (e.g. Simply Club). Pin the current colours at higher specificity so
+   no core/plugin stylesheet can re-tint them via those classes. */
+.kindi-summary__row--coupon.cart-discount,
+.kindi-summary__row--coupon.cart-discount .amount { color: var(--brand-red); }
 
 /* Grand total + place-order button + terms, at the foot of the summary. */
 .kindi-summary__place { margin-top: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--border); }
