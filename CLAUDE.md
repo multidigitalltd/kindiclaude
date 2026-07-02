@@ -65,6 +65,11 @@
 - שאילתות: מינימום, `prepare()` תמיד, `no_found_rows`, `update_post_meta_cache=false`
   וכו' כשאפשר. למנוע N+1. `get_posts` כשאין צורך ב-`WP_Query` מלא. אין `SELECT *`.
 - תאימות מלאה: LiteSpeed Cache, Redis, Memcached, Cloudflare, WP Rocket, Object Cache Pro.
+- **עקיפת תבניות WooCommerce:** לשמר תמיד את קלאסי הליבה לצד קלאסים מותאמים
+  (`.cart-subtotal`, `.order-total`, `.cart-discount`, `.woocommerce-Price-amount.amount`,
+  `#place_order`, `.woocommerce-checkout-review-order-table`) — תוספי צד-ג'
+  (Simply Club, Datalogics וכו') מאתרים נתונים בדף לפי הסלקטורים האלה. סכומים
+  מודפסים רק דרך `wc_price()` / `wc_cart_totals_*_html()`, ומרונדרים בצד השרת.
 
 ---
 
