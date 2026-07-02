@@ -348,6 +348,7 @@ function kindi_acf_import_tool(): void {
 	echo '<p style="margin:0 0 8px">' . esc_html( sprintf( 'מוצרים שממתינים לעיבוד בריצה הנוכחית: %d', (int) $kindi_left->found_posts ) ) . '</p>';
 
 	if ( $kindi_mapped ) {
+		global $wpdb;
 		$kindi_labels = array(
 			'age'         => 'גיל מומלץ',
 			'brand_label' => 'מותג',
@@ -356,28 +357,56 @@ function kindi_acf_import_tool(): void {
 			'play_time'   => 'זמן משחק',
 			'pieces'      => 'מספר חלקים',
 		);
-		$kindi_sample = get_posts(
-			array(
-				'post_type'      => 'product',
-				'post_status'    => 'any',
-				'posts_per_page' => 20,
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-			)
-		);
-		echo '<p style="margin:0 0 4px">' . esc_html( sprintf( 'בדיקת מדגם על %d מוצרים — כמה מהם מכילים ערך בשדה הממופה:', count( $kindi_sample ) ) ) . '</p><ul style="margin:0;padding-inline-start:18px">';
+		echo '<p style="margin:0 0 4px">' . esc_html__( 'ספירה על כל בסיס הנתונים — בכמה מוצרים יש ערך בשדה הממופה:', 'kindi' ) . '</p><ul style="margin:0;padding-inline-start:18px">';
 		foreach ( $kindi_mapped as $kindi_key => $kindi_optname ) {
 			$kindi_source = (string) kindi_opt( $kindi_optname, '' );
-			$kindi_hits   = 0;
-			foreach ( $kindi_sample as $kindi_pid ) {
-				if ( '' !== kindi_flatten_meta( get_post_meta( (int) $kindi_pid, $kindi_source, true ) ) ) {
-					++$kindi_hits;
-				}
+			$kindi_total  = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- admin-only diagnostics, indexed meta_key lookup.
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->postmeta} pm INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+					 WHERE p.post_type = 'product' AND pm.meta_key = %s AND pm.meta_value != ''",
+					$kindi_source
+				)
+			);
+			$kindi_examples = $kindi_total > 0 ? (array) $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->prepare(
+					"SELECT pm.meta_value FROM {$wpdb->postmeta} pm INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+					 WHERE p.post_type = 'product' AND pm.meta_key = %s AND pm.meta_value != '' LIMIT 2",
+					$kindi_source
+				)
+			) : array();
+			$kindi_mark = $kindi_total > 0 ? '✔' : '✖';
+			$kindi_line = sprintf( '%s %s ← "%s": %d מוצרים', $kindi_mark, $kindi_labels[ $kindi_key ] ?? $kindi_key, $kindi_source, $kindi_total );
+			if ( $kindi_examples ) {
+				$kindi_line .= ' (לדוגמה: ' . implode( ' | ', array_map( static fn( $v ) => mb_substr( kindi_flatten_meta( maybe_unserialize( $v ) ), 0, 30 ), $kindi_examples ) ) . ')';
 			}
-			$kindi_mark = $kindi_hits > 0 ? '✔' : '✖';
-			echo '<li>' . esc_html( sprintf( '%s %s ← "%s": %d/%d', $kindi_mark, $kindi_labels[ $kindi_key ] ?? $kindi_key, $kindi_source, $kindi_hits, count( $kindi_sample ) ) ) . '</li>';
+			echo '<li>' . esc_html( $kindi_line ) . '</li>';
 		}
-		echo '</ul><p class="description" style="margin:8px 0 0">' . esc_html__( 'אם שדה מציג 0 — שם השדה הממופה לא תואם את המפתח שבו הנתון שמור על המוצרים, ולכן הייבוא מעתיק 0.', 'kindi' ) . '</p>';
+		echo '</ul><p class="description" style="margin:8px 0 0">' . esc_html__( 'שדה עם 0 מוצרים = המפתח הממופה ריק בכל האתר — הנתון כנראה שמור במפתח אחר או כטקסונומיה, ולכן הייבוא מעתיק 0.', 'kindi' ) . '</p>';
+
+		// Where DOES product data live? List the most-populated custom meta keys +
+		// product taxonomies so a wrong mapping can be corrected on the spot.
+		$kindi_top = (array) $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- admin-only diagnostics.
+			"SELECT pm.meta_key, COUNT(*) AS n FROM {$wpdb->postmeta} pm INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+			 WHERE p.post_type = 'product' AND pm.meta_key NOT LIKE '\_%' AND pm.meta_value != ''
+			 GROUP BY pm.meta_key ORDER BY n DESC LIMIT 12"
+		);
+		if ( $kindi_top ) {
+			echo '<p style="margin:10px 0 4px"><strong>' . esc_html__( 'המפתחות המאוכלסים ביותר על מוצרים (לבחירת מיפוי נכון):', 'kindi' ) . '</strong></p><ul style="margin:0;padding-inline-start:18px">';
+			foreach ( $kindi_top as $kindi_row ) {
+				echo '<li>' . esc_html( sprintf( '"%s" — %d מוצרים', (string) $kindi_row->meta_key, (int) $kindi_row->n ) ) . '</li>';
+			}
+			echo '</ul>';
+		}
+		$kindi_taxes = get_object_taxonomies( 'product', 'objects' );
+		$kindi_tnames = array();
+		foreach ( $kindi_taxes as $kindi_tax ) {
+			if ( ! in_array( $kindi_tax->name, array( 'product_type', 'product_visibility', 'product_shipping_class' ), true ) ) {
+				$kindi_tnames[] = $kindi_tax->name;
+			}
+		}
+		if ( $kindi_tnames ) {
+			echo '<p style="margin:8px 0 0" class="description">' . esc_html( 'טקסונומיות קיימות על מוצרים: ' . implode( ', ', $kindi_tnames ) ) . '</p>';
+		}
 	}
 	echo '</div>';
 	echo '<form method="post" action="">';
