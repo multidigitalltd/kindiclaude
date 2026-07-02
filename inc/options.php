@@ -158,15 +158,10 @@ function kindi_default_options(): array {
 		'google_place_id'  => '',
 		'google_api_key'   => '',
 
-		// Custom-field (ACF) source-key mapping for toy fields.
-		// Pre-mapped to the site's existing ACF field names so data is adopted
-		// out of the box; override from the panel if a field is renamed.
-		'acf_key_age'          => 'age_fit',
-		'acf_key_brand'        => 'brand',
-		'acf_key_skills'       => 'skills',
-		'acf_key_players'      => 'users',
-		'acf_key_play_time'    => '',
-		'acf_key_pieces'       => '',
+		// Legacy term-meta key for the category bottom description — the ACF
+		// import tool is gone (its one-time job is done), but archive-desc.php
+		// still reads this key at runtime as a fallback for term meta that was
+		// created by ACF (the data outlives the removed plugin).
 		'acf_key_archive_desc' => 'תאור_תחתון_לארכיון',
 
 		// Footer / social.

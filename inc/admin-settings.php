@@ -406,16 +406,6 @@ function kindi_settings_render(): void {
 					echo ' <button type="button" class="button-link kindi-imgfield__clear">' . esc_html__( 'הסר', 'kindi' ) . '</button>';
 					echo '<div class="kindi-imgfield__preview">' . ( '' !== $img ? '<img src="' . esc_url( $img ) . '" alt="">' : '' ) . '</div>';
 					echo '</div>';
-				} elseif ( 'meta_select' === $field['type'] ) {
-					$keys = function_exists( 'kindi_detected_meta_keys' ) ? kindi_detected_meta_keys() : array();
-					echo '<select id="' . esc_attr( $id ) . '" name="kindi[' . esc_attr( $key ) . ']"><option value="">— ' . esc_html__( 'לא ממופה', 'kindi' ) . ' —</option>';
-					foreach ( $keys as $mk ) {
-						printf( '<option value="%1$s"%2$s>%1$s</option>', esc_attr( $mk ), selected( (string) $value, (string) $mk, false ) );
-					}
-					echo '</select>';
-					if ( ! $keys ) {
-						echo '<p class="description">' . esc_html__( 'לא נמצאו שדות מותאמים על המוצרים עדיין.', 'kindi' ) . '</p>';
-					}
 				} elseif ( 'note' === $field['type'] ) {
 					echo ''; // Help text printed below handles the content.
 				} elseif ( 'taxonomy_multi' === $field['type'] ) {

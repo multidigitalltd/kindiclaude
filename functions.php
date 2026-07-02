@@ -55,7 +55,6 @@ kindi_require( 'cookie-consent.php' );
 kindi_require( 'schema.php' );
 kindi_require( 'pixel.php' );
 kindi_require( 'critical-css.php' );
-kindi_require( 'acf-bridge.php' );
 kindi_require( 'emails.php' );
 kindi_require( 'email-branding.php' );
 kindi_require( 'setup.php' );
