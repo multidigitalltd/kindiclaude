@@ -21,6 +21,14 @@ defined( 'ABSPATH' ) || exit;
  * @return bool
  */
 function kindi_is_about_view(): bool {
+	if ( ! is_page() ) {
+		return false;
+	}
+	// The "אודות (Kindi)" template is assigned to the page…
+	if ( 'page-about' === get_page_template_slug( get_queried_object_id() ) ) {
+		return true;
+	}
+	// …or the page just uses one of the About slugs (page-about.html auto-applies).
 	return is_page( array( 'about', 'אודות', 'about-us', 'odot' ) );
 }
 

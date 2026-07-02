@@ -149,6 +149,7 @@
     { "name": "footer", "title": "Footer", "area": "footer" }
   ],
   "customTemplates": [
-    { "name": "page-no-title", "title": "Page (No Title)", "postTypes": ["page"] }
+    { "name": "page-no-title", "title": "Page (No Title)", "postTypes": ["page"] },
+    { "name": "page-about", "title": "אודות (Kindi)", "postTypes": ["page"] }
   ]
 }
