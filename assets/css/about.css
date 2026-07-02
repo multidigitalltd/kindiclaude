@@ -1,0 +1,104 @@
+/*
+ * About page — self-contained sections (.kindi-about-*). Reuses the theme's
+ * design tokens and the shared .kindi-eyebrow / .kindi-sec-title / .kindi-value
+ * classes from sections.css. Loaded only on the About page (see inc/about.php).
+ */
+
+/* ---------------- Hero ---------------- */
+.kindi-about-hero {
+  position: relative; overflow: hidden; border-radius: 2rem; margin-bottom: 1.5rem;
+  padding: clamp(1.5rem, 1rem + 3vw, 3rem);
+  background: linear-gradient(120deg, var(--brand-blue-soft), #fff 55%, color-mix(in oklab, var(--brand-red-soft) 55%, #fff));
+  border: 1px solid color-mix(in oklab, var(--brand-navy) 8%, transparent);
+}
+.kindi-about-hero__grid { display: grid; gap: 1.5rem; align-items: center; }
+@media (min-width: 1024px) { .kindi-about-hero__grid { grid-template-columns: 1fr 1.15fr; } }
+.kindi-about-hero__visual { position: relative; order: -1; }
+@media (min-width: 1024px) { .kindi-about-hero__visual { order: 0; } }
+.kindi-about-hero__mascot {
+  width: 100%; max-width: 340px; margin-inline: auto; display: block; object-fit: contain;
+  filter: drop-shadow(0 18px 22px rgba(27, 42, 82, 0.18));
+}
+.kindi-about-hero__copy { text-align: right; }
+.kindi-about-hero__title {
+  font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy);
+  font-size: clamp(2rem, 1.4rem + 3vw, 3rem); line-height: 1.1; margin: 0.75rem 0;
+}
+.kindi-about-hero__title span { color: var(--brand-red); }
+.kindi-about-hero__lead {
+  color: color-mix(in oklab, var(--brand-navy) 78%, transparent); font-size: 1.05rem; line-height: 1.8; max-width: 42rem;
+}
+
+/* ---------------- Stats band ---------------- */
+.kindi-about-stats {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem 0.75rem; margin: 1.5rem 0;
+  background: linear-gradient(to bottom left, var(--brand-navy), var(--brand-navy-dark));
+  border-radius: 1.5rem; padding: clamp(1.5rem, 1rem + 3vw, 2.5rem); box-shadow: var(--shadow-pop);
+}
+@media (min-width: 768px) { .kindi-about-stats { grid-template-columns: repeat(4, 1fr); } }
+.kindi-about-stat { text-align: center; }
+.kindi-about-stat__num {
+  display: block; font-family: var(--wp--preset--font-family--display); font-weight: 900;
+  color: color-mix(in oklab, var(--brand-red) 78%, white); line-height: 1;
+  font-size: clamp(1.75rem, 1.2rem + 2.5vw, 2.6rem);
+}
+.kindi-about-stat__label { display: block; margin-top: 0.4rem; color: rgba(255,255,255,0.8); font-size: 0.85rem; font-weight: 600; }
+
+/* ---------------- Story + contact ---------------- */
+.kindi-about-story { margin: 1.5rem 0; background: var(--brand-blue-soft); border-radius: 2rem; padding: clamp(1.5rem, 1rem + 3vw, 2.5rem); }
+.kindi-about-story__grid { display: grid; gap: 1.5rem; align-items: start; }
+@media (min-width: 1024px) { .kindi-about-story__grid { grid-template-columns: 20rem 1fr; } }
+
+.kindi-about-contact { display: flex; flex-direction: column; gap: 0.7rem; }
+.kindi-about-contact__item {
+  display: flex; align-items: center; gap: 0.75rem; background: #fff; border: 1px solid var(--border);
+  border-radius: 1rem; padding: 0.85rem 1rem; box-shadow: var(--shadow-card);
+}
+.kindi-about-contact__t { flex: 1; min-width: 0; text-align: right; display: flex; flex-direction: column; }
+.kindi-about-contact__t strong { color: var(--brand-navy); font-weight: 800; font-size: 0.95rem; }
+.kindi-about-contact__t span { color: var(--muted-foreground); font-size: 0.82rem; margin-top: 0.15rem; word-break: break-word; }
+.kindi-about-contact__ic {
+  flex: 0 0 auto; width: 2.6rem; height: 2.6rem; display: grid; place-items: center;
+  background: var(--brand-blue-soft); border-radius: 0.8rem; color: var(--brand-navy);
+}
+
+/* CSS-only tabs (no JS): radios drive the visible panel + active label. */
+.kindi-about-story__radio { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.kindi-about-story__nav { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; background: #fff; border-radius: 999px; padding: 0.3rem; margin-bottom: 1.1rem; box-shadow: var(--shadow-card); }
+.kindi-about-story__nav label { padding: 0.5rem 1.1rem; border-radius: 999px; font-weight: 800; color: var(--brand-navy); cursor: pointer; font-size: 0.9rem; transition: background 0.15s, color 0.15s; }
+.kindi-about-story__nav label:hover { background: var(--brand-blue-soft); }
+.kindi-about-story__panel { display: none; }
+.kindi-about-story__panel p { color: var(--foreground); line-height: 1.9; margin: 0 0 0.9rem; }
+.kindi-about-story__panel p:last-child { margin-bottom: 0; }
+#kabt1:checked ~ .kindi-about-story__body .kindi-about-story__panel[data-p="1"],
+#kabt2:checked ~ .kindi-about-story__body .kindi-about-story__panel[data-p="2"],
+#kabt3:checked ~ .kindi-about-story__body .kindi-about-story__panel[data-p="3"] { display: block; }
+#kabt1:checked ~ .kindi-about-story__nav label[for="kabt1"],
+#kabt2:checked ~ .kindi-about-story__nav label[for="kabt2"],
+#kabt3:checked ~ .kindi-about-story__nav label[for="kabt3"] { background: var(--brand-navy); color: #fff; }
+.kindi-about-story__radio:focus-visible ~ .kindi-about-story__nav label { outline: 2px solid var(--brand-red); outline-offset: 2px; }
+
+.kindi-about-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
+.kindi-about-chip { background: #fff; border: 1px solid color-mix(in oklab, var(--brand-blue) 22%, transparent); color: var(--brand-navy); border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.8rem; font-weight: 700; }
+
+/* Quality row: three cards across on desktop (the .kindi-values grid is 4-up). */
+@media (min-width: 1024px) { .kindi-values.kindi-about-3 { grid-template-columns: repeat(3, 1fr); } }
+
+/* ---------------- CTA band ---------------- */
+.kindi-about-cta {
+  position: relative; overflow: hidden; text-align: center; border-radius: 2rem; margin: 1.5rem 0; color: #fff;
+  padding: clamp(2rem, 1.2rem + 4vw, 3.5rem);
+  background: linear-gradient(120deg, var(--brand-navy), color-mix(in oklab, var(--brand-blue) 60%, var(--brand-navy)));
+  box-shadow: var(--shadow-pop);
+}
+.kindi-about-cta__badge { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--brand-red); color: #fff; border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.8rem; font-weight: 800; }
+.kindi-about-cta__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: clamp(1.75rem, 1.2rem + 2.5vw, 2.75rem); line-height: 1.15; margin: 1rem 0 0.75rem; }
+.kindi-about-cta__title span { color: color-mix(in oklab, var(--brand-red) 80%, white); }
+.kindi-about-cta__lead { color: rgba(255,255,255,0.85); max-width: 42rem; margin: 0 auto 1.5rem; line-height: 1.7; }
+.kindi-about-cta__btns { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+.kindi-about-cta__btn { display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 0.95rem; padding: 0.85rem 1.6rem; font-weight: 800; text-decoration: none; transition: transform 0.15s, background 0.15s; }
+.kindi-about-cta__btn:hover { transform: translateY(-2px); }
+.kindi-about-cta__btn--red { background: var(--brand-red); color: #fff; }
+.kindi-about-cta__btn--red:hover { background: var(--brand-red-dark); color: #fff; }
+.kindi-about-cta__btn--ghost { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+.kindi-about-cta__btn--ghost:hover { background: rgba(255,255,255,0.2); color: #fff; }
