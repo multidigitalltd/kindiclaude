@@ -327,6 +327,59 @@ function kindi_acf_import_tool(): void {
 
 	echo '<hr><h2>' . esc_html__( 'ייבוא נתוני שדות מותאמים', 'kindi' ) . '</h2>';
 	echo '<p class="description">' . esc_html__( 'מעתיק את ערכי השדות הממופים לשדות של קינדי ובונה את אינדקס הגיל לסינון. בטוח להריץ שוב — לא ידרוס נתונים קיימים של קינדי.', 'kindi' ) . '</p>';
+
+	// --- Diagnostics: make a stuck/0-count run explainable at a glance. ---
+	$kindi_run  = (int) get_option( 'kindi_acf_run', 0 );
+	$kindi_left = new WP_Query(
+		array(
+			'post_type'      => 'product',
+			'post_status'    => 'any',
+			'posts_per_page' => 1,
+			'fields'         => 'ids',
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery -- admin-only diagnostics.
+				'relation' => 'OR',
+				array( 'key' => '_kindi_acf_run', 'compare' => 'NOT EXISTS' ),
+				array( 'key' => '_kindi_acf_run', 'value' => $kindi_run, 'compare' => '!=' ),
+			),
+		)
+	);
+	echo '<div style="background:#fff;border:1px solid #c3c4c7;border-radius:6px;padding:12px 16px;margin:12px 0;max-width:640px">';
+	echo '<p style="margin:0 0 8px"><strong>' . esc_html__( 'אבחון', 'kindi' ) . '</strong> — ' . esc_html( sprintf( 'גרסת תבנית: %s', wp_get_theme()->get( 'Version' ) ) ) . '</p>';
+	echo '<p style="margin:0 0 8px">' . esc_html( sprintf( 'מוצרים שממתינים לעיבוד בריצה הנוכחית: %d', (int) $kindi_left->found_posts ) ) . '</p>';
+
+	if ( $kindi_mapped ) {
+		$kindi_labels = array(
+			'age'         => 'גיל מומלץ',
+			'brand_label' => 'מותג',
+			'skills'      => 'מיומנויות',
+			'players'     => 'מספר שחקנים',
+			'play_time'   => 'זמן משחק',
+			'pieces'      => 'מספר חלקים',
+		);
+		$kindi_sample = get_posts(
+			array(
+				'post_type'      => 'product',
+				'post_status'    => 'any',
+				'posts_per_page' => 20,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+			)
+		);
+		echo '<p style="margin:0 0 4px">' . esc_html( sprintf( 'בדיקת מדגם על %d מוצרים — כמה מהם מכילים ערך בשדה הממופה:', count( $kindi_sample ) ) ) . '</p><ul style="margin:0;padding-inline-start:18px">';
+		foreach ( $kindi_mapped as $kindi_key => $kindi_optname ) {
+			$kindi_source = (string) kindi_opt( $kindi_optname, '' );
+			$kindi_hits   = 0;
+			foreach ( $kindi_sample as $kindi_pid ) {
+				if ( '' !== kindi_flatten_meta( get_post_meta( (int) $kindi_pid, $kindi_source, true ) ) ) {
+					++$kindi_hits;
+				}
+			}
+			$kindi_mark = $kindi_hits > 0 ? '✔' : '✖';
+			echo '<li>' . esc_html( sprintf( '%s %s ← "%s": %d/%d', $kindi_mark, $kindi_labels[ $kindi_key ] ?? $kindi_key, $kindi_source, $kindi_hits, count( $kindi_sample ) ) ) . '</li>';
+		}
+		echo '</ul><p class="description" style="margin:8px 0 0">' . esc_html__( 'אם שדה מציג 0 — שם השדה הממופה לא תואם את המפתח שבו הנתון שמור על המוצרים, ולכן הייבוא מעתיק 0.', 'kindi' ) . '</p>';
+	}
+	echo '</div>';
 	echo '<form method="post" action="">';
 	wp_nonce_field( 'kindi_acf_import', 'kindi_acf_nonce' );
 	submit_button( __( 'ייבוא נתונים עכשיו', 'kindi' ), 'secondary', 'kindi_acf_import', false );
