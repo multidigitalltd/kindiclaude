@@ -156,7 +156,7 @@ function kindi_acf_import_batch( int $limit = 50 ): array {
 		}
 	);
 	if ( ! $map ) {
-		return array( 'done' => true, 'count' => 0 );
+		return array( 'done' => true, 'count' => 0, 'processed' => 0 );
 	}
 
 	$run = (int) get_option( 'kindi_acf_run', 0 );
@@ -179,7 +179,7 @@ function kindi_acf_import_batch( int $limit = 50 ): array {
 	);
 
 	if ( ! $ids ) {
-		return array( 'done' => true, 'count' => 0 );
+		return array( 'done' => true, 'count' => 0, 'processed' => 0 );
 	}
 
 	$multiline = kindi_acf_multiline_keys();
@@ -205,7 +205,7 @@ function kindi_acf_import_batch( int $limit = 50 ): array {
 		update_post_meta( $id, '_kindi_acf_run', $run );
 	}
 
-	return array( 'done' => false, 'count' => $count );
+	return array( 'done' => false, 'count' => $count, 'processed' => count( $ids ) );
 }
 
 /**
@@ -217,6 +217,10 @@ function kindi_acf_import_cron(): void {
 	$res   = kindi_acf_import_batch( 50 );
 	$total = (int) get_transient( 'kindi_acf_import_count' ) + (int) $res['count'];
 	set_transient( 'kindi_acf_import_count', $total, DAY_IN_SECONDS );
+	// Track scanned separately: products whose kindi fields were already filled
+	// copy nothing (never overwritten), so "updated" alone reads as stuck.
+	$scanned = (int) get_transient( 'kindi_acf_import_scanned' ) + (int) ( $res['processed'] ?? 0 );
+	set_transient( 'kindi_acf_import_scanned', $scanned, DAY_IN_SECONDS );
 
 	if ( $res['done'] ) {
 		delete_option( 'kindi_acf_importing' );
@@ -245,6 +249,7 @@ function kindi_acf_handle_import(): void {
 	update_option( 'kindi_acf_run', (int) get_option( 'kindi_acf_run', 0 ) + 1, false );
 	update_option( 'kindi_acf_importing', 1, false );
 	delete_transient( 'kindi_acf_import_count' );
+	delete_transient( 'kindi_acf_import_scanned' );
 	delete_transient( 'kindi_acf_import_done' );
 	if ( ! wp_next_scheduled( 'kindi_acf_import_cron' ) ) {
 		wp_schedule_single_event( time() + 5, 'kindi_acf_import_cron' );
@@ -317,12 +322,16 @@ function kindi_acf_import_tool(): void {
 	}
 
 	// A finished run shows the final count; a still-running one shows progress.
+	// "עודכנו" counts only NEW copies — products whose kindi fields were already
+	// filled by a previous run copy nothing, so the scanned figure is shown too.
 	$done = get_transient( 'kindi_acf_import_done' );
 	if ( false !== $done ) {
-		echo '<div class="notice notice-success is-dismissible"><p>' . sprintf( esc_html__( 'הייבוא הושלם — %d מוצרים עודכנו. כעת ניתן להסיר את תוסף ה-ACF בבטחה.', 'kindi' ), (int) $done ) . '</p></div>';
+		$scanned = (int) get_transient( 'kindi_acf_import_scanned' );
+		echo '<div class="notice notice-success is-dismissible"><p>' . sprintf( esc_html__( 'הייבוא הושלם — נסרקו %1$d מוצרים, עודכנו %2$d חדשים (מוצרים שכבר יובאו בעבר אינם נספרים). כעת ניתן להסיר את תוסף ה-ACF בבטחה.', 'kindi' ), $scanned, (int) $done ) . '</p></div>';
 	} elseif ( get_option( 'kindi_acf_importing' ) ) {
-		$so_far = (int) get_transient( 'kindi_acf_import_count' );
-		echo '<div class="notice notice-info"><p>' . sprintf( esc_html__( 'הייבוא רץ ברקע… %d מוצרים עודכנו עד כה. אפשר להמשיך לעבוד; רעננו את העמוד לעדכון.', 'kindi' ), $so_far ) . '</p></div>';
+		$so_far  = (int) get_transient( 'kindi_acf_import_count' );
+		$scanned = (int) get_transient( 'kindi_acf_import_scanned' );
+		echo '<div class="notice notice-info"><p>' . sprintf( esc_html__( 'הייבוא רץ ברקע… נסרקו %1$d מוצרים, עודכנו %2$d חדשים (0 = הנתונים כבר יובאו בעבר — קיים לא נדרס). רעננו את העמוד להתקדמות.', 'kindi' ), $scanned, $so_far ) . '</p></div>';
 	}
 
 	echo '<hr><h2>' . esc_html__( 'ייבוא נתוני שדות מותאמים', 'kindi' ) . '</h2>';
