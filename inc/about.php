@@ -28,8 +28,10 @@ function kindi_is_about_view(): bool {
 	if ( 'page-about' === get_page_template_slug( get_queried_object_id() ) ) {
 		return true;
 	}
-	// …or the page just uses one of the About slugs (page-about.html auto-applies).
-	return is_page( array( 'about', 'אודות', 'about-us', 'odot' ) );
+	// …or the page uses the one slug page-about.html auto-applies to. Other
+	// slugs without the template assigned would load ~30KB of section CSS for
+	// nothing, so the fallback stays narrow.
+	return is_page( 'about' );
 }
 
 /**
@@ -54,6 +56,9 @@ function kindi_about_assets(): void {
 	// Mascot sway (respects prefers-reduced-motion inside the file).
 	wp_enqueue_style( 'kindi-animations', KINDI_URI . 'assets/css/animations.css', array(), kindi_asset_version( 'assets/css/animations.css' ) );
 
+	// Deliberately render-blocking (unlike sections/woocommerce, which the
+	// critical-css module swaps to preload→onload): about.css styles the
+	// above-the-fold hero and is ~2KB gzipped — blocking avoids a hero FOUC.
 	wp_enqueue_style( 'kindi-about', KINDI_URI . 'assets/css/about.css', array( 'kindi-sections' ), kindi_asset_version( 'assets/css/about.css' ) );
 }
 add_action( 'wp_enqueue_scripts', 'kindi_about_assets', 20 );

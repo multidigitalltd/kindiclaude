@@ -43,6 +43,16 @@ function kindi_rest_subscribe( WP_REST_Request $request ): WP_REST_Response {
 		return new WP_REST_Response( array( 'message' => 'אירעה שגיאה. נסו שוב.' ), 403 );
 	}
 
+	// Rate limit: 5 per IP / 10 min (same pattern as the waitlist) — stops
+	// automated nonce-valid submissions from bloating the subscribers option.
+	$ip   = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+	$key  = 'kindi_nl_' . md5( $ip );
+	$hits = (int) get_transient( $key );
+	if ( $hits >= 5 ) {
+		return new WP_REST_Response( array( 'message' => 'יותר מדי בקשות. נסו שוב בעוד מספר דקות.' ), 429 );
+	}
+	set_transient( $key, $hits + 1, 10 * MINUTE_IN_SECONDS );
+
 	$email = sanitize_email( (string) $request->get_param( 'email' ) );
 	if ( ! is_email( $email ) ) {
 		return new WP_REST_Response( array( 'message' => 'כתובת אימייל לא תקינה.' ), 400 );

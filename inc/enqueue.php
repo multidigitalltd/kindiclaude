@@ -124,9 +124,11 @@ function kindi_enqueue_styles(): void {
 	}
 
 	// Content design — pages (terms/policies/accessibility), posts, blog index,
-	// archives, search and 404. Not the front page or the WooCommerce views.
+	// archives, search and 404. Not the front page, the WooCommerce views, or the
+	// About page (its template uses none of content.css's prose/page classes).
 	$is_content_view = is_singular() || is_home() || is_archive() || is_search() || is_404();
-	if ( $is_content_view && ! is_front_page() && ! kindi_is_wc_view() ) {
+	if ( $is_content_view && ! is_front_page() && ! kindi_is_wc_view()
+		&& ! ( function_exists( 'kindi_is_about_view' ) && kindi_is_about_view() ) ) {
 		wp_enqueue_style(
 			'kindi-content',
 			KINDI_URI . 'assets/css/content.css',

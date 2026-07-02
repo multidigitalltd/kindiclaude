@@ -112,7 +112,7 @@ $kindi_nav = kindi_nav_items();
 						<span class="kindi-mega__feature-title"><?php echo esc_html( $kindi_f['title'] ); ?></span>
 						<?php if ( $kindi_f['sub'] ) : ?><span class="kindi-mega__feature-sub"><?php echo esc_html( $kindi_f['sub'] ); ?></span><?php endif; ?>
 						<span class="kindi-mega__feature-cta">לצפייה<?php echo kindi_icon( 'arrowleft', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
-						<img class="kindi-mega__feature-img" src="<?php echo kindi_img( 'mascot/wave.webp' ); ?>" alt="" loading="lazy" decoding="async">
+						<img class="kindi-mega__feature-img" src="<?php echo kindi_img( 'mascot/wave.webp' ); ?>" alt="" width="96" height="96" loading="lazy" decoding="async">
 					</a>
 					<?php endif; ?>
 				</div>

@@ -143,7 +143,10 @@ add_action( 'wp_head', 'kindi_print_font_faces', 2 );
  * @return void
  */
 function kindi_preload_brand_fonts(): void {
-	if ( ! function_exists( 'kindi_is_motion_view' ) || ! kindi_is_motion_view() ) {
+	$is_motion = function_exists( 'kindi_is_motion_view' ) && kindi_is_motion_view();
+	// The About page's H1 uses the same display face above the fold.
+	$is_about  = function_exists( 'kindi_is_about_view' ) && kindi_is_about_view();
+	if ( ! $is_motion && ! $is_about ) {
 		return;
 	}
 
