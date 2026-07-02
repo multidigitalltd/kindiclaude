@@ -249,6 +249,12 @@ function kindi_acf_handle_import(): void {
 	if ( ! wp_next_scheduled( 'kindi_acf_import_cron' ) ) {
 		wp_schedule_single_event( time() + 5, 'kindi_acf_import_cron' );
 	}
+	// Kick WP-Cron right away (a loopback request) instead of waiting for the
+	// next visit; on hosts where WP-Cron is blocked entirely, the settings page
+	// itself also processes batches inline on every refresh (see the tool below).
+	if ( function_exists( 'spawn_cron' ) ) {
+		spawn_cron();
+	}
 
 	wp_safe_redirect( add_query_arg( array( 'page' => 'kindi-settings', 'tab' => 'texts', 'imported' => 'started' ), admin_url( 'admin.php' ) ) );
 	exit;
@@ -288,6 +294,28 @@ add_filter( 'kindi_settings_tabs', 'kindi_acf_settings_section' );
  * @return void
  */
 function kindi_acf_import_tool(): void {
+	// WP-Cron can be disabled or stalled on some hosts, which would leave the
+	// background run stuck at 0 forever. Make each settings-page load drive real
+	// progress: process a few batches inline while a run is active. Idempotent —
+	// the _kindi_acf_run marker stops a product being processed twice even if
+	// the cron worker also fires.
+	if ( get_option( 'kindi_acf_importing' ) && current_user_can( 'manage_options' ) ) {
+		for ( $i = 0; $i < 4 && get_option( 'kindi_acf_importing' ); $i++ ) {
+			kindi_acf_import_cron();
+		}
+	}
+
+	// No fields mapped = nothing to import — surface that instead of a 0-count.
+	$kindi_mapped = array_filter(
+		kindi_acf_map(),
+		static function ( $opt ) {
+			return '' !== (string) kindi_opt( $opt, '' );
+		}
+	);
+	if ( ! $kindi_mapped && ! get_option( 'kindi_acf_importing' ) && false === get_transient( 'kindi_acf_import_done' ) ) {
+		echo '<div class="notice notice-warning"><p>' . esc_html__( 'עדיין לא מופו שדות: בחרו למעלה את שדות הגיל/המותג ולחצו "שמירה" — ורק אז הריצו את הייבוא.', 'kindi' ) . '</p></div>';
+	}
+
 	// A finished run shows the final count; a still-running one shows progress.
 	$done = get_transient( 'kindi_acf_import_done' );
 	if ( false !== $done ) {
