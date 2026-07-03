@@ -40,6 +40,7 @@ function kindi_cache_nonce_actions(): array {
 		'kindi_save_cart',  // saved-cart form.
 		'kindi_waitlist',   // back-in-stock waitlist form.
 		'kindi_cancel',     // transaction-cancellation form.
+		'kindi_contact',    // contact form.
 	);
 }
 

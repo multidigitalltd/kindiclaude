@@ -19,17 +19,27 @@ if ( ! $kindi_cart ) {
 	return;
 }
 
-// Free shipping available for the current packages? Never claimed when the
-// order contains furniture — free shipping excludes it (see inc/woocommerce.php).
-$kindi_free = false;
-if ( $kindi_cart->needs_shipping() && $kindi_cart->show_shipping()
-	&& ! ( function_exists( 'kindi_cart_has_furniture' ) && kindi_cart_has_furniture() ) ) {
-	foreach ( WC()->shipping()->get_packages() as $kindi_pkg ) {
-		foreach ( (array) ( $kindi_pkg['rates'] ?? array() ) as $kindi_rate ) {
-			if ( 0.0 === (float) $kindi_rate->get_cost() ) {
+// The "free shipping included" banner fires ONLY when the CHOSEN method is a
+// real free_shipping rate. Any-0-cost-rate matching misfired for free self
+// pickup: the banner claimed "משלוח חינם" while the order actually went out as
+// איסוף עצמי. The chosen method's label is also captured for the totals row so
+// the shopper always sees WHICH method the order uses. Furniture orders never
+// get the banner (free shipping excludes furniture — see inc/woocommerce.php).
+$kindi_free       = false;
+$kindi_ship_label = '';
+if ( $kindi_cart->needs_shipping() && $kindi_cart->show_shipping() ) {
+	$kindi_chosen = WC()->session ? (array) WC()->session->get( 'chosen_shipping_methods' ) : array();
+	foreach ( WC()->shipping()->get_packages() as $kindi_i => $kindi_pkg ) {
+		$kindi_rates = (array) ( $kindi_pkg['rates'] ?? array() );
+		$kindi_sel   = (string) ( $kindi_chosen[ $kindi_i ] ?? '' );
+		$kindi_rate  = ( '' !== $kindi_sel && isset( $kindi_rates[ $kindi_sel ] ) ) ? $kindi_rates[ $kindi_sel ] : null;
+		if ( $kindi_rate ) {
+			$kindi_ship_label = wp_strip_all_tags( (string) $kindi_rate->get_label() );
+			if ( 'free_shipping' === $kindi_rate->get_method_id()
+				&& ! ( function_exists( 'kindi_cart_has_furniture' ) && kindi_cart_has_furniture() ) ) {
 				$kindi_free = true;
-				break 2;
 			}
+			break;
 		}
 	}
 }
@@ -114,7 +124,7 @@ $kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place ord
 		<?php endforeach; ?>
 
 		<?php if ( $kindi_cart->needs_shipping() && $kindi_cart->show_shipping() ) : ?>
-		<div class="kindi-summary__row"><span><?php esc_html_e( 'משלוח', 'kindi' ); ?></span><span><?php echo wp_kses_post( $kindi_cart->get_cart_shipping_total() ); ?></span></div>
+		<div class="kindi-summary__row"><span><?php esc_html_e( 'משלוח', 'kindi' ); ?><?php echo '' !== $kindi_ship_label ? ' — ' . esc_html( $kindi_ship_label ) : ''; ?></span><span><?php echo wp_kses_post( $kindi_cart->get_cart_shipping_total() ); ?></span></div>
 		<?php endif; ?>
 
 		<?php foreach ( $kindi_cart->get_fees() as $kindi_fee ) : ?>

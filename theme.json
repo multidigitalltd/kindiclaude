@@ -150,6 +150,7 @@
   ],
   "customTemplates": [
     { "name": "page-no-title", "title": "Page (No Title)", "postTypes": ["page"] },
-    { "name": "page-about", "title": "אודות (Kindi)", "postTypes": ["page"] }
+    { "name": "page-about", "title": "אודות (Kindi)", "postTypes": ["page"] },
+    { "name": "page-contact", "title": "יצירת קשר (Kindi)", "postTypes": ["page"] }
   ]
 }

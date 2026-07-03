@@ -529,9 +529,44 @@ function kindi_default_shipping_rate_id( array $rates ): string {
 			return (string) $rate_id;
 		}
 	}
+	// Never preselect self-pickup by accident: prefer the first DELIVERY rate
+	// (a shopper expecting home delivery could otherwise submit a pickup order
+	// without noticing). Pickup stays available — just not the silent default.
+	foreach ( $rates as $rate_id => $rate ) {
+		if ( function_exists( 'kindi_shipping_icon_name' ) && 'store' !== kindi_shipping_icon_name( $rate ) ) {
+			return (string) $rate_id;
+		}
+	}
 	$first = reset( $rates );
 	return ( is_object( $first ) && method_exists( $first, 'get_id' ) ) ? (string) $first->get_id() : '';
 }
+
+/**
+ * Definitive shipping-choice sync at order submission. WooCommerce creates the
+ * order from the SESSION's chosen_shipping_methods — not from the submitted
+ * form — so any missed AJAX sync (a radio change whose update_order_review
+ * didn't land) produced orders with a STALE method: a customer who selected
+ * home delivery got a self-pickup order. Copy the posted radios into the
+ * session right as checkout processing starts (WooCommerce has already
+ * verified the checkout nonce by this point), so the order always matches
+ * what the shopper actually selected on screen.
+ *
+ * @return void
+ */
+function kindi_sync_posted_shipping(): void {
+	if ( empty( $_POST['shipping_method'] ) || ! is_array( $_POST['shipping_method'] ) || ! function_exists( 'WC' ) || ! WC()->session ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- runs inside process_checkout, after WooCommerce verified its nonce.
+		return;
+	}
+	$posted = array_map( 'wc_clean', wp_unslash( (array) $_POST['shipping_method'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$chosen = (array) WC()->session->get( 'chosen_shipping_methods' );
+	foreach ( $posted as $kindi_i => $kindi_rate_id ) {
+		if ( '' !== (string) $kindi_rate_id ) {
+			$chosen[ (int) $kindi_i ] = (string) $kindi_rate_id;
+		}
+	}
+	WC()->session->set( 'chosen_shipping_methods', $chosen );
+}
+add_action( 'woocommerce_checkout_process', 'kindi_sync_posted_shipping', 1 );
 
 /**
  * Auto-select free shipping when it's offered. WooCommerce only calls this
