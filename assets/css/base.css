@@ -83,7 +83,8 @@ body {
 .a11y-stop-motion *, .a11y-stop-motion *::before, .a11y-stop-motion *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 
 /* Accessibility toolbar UI */
-.kindi-a11y { position: fixed; bottom: 6rem; left: 1.5rem; z-index: 220; width: 17rem; max-width: calc(100vw - 2rem); background: #fff; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35); border: 1px solid var(--border); overflow: hidden; }
+/* Opens beside the mid-left edge tab that toggles it. */
+.kindi-a11y { position: fixed; top: 50%; transform: translateY(-50%); left: 3.25rem; z-index: 220; width: 17rem; max-width: calc(100vw - 4.5rem); background: #fff; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35); border: 1px solid var(--border); overflow: hidden; }
 .kindi-a11y[hidden] { display: none; }
 .kindi-a11y__head { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--brand-navy); color: #fff; }
 .kindi-a11y__head strong { font-family: var(--wp--preset--font-family--display); }
