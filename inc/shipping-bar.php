@@ -24,6 +24,14 @@ function kindi_free_shipping_progress(): void {
 		return;
 	}
 
+	// Furniture is excluded from free shipping — when the cart contains it, a
+	// progress bar would promise something the order can't get, so show the
+	// exclusion note instead.
+	if ( function_exists( 'kindi_cart_has_furniture' ) && kindi_cart_has_furniture() ) {
+		echo '<div class="kindi-freeship"><p><span class="kindi-freeship__ic">' . kindi_icon( 'truck', 'kindi-icon--sm' ) . '</span>' . esc_html( sprintf( 'משלוח חינם מעל ₪%d — למעט פריטי ריהוט.', (int) $threshold ) ) . '</p></div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- kindi_icon returns escaped SVG.
+		return;
+	}
+
 	$total     = (float) WC()->cart->get_displayed_subtotal();
 	$remaining = $threshold - $total;
 	$pct       = max( 0, min( 100, ( $total / $threshold ) * 100 ) );

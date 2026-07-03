@@ -1092,6 +1092,9 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 /* Shipping & returns tab. */
 .kindi-pdp-ship p { margin: 0 0 0.75rem; line-height: 1.7; }
 .kindi-pdp-ship strong { color: var(--brand-navy); }
+/* Online-only stock/price disclaimer at the foot of the "מידע נוסף" tab. */
+.kindi-pdp-stocknote { margin: 1rem 0 0; padding: 0.8rem 1.1rem; background: var(--brand-red-soft); border-radius: 0.85rem; color: var(--brand-navy); font-size: 0.9rem; line-height: 1.6; }
+.kindi-pdp-stocknote strong { color: var(--brand-red); }
 
 /* Buy-now button under add-to-cart — sized to the qty + add-to-cart row (see the
    form.cart rule below), with breathing room above it. */

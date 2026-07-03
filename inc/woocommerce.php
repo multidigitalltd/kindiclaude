@@ -142,3 +142,78 @@ function kindi_cart_fragments( array $fragments ): array {
 	return $fragments;
 }
 add_filter( 'woocommerce_add_to_cart_fragments', 'kindi_cart_fragments' );
+
+/*
+ * ---------------------------------------------------------------------------
+ * Free shipping excludes furniture.
+ * ---------------------------------------------------------------------------
+ */
+
+/**
+ * Term ids of the "ריהוט" product categories, including all their
+ * subcategories. Matched by name so the rule keeps working if the category
+ * slug is technical; cached for the request.
+ *
+ * @return int[]
+ */
+function kindi_furniture_term_ids(): array {
+	static $ids = null;
+	if ( null !== $ids ) {
+		return $ids;
+	}
+	$ids   = array();
+	$roots = get_terms(
+		array(
+			'taxonomy'   => 'product_cat',
+			'fields'     => 'ids',
+			'hide_empty' => false,
+			'name__like' => 'ריהוט',
+		)
+	);
+	if ( is_wp_error( $roots ) || ! $roots ) {
+		return $ids;
+	}
+	$ids = array_map( 'intval', $roots );
+	foreach ( $roots as $kindi_tid ) {
+		$children = get_term_children( (int) $kindi_tid, 'product_cat' );
+		if ( ! is_wp_error( $children ) ) {
+			$ids = array_merge( $ids, array_map( 'intval', $children ) );
+		}
+	}
+	$ids = array_values( array_unique( $ids ) );
+	return $ids;
+}
+
+/**
+ * Does the cart contain a product from a furniture category?
+ *
+ * @return bool
+ */
+function kindi_cart_has_furniture(): bool {
+	if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+		return false;
+	}
+	$ids = kindi_furniture_term_ids();
+	if ( ! $ids ) {
+		return false;
+	}
+	foreach ( WC()->cart->get_cart() as $kindi_item ) {
+		$pid = (int) ( $kindi_item['product_id'] ?? 0 ); // Parent id, so variations count too.
+		if ( $pid && has_term( $ids, 'product_cat', $pid ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Withhold WooCommerce's free_shipping method when the cart contains
+ * furniture — those orders always ship at the flat rate, whatever the total.
+ *
+ * @param bool $is_available Whether free shipping qualifies.
+ * @return bool
+ */
+function kindi_free_shipping_excludes_furniture( $is_available ) {
+	return $is_available && ! kindi_cart_has_furniture();
+}
+add_filter( 'woocommerce_shipping_free_shipping_is_available', 'kindi_free_shipping_excludes_furniture' );

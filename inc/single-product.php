@@ -256,8 +256,9 @@ function kindi_pdp_price(): void {
 }
 
 /**
- * Friendlier in-stock text: "במלאי — נשארו N יחידות בלבד" when the quantity is
- * known, otherwise just "במלאי".
+ * In-stock text: a plain "במלאי" — the remaining-units count is deliberately
+ * NOT shown (online stock may differ from the physical store; see the notice
+ * added to the "מידע נוסף" tab in kindi_pdp_stock_notice()).
  *
  * @param string     $text    Default text.
  * @param WC_Product $product Product.
@@ -267,14 +268,20 @@ function kindi_pdp_stock_text( $text, $product ): string {
 	if ( ! $product instanceof WC_Product || ! $product->is_in_stock() ) {
 		return $text;
 	}
-	$qty = $product->get_stock_quantity();
-	if ( $product->managing_stock() && null !== $qty && $qty > 0 ) {
-		/* translators: %d: units left in stock. */
-		return sprintf( _n( 'במלאי — נשארה יחידה אחת בלבד', 'במלאי — נשארו %d יחידות בלבד', $qty, 'kindi' ), $qty );
-	}
 	return esc_html__( 'במלאי', 'kindi' );
 }
 add_filter( 'woocommerce_get_availability_text', 'kindi_pdp_stock_text', 10, 2 );
+
+/**
+ * Online-only stock/price disclaimer at the foot of the "מידע נוסף" tab.
+ *
+ * @return void
+ */
+function kindi_pdp_stock_notice(): void {
+	echo '<p class="kindi-pdp-stocknote"><strong>' . esc_html__( 'שימו לב!', 'kindi' ) . '</strong> '
+		. esc_html__( 'המלאי והמחירים באתר תקפים להזמנה אונליין בלבד. בחנות הפיזית ייתכנו הבדלים במלאי ובמחיר.', 'kindi' ) . '</p>';
+}
+add_action( 'woocommerce_product_additional_information', 'kindi_pdp_stock_notice', 20 );
 
 /**
  * Short description under the title — clamped to two lines (CSS) with a
@@ -499,19 +506,19 @@ function kindi_pdp_shipping_tab_content(): void {
 	$opt      = static fn( string $k, $d ) => function_exists( 'kindi_opt' ) ? kindi_opt( $k, $d ) : $d;
 	$cost     = (int) $opt( 'ship_cost', 29 );
 	$free     = (int) $opt( 'free_shipping', 299 );
-	$min_days = (int) $opt( 'ship_days_min', 1 );
+	$min_days = (int) $opt( 'ship_days_min', 2 );
 	$max_days = (int) $opt( 'ship_days_max', 4 );
 	$ret      = (int) $opt( 'return_days', 14 );
 	$address  = (string) $opt( 'store_address', '' );
 
 	$ship_line = $cost > 0
-		? sprintf( '₪%d, חינם מעל ₪%d. אספקה תוך %d-%d ימי עסקים.', $cost, $free, $min_days, $max_days )
-		: sprintf( 'חינם. אספקה תוך %d-%d ימי עסקים.', $min_days, $max_days );
+		? sprintf( '₪%d, חינם מעל ₪%d (למעט ריהוט). אספקה תוך %d-%d ימי עסקים. באזורים רחוקים, קיבוצים ויישובים — עד 6 ימי עסקים.', $cost, $free, $min_days, $max_days )
+		: sprintf( 'חינם (למעט ריהוט). אספקה תוך %d-%d ימי עסקים. באזורים רחוקים, קיבוצים ויישובים — עד 6 ימי עסקים.', $min_days, $max_days );
 
 	echo '<div class="kindi-pdp-ship">';
 	echo '<p><strong>' . esc_html__( 'משלוח עד הבית:', 'kindi' ) . '</strong> ' . esc_html( $ship_line ) . '</p>';
 	if ( '' !== $address ) {
-		echo '<p><strong>' . esc_html__( 'איסוף עצמי:', 'kindi' ) . '</strong> ' . esc_html( sprintf( 'חינם מהחנות — %s.', $address ) ) . '</p>';
+		echo '<p><strong>' . esc_html__( 'איסוף עצמי:', 'kindi' ) . '</strong> ' . esc_html( sprintf( 'בתיאום מראש, חינם מהחנות — %s.', $address ) ) . '</p>';
 	}
 	if ( $ret > 0 ) {
 		echo '<p><strong>' . esc_html__( 'החזרות:', 'kindi' ) . '</strong> ' . esc_html( sprintf( 'תוך %d יום באריזה מקורית, החזר כספי מלא.', $ret ) ) . '</p>';
