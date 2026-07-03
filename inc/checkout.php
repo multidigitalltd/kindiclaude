@@ -569,10 +569,15 @@ function kindi_sync_posted_shipping(): void {
 add_action( 'woocommerce_checkout_process', 'kindi_sync_posted_shipping', 1 );
 
 /**
- * Auto-select free shipping when it's offered. WooCommerce only calls this
- * filter while no valid method is chosen for the package, so a shopper who picks
- * a different option keeps it — we merely change the default from "first rate"
- * to "free shipping when present". The $chosen_method guard is belt-and-braces.
+ * Auto-select free shipping for whoever qualifies. WooCommerce calls this
+ * filter only when there is no valid choice yet OR the available rate set just
+ * changed (e.g. the cart crossed the free-shipping threshold) — so:
+ * - the moment a shopper becomes eligible, free shipping is selected for them
+ *   automatically (even over a previous paid choice — they just earned it);
+ * - a manual pick made while the rate set is stable is never touched, because
+ *   the filter simply doesn't run then;
+ * - without a free rate, a still-valid manual choice is kept, and the fallback
+ *   default is a delivery rate (never silently self-pickup).
  *
  * @param string $default       WooCommerce's default rate id.
  * @param array  $rates         Package rates.
@@ -580,11 +585,17 @@ add_action( 'woocommerce_checkout_process', 'kindi_sync_posted_shipping', 1 );
  * @return string
  */
 function kindi_prefer_free_shipping( $default, $rates, $chosen_method ) {
+	$rates = (array) $rates;
+	foreach ( $rates as $rate_id => $rate ) {
+		if ( is_object( $rate ) && method_exists( $rate, 'get_method_id' ) && 'free_shipping' === $rate->get_method_id() ) {
+			return (string) $rate_id;
+		}
+	}
 	if ( $chosen_method && isset( $rates[ $chosen_method ] ) ) {
 		return $chosen_method;
 	}
-	$free = kindi_default_shipping_rate_id( (array) $rates );
-	return '' !== $free ? $free : $default;
+	$fallback = kindi_default_shipping_rate_id( $rates );
+	return '' !== $fallback ? $fallback : $default;
 }
 add_filter( 'woocommerce_shipping_chosen_method', 'kindi_prefer_free_shipping', 10, 3 );
 

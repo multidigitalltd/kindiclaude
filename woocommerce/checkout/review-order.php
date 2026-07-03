@@ -55,10 +55,27 @@ $kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place ord
 		<a class="kindi-summary__edit" href="<?php echo esc_url( wc_get_cart_url() ); ?>"><?php esc_html_e( 'ערוך עגלה', 'kindi' ); ?></a>
 	</div>
 
+	<?php
+	// Below the threshold (and no furniture, which free shipping excludes):
+	// nudge with the exact amount left for free shipping instead of silence.
+	$kindi_nudge = 0.0;
+	if ( ! $kindi_free && $kindi_cart->needs_shipping()
+		&& ! ( function_exists( 'kindi_cart_has_furniture' ) && kindi_cart_has_furniture() ) ) {
+		$kindi_threshold = (float) ( function_exists( 'kindi_opt' ) ? kindi_opt( 'free_shipping', 299 ) : 299 );
+		if ( $kindi_threshold > 0 ) {
+			$kindi_nudge = max( 0.0, $kindi_threshold - (float) $kindi_cart->get_displayed_subtotal() );
+		}
+	}
+	?>
 	<?php if ( $kindi_free ) : ?>
 	<div class="kindi-summary__free">
 		<?php echo kindi_icon( 'check', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 		<span><?php esc_html_e( 'מזל טוב! משלוח חינם כלול בהזמנה', 'kindi' ); ?></span>
+	</div>
+	<?php elseif ( $kindi_nudge > 0 ) : ?>
+	<div class="kindi-summary__free kindi-summary__free--nudge">
+		<?php echo kindi_icon( 'truck', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+		<span><?php printf( wp_kses_post( __( 'עוד %s למשלוח חינם!', 'kindi' ) ), wp_kses_post( wc_price( $kindi_nudge ) ) ); ?></span>
 	</div>
 	<?php endif; ?>
 
