@@ -75,11 +75,11 @@ $kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place ord
 						<span class="kindi-summary__meta"><?php echo wp_kses_post( $kindi_meta ); ?></span>
 					<?php endif; ?>
 					<div class="kindi-summary__controls">
-						<button type="button" class="kindi-summary__remove" data-key="<?php echo esc_attr( $kindi_key ); ?>" aria-label="<?php esc_attr_e( 'הסרת פריט', 'kindi' ); ?>">&times;</button>
+						<button type="button" class="kindi-summary__remove" data-key="<?php echo esc_attr( $kindi_key ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'הסרת פריט: %s', 'kindi' ), $kindi_product->get_name() ) ); ?>">&times;</button>
 						<span class="kindi-mcqty" data-key="<?php echo esc_attr( $kindi_key ); ?>">
-							<button type="button" class="kindi-mcqty__b" data-d="-1" aria-label="<?php esc_attr_e( 'הפחתת כמות', 'kindi' ); ?>">&#8722;</button>
+							<button type="button" class="kindi-mcqty__b" data-d="-1" aria-label="<?php echo esc_attr( sprintf( __( 'הפחתת כמות: %s', 'kindi' ), $kindi_product->get_name() ) ); ?>">&#8722;</button>
 							<span class="kindi-mcqty__n"><?php echo esc_html( (string) $kindi_item['quantity'] ); ?></span>
-							<button type="button" class="kindi-mcqty__b" data-d="1" aria-label="<?php esc_attr_e( 'הוספת כמות', 'kindi' ); ?>">&#43;</button>
+							<button type="button" class="kindi-mcqty__b" data-d="1" aria-label="<?php echo esc_attr( sprintf( __( 'הוספת כמות: %s', 'kindi' ), $kindi_product->get_name() ) ); ?>">&#43;</button>
 						</span>
 					</div>
 				</div>

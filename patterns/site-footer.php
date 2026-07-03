@@ -25,7 +25,7 @@ $kindi_foot_menus = array(
 			'ביטול עסקה'        => home_url( '/refund_returns/' ),
 			'משלוחים והחזרות'   => home_url( '/shipping/' ),
 			'מדיניות פרטיות'    => home_url( '/privacy-policy/' ),
-			'הצהרת נגישות'      => home_url( '/accessibility-statement/' ),
+			'הצהרת נגישות'      => home_url( '/accessibility/' ),
 			'הבלוג שלנו'        => home_url( '/blog/' ),
 			'יצירת קשר'         => home_url( '/contact/' ),
 		),
@@ -85,7 +85,7 @@ $kindi_pay = array( 'VISA', 'MC', 'ISRACARD', 'PayPal', 'Bit' );
 	</div>
 
 	<div class="kindi-footer__bottom">
-		<div class="kindi-footer__copy">© 2026 קינדר טויס • כל הזכויות שמורות • <a href="/accessibility-statement">הצהרת נגישות</a></div>
+		<div class="kindi-footer__copy">© 2026 קינדר טויס • כל הזכויות שמורות • <a href="/accessibility/">הצהרת נגישות</a></div>
 		<div class="kindi-footer__credit">UX/UI &amp; Dev by <a href="https://m-d.co.il" target="_blank" rel="noopener">Multi Digital</a></div>
 		<div class="kindi-footer__pay">
 			<span>תשלום מאובטח:</span>

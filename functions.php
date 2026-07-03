@@ -50,7 +50,6 @@ kindi_require( 'store.php' );
 kindi_require( 'reviews.php' );
 kindi_require( 'newsletter.php' );
 kindi_require( 'accessibility.php' );
-kindi_require( 'accessibility-statement.php' );
 kindi_require( 'cookie-consent.php' );
 kindi_require( 'schema.php' );
 kindi_require( 'pixel.php' );

@@ -47,7 +47,6 @@
 .kindi-prose :where(h2, h3):first-child { margin-top: 0; }
 
 /* Accessibility statement reuses the prose styles. */
-.kindi-a11y-statement { max-width: 860px; margin-inline: auto; }
 
 /* ---------- Blog index / archives ---------- */
 .kindi-blog__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: clamp(1.875rem, 1.4rem + 2vw, 2.5rem); margin: 0 0 1.75rem; }

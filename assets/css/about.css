@@ -76,7 +76,10 @@
 #kabt1:checked ~ .kindi-about-story__nav label[for="kabt1"],
 #kabt2:checked ~ .kindi-about-story__nav label[for="kabt2"],
 #kabt3:checked ~ .kindi-about-story__nav label[for="kabt3"] { background: var(--brand-navy); color: #fff; }
-.kindi-about-story__radio:focus-visible ~ .kindi-about-story__nav label { outline: 2px solid var(--brand-red); outline-offset: 2px; }
+/* Focus ring only on the label of the radio that actually holds focus. */
+#kabt1:focus-visible ~ .kindi-about-story__nav label[for="kabt1"],
+#kabt2:focus-visible ~ .kindi-about-story__nav label[for="kabt2"],
+#kabt3:focus-visible ~ .kindi-about-story__nav label[for="kabt3"] { outline: 2px solid var(--brand-red); outline-offset: 2px; }
 
 .kindi-about-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
 .kindi-about-chip { background: #fff; border: 1px solid color-mix(in oklab, var(--brand-blue) 22%, transparent); color: var(--brand-navy); border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.8rem; font-weight: 700; }
@@ -93,7 +96,9 @@
 }
 .kindi-about-cta__badge { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--brand-red); color: #fff; border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.8rem; font-weight: 800; }
 .kindi-about-cta__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: clamp(1.75rem, 1.2rem + 2.5vw, 2.75rem); line-height: 1.15; margin: 1rem 0 0.75rem; }
-.kindi-about-cta__title span { color: color-mix(in oklab, var(--brand-red) 80%, white); }
+/* Light enough for ≥3:1 large-text contrast against BOTH ends of the gradient
+   (navy → blue) behind it. */
+.kindi-about-cta__title span { color: color-mix(in oklab, var(--brand-red) 50%, white); }
 .kindi-about-cta__lead { color: rgba(255,255,255,0.85); max-width: 42rem; margin: 0 auto 1.5rem; line-height: 1.7; }
 .kindi-about-cta__btns { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
 .kindi-about-cta__btn { display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 0.95rem; padding: 0.85rem 1.6rem; font-weight: 800; text-decoration: none; transition: transform 0.15s, background 0.15s; }

@@ -114,10 +114,6 @@ function kindi_settings_tabs(): array {
 					'news_title'    => array( 'type' => 'text', 'label' => 'ניוזלטר — כותרת' ),
 					'news_sub'      => array( 'type' => 'textarea', 'label' => 'ניוזלטר — תיאור' ),
 				),
-				'נגישות' => array(
-					'_a11y_note'     => array( 'type' => 'note', 'label' => '', 'help' => 'הטקסט שיוצג בעמוד "/accessibility-statement/" (מקושר מסרגל הנגישות). השאירו ריק כדי להשתמש בנוסח ברירת מחדל תקני.' ),
-					'a11y_statement' => array( 'type' => 'html', 'label' => 'טקסט הצהרת הנגישות', 'help' => 'אפשר HTML בסיסי: כותרות (h2), רשימות (ul/li), קישורים והדגשות.' ),
-				),
 				'באנר עוגיות (Cookies)' => array(
 					'cookie_enable'      => array( 'type' => 'select', 'label' => 'הצגת הבאנר', 'options' => array( '1' => 'מופעל', '0' => 'כבוי' ) ),
 					'cookie_text'        => array( 'type' => 'textarea', 'label' => 'טקסט ההודעה' ),

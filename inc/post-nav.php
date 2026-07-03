@@ -36,20 +36,24 @@ function kindi_post_prev_next(): string {
 		return '';
 	}
 
-	$card = static function ( $post, string $label, string $mod ): string {
+	// The arrow glyphs are decorative (aria-hidden) so screen readers announce a
+	// clean "הפוסט הקודם/הבא" + title, not "left-pointing arrow".
+	$card = static function ( $post, string $label, string $arrow, bool $arrow_first, string $mod ): string {
 		if ( ! $post instanceof WP_Post ) {
 			// Keeps the grid balanced when only one neighbour exists.
 			return '<span class="kindi-pn__card kindi-pn__card--empty" aria-hidden="true"></span>';
 		}
+		$arrow_html = '<span aria-hidden="true">' . esc_html( $arrow ) . '</span>';
+		$label_html = $arrow_first ? $arrow_html . ' ' . esc_html( $label ) : esc_html( $label ) . ' ' . $arrow_html;
 		return '<a class="kindi-pn__card kindi-pn__card--' . esc_attr( $mod ) . '" href="' . esc_url( (string) get_permalink( $post ) ) . '">'
-			. '<span class="kindi-pn__label">' . esc_html( $label ) . '</span>'
+			. '<span class="kindi-pn__label">' . $label_html . '</span>'
 			. '<span class="kindi-pn__title">' . esc_html( get_the_title( $post ) ) . '</span>'
 			. '</a>';
 	};
 
 	return '<nav class="kindi-pn" aria-label="' . esc_attr__( 'ניווט בין פוסטים', 'kindi' ) . '">'
-		. $card( $prev, __( '→ הפוסט הקודם', 'kindi' ), 'prev' )
-		. $card( $next, __( 'הפוסט הבא ←', 'kindi' ), 'next' )
+		. $card( $prev, __( 'הפוסט הקודם', 'kindi' ), '→', true, 'prev' )
+		. $card( $next, __( 'הפוסט הבא', 'kindi' ), '←', false, 'next' )
 		. '</nav>';
 }
 

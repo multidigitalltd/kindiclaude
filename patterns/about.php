@@ -74,11 +74,11 @@ $kindi_quality = array(
 			<?php endforeach; ?>
 		</div>
 
-		<div class="kindi-about-story__tabs">
+		<div class="kindi-about-story__tabs" role="radiogroup" aria-label="בחירת נושא: הסיפור, הערכים והחזון">
 			<input type="radio" name="kabout" id="kabt1" class="kindi-about-story__radio" checked>
 			<input type="radio" name="kabout" id="kabt2" class="kindi-about-story__radio">
 			<input type="radio" name="kabout" id="kabt3" class="kindi-about-story__radio">
-			<div class="kindi-about-story__nav" role="tablist">
+			<div class="kindi-about-story__nav">
 				<label for="kabt1">הסיפור שלנו</label>
 				<label for="kabt2">הערכים שלנו</label>
 				<label for="kabt3">החזון שלנו</label>
