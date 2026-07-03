@@ -43,6 +43,29 @@ function kindi_price_filter_clauses( array $clauses, $query ): array {
 add_filter( 'posts_clauses', 'kindi_price_filter_clauses', 20, 2 );
 
 /**
+ * Sale-only shop view: /shop/?on_sale=1 restricts the archive to on-sale
+ * products — lets menus (e.g. footer "מבצעים") link straight to a sale listing
+ * without needing a maintained "מבצעים" category.
+ *
+ * @param WP_Query $query Main query.
+ * @return void
+ */
+function kindi_shop_on_sale_filter( WP_Query $query ): void {
+	if ( is_admin() || ! $query->is_main_query() ) {
+		return;
+	}
+	if ( empty( $_GET['on_sale'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only listing filter.
+		return;
+	}
+	if ( ! function_exists( 'is_shop' ) || ! ( is_shop() || is_product_taxonomy() ) ) {
+		return;
+	}
+	$ids = wc_get_product_ids_on_sale(); // Cached by WooCommerce in a transient.
+	$query->set( 'post__in', $ids ? array_map( 'intval', $ids ) : array( 0 ) );
+}
+add_action( 'pre_get_posts', 'kindi_shop_on_sale_filter', 20 );
+
+/**
  * Sub-categories of the current category (direct children only) — or the
  * top-level categories on the shop. Each entry carries an icon + product count
  * for the hero chips and the sidebar sub-category list. Cached per context.
