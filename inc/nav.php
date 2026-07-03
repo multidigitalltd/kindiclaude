@@ -261,14 +261,12 @@ function kindi_build_nav_tree( array $items ): array {
 					'url'   => $leaf->url,
 				);
 			}
-			if ( ! $links ) {
-				$links[] = array(
-					'label' => $col->title,
-					'url'   => $col->url,
-				);
-			}
+			// No sub-categories: the column keeps an empty list and its own URL —
+			// the templates then render the title ONCE as a clickable heading,
+			// instead of duplicating the name as both heading and sub-item.
 			$cols[] = array(
 				'title' => $col->title,
+				'url'   => (string) $col->url,
 				'links' => $links,
 			);
 		}

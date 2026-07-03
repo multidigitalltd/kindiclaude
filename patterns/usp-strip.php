@@ -9,7 +9,7 @@
  */
 
 $kindi_usps = array(
-	array( 'icon' => 'truck', 'title' => 'משלוח חינם', 'sub' => 'בהזמנה מעל 299 ₪' ),
+	array( 'icon' => 'truck', 'title' => 'משלוח חינם', 'sub' => 'בהזמנה מעל 299 ₪ (למעט ריהוט)' ),
 	array( 'icon' => 'phone', 'title' => 'שירות אישי', 'sub' => 'ומקצועי לכל שאלה' ),
 	array( 'icon' => 'shield', 'title' => 'תשלום מאובטח', 'sub' => 'SSL + אישור PCI' ),
 	array( 'icon' => 'gift', 'title' => 'מועדון קינדי', 'sub' => 'נקודות, הנחות ומתנות' ),

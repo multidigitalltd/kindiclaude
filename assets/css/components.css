@@ -165,6 +165,10 @@
 .kindi-mega__cols { flex: 1; display: flex; gap: 2rem; }
 .kindi-mega__col { flex: 1; min-width: 0; }
 .kindi-mega__title { display: flex; align-items: center; gap: 0.4rem; font-size: 1rem; letter-spacing: normal; color: var(--brand-red); font-weight: 800; margin: 0 0 0.85rem; }
+/* Childless category: the title itself is the link (rendered once, no duplicate
+   sub-item) — same look as the heading, underline on hover. */
+a.kindi-mega__title--link { text-decoration: none; }
+a.kindi-mega__title--link:hover { text-decoration: underline; }
 .kindi-mega__col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 
 /* Mega feature card */

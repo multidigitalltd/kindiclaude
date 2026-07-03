@@ -19,9 +19,11 @@ if ( ! $kindi_cart ) {
 	return;
 }
 
-// Free shipping available for the current packages?
+// Free shipping available for the current packages? Never claimed when the
+// order contains furniture — free shipping excludes it (see inc/woocommerce.php).
 $kindi_free = false;
-if ( $kindi_cart->needs_shipping() && $kindi_cart->show_shipping() ) {
+if ( $kindi_cart->needs_shipping() && $kindi_cart->show_shipping()
+	&& ! ( function_exists( 'kindi_cart_has_furniture' ) && kindi_cart_has_furniture() ) ) {
 	foreach ( WC()->shipping()->get_packages() as $kindi_pkg ) {
 		foreach ( (array) ( $kindi_pkg['rates'] ?? array() ) as $kindi_rate ) {
 			if ( 0.0 === (float) $kindi_rate->get_cost() ) {

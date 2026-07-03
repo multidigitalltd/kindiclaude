@@ -97,12 +97,17 @@ $kindi_nav = kindi_nav_items();
 					<div class="kindi-mega__cols">
 						<?php foreach ( $c['cols'] as $col ) : ?>
 						<div class="kindi-mega__col">
+							<?php if ( empty( $col['links'] ) && ! empty( $col['url'] ) ) : ?>
+							<?php /* Category with no sub-categories: one clickable title, no duplicate sub-item. */ ?>
+							<a class="kindi-mega__title kindi-mega__title--link" href="<?php echo esc_url( $col['url'] ); ?>"><?php echo kindi_icon( 'sparkles', 'kindi-icon--xs' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $col['title'] ); ?></a>
+							<?php else : ?>
 							<h4 class="kindi-mega__title"><?php echo kindi_icon( 'sparkles', 'kindi-icon--xs' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $col['title'] ); ?></h4>
 							<ul>
 								<?php foreach ( $col['links'] as $link ) : ?>
 								<li><a href="<?php echo esc_url( $link['url'] ); ?>"><?php echo esc_html( $link['label'] ); ?></a></li>
 								<?php endforeach; ?>
 							</ul>
+							<?php endif; ?>
 						</div>
 						<?php endforeach; ?>
 					</div>
@@ -142,10 +147,15 @@ $kindi_nav = kindi_nav_items();
 				<summary class="kindi-drawer__link"><?php echo kindi_icon( $c['icon'], 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><?php echo esc_html( $c['label'] ); ?></span></summary>
 				<div class="kindi-drawer__sub">
 					<?php foreach ( $c['cols'] as $col ) : ?>
+						<?php if ( empty( $col['links'] ) && ! empty( $col['url'] ) ) : ?>
+						<?php /* Category with no sub-categories: a single link, not a title + duplicate item. */ ?>
+					<a class="kindi-drawer__sublink" href="<?php echo esc_url( $col['url'] ); ?>"><?php echo esc_html( $col['title'] ); ?></a>
+						<?php else : ?>
 					<div class="kindi-drawer__coltitle"><?php echo esc_html( $col['title'] ); ?></div>
-						<?php foreach ( $col['links'] as $link ) : ?>
+							<?php foreach ( $col['links'] as $link ) : ?>
 					<a class="kindi-drawer__sublink" href="<?php echo esc_url( $link['url'] ); ?>"><?php echo esc_html( $link['label'] ); ?></a>
-						<?php endforeach; ?>
+							<?php endforeach; ?>
+						<?php endif; ?>
 					<?php endforeach; ?>
 				</div>
 			</details>
