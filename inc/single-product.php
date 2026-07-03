@@ -488,7 +488,6 @@ function kindi_pdp_shipping_tab_content(): void {
 	$free     = (int) $opt( 'free_shipping', 299 );
 	$min_days = (int) $opt( 'ship_days_min', 2 );
 	$max_days = (int) $opt( 'ship_days_max', 4 );
-	$ret      = (int) $opt( 'return_days', 14 );
 	$address  = (string) $opt( 'store_address', '' );
 
 	$ship_line = $cost > 0
@@ -500,9 +499,5 @@ function kindi_pdp_shipping_tab_content(): void {
 	if ( '' !== $address ) {
 		echo '<p><strong>' . esc_html__( 'איסוף עצמי:', 'kindi' ) . '</strong> ' . esc_html( sprintf( 'בתיאום מראש, חינם מהחנות — %s.', $address ) ) . '</p>';
 	}
-	if ( $ret > 0 ) {
-		echo '<p><strong>' . esc_html__( 'החזרות:', 'kindi' ) . '</strong> ' . esc_html( sprintf( 'תוך %d יום באריזה מקורית, החזר כספי מלא.', $ret ) ) . '</p>';
-	}
-	echo '<p><strong>' . esc_html__( 'אחריות:', 'kindi' ) . '</strong> ' . esc_html__( 'שנה מלאה של היבואן הרשמי.', 'kindi' ) . '</p>';
 	echo '</div>';
 }
