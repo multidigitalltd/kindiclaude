@@ -28,7 +28,7 @@ function kindi_free_shipping_progress(): void {
 	// progress bar would promise something the order can't get, so show the
 	// exclusion note instead.
 	if ( function_exists( 'kindi_cart_has_furniture' ) && kindi_cart_has_furniture() ) {
-		echo '<div class="kindi-freeship"><p><span class="kindi-freeship__ic">' . kindi_icon( 'truck', 'kindi-icon--sm' ) . '</span>' . esc_html( sprintf( 'משלוח חינם מעל ₪%d — למעט פריטי ריהוט.', (int) $threshold ) ) . '</p></div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- kindi_icon returns escaped SVG.
+		echo '<div class="kindi-freeship"><p><span class="kindi-freeship__ic">' . kindi_icon( 'truck', 'kindi-icon--sm' ) . '</span>' . esc_html__( 'הטבת משלוח חינם לא כוללת מוצרי ריהוט', 'kindi' ) . '</p></div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- kindi_icon returns escaped SVG.
 		return;
 	}
 

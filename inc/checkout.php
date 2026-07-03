@@ -73,11 +73,33 @@ add_action( 'woocommerce_before_cart', 'kindi_cart_steps', 1 );
  */
 function kindi_checkout_top(): void {
 	kindi_checkout_steps( 'details' );
+	// Wrapped so the AJAX fragment below can live-refresh the bar (it renders
+	// before the checkout form, outside WooCommerce's own refresh zone).
+	echo '<div class="kindi-cohead-freeship">';
 	if ( function_exists( 'kindi_free_shipping_progress' ) ) {
 		kindi_free_shipping_progress();
 	}
+	echo '</div>';
 }
 add_action( 'woocommerce_before_checkout_form', 'kindi_checkout_top', 5 );
+
+/**
+ * Keep the top free-shipping bar in sync with quantity/coupon changes — it
+ * lives outside the order-review zone, so without a fragment it only reflected
+ * the state at page load.
+ *
+ * @param array<string,string> $fragments Fragments keyed by CSS selector.
+ * @return array<string,string>
+ */
+function kindi_freeship_bar_fragment( array $fragments ): array {
+	ob_start();
+	if ( function_exists( 'kindi_free_shipping_progress' ) ) {
+		kindi_free_shipping_progress();
+	}
+	$fragments['.kindi-cohead-freeship'] = '<div class="kindi-cohead-freeship">' . (string) ob_get_clean() . '</div>';
+	return $fragments;
+}
+add_filter( 'woocommerce_update_order_review_fragments', 'kindi_freeship_bar_fragment' );
 
 /**
  * Simply Club box inside the "פרטי קשר" contact card (step 1), centred.
