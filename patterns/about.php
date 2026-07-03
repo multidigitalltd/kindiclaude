@@ -23,7 +23,7 @@ $kindi_contact = array(
 	array( 'icon' => 'pin',   'label' => 'כתובת החנות', 'value' => (string) kindi_opt( 'store_address' ) ),
 	array( 'icon' => 'phone', 'label' => 'טלפון',        'value' => (string) kindi_opt( 'store_phone' ) . ' • שירות אישי וייעוץ' ),
 	array( 'icon' => 'clock', 'label' => 'שעות פתיחה',   'value' => (string) kindi_opt( 'store_hours' ) ),
-	array( 'icon' => 'mail',  'label' => 'אימייל',       'value' => $kindi_email ),
+	array( 'icon' => 'mail',  'label' => 'אימייל',       'value' => $kindi_email, 'href' => 'mailto:' . $kindi_email ),
 );
 
 $kindi_brands = array( 'LEGO', 'Crayola', 'Fisher-Price', 'Playmobil', 'Melissa & Doug', 'Ravensburger', 'Hasbro' );
@@ -68,10 +68,11 @@ $kindi_quality = array(
 	<div class="kindi-about-story__grid">
 		<div class="kindi-about-contact">
 			<?php foreach ( $kindi_contact as $c ) : ?>
-			<div class="kindi-about-contact__item">
+			<?php $kindi_tag = ! empty( $c['href'] ) ? 'a' : 'div'; ?>
+			<<?php echo $kindi_tag; // phpcs:ignore WordPress.Security.EscapeOutput -- 'a'/'div' literal. ?> class="kindi-about-contact__item"<?php echo ! empty( $c['href'] ) ? ' href="' . esc_url( $c['href'] ) . '"' : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
 				<span class="kindi-about-contact__t"><strong><?php echo esc_html( $c['label'] ); ?></strong><span><?php echo esc_html( $c['value'] ); ?></span></span>
 				<span class="kindi-about-contact__ic"><?php echo kindi_icon( $c['icon'], 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
-			</div>
+			</<?php echo $kindi_tag; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
 			<?php endforeach; ?>
 		</div>
 

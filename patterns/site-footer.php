@@ -76,7 +76,7 @@ $kindi_pay = array( 'VISA', 'MC', 'ISRACARD', 'PayPal', 'Bit' );
 			<h4>צרו קשר</h4>
 			<ul>
 				<li><a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', (string) kindi_opt( 'phone' ) ) ); ?>"><?php echo kindi_icon( 'phone', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo esc_html( kindi_opt( 'phone' ) ); ?></a></li>
-				<li><?php echo kindi_icon( 'mail', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo esc_html( kindi_opt( 'email' ) ); ?></li>
+				<li><a href="mailto:<?php echo esc_attr( kindi_opt( 'email' ) ); ?>"><?php echo kindi_icon( 'mail', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo esc_html( kindi_opt( 'email' ) ); ?></a></li>
 				<li><?php echo kindi_icon( 'pin', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo esc_html( kindi_opt( 'store_address' ) ); ?></li>
 				<li class="kindi-footer__hours"><?php echo esc_html( kindi_opt( 'store_hours' ) ); ?></li>
 			</ul>
