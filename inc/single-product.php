@@ -104,8 +104,8 @@ function kindi_pdp_delivery_card(): void {
 	$threshold = (int) ( function_exists( 'kindi_opt' ) ? kindi_opt( 'free_shipping', 299 ) : 299 );
 
 	echo '<div class="kindi-pdp__delivery">';
-	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--blue">' . kindi_icon( 'truck', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>' . esc_html( sprintf( 'משלוח חינם בהזמנה מעל ₪%d', $threshold ) ) . '</strong><span>' . kindi_icon( 'clock', 'kindi-icon--xs' ) . 'הזמינו היום — משלוח מהיר עד הבית</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
-	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--red">' . kindi_icon( 'gift', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>עטיפת מתנה חינם</strong><span>סמנו בעגלה — נעטוף יפה ונצרף ברכה</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--blue">' . kindi_icon( 'truck', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>' . esc_html( sprintf( 'משלוח חינם בהזמנה מעל ₪%d (למעט ריהוט)', $threshold ) ) . '</strong><span>' . kindi_icon( 'clock', 'kindi-icon--xs' ) . 'הזמינו היום — משלוח מהיר עד הבית</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--red">' . kindi_icon( 'gift', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>עטיפת מתנה</strong><span>סמנו בעגלה — נעטוף יפה ונצרף ברכה</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	echo '</div>';
 }
 add_action( 'woocommerce_single_product_summary', 'kindi_pdp_delivery_card', 34 );
@@ -143,25 +143,6 @@ function kindi_pdp_facts( $product ): void {
 }
 
 /**
- * Trust strip (free shipping / returns / warranty).
- *
- * @return void
- */
-function kindi_pdp_trust(): void {
-	$threshold = (int) ( function_exists( 'kindi_opt' ) ? kindi_opt( 'free_shipping', 299 ) : 299 );
-	$items     = array(
-		array( 'icon' => 'truck', 'text' => sprintf( 'משלוח חינם ₪%d+', $threshold ) ),
-		array( 'icon' => 'rotate', 'text' => 'החזרה תוך 14 יום' ),
-		array( 'icon' => 'shield', 'text' => 'אחריות יבואן רשמי' ),
-	);
-	echo '<div class="kindi-trust">';
-	foreach ( $items as $item ) {
-		echo '<div class="kindi-trust__i">' . kindi_icon( $item['icon'], 'kindi-icon--sm' ) . '<span>' . esc_html( $item['text'] ) . '</span></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
-	}
-	echo '</div>';
-}
-
-/**
  * "In the box" navy gradient card with chips.
  *
  * @param WC_Product $product Product.
@@ -193,7 +174,6 @@ function kindi_pdp_left_extras( $product ): void {
 	}
 
 	echo '<div class="kindi-pdp-extras">';
-	kindi_pdp_trust();
 	kindi_pdp_facts( $product );
 
 	// Skills chips.

@@ -97,6 +97,7 @@ function kindi_guess_category_icon( string $label ): string {
 		'תינוק'    => 'baby',
 		'פעוט'     => 'baby',
 		'בית ספר'  => 'backpack',
+		'בית הספר' => 'backpack',
 		'ילקוט'    => 'backpack',
 		'כתיבה'    => 'pencil',
 		'יציר'     => 'palette',

@@ -1002,10 +1002,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 /* after-summary full-width block */
 .kindi-pdp-extras { display: flex; flex-direction: column; gap: 1.25rem; margin: 0.5rem 0 0; }
 /* trust strip */
-.kindi-trust { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
-@media (min-width: 640px) { .kindi-trust { grid-template-columns: repeat(3, 1fr); } }
-.kindi-trust__i { display: flex; align-items: center; gap: 0.5rem; background: #fff; border: 1px solid var(--border); border-radius: 0.9rem; padding: 0.7rem 0.9rem; font-size: 0.82rem; font-weight: 700; color: var(--brand-navy); }
-.kindi-trust__i .kindi-icon { color: var(--brand-blue); }
 /* key facts cards */
 .kindi-facts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.7rem; }
 @media (min-width: 640px) { .kindi-facts { grid-template-columns: repeat(4, 1fr); } }
