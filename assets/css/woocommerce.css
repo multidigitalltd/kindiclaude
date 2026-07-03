@@ -868,6 +868,22 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .woocommerce-checkout #place_order { width: 100%; padding: 1rem 1.5rem; font-size: 1.1rem; font-weight: 800; border-radius: 0.95rem; }
 .woocommerce-checkout #payment .woocommerce-terms-and-conditions-wrapper { margin-bottom: 1rem; }
 
+/* "Please wait" overlay while the order submits (markup in inc/checkout.php,
+   behaviour in store.js). Above everything, including the floating buttons. */
+.kindi-wait { position: fixed; inset: 0; z-index: 260; display: flex; align-items: center; justify-content: center; background: rgba(20, 35, 63, 0.55); }
+.kindi-wait[hidden] { display: none; }
+.kindi-wait__box {
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem; text-align: center;
+  background: #fff; border-radius: 1.25rem; box-shadow: var(--shadow-pop); padding: 1.75rem 2rem;
+  width: min(90vw, 24rem);
+}
+.kindi-wait__logo { width: 72px; height: 72px; object-fit: contain; animation: kindi-wait-pulse 1.2s ease-in-out infinite; }
+.kindi-wait__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.2rem; margin-top: 0.5rem; }
+.kindi-wait__sub { color: var(--muted-foreground); font-size: 0.9rem; line-height: 1.5; }
+@keyframes kindi-wait-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+@media (prefers-reduced-motion: reduce) { .kindi-wait__logo { animation: none; } }
+body.kindi-wait-open { overflow: hidden; }
+
 /* Cart: shipping method is chosen at checkout, so hide the shipping row +
    calculator from the cart totals (no method-changing on the cart page). */
 .woocommerce-cart .cart_totals .woocommerce-shipping-totals,

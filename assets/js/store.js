@@ -628,3 +628,53 @@
 			.catch( function () { form.submit(); } );
 	} );
 }() );
+
+/* Checkout "please wait" overlay (markup in inc/checkout.php). Shows when the
+ * order form submits; hides again whenever WooCommerce reports a problem
+ * (checkout_error / a refreshed review / new notices), so the shopper is never
+ * stuck behind it. WooCommerce's own blockUI still guards double-submits; this
+ * layer is purely reassurance UX. */
+( function () {
+	'use strict';
+	var overlay = document.querySelector( '[data-kindi-wait]' );
+	var form = document.querySelector( 'form.checkout' );
+	if ( ! overlay || ! form ) {
+		return;
+	}
+
+	var show = function () {
+		overlay.hidden = false;
+		document.body.classList.add( 'kindi-wait-open' );
+		form.setAttribute( 'aria-busy', 'true' );
+	};
+	var hide = function () {
+		overlay.hidden = true;
+		document.body.classList.remove( 'kindi-wait-open' );
+		form.removeAttribute( 'aria-busy' );
+	};
+
+	form.addEventListener( 'submit', function () {
+		// Native validation failures never leave the page — don't cover them.
+		if ( 'function' === typeof form.checkValidity && ! form.checkValidity() ) {
+			return;
+		}
+		show();
+	} );
+
+	// WooCommerce signals failures/refreshes through jQuery events (it always
+	// loads jQuery on checkout; the guard is for safety only).
+	if ( window.jQuery ) {
+		window.jQuery( document.body ).on( 'checkout_error updated_checkout', hide );
+	}
+
+	// Backstop: any new WooCommerce notice (validation errors rendered into the
+	// page) means processing stopped — release the overlay.
+	var notices = document.querySelector( '.woocommerce-notices-wrapper' );
+	if ( notices && 'MutationObserver' in window ) {
+		new MutationObserver( hide ).observe( notices, { childList: true, subtree: true } );
+	}
+
+	// Returning via the browser back button (bfcache) must never restore a
+	// stale overlay.
+	window.addEventListener( 'pageshow', hide );
+}() );

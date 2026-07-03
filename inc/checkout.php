@@ -564,6 +564,31 @@ function kindi_default_shipping_rate_id( array $rates ): string {
 }
 
 /**
+ * "Please wait" overlay while the order is being submitted — reassures the
+ * shopper and discourages page-closing/double actions during the (AJAX)
+ * checkout processing. Markup only: styling lives in woocommerce.css
+ * (.kindi-wait*) and behaviour in store.js, both already loaded here — no
+ * inline render-blocking assets. Hidden until JS reveals it on submit.
+ *
+ * @return void
+ */
+function kindi_checkout_wait_overlay(): void {
+	if ( ! function_exists( 'is_checkout' ) || ! is_checkout() || is_wc_endpoint_url( 'order-received' ) ) {
+		return;
+	}
+	?>
+	<div class="kindi-wait" data-kindi-wait hidden role="status" aria-live="assertive">
+		<div class="kindi-wait__box">
+			<img class="kindi-wait__logo" src="<?php echo kindi_img( 'logo.webp' ); // phpcs:ignore WordPress.Security.EscapeOutput -- kindi_img() esc_url()s. ?>" alt="" width="72" height="72" aria-hidden="true">
+			<strong class="kindi-wait__title"><?php esc_html_e( 'אנא המתינו…', 'kindi' ); ?></strong>
+			<span class="kindi-wait__sub"><?php esc_html_e( 'ההזמנה נשלחת בצורה מאובטחת — אל תסגרו את העמוד.', 'kindi' ); ?></span>
+		</div>
+	</div>
+	<?php
+}
+add_action( 'wp_footer', 'kindi_checkout_wait_overlay' );
+
+/**
  * Definitive shipping-choice sync at order submission. WooCommerce creates the
  * order from the SESSION's chosen_shipping_methods — not from the submitted
  * form — so any missed AJAX sync (a radio change whose update_order_review
