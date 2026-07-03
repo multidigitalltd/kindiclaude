@@ -91,6 +91,22 @@ function kindi_checkout_fields( array $fields ): array {
 add_filter( 'woocommerce_checkout_fields', 'kindi_checkout_fields' );
 
 /**
+ * Postcode is optional — many Israeli shoppers don't know their מיקוד and
+ * domestic delivery resolves fine without it. Applied at the address-fields
+ * level so it holds for checkout, My Account addresses and the cart estimator.
+ *
+ * @param array<string,array<string,mixed>> $fields Default address fields.
+ * @return array<string,array<string,mixed>>
+ */
+function kindi_optional_postcode( array $fields ): array {
+	if ( isset( $fields['postcode'] ) ) {
+		$fields['postcode']['required'] = false;
+	}
+	return $fields;
+}
+add_filter( 'woocommerce_default_address_fields', 'kindi_optional_postcode' );
+
+/**
  * Persist the custom shipping note to the order. $data already holds the
  * sanitised, posted checkout fields (WooCommerce verifies its own nonce before
  * this runs), so no direct $_POST access is needed.
