@@ -43,27 +43,52 @@ function kindi_price_filter_clauses( array $clauses, $query ): array {
 add_filter( 'posts_clauses', 'kindi_price_filter_clauses', 20, 2 );
 
 /**
- * Sale-only shop view: /shop/?on_sale=1 restricts the archive to on-sale
- * products — lets menus (e.g. footer "מבצעים") link straight to a sale listing
- * without needing a maintained "מבצעים" category.
+ * Which special shop view is active: 'sale' (/shop/?on_sale=1), 'new'
+ * (/shop/?new=1) or '' for the regular archive. Dedicated params — the sort
+ * dropdown's orderby never renames the page by accident.
+ *
+ * @return string
+ */
+function kindi_special_shop_view(): string {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view flags.
+	if ( ! empty( $_GET['on_sale'] ) ) {
+		return 'sale';
+	}
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( ! empty( $_GET['new'] ) ) {
+		return 'new';
+	}
+	return '';
+}
+
+/**
+ * Special shop views for menu links (e.g. footer "מבצעים" / "מוצרים חדשים"):
+ * ?on_sale=1 restricts the archive to on-sale products; ?new=1 orders the
+ * archive newest-first. The archive hero titles both views accordingly.
  *
  * @param WP_Query $query Main query.
  * @return void
  */
-function kindi_shop_on_sale_filter( WP_Query $query ): void {
+function kindi_shop_special_views( WP_Query $query ): void {
 	if ( is_admin() || ! $query->is_main_query() ) {
 		return;
 	}
-	if ( empty( $_GET['on_sale'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only listing filter.
+	$view = kindi_special_shop_view();
+	if ( '' === $view ) {
 		return;
 	}
 	if ( ! function_exists( 'is_shop' ) || ! ( is_shop() || is_product_taxonomy() ) ) {
 		return;
 	}
-	$ids = wc_get_product_ids_on_sale(); // Cached by WooCommerce in a transient.
-	$query->set( 'post__in', $ids ? array_map( 'intval', $ids ) : array( 0 ) );
+	if ( 'sale' === $view ) {
+		$ids = wc_get_product_ids_on_sale(); // Cached by WooCommerce in a transient.
+		$query->set( 'post__in', $ids ? array_map( 'intval', $ids ) : array( 0 ) );
+	} else {
+		$query->set( 'orderby', 'date' );
+		$query->set( 'order', 'DESC' );
+	}
 }
-add_action( 'pre_get_posts', 'kindi_shop_on_sale_filter', 20 );
+add_action( 'pre_get_posts', 'kindi_shop_special_views', 20 );
 
 /**
  * Sub-categories of the current category (direct children only) — or the
@@ -227,6 +252,18 @@ function kindi_archive_hero(): void {
 		$desc  = $term instanceof WP_Term ? wp_strip_all_tags( term_description( $term ) ) : '';
 	} else {
 		$title = wp_strip_all_tags( woocommerce_page_title( false ) );
+	}
+
+	// Special shop views (menu links) get their own title, so the visitor sees
+	// a "מבצעים" / "מוצרים חדשים" page — not a plain "חנות" that happens to be
+	// filtered/sorted.
+	$kindi_view = kindi_special_shop_view();
+	if ( 'sale' === $kindi_view ) {
+		$title = __( 'מבצעים חמים', 'kindi' );
+		$desc  = __( 'כל המוצרים שבמבצע עכשיו — במקום אחד. המלאי מתעדכן, שווה להזדרז!', 'kindi' );
+	} elseif ( 'new' === $kindi_view ) {
+		$title = __( 'מוצרים חדשים', 'kindi' );
+		$desc  = __( 'ההגעות האחרונות לקינדר טויס — הכי חדש, ראשונים אצלכם.', 'kindi' );
 	}
 
 	echo '<section class="kindi-archhero"><div class="kindi-archhero__inner">';
