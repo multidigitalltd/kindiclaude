@@ -51,6 +51,21 @@ function kindi_maybe_render_feed(): void {
 add_action( 'template_redirect', 'kindi_maybe_render_feed' );
 
 /**
+ * Escape a value for XML text content. esc_html() is NOT safe here: it keeps
+ * pre-existing named HTML entities as-is (double_encode=false), and entities
+ * like &hellip; / &nbsp; are undefined in XML — feed readers reject the file.
+ * Decode every HTML entity to its real character first, then encode only
+ * XML's own five.
+ *
+ * @param string $value Raw value.
+ * @return string
+ */
+function kindi_xml( string $value ): string {
+	$value = html_entity_decode( $value, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	return htmlspecialchars( $value, ENT_XML1 | ENT_QUOTES, 'UTF-8' );
+}
+
+/**
  * Build the product feed XML. Variable products are exported as one item per
  * in-stock variation, linked by item_group_id (Google/Facebook standard), so
  * colour/size variants surface individually.
@@ -68,9 +83,9 @@ function kindi_build_google_feed(): string {
 
 	$xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 	$xml .= '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0"><channel>';
-	$xml .= '<title>' . esc_html( get_bloginfo( 'name' ) ) . '</title>';
+	$xml .= '<title>' . kindi_xml( get_bloginfo( 'name' ) ) . '</title>';
 	$xml .= '<link>' . esc_url( home_url( '/' ) ) . '</link>';
-	$xml .= '<description>' . esc_html( get_bloginfo( 'description' ) ) . '</description>';
+	$xml .= '<description>' . kindi_xml( get_bloginfo( 'description' ) ) . '</description>';
 
 	foreach ( $products as $product ) {
 		if ( ! $product->is_visible() ) {
@@ -128,8 +143,8 @@ function kindi_feed_item( $product, $parent = null ): string {
 	// item_group_id groups variations; for simple products it equals the id
 	// (matches the store's existing woo-feed output).
 	$item .= '<g:item_group_id>' . (int) ( $parent instanceof WC_Product ? $parent->get_id() : $product->get_id() ) . '</g:item_group_id>';
-	$item .= '<g:title>' . esc_html( $product->get_name() ) . '</g:title>';
-	$item .= '<g:description>' . esc_html( wp_trim_words( wp_strip_all_tags( (string) $desc ), 100 ) ) . '</g:description>';
+	$item .= '<g:title>' . kindi_xml( $product->get_name() ) . '</g:title>';
+	$item .= '<g:description>' . kindi_xml( wp_trim_words( wp_strip_all_tags( (string) $desc ), 100, '…' ) ) . '</g:description>';
 	$item .= '<link>' . esc_url( $permalink ) . '</link>';
 	$item .= '<g:canonical_link>' . esc_url( $permalink ) . '</g:canonical_link>';
 	if ( $image ) {
@@ -146,29 +161,29 @@ function kindi_feed_item( $product, $parent = null ): string {
 	}
 
 	$item .= '<g:availability>' . ( $product->is_in_stock() ? 'in_stock' : 'out_of_stock' ) . '</g:availability>';
-	$item .= '<g:price>' . esc_html( wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) ) . ' ' . $currency ) . '</g:price>';
+	$item .= '<g:price>' . kindi_xml( wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) ) . ' ' . $currency ) . '</g:price>';
 	if ( $product->is_on_sale() && '' !== $product->get_sale_price() ) {
-		$item .= '<g:sale_price>' . esc_html( wc_get_price_to_display( $product ) . ' ' . $currency ) . '</g:sale_price>';
+		$item .= '<g:sale_price>' . kindi_xml( wc_get_price_to_display( $product ) . ' ' . $currency ) . '</g:sale_price>';
 		$from = $product->get_date_on_sale_from();
 		$to   = $product->get_date_on_sale_to();
 		if ( $to ) {
 			$item .= '<g:sale_price_effective_date>'
-				. esc_html( ( $from ? $from->date( 'c' ) : gmdate( 'c', 0 ) ) . '/' . $to->date( 'c' ) )
+				. kindi_xml( ( $from ? $from->date( 'c' ) : gmdate( 'c', 0 ) ) . '/' . $to->date( 'c' ) )
 				. '</g:sale_price_effective_date>';
 		}
 	}
 
-	$item .= '<g:brand>' . esc_html( $brand ? $brand : get_bloginfo( 'name' ) ) . '</g:brand>';
+	$item .= '<g:brand>' . kindi_xml( $brand ? $brand : get_bloginfo( 'name' ) ) . '</g:brand>';
 	$item .= '<g:condition>new</g:condition>';
 
 	// Identifiers — native WooCommerce GTIN (WC 9.2+) or common meta, plus SKU as MPN.
 	$gtin = kindi_feed_gtin( $product );
 	$sku  = $product->get_sku() ? $product->get_sku() : $source->get_sku();
 	if ( '' !== $gtin ) {
-		$item .= '<g:gtin>' . esc_html( $gtin ) . '</g:gtin>';
+		$item .= '<g:gtin>' . kindi_xml( $gtin ) . '</g:gtin>';
 	}
 	if ( $sku ) {
-		$item .= '<g:mpn>' . esc_html( $sku ) . '</g:mpn>';
+		$item .= '<g:mpn>' . kindi_xml( $sku ) . '</g:mpn>';
 	}
 	$item .= '<g:identifier_exists>' . ( ( '' !== $gtin || $sku ) ? 'yes' : 'no' ) . '</g:identifier_exists>';
 
@@ -181,21 +196,21 @@ function kindi_feed_item( $product, $parent = null ): string {
 		$gpc = (string) kindi_opt( 'google_category', '' );
 	}
 	if ( '' !== $gpc ) {
-		$item .= '<g:google_product_category>' . esc_html( $gpc ) . '</g:google_product_category>';
+		$item .= '<g:google_product_category>' . kindi_xml( $gpc ) . '</g:google_product_category>';
 	}
 	if ( $cats ) {
-		$item .= '<g:product_type>' . esc_html( $cats ) . '</g:product_type>';
+		$item .= '<g:product_type>' . kindi_xml( $cats ) . '</g:product_type>';
 	}
 
 	// Variant attributes (colour / size / material / pattern) for variations.
 	foreach ( kindi_feed_variant_attributes( $product ) as $key => $value ) {
-		$item .= '<g:' . $key . '>' . esc_html( $value ) . '</g:' . $key . '>'; // phpcs:ignore WordPress.Security.EscapeOutput -- $key is a fixed feed tag.
+		$item .= '<g:' . $key . '>' . kindi_xml( $value ) . '</g:' . $key . '>'; // phpcs:ignore WordPress.Security.EscapeOutput -- $key is a fixed feed tag.
 	}
 
 	// Shipping weight.
 	$weight = $product->get_weight() ? $product->get_weight() : $source->get_weight();
 	if ( $weight ) {
-		$item .= '<g:shipping_weight>' . esc_html( $weight . ' ' . get_option( 'woocommerce_weight_unit', 'kg' ) ) . '</g:shipping_weight>';
+		$item .= '<g:shipping_weight>' . kindi_xml( $weight . ' ' . get_option( 'woocommerce_weight_unit', 'kg' ) ) . '</g:shipping_weight>';
 	}
 
 	// Shipping cost (flat domestic rate; free over the configured threshold).
@@ -204,7 +219,7 @@ function kindi_feed_item( $product, $parent = null ): string {
 	$price_now = (float) wc_get_price_to_display( $product );
 	$ship_now  = ( $threshold > 0 && $price_now >= $threshold ) ? 0 : $ship_cost;
 	$item     .= '<g:shipping><g:country>IL</g:country><g:service>Standard</g:service><g:price>'
-		. esc_html( number_format( (float) $ship_now, 2, '.', '' ) . ' ' . $currency ) . '</g:price></g:shipping>';
+		. kindi_xml( number_format( (float) $ship_now, 2, '.', '' ) . ' ' . $currency ) . '</g:price></g:shipping>';
 
 	$item .= '</item>';
 
@@ -280,6 +295,7 @@ function kindi_flush_feed_cache(): void {
 	delete_transient( 'kindi_google_feed' );
 }
 add_action( 'save_post_product', 'kindi_flush_feed_cache' );
+add_action( 'after_switch_theme', 'kindi_flush_feed_cache' ); // Fresh XML right after a theme update.
 add_action( 'woocommerce_update_product', 'kindi_flush_feed_cache' );
 
 /**
