@@ -9,7 +9,8 @@
  * @package Kindi
  */
 
-$kindi_email = (string) kindi_opt( 'store_email', 'support@kindertoys.co.il' );
+// The site's single contact address (same one the footer shows).
+$kindi_email = (string) kindi_opt( 'email', 'office@kindertoys.co.il' );
 
 $kindi_stats = array(
 	array( 'num' => '+10', 'label' => 'שנים של מקצועיות' ),

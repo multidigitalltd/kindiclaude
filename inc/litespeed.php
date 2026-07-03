@@ -39,6 +39,7 @@ function kindi_cache_nonce_actions(): array {
 		'remove-coupon',    // summary coupon remove (store.js).
 		'kindi_save_cart',  // saved-cart form.
 		'kindi_waitlist',   // back-in-stock waitlist form.
+		'kindi_cancel',     // transaction-cancellation form.
 	);
 }
 

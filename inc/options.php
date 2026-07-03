@@ -164,7 +164,7 @@ function kindi_default_options(): array {
 
 		// Footer / social.
 		'about'         => 'החנות המובילה לצעצועים, מכשירי כתיבה, חומרי יצירה וציוד לגני ילדים ובתי ספר. שירות אישי, מחירים הוגנים ואלפי לקוחות מרוצים.',
-		'email'         => 'info@kindertoys.co.il',
+		'email'         => 'office@kindertoys.co.il',
 		'fb'            => '#',
 		'ig'            => '#',
 	);

@@ -101,3 +101,27 @@
 .kindi-relcard__title { padding: 0.85rem 1rem 0.25rem; color: var(--brand-navy); font-weight: 800; line-height: 1.35; }
 .kindi-relcard__date { padding: 0 1rem 1rem; color: var(--muted-foreground); font-size: 0.8rem; }
 @media (prefers-reduced-motion: reduce) { .kindi-pn__card, .kindi-relcard { transition: none; } .kindi-pn__card:hover, .kindi-relcard:hover { transform: none; } }
+
+/* ---------- Transaction-cancellation form ([kindi_cancel_form]) ---------- */
+.kindi-cancel { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.5rem; box-shadow: var(--shadow-card); }
+.kindi-cancel .kindi-hp { position: absolute !important; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; clip: rect(0 0 0 0); clip-path: inset(50%); }
+.kindi-cancel__grid { display: grid; grid-template-columns: 1fr; gap: 1rem 1.25rem; }
+@media (min-width: 640px) { .kindi-cancel__grid { grid-template-columns: 1fr 1fr; } .kindi-cancel__field--wide { grid-column: 1 / -1; } }
+.kindi-cancel__field { display: flex; flex-direction: column; gap: 0.35rem; margin: 0; }
+.kindi-cancel__field label { font-weight: 700; color: var(--brand-navy); font-size: 0.9rem; }
+.kindi-cancel__req { color: var(--brand-red); }
+.kindi-cancel__field input, .kindi-cancel__field textarea {
+  border: 2px solid color-mix(in oklab, var(--brand-navy) 12%, transparent); border-radius: 0.75rem;
+  padding: 0.7rem 0.9rem; font-size: 0.9375rem; font-family: inherit; background: #fff; width: 100%; box-sizing: border-box;
+}
+.kindi-cancel__field input:focus, .kindi-cancel__field textarea:focus { outline: none; border-color: var(--brand-red); }
+.kindi-cancel__submit {
+  margin-top: 1.25rem; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--brand-red); color: #fff; border: 0; border-radius: 0.95rem; padding: 0.85rem 1.75rem;
+  font-family: inherit; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: var(--shadow-pop); transition: background 0.15s ease;
+}
+.kindi-cancel__submit:hover { background: var(--brand-red-dark); }
+.kindi-cancel__note { margin: 0.85rem 0 0; color: var(--muted-foreground); font-size: 0.82rem; }
+.kindi-cancel__notice { border-radius: 0.9rem; padding: 0.9rem 1.1rem; margin: 0 0 1rem; font-weight: 700; }
+.kindi-cancel__notice--ok { background: color-mix(in oklab, #16a34a 10%, #fff); border: 1px solid color-mix(in oklab, #16a34a 30%, transparent); color: #15803d; }
+.kindi-cancel__notice--err { background: var(--brand-red-soft); border: 1px solid color-mix(in oklab, var(--brand-red) 25%, transparent); color: var(--brand-red-dark); }
