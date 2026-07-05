@@ -508,7 +508,7 @@ function kindi_checkout_side_extras(): void {
 	<div class="kindi-coextras">
 		<div class="kindi-trustrow">
 			<div class="kindi-trustrow__item"><span class="kindi-trustrow__ic"><?php echo kindi_icon( 'truck', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span><?php esc_html_e( 'משלוח מהיר', 'kindi' ); ?></span></div>
-			<div class="kindi-trustrow__item"><span class="kindi-trustrow__ic"><?php echo kindi_icon( 'rotate', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span><?php esc_html_e( 'החזרה חינם 30 יום', 'kindi' ); ?></span></div>
+			<div class="kindi-trustrow__item"><span class="kindi-trustrow__ic"><?php echo kindi_icon( 'star', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span><?php esc_html_e( 'אלפי לקוחות מרוצים', 'kindi' ); ?></span></div>
 			<div class="kindi-trustrow__item"><span class="kindi-trustrow__ic"><?php echo kindi_icon( 'shield', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span><?php esc_html_e( 'תשלום מאובטח', 'kindi' ); ?></span></div>
 		</div>
 		<a class="kindi-helpbox" href="<?php echo esc_url( $href ); ?>"<?php echo '' !== $wa ? ' target="_blank" rel="noopener"' : ''; ?>>
