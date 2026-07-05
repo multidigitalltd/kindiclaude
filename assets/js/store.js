@@ -642,15 +642,34 @@
 		return;
 	}
 
+	// Hard double-submit guard: duplicate orders were observed on the live
+	// store from rapid double-clicks that beat WooCommerce's blockUI. The
+	// button is disabled only AFTER the submit event fires (so serialization
+	// is unaffected) and re-enabled by every failure path below.
+	var lockBtn = function ( on ) {
+		var btn = document.getElementById( 'place_order' );
+		if ( ! btn ) {
+			return;
+		}
+		btn.disabled = on;
+		if ( on ) {
+			btn.setAttribute( 'aria-busy', 'true' );
+		} else {
+			btn.removeAttribute( 'aria-busy' );
+		}
+	};
+
 	var show = function () {
 		overlay.hidden = false;
 		document.body.classList.add( 'kindi-wait-open' );
 		form.setAttribute( 'aria-busy', 'true' );
+		lockBtn( true );
 	};
 	var hide = function () {
 		overlay.hidden = true;
 		document.body.classList.remove( 'kindi-wait-open' );
 		form.removeAttribute( 'aria-busy' );
+		lockBtn( false );
 	};
 
 	form.addEventListener( 'submit', function () {

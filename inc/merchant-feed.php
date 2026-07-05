@@ -73,39 +73,18 @@ function kindi_xml( string $value ): string {
  * @return string
  */
 function kindi_build_google_feed(): string {
-	$products = wc_get_products(
-		array(
-			'status'     => 'publish',
-			'limit'      => 1000,
-			'visibility' => 'visible',
-		)
-	);
-
 	$xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 	$xml .= '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0"><channel>';
 	$xml .= '<title>' . kindi_xml( get_bloginfo( 'name' ) ) . '</title>';
 	$xml .= '<link>' . esc_url( home_url( '/' ) ) . '</link>';
 	$xml .= '<description>' . kindi_xml( get_bloginfo( 'description' ) ) . '</description>';
 
-	foreach ( $products as $product ) {
-		if ( ! $product->is_visible() ) {
-			continue;
+	// Paginated walk — the whole catalogue, not just the first 1,000 products.
+	kindi_feed_walk(
+		static function ( $product, $parent ) use ( &$xml ): void {
+			$xml .= kindi_feed_item( $product, $parent );
 		}
-
-		if ( $product->is_type( 'variable' ) ) {
-			foreach ( $product->get_children() as $variation_id ) {
-				$variation = wc_get_product( $variation_id );
-				if ( $variation instanceof WC_Product && '' !== $variation->get_price() ) {
-					$xml .= kindi_feed_item( $variation, $product );
-				}
-			}
-			continue;
-		}
-
-		if ( '' !== $product->get_price() ) {
-			$xml .= kindi_feed_item( $product );
-		}
-	}
+	);
 
 	$xml .= '</channel></rss>';
 
@@ -226,6 +205,152 @@ function kindi_feed_item( $product, $parent = null ): string {
 	return $item;
 }
 
+
+/**
+ * Walk every publishable catalog product (and sellable variation) in pages —
+ * a single wc_get_products() call capped the feed at 1,000 products while the
+ * store holds ~10k. $cb receives ($product, $parent|null).
+ *
+ * @param callable $cb Item callback.
+ * @return void
+ */
+function kindi_feed_walk( callable $cb ): void {
+	$page = 1;
+	do {
+		$products = wc_get_products(
+			array(
+				'status'     => 'publish',
+				'limit'      => 200,
+				'page'       => $page,
+				'visibility' => 'visible',
+			)
+		);
+		foreach ( $products as $product ) {
+			if ( ! $product->is_visible() ) {
+				continue;
+			}
+			if ( $product->is_type( 'variable' ) ) {
+				foreach ( $product->get_children() as $variation_id ) {
+					$variation = wc_get_product( $variation_id );
+					if ( $variation instanceof WC_Product && '' !== $variation->get_price() ) {
+						$cb( $variation, $product );
+					}
+				}
+				continue;
+			}
+			if ( '' !== $product->get_price() ) {
+				$cb( $product, null );
+			}
+		}
+		++$page;
+	} while ( count( $products ) === 200 );
+}
+
+/**
+ * Plain-text value for CSV cells: real characters (no HTML entities), no tags.
+ *
+ * @param string $value Raw value.
+ * @return string
+ */
+function kindi_feed_text( string $value ): string {
+	return trim( html_entity_decode( wp_strip_all_tags( $value ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
+}
+
+/**
+ * Build the Meta (Facebook) catalog CSV — standard column names, one row per
+ * simple product / variation, matching the item set of the Google XML.
+ *
+ * @return string
+ */
+function kindi_build_facebook_csv(): string {
+	$currency = get_woocommerce_currency();
+	$out      = fopen( 'php://temp', 'r+' );
+	fwrite( $out, "\xEF\xBB\xBF" ); // UTF-8 BOM.
+	fputcsv( $out, array( 'id', 'item_group_id', 'title', 'description', 'availability', 'condition', 'price', 'sale_price', 'link', 'image_link', 'brand', 'gtin', 'mpn' ) );
+
+	kindi_feed_walk(
+		static function ( $product, $parent ) use ( $out, $currency ): void {
+			$source = $parent instanceof WC_Product ? $parent : $product;
+			$image  = wp_get_attachment_url( $product->get_image_id() );
+			if ( ! $image ) {
+				$image = wp_get_attachment_url( $source->get_image_id() );
+			}
+			$desc = $product->get_description() ? $product->get_description() : $source->get_short_description();
+			$desc = $desc ? $desc : $source->get_description();
+			$sale = $product->is_on_sale() ? wc_get_price_to_display( $product ) . ' ' . $currency : '';
+
+			fputcsv(
+				$out,
+				array(
+					(int) $product->get_id(),
+					(int) $source->get_id(),
+					kindi_feed_text( $product->get_name() ),
+					kindi_feed_text( wp_trim_words( wp_strip_all_tags( (string) $desc ), 100, '…' ) ),
+					$product->is_in_stock() ? 'in stock' : 'out of stock',
+					'new',
+					wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) ) . ' ' . $currency,
+					$sale,
+					get_permalink( $source->get_id() ),
+					(string) $image,
+					kindi_feed_text( (string) ( function_exists( 'kindi_product_brand' ) ? kindi_product_brand( $source ) : '' ) ),
+					kindi_feed_gtin( $product ),
+					(string) $product->get_sku(),
+				)
+			);
+		}
+	);
+
+	rewind( $out );
+	$csv = (string) stream_get_contents( $out );
+	fclose( $out );
+	return $csv;
+}
+
+/**
+ * Write both feeds as REAL STATIC FILES at the exact paths the previous
+ * woo-feed plugin used — Google Merchant and Meta keep fetching their old
+ * URLs with nothing to reconfigure, and the server serves them without PHP:
+ *   uploads/woo-feed/google/xml/kinder27125.xml
+ *   uploads/woo-feed/facebook/csv/kindermetactx.csv
+ *
+ * @return void
+ */
+function kindi_write_legacy_feeds(): void {
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
+	$up = wp_upload_dir();
+	if ( ! empty( $up['error'] ) ) {
+		return;
+	}
+	$base    = trailingslashit( $up['basedir'] ) . 'woo-feed/';
+	$targets = array(
+		$base . 'google/xml/kinder27125.xml'     => kindi_build_google_feed(),
+		$base . 'facebook/csv/kindermetactx.csv' => kindi_build_facebook_csv(),
+	);
+	foreach ( $targets as $path => $content ) {
+		if ( '' === $content ) {
+			continue;
+		}
+		wp_mkdir_p( dirname( $path ) );
+		file_put_contents( $path, $content ); // phpcs:ignore WordPress.WP.AlternativeFunctions -- local uploads write, theme-fixed path.
+	}
+}
+add_action( 'kindi_legacy_feeds_cron', 'kindi_write_legacy_feeds' );
+add_action( 'after_switch_theme', 'kindi_write_legacy_feeds', 20 ); // First files right after deploy.
+
+/**
+ * Twice-daily refresh for the static feed files.
+ *
+ * @return void
+ */
+function kindi_schedule_legacy_feeds(): void {
+	if ( ! wp_next_scheduled( 'kindi_legacy_feeds_cron' ) ) {
+		wp_schedule_event( time() + HOUR_IN_SECONDS, 'twicedaily', 'kindi_legacy_feeds_cron' );
+	}
+}
+add_action( 'init', 'kindi_schedule_legacy_feeds', 20 );
+
 /**
  * Best-available GTIN/EAN/UPC for a product — native WooCommerce field first
  * (WC 9.2+ exposes get_global_unique_id), then common third-party meta keys.
@@ -295,6 +420,21 @@ function kindi_flush_feed_cache(): void {
 	delete_transient( 'kindi_google_feed' );
 }
 add_action( 'save_post_product', 'kindi_flush_feed_cache' );
+add_action( 'kindi_legacy_feeds_refresh', 'kindi_write_legacy_feeds' );
+
+/**
+ * Refresh the static feed files ~10 minutes after product changes (debounced —
+ * a bulk edit queues a single regeneration).
+ *
+ * @return void
+ */
+function kindi_queue_legacy_feeds_refresh(): void {
+	if ( ! wp_next_scheduled( 'kindi_legacy_feeds_refresh' ) ) {
+		wp_schedule_single_event( time() + 10 * MINUTE_IN_SECONDS, 'kindi_legacy_feeds_refresh' );
+	}
+}
+add_action( 'save_post_product', 'kindi_queue_legacy_feeds_refresh' );
+add_action( 'woocommerce_update_product', 'kindi_queue_legacy_feeds_refresh' );
 add_action( 'after_switch_theme', 'kindi_flush_feed_cache' ); // Fresh XML right after a theme update.
 add_action( 'woocommerce_update_product', 'kindi_flush_feed_cache' );
 
