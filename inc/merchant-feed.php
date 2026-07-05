@@ -12,18 +12,6 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
- * The feed URL. The same RSS/g: feed is valid for both Google Merchant Center
- * and Facebook/Meta catalogs; the type only changes the query value.
- *
- * @param string $type 'google' | 'facebook'.
- * @return string
- */
-function kindi_feed_url( string $type = 'google' ): string {
-	$type = in_array( $type, array( 'google', 'facebook' ), true ) ? $type : 'google';
-	return add_query_arg( 'kindi_feed', $type, home_url( '/' ) );
-}
-
-/**
  * Output the feed when requested.
  *
  * @return void
@@ -450,13 +438,17 @@ function kindi_feeds_admin_panel(): void {
 		return;
 	}
 
+	// The PRIMARY URLs are the static files written at the exact paths the old
+	// woo-feed plugin used — Google/Meta stay configured as-is, zero changes.
+	$up   = wp_upload_dir();
+	$feed_base = trailingslashit( $up['baseurl'] ) . 'woo-feed/';
 	$rows = array(
-		array( 'Google Merchant — פיד מוצרים', kindi_feed_url( 'google' ), 'מתאים ל-Google Merchant Center (Shopping / רישומים חינמיים).' ),
-		array( 'Facebook / Meta — פיד קטלוג', kindi_feed_url( 'facebook' ), 'הדביקו ב-Meta Commerce Manager → קטלוג → מקור נתונים → Data Feed.' ),
+		array( 'Google Merchant — פיד מוצרים', $feed_base . 'google/xml/kinder27125.xml', 'הכתובת זהה לפיד הישן — לא צריך לשנות דבר ב-Google Merchant Center.' ),
+		array( 'Facebook / Meta — פיד קטלוג', $feed_base . 'facebook/csv/kindermetactx.csv', 'הכתובת זהה לפיד הישן — לא צריך לשנות דבר ב-Meta Commerce Manager.' ),
 	);
 
 	echo '<hr><h2>' . esc_html__( 'פידים למוצרים', 'kindi' ) . '</h2>';
-	echo '<p class="description">' . esc_html__( 'העתיקו את הכתובות והדביקו במערכות הפרסום. הפיד מתעדכן אוטומטית בכל שינוי מוצר.', 'kindi' ) . '</p>';
+	echo '<p class="description">' . esc_html__( 'הכתובות זהות לפיד של התוסף הישן — גוגל ומטא ממשיכים למשוך מאותו מקום. הקבצים מתעדכנים פעמיים ביום וכ-10 דקות אחרי כל שינוי מוצר.', 'kindi' ) . '</p>';
 	echo '<table class="form-table" role="presentation"><tbody>';
 	foreach ( $rows as $i => $row ) {
 		list( $label, $url, $help ) = $row;
