@@ -69,7 +69,8 @@ function kindi_icon( string $name, string $class = '' ): string {
 		'teddy' => array( 'stroke' => '#1B2A52', 'body' => '<circle cx="6.5" cy="7" r="2" fill="#FDE8EA" /> <circle cx="17.5" cy="7" r="2" fill="#FDE8EA" /> <circle cx="12" cy="14" r="6.5" fill="#E8F0FE" /> <circle cx="10" cy="13" r="0.8" fill="#1B2A52" stroke="none" /> <circle cx="14" cy="13" r="0.8" fill="#1B2A52" stroke="none" /> <path d="M10.5 16c.7.8 2.3.8 3 0" /> <circle cx="12" cy="15" r="0.6" fill="#E63946" stroke="none" />' ),
 		'truck' => array( 'stroke' => '#1B2A52', 'body' => '<rect x="1.5" y="7" width="12" height="9" rx="1.5" fill="#E8F0FE" /> <path d="M13.5 9.5h4l3 3v3.5h-7z" fill="#FDE8EA" /> <path d="M1.5 16h19" /> <circle cx="7" cy="17.5" r="1.8" fill="white" /> <circle cx="16.5" cy="17.5" r="1.8" fill="white" /> <path d="M13.5 7v9M17.5 9.5h-4M20.5 12.5h-3" /> <circle cx="20" cy="6" r="0.9" fill="#FFD43B" stroke="none" />' ),
 		'user' => array( 'stroke' => '#1B2A52', 'body' => '<circle cx="12" cy="8" r="3.5" fill="#E8F0FE" /> <path d="M4.5 20c1-4 4-6 7.5-6s6.5 2 7.5 6" fill="#E8F0FE" />' ),
-			'whatsapp' => array( 'stroke' => '#1B2A52', 'body' => '<path d="M12 3a9 9 0 0 0-7.7 13.7L3 21l4.5-1.2A9 9 0 1 0 12 3z" fill="#25D366" stroke="none" /> <path d="M8.5 8.2c0-.7.7-1.2 1.3-1.2h.6l1.3 2.6-1.3.7c0 1.4 1.3 2.7 2.7 2.7l.7-1.3 2.6 1.3v.6c0 .6-.5 1.3-1.2 1.3-3.5 0-6.7-3.2-6.7-6.7z" fill="white" stroke="none" />' ),
+			'youtube' => array( 'stroke' => 'currentColor', 'body' => '<rect x="2.5" y="6.5" width="19" height="11.5" rx="3" /> <path d="M10.2 9.6v4.8l4.4-2.4z" fill="currentColor" stroke="none" />' ),
+		'whatsapp' => array( 'stroke' => '#1B2A52', 'body' => '<path d="M12 3a9 9 0 0 0-7.7 13.7L3 21l4.5-1.2A9 9 0 1 0 12 3z" fill="#25D366" stroke="none" /> <path d="M8.5 8.2c0-.7.7-1.2 1.3-1.2h.6l1.3 2.6-1.3.7c0 1.4 1.3 2.7 2.7 2.7l.7-1.3 2.6 1.3v.6c0 .6-.5 1.3-1.2 1.3-3.5 0-6.7-3.2-6.7-6.7z" fill="white" stroke="none" />' ),
 		);
 	}
 

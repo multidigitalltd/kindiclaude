@@ -150,6 +150,7 @@ function kindi_settings_tabs(): array {
 					'email' => array( 'type' => 'text', 'label' => 'אימייל' ),
 					'fb'    => array( 'type' => 'url', 'label' => 'קישור פייסבוק' ),
 					'ig'    => array( 'type' => 'url', 'label' => 'קישור אינסטגרם' ),
+					'yt'    => array( 'type' => 'url', 'label' => 'קישור יוטיוב' ),
 				),
 			),
 		),

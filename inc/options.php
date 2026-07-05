@@ -167,6 +167,7 @@ function kindi_default_options(): array {
 		'email'         => 'office@kindertoys.co.il',
 		'fb'            => '#',
 		'ig'            => '#',
+		'yt'            => '#',
 	);
 }
 

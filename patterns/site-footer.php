@@ -61,6 +61,7 @@ $kindi_pay = array( 'VISA', 'MC', 'ISRACARD', 'PayPal', 'Bit' );
 			<div class="kindi-footer__social">
 				<a href="<?php echo esc_url( kindi_opt( 'fb' ) ); ?>" aria-label="פייסבוק" class="kindi-footer__soc">f</a>
 				<a href="<?php echo esc_url( kindi_opt( 'ig' ) ); ?>" aria-label="אינסטגרם" class="kindi-footer__soc">◎</a>
+				<a href="<?php echo esc_url( kindi_opt( 'yt' ) ); ?>" aria-label="יוטיוב" class="kindi-footer__soc"><?php echo kindi_icon( 'youtube', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
 				<a href="https://wa.me/<?php echo esc_attr( kindi_opt( 'whatsapp' ) ); ?>" aria-label="וואטסאפ" class="kindi-footer__soc"><?php echo kindi_icon( 'whatsapp', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
 			</div>
 		</div>
