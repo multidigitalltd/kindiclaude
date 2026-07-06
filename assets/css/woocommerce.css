@@ -458,6 +458,22 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-cobox__grid #billing_address_2_field { order: 2; }
 .kindi-cobox__grid #billing_city_field { order: 3; }
 .kindi-cobox__grid #billing_postcode_field { order: 4; }
+/* The same two-up lock for the ship-to-a-different-address fields. */
+.kindi-cobox__grid #shipping_address_1_field,
+.kindi-cobox__grid #shipping_address_2_field,
+.kindi-cobox__grid #shipping_city_field,
+.kindi-cobox__grid #shipping_postcode_field { grid-column: auto / span 1 !important; }
+.kindi-cobox__grid #shipping_address_1_field { order: 1; }
+.kindi-cobox__grid #shipping_address_2_field { order: 2; }
+.kindi-cobox__grid #shipping_city_field { order: 3; }
+.kindi-cobox__grid #shipping_postcode_field { order: 4; }
+
+/* "משלוח לכתובת אחרת" toggle card (form-shipping.php) — sits under Box 2; the
+   fields inside open/close via WooCommerce's own checkout JS. */
+.woocommerce-checkout .kindi-shipto .kindi-shipto__toggle { margin: 0; font-size: 1.1rem; }
+.kindi-shipto .kindi-shipto__toggle label { display: flex; align-items: center; gap: 0.6rem; margin: 0; cursor: pointer; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.1rem; }
+.kindi-shipto .kindi-shipto__toggle input { width: 1.25rem; height: 1.25rem; accent-color: var(--brand-red); margin: 0; flex: 0 0 auto; }
+.kindi-shipto .kindi-shipto__fields { padding-top: 1.1rem; }
 @media (max-width: 600px) { .kindi-cobox__grid { grid-template-columns: 1fr; } }
 .kindi-hidden-field { display: none !important; }
 /* Hide stray technical/empty checkout fields (e.g. Datalogics platform id) that

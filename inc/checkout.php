@@ -11,10 +11,10 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Force shipping to the billing address on the front end, which removes the
- * "Ship to a different address?" toggle and the separate shipping fields
- * (shipping still calculates from the billing address). Front-end only, so the
- * WooCommerce settings screen keeps showing the real stored value.
+ * Shipping defaults to the billing address, with an opt-in "משלוח לכתובת
+ * אחרת" toggle (rendered by our form-shipping.php override under Box 2) that
+ * opens the four shipping-address fields. Front-end only, so the WooCommerce
+ * settings screen keeps showing the real stored value.
  *
  * @param mixed $value Stored option value.
  * @return mixed
@@ -23,7 +23,7 @@ function kindi_force_ship_to_billing( $value ) {
 	if ( is_admin() || ! apply_filters( 'kindi_force_billing_shipping', true ) ) {
 		return $value;
 	}
-	return 'billing_only';
+	return 'billing';
 }
 add_filter( 'option_woocommerce_ship_to_destination', 'kindi_force_ship_to_billing' );
 
@@ -204,10 +204,71 @@ function kindi_checkout_field_layout( array $fields ): array {
 		$fields['billing']['billing_address_2']['label_class'] = array();
 	}
 
+	// --- "משלוח לכתובת אחרת" fields (opened by the toggle under Box 2): exactly
+	// רחוב · מספר · עיר · מיקוד. WooCommerce validates these only while the
+	// toggle is checked. The name fields are hidden (auto-filled from billing at
+	// submit — see kindi_fill_shipping_names) and company/state are dropped;
+	// country stays in the DOM as IL, hidden.
+	$smap = array(
+		'shipping_address_1' => array( 'רחוב', 'הרצל', 50, 'form-row-first' ),
+		'shipping_address_2' => array( 'מספר', '12', 60, 'form-row-last' ),
+		'shipping_city'      => array( 'עיר', 'תל אביב', 70, 'form-row-first' ),
+		'shipping_postcode'  => array( 'מיקוד', '6100000', 80, 'form-row-last' ),
+	);
+	foreach ( $smap as $key => $cfg ) {
+		if ( ! isset( $fields['shipping'][ $key ] ) ) {
+			continue;
+		}
+		$fields['shipping'][ $key ]['label']       = $cfg[0];
+		$fields['shipping'][ $key ]['placeholder'] = $cfg[1];
+		$fields['shipping'][ $key ]['priority']    = $cfg[2];
+		$fields['shipping'][ $key ]['class']       = array( $cfg[3] );
+		$fields['shipping'][ $key ]['input_class'] = array( 'input-text' );
+	}
+	unset( $fields['shipping']['shipping_company'] );
+	if ( isset( $fields['shipping']['shipping_state'] ) ) {
+		$fields['shipping']['shipping_state']['required'] = false;
+		$fields['shipping']['shipping_state']['class']    = array( 'kindi-hidden-field' );
+	}
+	if ( isset( $fields['shipping']['shipping_country'] ) ) {
+		$fields['shipping']['shipping_country']['class'] = array( 'kindi-hidden-field' );
+	}
+	foreach ( array( 'shipping_first_name', 'shipping_last_name' ) as $key ) {
+		if ( isset( $fields['shipping'][ $key ] ) ) {
+			$fields['shipping'][ $key ]['required'] = false;
+			$fields['shipping'][ $key ]['class']    = array( 'kindi-hidden-field' );
+		}
+	}
+	if ( isset( $fields['shipping']['shipping_address_2'] ) ) {
+		$fields['shipping']['shipping_address_2']['required']    = true;
+		$fields['shipping']['shipping_address_2']['label_class'] = array();
+	}
+
 	return $fields;
 }
 // Late priority so our labels/layout win over locale + plugin field filters.
 add_filter( 'woocommerce_checkout_fields', 'kindi_checkout_field_layout', 9999 );
+
+/**
+ * The shipping name fields are hidden (the recipient is the buyer) — copy the
+ * billing names into them at submit so the order's shipping address is complete
+ * for the courier label.
+ *
+ * @param array<string,mixed> $data Posted checkout data (already sanitised by WooCommerce).
+ * @return array<string,mixed>
+ */
+function kindi_fill_shipping_names( array $data ): array {
+	if ( ! empty( $data['ship_to_different_address'] ) ) {
+		if ( empty( $data['shipping_first_name'] ) ) {
+			$data['shipping_first_name'] = (string) ( $data['billing_first_name'] ?? '' );
+		}
+		if ( empty( $data['shipping_last_name'] ) ) {
+			$data['shipping_last_name'] = (string) ( $data['billing_last_name'] ?? '' );
+		}
+	}
+	return $data;
+}
+add_filter( 'woocommerce_checkout_posted_data', 'kindi_fill_shipping_names' );
 
 /**
  * Shipping-method card (box 3) HTML, rendered in the main process column and
