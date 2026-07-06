@@ -76,7 +76,12 @@ function kindi_product_search_template( array $templates ): array {
 	}
 	return $templates;
 }
-add_filter( 'search_template_hierarchy', 'kindi_product_search_template' );
+// Priority 9999: WooCommerce unshifts its own product-search-results slug on
+// this hierarchy at priority 10, and it registers later than the theme — so at
+// equal priority its default block template would win over the archive layout.
+// Running last keeps archive-product first (templates/product-search-results.html
+// covers any path that still resolves WooCommerce's slug).
+add_filter( 'search_template_hierarchy', 'kindi_product_search_template', 9999 );
 
 /**
  * Hide the informational "הלקוח תואם לאזור …" shipping-zone notice by removing
