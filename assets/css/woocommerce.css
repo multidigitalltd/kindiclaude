@@ -604,6 +604,8 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 /* WooCommerce's apply/remove-coupon notice, rendered under the coupon box. */
 .kindi-coupon__msg { margin: -0.4rem 0 1rem; font-size: 0.85rem; font-weight: 700; color: #15803d; }
 .kindi-coupon__msg.is-error { color: var(--brand-red-dark); }
+/* Shown instead of the coupon box while a club-points redemption is active. */
+.kindi-coupon__off { margin: 1rem 0; font-size: 0.85rem; font-weight: 600; color: var(--muted-foreground); }
 
 .kindi-summary__totals { margin-top: 0.5rem; padding-top: 0.5rem; }
 .kindi-summary__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; color: var(--brand-navy); font-weight: 600; }

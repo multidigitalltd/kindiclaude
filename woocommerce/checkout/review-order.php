@@ -123,11 +123,16 @@ $kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place ord
 		?>
 	</ul>
 
+	<?php if ( function_exists( 'kindi_cart_redeems_points' ) && kindi_cart_redeems_points() ) : ?>
+	<?php // A club-points redemption and a coupon are mutually exclusive (inc/club-points.php) — swap the box for a note. ?>
+	<p class="kindi-coupon__off"><?php esc_html_e( 'מימוש נקודות מועדון פעיל — לא ניתן לשלב קוד קופון.', 'kindi' ); ?></p>
+	<?php else : ?>
 	<div class="kindi-coupon" data-kindi-coupon>
 		<span class="kindi-coupon__ic"><?php echo kindi_icon( 'tag', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 		<input type="text" class="kindi-coupon__input" placeholder="<?php esc_attr_e( 'קוד קופון', 'kindi' ); ?>" data-kindi-coupon-input aria-label="<?php esc_attr_e( 'קוד קופון', 'kindi' ); ?>" />
 		<button type="button" class="kindi-coupon__btn" data-kindi-coupon-apply><?php esc_html_e( 'החל', 'kindi' ); ?></button>
 	</div>
+	<?php endif; ?>
 
 	<?php
 	// Anchor for the Gifta gift-card box + its notice, so they sit in the summary
