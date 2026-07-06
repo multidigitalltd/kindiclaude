@@ -125,7 +125,7 @@ $kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place ord
 
 	<?php if ( function_exists( 'kindi_cart_redeems_points' ) && kindi_cart_redeems_points() ) : ?>
 	<?php // A club-points redemption and a coupon are mutually exclusive (inc/club-points.php) — swap the box for a note. ?>
-	<p class="kindi-coupon__off"><?php esc_html_e( 'מימוש נקודות מועדון פעיל — לא ניתן לשלב קוד קופון.', 'kindi' ); ?></p>
+	<p class="kindi-coupon__off"><?php esc_html_e( 'לתשומת ליבכם: לא ניתן לממש נקודות מועדון יחד עם קופון. מימוש הנקודות פעיל כעת ולכן לא ניתן להזין קוד קופון; לשימוש בקופון הסירו את הנחת המועדון מסיכום ההזמנה.', 'kindi' ); ?></p>
 	<?php else : ?>
 	<div class="kindi-coupon" data-kindi-coupon>
 		<span class="kindi-coupon__ic"><?php echo kindi_icon( 'tag', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>

@@ -604,8 +604,8 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 /* WooCommerce's apply/remove-coupon notice, rendered under the coupon box. */
 .kindi-coupon__msg { margin: -0.4rem 0 1rem; font-size: 0.85rem; font-weight: 700; color: #15803d; }
 .kindi-coupon__msg.is-error { color: var(--brand-red-dark); }
-/* Shown instead of the coupon box while a club-points redemption is active. */
-.kindi-coupon__off { margin: 1rem 0; font-size: 0.85rem; font-weight: 700; color: var(--brand-red-dark); }
+/* The club-points note (.kindi-coupon__off, shown instead of the coupon box
+   while a redemption is active) shares the Gifta notice styling below. */
 
 .kindi-summary__totals { margin-top: 0.5rem; padding-top: 0.5rem; }
 .kindi-summary__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; color: var(--brand-navy); font-weight: 600; }
@@ -807,8 +807,10 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-giftcards .kindi-gifta-note { margin: 0.6rem 0 0; font-size: 0.82rem; }
 @media (max-width: 600px) { .kindi-giftcards__col { flex-basis: 100%; } }
 
-/* Gifta + coupon notice before the payment methods. */
-.woocommerce-checkout .kindi-gifta-note {
+/* Gifta + coupon notice before the payment methods; the club-points note in
+   the summary uses the identical look. */
+.woocommerce-checkout .kindi-gifta-note,
+.woocommerce-checkout .kindi-coupon__off {
   background: var(--brand-yellow-soft, color-mix(in oklab, var(--wp--preset--color--accent, #f6c544) 22%, #fff));
   border: 1px solid color-mix(in oklab, var(--wp--preset--color--accent, #f6c544) 45%, transparent);
   border-radius: 0.875rem; padding: 0.8rem 1rem; margin: 0 0 1rem;
