@@ -503,15 +503,60 @@
 		}
 	} );
 
-	/* Checkout summary coupon box: apply / remove via WooCommerce's wc-ajax. */
+	/* Checkout summary coupon box: apply / remove via WooCommerce's wc-ajax.
+	 * WooCommerce answers with its notice HTML (e.g. "קופון לא בתוקף") — show
+	 * that under the coupon field instead of discarding it. The summary is
+	 * replaced by the AJAX refresh right after, so the message is (re)rendered
+	 * on updated_checkout, after the new markup is in place. */
+	var couponMsg = null;
+	function renderCouponMsg() {
+		var cbox = document.querySelector( '[data-kindi-coupon]' );
+		if ( ! cbox || ! couponMsg ) { return; }
+		var old = cbox.parentNode.querySelector( '.kindi-coupon__msg' );
+		if ( old ) { old.remove(); }
+		var note = document.createElement( 'p' );
+		note.className = 'kindi-coupon__msg' + ( couponMsg.error ? ' is-error' : '' );
+		note.setAttribute( 'role', 'alert' );
+		note.textContent = couponMsg.text;
+		cbox.insertAdjacentElement( 'afterend', note );
+		couponMsg = null;
+	}
+	function couponBusy( on ) {
+		var btn = document.querySelector( '[data-kindi-coupon-apply]' );
+		if ( btn ) { btn.disabled = on; btn.classList.toggle( 'is-busy', on ); }
+	}
 	function couponAjax( endpoint, params ) {
 		var url = ( cfg.wcAjaxUrl || '/?wc-ajax=%%endpoint%%' ).replace( '%%endpoint%%', endpoint );
 		var body = new URLSearchParams();
 		Object.keys( params ).forEach( function ( k ) { body.append( k, params[ k ] ); } );
+		var fail = { text: 'לא הצלחנו לעדכן את הקופון — רעננו את העמוד ונסו שוב.', error: true };
+		couponBusy( true );
 		fetch( url, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() } )
 			.then( function ( r ) { return r.text(); } )
-			.then( refreshCheckout )
-			.catch( function () {} );
+			.then( function ( html ) {
+				var tmp = document.createElement( 'div' );
+				tmp.innerHTML = html || '';
+				var err = tmp.querySelector( '.woocommerce-error, .is-error' );
+				var ok = tmp.querySelector( '.woocommerce-message, .is-success' );
+				var el = err || ok;
+				var text = el ? el.textContent.trim() : '';
+				// An empty / "-1" reply means the request was rejected (e.g. a
+				// stale nonce on a long-open tab) — say so instead of doing
+				// nothing, which reads as a dead button.
+				couponMsg = text ? { text: text, error: !! err } : fail;
+				couponBusy( false );
+				refreshCheckout();
+				// No jQuery would mean no updated_checkout event — render now.
+				if ( ! window.jQuery ) { renderCouponMsg(); }
+			} )
+			.catch( function () {
+				couponMsg = fail;
+				couponBusy( false );
+				renderCouponMsg();
+			} );
+	}
+	if ( window.jQuery ) {
+		window.jQuery( document.body ).on( 'updated_checkout', renderCouponMsg );
 	}
 	document.addEventListener( 'click', function ( e ) {
 		var apply = e.target.closest( '[data-kindi-coupon-apply]' );

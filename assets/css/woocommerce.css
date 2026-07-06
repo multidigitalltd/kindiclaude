@@ -600,6 +600,10 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-coupon__btn { flex: 0 0 auto; background: var(--brand-navy); color: #fff; border: 0; border-radius: 0.65rem; padding: 0.55rem 1.2rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; cursor: pointer; transition: background 0.12s ease; }
 .kindi-coupon__btn:hover { background: var(--brand-navy-dark, #16224a); }
 .kindi-coupon__remove { border: 0; background: none; color: var(--brand-red); font-size: 1rem; line-height: 1; cursor: pointer; padding: 0 0.25rem; }
+.kindi-coupon__btn:disabled { opacity: 0.6; cursor: wait; }
+/* WooCommerce's apply/remove-coupon notice, rendered under the coupon box. */
+.kindi-coupon__msg { margin: -0.4rem 0 1rem; font-size: 0.85rem; font-weight: 700; color: #15803d; }
+.kindi-coupon__msg.is-error { color: var(--brand-red-dark); }
 
 .kindi-summary__totals { margin-top: 0.5rem; padding-top: 0.5rem; }
 .kindi-summary__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; color: var(--brand-navy); font-weight: 600; }
