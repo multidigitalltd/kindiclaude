@@ -47,4 +47,6 @@ function kindi_free_shipping_progress(): void {
 	echo '</div>';
 }
 add_action( 'woocommerce_before_cart', 'kindi_free_shipping_progress', 5 );
-add_action( 'woocommerce_widget_shopping_cart_before_buttons', 'kindi_free_shipping_progress', 5 );
+// Mini-cart drawer: at the TOP, above the item list (refreshes with the cart
+// fragment on every add-to-cart / quantity change).
+add_action( 'woocommerce_before_mini_cart', 'kindi_free_shipping_progress', 5 );

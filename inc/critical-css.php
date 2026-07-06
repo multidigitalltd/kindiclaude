@@ -108,7 +108,23 @@ function kindi_async_styles( string $tag, string $handle ): string {
 		'woocommerce-blocktheme', 'wc-blocks-style', 'wc-blocks-packages-style',
 		'brands-styles', 'aos',
 	);
-	if ( ! in_array( $handle, $async, true ) ) {
+
+	// Third-party plugin stylesheets are the remaining render-blocking cost on
+	// mobile. Outside the WooCommerce funnel pages (cart/checkout/account, where
+	// plugin UI must never flash unstyled), swap EVERY stylesheet that isn't
+	// core chrome to non-blocking as well. Unknown handles simply keep working —
+	// they just stop delaying first paint.
+	$keep_blocking = array(
+		'kindi-base', 'kindi-components', 'kindi-content', 'kindi-about',
+		'wp-block-library', 'global-styles', 'admin-bar', 'dashicons',
+	);
+	$is_funnel = ( function_exists( 'is_cart' ) && is_cart() )
+		|| ( function_exists( 'is_checkout' ) && is_checkout() )
+		|| ( function_exists( 'is_account_page' ) && is_account_page() );
+
+	$should_async = in_array( $handle, $async, true )
+		|| ( ! $is_funnel && ! in_array( $handle, $keep_blocking, true ) );
+	if ( ! $should_async ) {
 		return $tag;
 	}
 
