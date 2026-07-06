@@ -566,11 +566,24 @@ function kindi_checkout_side_extras(): void {
 	$wa   = function_exists( 'kindi_whatsapp_url' ) ? kindi_whatsapp_url( 'היי, אשמח לעזרה בהשלמת ההזמנה' ) : '';
 	$href = '' !== $wa ? $wa : '#';
 	?>
+	<?php
+	// Benefits under the place-order button — Kindi brand icons only (no emoji).
+	$kindi_benefits = array(
+		array( 'shield', 'כל ההזמנות מאובטחות בתקן PCI המחמיר ביותר' ),
+		array( 'phone', 'שירות לקוחות אישי עם מענה מהיר' ),
+		array( 'check', 'מוצרים איכותיים בלבד' ),
+		array( 'gift', 'משלוח עד הבית ארוז בצורה נקיה ומסודרת' ),
+		array( 'truck', 'משלוח מהיר — החבילה שלכם נארזת באותו היום' ),
+	);
+	?>
 	<div class="kindi-coextras">
-		<div class="kindi-trustrow">
-			<div class="kindi-trustrow__item"><span class="kindi-trustrow__ic"><?php echo kindi_icon( 'truck', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span><?php esc_html_e( 'משלוח מהיר', 'kindi' ); ?></span></div>
-			<div class="kindi-trustrow__item"><span class="kindi-trustrow__ic"><?php echo kindi_icon( 'star', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span><?php esc_html_e( 'אלפי לקוחות מרוצים', 'kindi' ); ?></span></div>
-			<div class="kindi-trustrow__item"><span class="kindi-trustrow__ic"><?php echo kindi_icon( 'shield', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span><?php esc_html_e( 'תשלום מאובטח', 'kindi' ); ?></span></div>
+		<div class="kindi-cobenefits">
+			<h3 class="kindi-cobenefits__title"><?php esc_html_e( 'למה שווה מאד לקנות אצלנו?', 'kindi' ); ?></h3>
+			<ul>
+				<?php foreach ( $kindi_benefits as $kindi_b ) : ?>
+				<li><?php echo kindi_icon( $kindi_b[0], 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><?php echo esc_html( $kindi_b[1] ); ?></span></li>
+				<?php endforeach; ?>
+			</ul>
 		</div>
 		<a class="kindi-helpbox" href="<?php echo esc_url( $href ); ?>"<?php echo '' !== $wa ? ' target="_blank" rel="noopener"' : ''; ?>>
 			<span class="kindi-helpbox__text">
