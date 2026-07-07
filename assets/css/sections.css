@@ -76,6 +76,11 @@
 @media (min-width: 1024px) { .kindi-hero__visual { display: block; aspect-ratio: 1; max-width: 520px; margin-inline: auto; } }
 .kindi-hero__visual .kindi-spark { position: absolute; }
 .kindi-hero__mascot { position: relative; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 18px 22px rgba(27,42,82,0.18)); }
+/* Imagify's next-gen <picture> wrapper carries the class instead of the img —
+   turn the wrapper into the sized box and let the inner img fill it without
+   distortion (object-fit on the wrapper alone does nothing). */
+picture.kindi-hero__mascot { display: block; }
+.kindi-hero__mascot > img { width: 100%; height: 100%; object-fit: contain; }
 .kindi-hero__pill { position: absolute; z-index: 20; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 1rem; box-shadow: var(--shadow-pop); }
 .kindi-hero__pill small { display: block; font-size: 10px; line-height: 1; opacity: 0.7; }
 .kindi-hero__pill b { display: block; font-size: 0.75rem; font-weight: 800; margin-top: 2px; }
@@ -176,6 +181,9 @@
 .kindi-promo__img { position: absolute; left: 1.25rem; top: 1.25rem; bottom: 1.25rem; width: 48%; height: calc(100% - 40px); object-fit: cover; border-radius: 1rem; transition: transform 0.5s; }
 .kindi-promo--big .kindi-promo__img { width: 52%; }
 .kindi-promo:hover .kindi-promo__img { transform: scale(1.05); }
+/* Same Imagify <picture>-wrapper safety as the hero mascot. */
+picture.kindi-promo__img { display: block; }
+.kindi-promo__img > img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 .kindi-promo__body { position: relative; z-index: 10; max-width: 48%; display: flex; flex-direction: column; gap: 0.375rem; }
 .kindi-promo--big .kindi-promo__body { max-width: 44%; }
 .kindi-promo__badge { display: inline-flex; align-items: center; gap: 0.375rem; align-self: flex-start; font-size: 11px; font-weight: 700; padding: 0.25rem 0.625rem; border-radius: 999px; }
@@ -254,6 +262,9 @@
 .kindi-zone__halo { position: absolute; bottom: 2.5rem; width: 18rem; height: 18rem; border-radius: 999px; background: linear-gradient(to bottom right, color-mix(in oklab, var(--brand-blue) 70%, transparent), color-mix(in oklab, var(--brand-red) 40%, transparent)); filter: blur(40px); }
 .kindi-zone__disc { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); width: 18rem; max-width: 80%; aspect-ratio: 5 / 1; border-radius: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0.6)); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 18px 30px -12px rgba(0,0,0,0.5); }
 .kindi-zone__mascot { position: relative; height: 100%; max-height: 30rem; width: auto; object-fit: contain; filter: drop-shadow(0 14px 18px rgba(0,0,0,0.45)); }
+/* Same Imagify <picture>-wrapper safety as the hero mascot. */
+picture.kindi-zone__mascot { display: block; width: fit-content; }
+.kindi-zone__mascot > img { height: 100%; max-height: 30rem; width: auto; object-fit: contain; }
 
 /* ============================ Testimonials ============================ */
 .kindi-tst { display: grid; gap: 1rem; }
@@ -314,6 +325,9 @@
 .kindi-store__media { position: relative; z-index: 10; aspect-ratio: 4/3; border-radius: 1rem; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; background: linear-gradient(to bottom, color-mix(in oklab, var(--brand-blue) 40%, transparent), var(--brand-navy)); }
 .kindi-store__disc { position: absolute; bottom: 0.5rem; left: 50%; transform: translateX(-50%); width: 75%; aspect-ratio: 5 / 1; border-radius: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.15), rgba(255,255,255,0.4)); border: 1px solid rgba(255,255,255,0.3); z-index: 1; }
 .kindi-store__mascot { position: relative; z-index: 10; height: 92%; width: auto; object-fit: contain; filter: drop-shadow(0 14px 18px rgba(0,0,0,0.45)); }
+/* Same Imagify <picture>-wrapper safety as the hero mascot. */
+picture.kindi-store__mascot { display: block; width: fit-content; }
+.kindi-store__mascot > img { height: 100%; width: auto; object-fit: contain; }
 .kindi-store__here { position: absolute; top: 0.75rem; right: 0.75rem; z-index: 20; background: #fff; color: var(--brand-navy); padding: 0.375rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800; box-shadow: var(--shadow-pop); display: inline-flex; align-items: center; gap: 0.375rem; }
 
 /* Newsletter */
