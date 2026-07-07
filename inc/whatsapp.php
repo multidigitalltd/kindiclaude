@@ -62,10 +62,19 @@ function kindi_whatsapp_product_button(): void {
 		return;
 	}
 
+	// WhatsApp's link detection stops at RTL characters, so a Hebrew product
+	// slug arrives as a broken half-link once the pre-filled text is decoded.
+	// Any non-ASCII permalink is swapped for the ?p= shortlink, which always
+	// linkifies whole and redirects to the product page.
+	$link = get_permalink( $product->get_id() );
+	if ( preg_match( '/[^\x21-\x7E]/', rawurldecode( $link ) ) ) {
+		$link = wp_get_shortlink( $product->get_id() ) ?: $link;
+	}
+
 	$template = (string) kindi_opt( 'whatsapp_product_msg' );
 	$message  = str_replace(
 		array( '{product}', '{url}' ),
-		array( $product->get_name(), get_permalink( $product->get_id() ) ),
+		array( $product->get_name(), $link ),
 		$template
 	);
 
