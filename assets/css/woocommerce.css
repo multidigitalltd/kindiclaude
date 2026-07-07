@@ -146,6 +146,18 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 }
 .woocommerce nav.woocommerce-pagination ul li span.current,
 .woocommerce nav.woocommerce-pagination ul li a:hover { background: var(--brand-red); color: #fff; border-color: var(--brand-red); }
+/* Mobile: a compact single row — arrows + the current page with its two
+   neighbours only (the wrap rule above stays as the no-:has fallback). */
+@media (max-width: 767px) {
+  @supports selector(li:has(a)) {
+    .woocommerce nav.woocommerce-pagination ul li { display: none; }
+    .woocommerce nav.woocommerce-pagination ul li:has(a.prev),
+    .woocommerce nav.woocommerce-pagination ul li:has(a.next),
+    .woocommerce nav.woocommerce-pagination ul li:has(.current),
+    .woocommerce nav.woocommerce-pagination ul li:has(+ li .current),
+    .woocommerce nav.woocommerce-pagination ul li:has(.current) + li { display: block; }
+  }
+}
 
 /* ---------- Single product (custom Lovable layout) ---------- */
 .woocommerce div.product.kindi-pdp { display: block; }
