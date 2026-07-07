@@ -26,15 +26,27 @@
 				<a class="kindi-btn kindi-btn--ghost" href="<?php echo esc_url( kindi_opt( 'hero_cta2_url' ) ); ?>"><?php echo kindi_icon( 'play', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( kindi_opt( 'hero_cta2' ) ); ?></a>
 			</div>
 
+			<?php
+			// Trust row — panel-controlled (באנר ראשי); an empty value hides its item.
+			$kindi_rating = (string) kindi_opt( 'hero_rating' );
+			$kindi_trust1 = (string) kindi_opt( 'hero_trust1' );
+			$kindi_trust2 = (string) kindi_opt( 'hero_trust2' );
+			?>
 			<div class="kindi-hero__trust">
+				<?php if ( '' !== $kindi_rating ) : ?>
 				<span class="kindi-hero__rating">
 					<?php for ( $i = 0; $i < 5; $i++ ) {
 						echo kindi_icon( 'star', 'kindi-icon--xs' ); // phpcs:ignore WordPress.Security.EscapeOutput
 					} ?>
-					<b>4.9</b> <small>(+50,000 הורים)</small>
+					<b><?php echo esc_html( $kindi_rating ); ?></b> <small><?php echo esc_html( kindi_opt( 'hero_rating_note' ) ); ?></small>
 				</span>
-				<span class="kindi-hero__trust-item"><?php echo kindi_icon( 'truck', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>משלוח מחר עד הבית</span>
-				<span class="kindi-hero__trust-item"><?php echo kindi_icon( 'sparkles', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>+10,000 מוצרים במלאי</span>
+				<?php endif; ?>
+				<?php if ( '' !== $kindi_trust1 ) : ?>
+				<span class="kindi-hero__trust-item"><?php echo kindi_icon( 'truck', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $kindi_trust1 ); ?></span>
+				<?php endif; ?>
+				<?php if ( '' !== $kindi_trust2 ) : ?>
+				<span class="kindi-hero__trust-item"><?php echo kindi_icon( 'sparkles', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $kindi_trust2 ); ?></span>
+				<?php endif; ?>
 			</div>
 		</div>
 

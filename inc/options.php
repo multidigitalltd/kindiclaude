@@ -71,6 +71,10 @@ function kindi_default_options(): array {
 		'hero_cta1_url' => '/shop/?on_sale=1',
 		'hero_cta2'     => 'לכל המוצרים',
 		'hero_cta2_url' => '/shop/',
+		'hero_rating'      => '4.9',
+		'hero_rating_note' => '(+50,000 הורים)',
+		'hero_trust1'      => 'משלוח מחר עד הבית',
+		'hero_trust2'      => '+10,000 מוצרים במלאי',
 
 		// Homepage categories + products control.
 		'home_cats_mode'       => 'auto',
