@@ -32,7 +32,8 @@ $kindi_sparks   = array(
 				<div class="kindi-zone__benefit"><span class="kindi-zone__check"><?php echo kindi_icon( 'check', 'kindi-icon--sm kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><?php echo esc_html( $b ); ?></div>
 				<?php endforeach; ?>
 			</div>
-			<a class="kindi-zone__cta" href="<?php echo esc_url( kindi_opt( 'club_cta_url' ) ); ?>">הצטרפות חינם — לחצו כאן<?php echo kindi_icon( 'arrowleft', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
+			<?php // kindi-club-trigger / #clubcta are the selectors registered in Simply Club's "toggle the authentication popup" setting; the href stays as a fallback when the plugin is off. ?>
+			<a class="kindi-zone__cta kindi-club-trigger" id="clubcta" href="<?php echo esc_url( kindi_opt( 'club_cta_url' ) ); ?>">הצטרפות חינם — לחצו כאן<?php echo kindi_icon( 'arrowleft', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
 		</div>
 
 		<div class="kindi-zone__stage" aria-hidden="true">
