@@ -2,14 +2,14 @@
 /**
  * In-dashboard theme updates, served from the theme's GitHub releases.
  *
- * Every release of the (private) repo carries the built kindi.zip as an
- * asset; when its version is newer than the installed one, WordPress shows
- * the standard "עדכון זמין / עדכן עכשיו" on the Themes and Updates screens.
- * Access needs a fine-grained GitHub token with read-only Contents permission
- * on the repo — defined as KINDI_UPDATE_TOKEN in wp-config.php (preferred) or
- * pasted in the panel (עדכוני תבנית). Without a token the whole module is a
- * no-op. The remote check is cached for 6 hours; "בדוק שוב" on the Updates
- * screen refreshes it.
+ * Every release of the repo carries the built kindi.zip as an asset; when its
+ * version is newer than the installed one, WordPress shows the standard
+ * "עדכון זמין / עדכן עכשיו" on the Themes and Updates screens. The repo is
+ * public, so no credentials are needed; if it ever turns private, set a
+ * fine-grained GitHub token (read-only Contents) as KINDI_UPDATE_TOKEN in
+ * wp-config.php or in the panel (עדכוני תבנית) and everything keeps working.
+ * The remote check is cached for 6 hours; "בדוק שוב" on the Updates screen
+ * refreshes it.
  *
  * @package Kindi
  */
@@ -39,24 +39,23 @@ function kindi_update_token(): string {
  *         token, no release, or the release has no kindi.zip asset.
  */
 function kindi_update_remote(): ?array {
-	if ( '' === kindi_update_token() ) {
-		return null;
-	}
-
 	$cached = get_site_transient( 'kindi_update_remote' );
 	if ( is_array( $cached ) ) {
 		return $cached ? $cached : null;
 	}
 
+	$headers = array(
+		'Accept'               => 'application/vnd.github+json',
+		'X-GitHub-Api-Version' => '2022-11-28',
+	);
+	if ( '' !== kindi_update_token() ) {
+		$headers['Authorization'] = 'Bearer ' . kindi_update_token();
+	}
 	$resp = wp_remote_get(
 		'https://api.github.com/repos/' . KINDI_UPDATE_REPO . '/releases/latest',
 		array(
 			'timeout' => 10,
-			'headers' => array(
-				'Accept'               => 'application/vnd.github+json',
-				'Authorization'        => 'Bearer ' . kindi_update_token(),
-				'X-GitHub-Api-Version' => '2022-11-28',
-			),
+			'headers' => $headers,
 		)
 	);
 
@@ -125,13 +124,11 @@ add_filter( 'pre_set_site_transient_update_themes', 'kindi_update_inject' );
  */
 function kindi_update_download_args( array $args, string $url ): array {
 	if ( 0 === strpos( $url, 'https://api.github.com/repos/' . KINDI_UPDATE_REPO . '/releases/assets/' ) ) {
-		$args['headers'] = array_merge(
-			(array) ( $args['headers'] ?? array() ),
-			array(
-				'Accept'        => 'application/octet-stream',
-				'Authorization' => 'Bearer ' . kindi_update_token(),
-			)
-		);
+		$headers = array( 'Accept' => 'application/octet-stream' );
+		if ( '' !== kindi_update_token() ) {
+			$headers['Authorization'] = 'Bearer ' . kindi_update_token();
+		}
+		$args['headers'] = array_merge( (array) ( $args['headers'] ?? array() ), $headers );
 	}
 	return $args;
 }

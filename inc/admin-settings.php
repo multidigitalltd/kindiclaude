@@ -111,7 +111,7 @@ function kindi_settings_tabs(): array {
 					'club_cta_url'  => array( 'type' => 'url', 'label' => 'קישור הצטרפות' ),
 				),
 				'עדכוני תבנית' => array(
-					'update_token' => array( 'type' => 'text', 'label' => 'GitHub Token לעדכונים', 'help' => 'Fine-grained token עם הרשאת Contents: Read-only לריפו של התבנית. כשהוא מוגדר, עדכוני תבנית יופיעו בלוח הבקרה עם כפתור "עדכן עכשיו". מאובטח יותר: להגדיר KINDI_UPDATE_TOKEN ב-wp-config.php ולהשאיר ריק כאן.' ),
+					'update_token' => array( 'type' => 'text', 'label' => 'GitHub Token לעדכונים (אופציונלי)', 'help' => 'עדכוני התבנית מגיעים אוטומטית מהריפו הציבורי — אין צורך בטוקן. רק אם הריפו יהפוך פרטי: Fine-grained token עם הרשאת Contents: Read-only, כאן או כ-KINDI_UPDATE_TOKEN ב-wp-config.php.' ),
 				),
 				'שאלות ותשובות (פוטר)' => array(
 					'faq_title'       => array( 'type' => 'text', 'label' => 'כותרת הסקשן' ),
