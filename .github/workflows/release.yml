@@ -1,12 +1,13 @@
-# Builds the installable theme zip and publishes it as a GitHub release
-# whenever a v* tag is pushed. The site's in-dashboard updater
-# (inc/updates.php) reads the latest release and offers the kindi.zip asset
-# as a one-click theme update.
+# Builds the installable theme zip and publishes it as a GitHub release on
+# every push, keyed by the Version header in style.css — one release per
+# version, existing releases are never touched. The site's in-dashboard
+# updater (inc/updates.php) reads the latest release and offers the kindi.zip
+# asset as a one-click theme update.
 name: Release theme zip
 
 on:
   push:
-    tags: ['v*']
+    branches: ['claude/amazing-gauss-5u56se', 'main']
 
 permissions:
   contents: write
@@ -17,6 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Read theme version
+        id: ver
+        run: echo "version=$(sed -n 's/^Version:[[:space:]]*//p' style.css | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+
       - name: Build kindi.zip
         run: |
           mkdir -p /tmp/build/kindi
@@ -25,11 +30,18 @@ jobs:
           zip -rqX kindi.zip kindi
           unzip -tq kindi.zip
 
-      - name: Publish release
+      - name: Publish release (skip if this version is already released)
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: v${{ steps.ver.outputs.version }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" /tmp/build/kindi.zip \
-            --repo "${GITHUB_REPOSITORY}" \
-            --title "kindi ${GITHUB_REF_NAME}" \
-            --notes "Theme build ${GITHUB_REF_NAME}"
+          if [ "$TAG" = "v" ]; then echo "No version found in style.css"; exit 1; fi
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists — skipping."
+            exit 0
+          fi
+          gh release create "$TAG" /tmp/build/kindi.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "kindi $TAG" \
+            --notes "Theme build $TAG"
