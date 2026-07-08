@@ -1,0 +1,35 @@
+# Builds the installable theme zip and publishes it as a GitHub release
+# whenever a v* tag is pushed. The site's in-dashboard updater
+# (inc/updates.php) reads the latest release and offers the kindi.zip asset
+# as a one-click theme update.
+name: Release theme zip
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build kindi.zip
+        run: |
+          mkdir -p /tmp/build/kindi
+          cp -r style.css functions.php theme.json inc assets parts patterns templates woocommerce screenshot.png README.md /tmp/build/kindi/
+          cd /tmp/build
+          zip -rqX kindi.zip kindi
+          unzip -tq kindi.zip
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" /tmp/build/kindi.zip \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "kindi ${GITHUB_REF_NAME}" \
+            --notes "Theme build ${GITHUB_REF_NAME}"

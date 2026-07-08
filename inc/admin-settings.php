@@ -110,6 +110,9 @@ function kindi_settings_tabs(): array {
 					'club_benefits' => array( 'type' => 'textarea', 'label' => 'הטבות', 'help' => 'שורה אחת לכל הטבה' ),
 					'club_cta_url'  => array( 'type' => 'url', 'label' => 'קישור הצטרפות' ),
 				),
+				'עדכוני תבנית' => array(
+					'update_token' => array( 'type' => 'text', 'label' => 'GitHub Token לעדכונים', 'help' => 'Fine-grained token עם הרשאת Contents: Read-only לריפו של התבנית. כשהוא מוגדר, עדכוני תבנית יופיעו בלוח הבקרה עם כפתור "עדכן עכשיו". מאובטח יותר: להגדיר KINDI_UPDATE_TOKEN ב-wp-config.php ולהשאיר ריק כאן.' ),
+				),
 				'שאלות ותשובות (פוטר)' => array(
 					'faq_title'       => array( 'type' => 'text', 'label' => 'כותרת הסקשן' ),
 					'faq_intro'       => array( 'type' => 'textarea', 'label' => 'פסקת פתיחה' ),
