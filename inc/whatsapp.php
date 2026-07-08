@@ -62,17 +62,23 @@ function kindi_whatsapp_product_button(): void {
 		return;
 	}
 
-	// The settings panel saves this template through a single-line field, so
-	// the newline separators get stripped and the URL ends up glued to the
-	// product name — and WhatsApp only linkifies a URL preceded by whitespace.
-	// Re-break any placeholder glued to preceding text onto its own line.
-	$template = (string) kindi_opt( 'whatsapp_product_msg' );
-	$template = (string) preg_replace( '/(?<=\S)\{(product|url)\}/u', "\n" . '{$1}', $template );
-	$message  = str_replace(
+	$name    = $product->get_name();
+	$link    = (string) get_permalink( $product->get_id() );
+	$message = str_replace(
 		array( '{product}', '{url}' ),
-		array( $product->get_name(), get_permalink( $product->get_id() ) ),
-		$template
+		array( $name, $link ),
+		(string) kindi_opt( 'whatsapp_product_msg' )
 	);
+
+	// WhatsApp only turns a URL into a tappable link when whitespace precedes it.
+	// The settings field can flatten the template's line breaks, gluing the link
+	// to the text before it ("…חומהhttps://…") so it arrives cut off. Guarantee a
+	// newline right before the link, whatever the template looks like. The URL is
+	// ASCII, so strpos lands on a byte boundary and the insert is multibyte-safe.
+	$at = strpos( $message, $link );
+	if ( false !== $at && $at > 0 && ! ctype_space( $message[ $at - 1 ] ) ) {
+		$message = substr_replace( $message, "\n", $at, 0 );
+	}
 
 	$url = kindi_whatsapp_url( $message );
 	if ( '' === $url ) {
