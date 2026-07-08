@@ -116,7 +116,7 @@ function kindi_settings_tabs(): array {
 				'שאלות ותשובות (פוטר)' => array(
 					'faq_title'       => array( 'type' => 'text', 'label' => 'כותרת הסקשן' ),
 					'faq_intro'       => array( 'type' => 'textarea', 'label' => 'פסקת פתיחה' ),
-					'faq_items'       => array( 'type' => 'textarea', 'label' => 'שאלות ותשובות', 'help' => 'כל שאלה ותשובה בבלוק משלו, מופרדות בשורה ריקה: השורה הראשונה בבלוק היא השאלה והשאר התשובה. ריק = הסקשן מוסתר.' ),
+					'faq_items'       => array( 'type' => 'textarea', 'label' => 'שאלות ותשובות', 'help' => 'מפרידים בין שאלה לשאלה בשורה עם שלושה מקפים (---). בכל בלוק: השורה הראשונה היא השאלה, וכל השאר התשובה. כדי ליצור רווח/פסקה חדשה בתוך תשובה — פשוט השאירו שורה ריקה בין הפסקאות. ריק = הסקשן מוסתר.' ),
 					'faq_outro_title' => array( 'type' => 'text', 'label' => 'כותרת סיום' ),
 					'faq_outro'       => array( 'type' => 'textarea', 'label' => 'פסקת סיום' ),
 				),

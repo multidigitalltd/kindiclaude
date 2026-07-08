@@ -20,6 +20,45 @@ function kindi_img( string $relative ): string {
 }
 
 /**
+ * Parse the footer FAQ option into question/answer pairs.
+ *
+ * Two authoring formats, auto-detected:
+ *  - When a line of only dashes (`---`) appears, it separates Q&A blocks, and
+ *    blank lines *inside* an answer are kept (rendered as paragraphs). This is
+ *    how you get spacing between lines in an answer.
+ *  - Otherwise (legacy) blocks are separated by a blank line — simple, but an
+ *    answer can't then contain blank lines.
+ * In both, the first line of a block is the question and the rest the answer.
+ *
+ * @return array<int,array{0:string,1:string}> [ [question, answer], … ]
+ */
+function kindi_faq_items(): array {
+	$raw = trim( str_replace( "\r", '', (string) kindi_opt( 'faq_items' ) ) );
+	if ( '' === $raw ) {
+		return array();
+	}
+
+	$blocks = preg_match( '/^---+$/m', $raw )
+		? preg_split( '/^---+$/m', $raw )   // Explicit separators: blank lines stay inside answers.
+		: preg_split( '/\n\s*\n/', $raw );  // Legacy: blank line = separator.
+
+	$out = array();
+	foreach ( $blocks as $block ) {
+		$block = trim( (string) $block );
+		if ( '' === $block ) {
+			continue;
+		}
+		$lines    = explode( "\n", $block );
+		$question = trim( (string) array_shift( $lines ) );
+		$answer   = trim( implode( "\n", $lines ) );
+		if ( '' !== $question && '' !== $answer ) {
+			$out[] = array( $question, $answer );
+		}
+	}
+	return $out;
+}
+
+/**
  * Render a standard section heading (eyebrow + title with highlight).
  *
  * Mirrors the Lovable <SectionHead> component.

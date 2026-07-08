@@ -178,6 +178,30 @@ function kindi_output_schema(): void {
 		}
 	}
 
+	// FAQPage — the footer FAQ (front page only, so the same site-wide FAQ isn't
+	// declared on every URL).
+	if ( is_front_page() && function_exists( 'kindi_faq_items' ) ) {
+		$faq = kindi_faq_items();
+		if ( $faq ) {
+			$qa = array();
+			foreach ( $faq as $pair ) {
+				$qa[] = array(
+					'@type'          => 'Question',
+					'name'           => $pair[0],
+					'acceptedAnswer' => array(
+						'@type' => 'Answer',
+						'text'  => wp_strip_all_tags( $pair[1] ),
+					),
+				);
+			}
+			$blocks[] = array(
+				'@context'   => 'https://schema.org',
+				'@type'      => 'FAQPage',
+				'mainEntity' => $qa,
+			);
+		}
+	}
+
 	// BreadcrumbList (product / product category).
 	if ( function_exists( 'is_product' ) && ( is_product() || is_product_category() ) ) {
 		$crumbs = array(

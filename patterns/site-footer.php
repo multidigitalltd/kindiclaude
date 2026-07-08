@@ -54,18 +54,8 @@ $kindi_pay = array( 'VISA', 'MC', 'ISRACARD', 'PayPal', 'Bit' );
 <!-- wp:html -->
 <?php
 // FAQ accordion above the footer (site-wide, panel-managed: "שאלות ותשובות
-// (פוטר)"). Items = blocks separated by an empty line; first line question,
-// the rest answer. No items → the whole section is skipped.
-$kindi_faq_raw = trim( str_replace( "\r", '', (string) kindi_opt( 'faq_items' ) ) );
-$kindi_faq     = array();
-if ( '' !== $kindi_faq_raw ) {
-	foreach ( preg_split( '/\n\s*\n/', $kindi_faq_raw ) as $kindi_faq_block ) {
-		$kindi_faq_lines = array_values( array_filter( array_map( 'trim', explode( "\n", $kindi_faq_block ) ) ) );
-		if ( count( $kindi_faq_lines ) >= 2 ) {
-			$kindi_faq[] = array( array_shift( $kindi_faq_lines ), implode( "\n", $kindi_faq_lines ) );
-		}
-	}
-}
+// (פוטר)"). Parsed by kindi_faq_items(); no items → the section is skipped.
+$kindi_faq = kindi_faq_items();
 if ( $kindi_faq ) :
 	$kindi_faq_intro = (string) kindi_opt( 'faq_intro' );
 	$kindi_faq_outro = (string) kindi_opt( 'faq_outro' );
