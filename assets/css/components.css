@@ -349,3 +349,25 @@ a.kindi-mega__title--link:hover { text-decoration: underline; }
 .kindi-cookie__txt { margin: 0; font-size: 0.85rem; color: var(--foreground); max-width: 70ch; line-height: 1.5; }
 .kindi-cookie__link { color: var(--brand-red); font-weight: 700; text-decoration: underline; }
 .kindi-cookie__ok { flex: 0 0 auto; padding: 0.6rem 1.5rem; }
+
+/* ============== Footer FAQ (site-wide accordion above the footer) ============== */
+/* Sits as the footer's first child, on its own light background — visually a
+   section above the navy footer. */
+.kindi-faq { background: var(--surface, #f7f9fc); padding: 3rem 1rem; }
+.kindi-faq__inner { max-width: 860px; margin-inline: auto; }
+.kindi-faq__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); text-align: center; font-size: 1.7rem; margin: 0 0 0.75rem; }
+.kindi-faq__intro { text-align: center; color: var(--muted-foreground); margin: 0 auto 1.75rem; max-width: 62ch; line-height: 1.6; }
+.kindi-faq__list { display: flex; flex-direction: column; gap: 0.6rem; }
+.kindi-faq__item summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: var(--brand-navy); color: #fff; font-weight: 700; font-size: 0.95rem; padding: 0.85rem 1.15rem; border-radius: 0.75rem; cursor: pointer; list-style: none; }
+.kindi-faq__item summary::-webkit-details-marker { display: none; }
+.kindi-faq__item summary:hover { background: var(--brand-navy-dark, #16224a); }
+.kindi-faq__item summary:focus-visible { outline: 3px solid var(--brand-blue); outline-offset: 2px; }
+.kindi-faq__item[open] summary { border-radius: 0.75rem 0.75rem 0 0; }
+.kindi-faq__plus { flex: 0 0 auto; font-size: 1.25rem; line-height: 1; transition: transform 0.2s ease; }
+.kindi-faq__item[open] .kindi-faq__plus { transform: rotate(45deg); }
+@media (prefers-reduced-motion: reduce) { .kindi-faq__plus { transition: none; } }
+.kindi-faq__answer { background: #fff; border: 1px solid var(--border); border-top: 0; border-radius: 0 0 0.75rem 0.75rem; padding: 0.9rem 1.15rem; color: var(--foreground); line-height: 1.65; }
+.kindi-faq__answer p { margin: 0 0 0.5rem; }
+.kindi-faq__answer p:last-child { margin-bottom: 0; }
+.kindi-faq__outro-title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); text-align: center; font-size: 1.25rem; margin: 2.25rem 0 0.5rem; }
+.kindi-faq__outro { text-align: center; color: var(--muted-foreground); max-width: 62ch; margin: 0 auto; line-height: 1.6; }

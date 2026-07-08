@@ -393,6 +393,17 @@ function kindi_archive_sidebar(): void {
 	echo '<button type="button" class="kindi-side__close" data-kindi-filters-close aria-label="' . esc_attr__( 'סגירה', 'kindi' ) . '">' . kindi_icon( 'close', 'kindi-icon--md' ) . '</button>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	echo '</div>';
 
+	// "Clear filters" at the TOP — visible without scrolling the facets.
+	$reset_url = kindi_archive_reset_url();
+	if ( '' !== $reset_url ) {
+		printf(
+			'<a class="kindi-chip kindi-chip--reset" href="%s">%s%s</a>',
+			esc_url( $reset_url ),
+			kindi_icon( 'close', 'kindi-icon--xs' ), // phpcs:ignore WordPress.Security.EscapeOutput
+			esc_html__( 'ביטול סינון', 'kindi' )
+		);
+	}
+
 	// Sub-categories of the current category (icon + name + count) — open.
 	$subcats = kindi_category_chips();
 	if ( $subcats ) {
@@ -461,17 +472,6 @@ function kindi_archive_sidebar(): void {
 	printf( '<input type="range" class="kindi-priceslider__hi" min="%1$d" max="%2$d" value="%3$d" aria-label="%4$s">', (int) $bounds['min'], (int) $bounds['max'], (int) $max_v, esc_attr__( 'מחיר מקסימום', 'kindi' ) );
 	echo '<div class="kindi-priceslider__labels"><span data-pl-min>₪' . esc_html( (string) $bounds['min'] ) . '</span><span class="kindi-priceslider__pill" data-pl-pill></span><span data-pl-max>₪' . esc_html( (string) $bounds['max'] ) . '+</span></div>';
 	echo '</div></details>';
-
-	// "Clear filters" when any attribute/price filter is active.
-	$reset_url = kindi_archive_reset_url();
-	if ( '' !== $reset_url ) {
-		printf(
-			'<a class="kindi-chip kindi-chip--reset" href="%s">%s%s</a>',
-			esc_url( $reset_url ),
-			kindi_icon( 'close', 'kindi-icon--xs' ), // phpcs:ignore WordPress.Security.EscapeOutput
-			esc_html__( 'ביטול סינון', 'kindi' )
-		);
-	}
 }
 
 /**

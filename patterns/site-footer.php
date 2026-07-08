@@ -52,6 +52,45 @@ $kindi_foot_menus = array(
 $kindi_pay = array( 'VISA', 'MC', 'ISRACARD', 'PayPal', 'Bit' );
 ?>
 <!-- wp:html -->
+<?php
+// FAQ accordion above the footer (site-wide, panel-managed: "שאלות ותשובות
+// (פוטר)"). Items = blocks separated by an empty line; first line question,
+// the rest answer. No items → the whole section is skipped.
+$kindi_faq_raw = trim( str_replace( "\r", '', (string) kindi_opt( 'faq_items' ) ) );
+$kindi_faq     = array();
+if ( '' !== $kindi_faq_raw ) {
+	foreach ( preg_split( '/\n\s*\n/', $kindi_faq_raw ) as $kindi_faq_block ) {
+		$kindi_faq_lines = array_values( array_filter( array_map( 'trim', explode( "\n", $kindi_faq_block ) ) ) );
+		if ( count( $kindi_faq_lines ) >= 2 ) {
+			$kindi_faq[] = array( array_shift( $kindi_faq_lines ), implode( "\n", $kindi_faq_lines ) );
+		}
+	}
+}
+if ( $kindi_faq ) :
+	$kindi_faq_intro = (string) kindi_opt( 'faq_intro' );
+	$kindi_faq_outro = (string) kindi_opt( 'faq_outro' );
+	?>
+<section class="kindi-faq" aria-label="<?php echo esc_attr( kindi_opt( 'faq_title' ) ); ?>">
+	<div class="kindi-faq__inner">
+		<h2 class="kindi-faq__title"><?php echo esc_html( kindi_opt( 'faq_title' ) ); ?></h2>
+		<?php if ( '' !== $kindi_faq_intro ) : ?>
+		<p class="kindi-faq__intro"><?php echo esc_html( $kindi_faq_intro ); ?></p>
+		<?php endif; ?>
+		<div class="kindi-faq__list">
+			<?php foreach ( $kindi_faq as $kindi_qa ) : ?>
+			<details class="kindi-faq__item">
+				<summary><span><?php echo esc_html( $kindi_qa[0] ); ?></span><span class="kindi-faq__plus" aria-hidden="true">+</span></summary>
+				<div class="kindi-faq__answer"><?php echo wp_kses_post( wpautop( $kindi_qa[1] ) ); ?></div>
+			</details>
+			<?php endforeach; ?>
+		</div>
+		<?php if ( '' !== $kindi_faq_outro ) : ?>
+		<h3 class="kindi-faq__outro-title"><?php echo esc_html( kindi_opt( 'faq_outro_title' ) ); ?></h3>
+		<p class="kindi-faq__outro"><?php echo esc_html( $kindi_faq_outro ); ?></p>
+		<?php endif; ?>
+	</div>
+</section>
+<?php endif; ?>
 <div class="kindi-footer__inner">
 	<div class="kindi-footer__grid">
 

@@ -59,9 +59,6 @@
 
 	var load = function ( url, push ) {
 		setBusy( true );
-		// Preserve the mobile filter drawer's open state across the swap.
-		var archNow = scope.querySelector( '.kindi-archive' );
-		var wasOpen = !! ( archNow && archNow.classList.contains( 'is-filters-open' ) );
 		fetch( url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' } )
 			.then( function ( r ) { return r.text(); } )
 			.then( function ( html ) {
@@ -78,12 +75,10 @@
 				if ( push ) {
 					history.pushState( { kindiFilter: true }, '', url );
 				}
-				var archNew = scope.querySelector( '.kindi-archive' );
-				if ( archNew && wasOpen ) {
-					archNew.classList.add( 'is-filters-open' );
-				} else {
-					document.body.style.overflow = '';
-				}
+				// The swapped-in markup has no is-filters-open class, so the mobile
+				// drawer closes itself after every selection — the shopper lands
+				// straight on the filtered results.
+				document.body.style.overflow = '';
 				setBusy( false );
 				applyView();
 				initPriceSlider();

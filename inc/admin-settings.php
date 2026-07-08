@@ -110,6 +110,13 @@ function kindi_settings_tabs(): array {
 					'club_benefits' => array( 'type' => 'textarea', 'label' => 'הטבות', 'help' => 'שורה אחת לכל הטבה' ),
 					'club_cta_url'  => array( 'type' => 'url', 'label' => 'קישור הצטרפות' ),
 				),
+				'שאלות ותשובות (פוטר)' => array(
+					'faq_title'       => array( 'type' => 'text', 'label' => 'כותרת הסקשן' ),
+					'faq_intro'       => array( 'type' => 'textarea', 'label' => 'פסקת פתיחה' ),
+					'faq_items'       => array( 'type' => 'textarea', 'label' => 'שאלות ותשובות', 'help' => 'כל שאלה ותשובה בבלוק משלו, מופרדות בשורה ריקה: השורה הראשונה בבלוק היא השאלה והשאר התשובה. ריק = הסקשן מוסתר.' ),
+					'faq_outro_title' => array( 'type' => 'text', 'label' => 'כותרת סיום' ),
+					'faq_outro'       => array( 'type' => 'textarea', 'label' => 'פסקת סיום' ),
+				),
 				'פרטי החנות'   => array(
 					'store_address' => array( 'type' => 'text', 'label' => 'כתובת' ),
 					'store_phone'   => array( 'type' => 'text', 'label' => 'טלפון בחנות' ),
