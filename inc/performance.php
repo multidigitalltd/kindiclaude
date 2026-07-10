@@ -55,6 +55,32 @@ function kindi_dequeue_unused(): void {
 add_action( 'wp_enqueue_scripts', 'kindi_dequeue_unused', 20 );
 
 /**
+ * Payment-gateway scripts (SUMIT / OfficeGuy — including the external
+ * app.sumit.co.il loader) are only used where payment happens, but the plugin
+ * enqueues them site-wide and render-blocking. Dequeue them everywhere except
+ * the purchase funnel; the checkout keeps them untouched.
+ *
+ * @return void
+ */
+function kindi_dequeue_payment_scripts(): void {
+	$is_funnel = ( function_exists( 'is_checkout' ) && is_checkout() )
+		|| ( function_exists( 'is_cart' ) && is_cart() )
+		|| ( function_exists( 'is_account_page' ) && is_account_page() );
+	if ( $is_funnel ) {
+		return;
+	}
+
+	$scripts = wp_scripts();
+	foreach ( $scripts->queue as $handle ) {
+		$src = isset( $scripts->registered[ $handle ] ) ? (string) $scripts->registered[ $handle ]->src : '';
+		if ( false !== stripos( $src, 'officeguy' ) || false !== stripos( $src, 'app.sumit.co.il' ) ) {
+			wp_dequeue_script( $handle );
+		}
+	}
+}
+add_action( 'wp_enqueue_scripts', 'kindi_dequeue_payment_scripts', 999 );
+
+/**
  * Add resource hints for self-hosted fonts origin (same-origin → preconnect noop,
  * kept for CDN/Cloudflare setups where assets may be offloaded).
  *

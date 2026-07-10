@@ -78,11 +78,39 @@ function kindi_preload_lcp_image(): void {
 		return;
 	}
 	$src = kindi_mascot_src( 'hero_mascot', 'mascot/kindy-hero.webp' );
-	if ( '' !== $src ) {
-		// The hero mascot only shows at ≥1024px, so preload it there only —
-		// otherwise mobile would download a hidden image and slow its LCP.
-		printf( '<link rel="preload" as="image" href="%s" media="(min-width: 1024px)" fetchpriority="high">' . "\n", esc_url( $src ) );
+	if ( '' === $src ) {
+		return;
 	}
+
+	// Imagify rewrites the rendered <img> into an AVIF <picture>, so preloading
+	// the original PNG/JPG would download the image TWICE. When a next-gen twin
+	// exists (Imagify stores it alongside as <file>.avif / <file>.webp), preload
+	// that instead; if the source is being rewritten but no twin is found yet,
+	// skip the preload — better none than a wasted double download.
+	$type = '';
+	if ( defined( 'IMAGIFY_VERSION' ) && ! preg_match( '/\.(webp|avif)$/i', $src ) ) {
+		$uploads = wp_get_upload_dir();
+		if ( 0 !== strpos( $src, (string) $uploads['baseurl'] ) ) {
+			return; // Non-uploads original that will be rewritten — can't verify a twin.
+		}
+		$path  = str_replace( (string) $uploads['baseurl'], (string) $uploads['basedir'], $src );
+		$found = '';
+		foreach ( array( 'avif', 'webp' ) as $ext ) {
+			if ( file_exists( $path . '.' . $ext ) ) {
+				$found = $ext;
+				break;
+			}
+		}
+		if ( '' === $found ) {
+			return;
+		}
+		$src  .= '.' . $found;
+		$type  = ' type="image/' . $found . '"';
+	}
+
+	// The hero mascot only shows at ≥1024px, so preload it there only —
+	// otherwise mobile would download a hidden image and slow its LCP.
+	printf( '<link rel="preload" as="image" href="%s" media="(min-width: 1024px)" fetchpriority="high"%s>' . "\n", esc_url( $src ), $type ); // phpcs:ignore WordPress.Security.EscapeOutput -- $type built from a fixed whitelist.
 }
 add_action( 'wp_head', 'kindi_preload_lcp_image', 1 );
 
