@@ -55,7 +55,7 @@
 			<span class="kindi-spark animate-sparkle" style="top:32%;right:-2%;animation-delay:0.8s"><?php echo kindi_icon( 'star', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			<span class="kindi-spark animate-sparkle" style="bottom:24%;left:4%;animation-delay:1.4s"><?php echo kindi_icon( 'star', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			<span class="kindi-ground-shadow animate-ground"></span>
-			<img class="kindi-hero__mascot animate-mascot" src="<?php echo esc_url( kindi_mascot_src( 'hero_mascot', 'mascot/kindy-hero.webp' ) ); ?>" width="520" height="520" fetchpriority="high" decoding="async" alt="קינדי מציג את עולם המוצרים בקינדר טויס — צעצועים, ילקוטים, יצירה ומשחקי קופסה">
+			<?php echo kindi_mascot_img( 'hero_mascot', 'mascot/kindy-hero.webp', 'kindi-hero__mascot animate-mascot', '(max-width: 1023px) 300px, 520px', 'קינדי מציג את עולם המוצרים בקינדר טויס — צעצועים, ילקוטים, יצירה ומשחקי קופסה', array( 'fetchpriority' => 'high', 'decoding' => 'async' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within. ?>
 
 			<span class="kindi-hero__pill kindi-hero__pill--top"><?php echo kindi_icon( 'sparkles', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><small>חדש השבוע</small><b>+120 מוצרים</b></span></span>
 			<span class="kindi-hero__pill kindi-hero__pill--bottom"><?php echo kindi_icon( 'truck', 'kindi-icon--lg kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><small>משלוח מהיר</small><b>חינם מעל 299 ש"ח</b></span></span>

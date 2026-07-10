@@ -37,7 +37,7 @@ $kindi_details = array(
 		<div class="kindi-store__media">
 			<span class="kindi-store__disc"></span>
 			<span class="kindi-ground-shadow animate-ground"></span>
-			<img class="kindi-store__mascot animate-mascot" src="<?php echo esc_url( kindi_mascot_src( 'storeinfo_mascot', 'mascot/kindy-store-invite.webp' ) ); ?>" alt="" width="520" height="520" loading="lazy" decoding="async">
+			<?php echo kindi_mascot_img( 'storeinfo_mascot', 'mascot/kindy-store-invite.webp', 'kindi-store__mascot animate-mascot', '(max-width: 767px) 60vw, 450px', '', array( 'loading' => 'lazy', 'decoding' => 'async' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within. ?>
 			<span class="kindi-store__here"><?php echo kindi_icon( 'pin', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>כאן אנחנו!</span>
 		</div>
 	</div>

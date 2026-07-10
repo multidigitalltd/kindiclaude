@@ -63,6 +63,26 @@ function kindi_wc_loop_columns(): int {
 add_filter( 'loop_shop_columns', 'kindi_wc_loop_columns' );
 
 /**
+ * Accurate sizes attribute for product-card thumbnails. WordPress's default
+ * claims ~100vw, so phones pick a desktop-sized source from the srcset; the
+ * card grid is really 2-up on phones (≈46vw), 3-up on tablets and 4–5-up on
+ * desktop (≈320px each) — declaring that lets the browser download the small
+ * candidate.
+ *
+ * @param array<string,string> $attr Image attributes.
+ * @param WP_Post|null         $attachment Attachment (unused).
+ * @param string|int[]         $size Requested size name.
+ * @return array<string,string>
+ */
+function kindi_product_thumb_sizes( array $attr, $attachment = null, $size = '' ): array {
+	if ( 'woocommerce_thumbnail' === $size ) {
+		$attr['sizes'] = '(max-width: 639px) 46vw, (max-width: 1023px) 30vw, 320px';
+	}
+	return $attr;
+}
+add_filter( 'wp_get_attachment_image_attributes', 'kindi_product_thumb_sizes', 10, 3 );
+
+/**
  * Render product search results with the product-archive template, so a search
  * for products looks exactly like the shop/category archive (product-card grid,
  * filters, ordering) instead of the generic post search layout.

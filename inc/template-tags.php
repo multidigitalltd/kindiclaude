@@ -131,6 +131,74 @@ function kindi_mascot_src( string $opt_key, string $default_rel ): string {
 }
 
 /**
+ * Attachment ID behind a mascot option's URL (0 when it isn't a media-library
+ * image). attachment_url_to_postid() is a DB query, so the answer is cached.
+ *
+ * @param string $url Image URL.
+ * @return int
+ */
+function kindi_mascot_attachment_id( string $url ): int {
+	if ( false === strpos( $url, '/uploads/' ) ) {
+		return 0;
+	}
+	$key = 'kindi_imgid_' . md5( $url );
+	$id  = get_transient( $key );
+	if ( false === $id ) {
+		// Sized URLs (…-683x1024.png) don't resolve — strip the dimensions suffix.
+		$base = preg_replace( '/-\d+x\d+(\.[a-z]{3,4})$/i', '$1', $url );
+		$id   = (int) attachment_url_to_postid( $url );
+		if ( 0 === $id && $base !== $url ) {
+			$id = (int) attachment_url_to_postid( (string) $base );
+		}
+		set_transient( $key, $id, WEEK_IN_SECONDS );
+	}
+	return (int) $id;
+}
+
+/**
+ * Render a mascot <img> responsively: media-library images get WordPress's
+ * full srcset + an accurate sizes attribute, so phones download a phone-sized
+ * file instead of the original. Bundled theme mascots (small WebP files) and
+ * non-library URLs fall back to the plain tag rendered until now.
+ *
+ * @param string               $opt_key     Option key (e.g. 'hero_mascot').
+ * @param string               $default_rel Bundled fallback under assets/img/.
+ * @param string               $class       CSS classes for the img.
+ * @param string               $sizes       The sizes attribute (real rendered widths).
+ * @param string               $alt         Alt text ('' for decorative).
+ * @param array<string,string> $extra       Extra attributes (loading, fetchpriority, decoding).
+ * @return string
+ */
+function kindi_mascot_img( string $opt_key, string $default_rel, string $class, string $sizes, string $alt = '', array $extra = array() ): string {
+	$src = kindi_mascot_src( $opt_key, $default_rel );
+	if ( '' === $src ) {
+		return '';
+	}
+
+	$id = kindi_mascot_attachment_id( $src );
+	if ( $id > 0 ) {
+		$attrs = array_merge(
+			array(
+				'class' => $class,
+				'sizes' => $sizes,
+				'alt'   => $alt,
+			),
+			$extra
+		);
+		$html = wp_get_attachment_image( $id, 'large', false, $attrs );
+		if ( '' !== $html ) {
+			return $html;
+		}
+	}
+
+	$out = '<img class="' . esc_attr( $class ) . '" src="' . esc_url( $src ) . '" width="520" height="520" alt="' . esc_attr( $alt ) . '"';
+	foreach ( $extra as $attr => $value ) {
+		$out .= ' ' . esc_attr( $attr ) . '="' . esc_attr( $value ) . '"';
+	}
+	return $out . '>';
+}
+
+/**
  * Shortcode: [kindi_hot_products] — popular products grid that degrades
  * gracefully to a placeholder when WooCommerce is inactive (so the raw
  * [products] tag is never shown to visitors).

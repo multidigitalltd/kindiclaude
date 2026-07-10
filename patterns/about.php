@@ -45,7 +45,7 @@ $kindi_quality = array(
 <section class="kindi-section kindi-about-hero">
 	<div class="kindi-about-hero__grid">
 		<div class="kindi-about-hero__visual">
-			<img class="kindi-about-hero__mascot animate-mascot" src="<?php echo esc_url( kindi_mascot_src( 'hero_mascot', 'mascot/kindy-hero.webp' ) ); ?>" alt="קינדי — המסקוט של קינדר טויס" width="520" height="520" decoding="async" fetchpriority="high">
+			<?php echo kindi_mascot_img( 'hero_mascot', 'mascot/kindy-hero.webp', 'kindi-about-hero__mascot animate-mascot', '(max-width: 1023px) 300px, 340px', 'קינדי — המסקוט של קינדר טויס', array( 'fetchpriority' => 'high', 'decoding' => 'async' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within. ?>
 		</div>
 		<div class="kindi-about-hero__copy">
 			<span class="kindi-eyebrow"><?php echo kindi_icon( 'sparkles', 'kindi-icon--xs' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>אלפי מוצרים • יצירה • משחק ולמידה</span>
