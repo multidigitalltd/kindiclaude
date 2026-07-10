@@ -113,6 +113,11 @@ function kindi_settings_tabs(): array {
 				'עדכוני תבנית' => array(
 					'update_token' => array( 'type' => 'text', 'label' => 'GitHub Token לעדכונים (אופציונלי)', 'help' => 'עדכוני התבנית מגיעים אוטומטית מהריפו הציבורי — אין צורך בטוקן. רק אם הריפו יהפוך פרטי: Fine-grained token עם הרשאת Contents: Read-only, כאן או כ-KINDI_UPDATE_TOKEN ב-wp-config.php.' ),
 				),
+				'Webhook — הזמנה שהושלמה (Pabbly)' => array(
+					'webhook_enable' => array( 'type' => 'select', 'label' => 'הפעלת ה-Webhook', 'options' => array( '0' => 'כבוי', '1' => 'מופעל' ), 'help' => 'כשמופעל: בכל פעם שהזמנה עוברת לסטטוס "הושלמה", נשלחים פרטי ההזמנה (שם, טלפון, מוצרים עם קישור, מספר חשבונית) לכתובת ה-Webhook. כיבוי כאן עוצר הכל מיידית.' ),
+					'webhook_url'    => array( 'type' => 'text', 'label' => 'כתובת ה-Webhook', 'help' => 'ה-URL של ה-Workflow ב-Pabbly (או Zapier/Make). חייב להתחיל ב-https://.' ),
+					'_webhook_status' => array( 'type' => 'note', 'label' => 'סטטוס ובדיקה', 'help_cb' => 'kindi_webhook_status_html', 'help' => 'הלוג מציג את השליחות האחרונות (זמן, מספר הזמנה, קוד תשובת השרת). קוד 200 = נשלח בהצלחה.' ),
+				),
 				'שאלות ותשובות (פוטר)' => array(
 					'faq_title'       => array( 'type' => 'text', 'label' => 'כותרת הסקשן' ),
 					'faq_intro'       => array( 'type' => 'textarea', 'label' => 'פסקת פתיחה' ),
@@ -418,7 +423,11 @@ function kindi_settings_render(): void {
 					echo '<div class="kindi-imgfield__preview">' . ( '' !== $img ? '<img src="' . esc_url( $img ) . '" alt="">' : '' ) . '</div>';
 					echo '</div>';
 				} elseif ( 'note' === $field['type'] ) {
-					echo ''; // Help text printed below handles the content.
+					// A note carries no input; when it has a help_cb, render that
+					// (dynamic status HTML) here — the static help below still prints.
+					if ( isset( $field['help_cb'] ) && is_callable( $field['help_cb'] ) ) {
+						echo wp_kses_post( (string) call_user_func( $field['help_cb'] ) );
+					}
 				} elseif ( 'taxonomy_multi' === $field['type'] ) {
 				$selected_ids = is_array( $value ) ? array_map( 'intval', $value ) : array();
 				echo '<input type="hidden" name="kindi__multi[' . esc_attr( $key ) . ']" value="1">';
