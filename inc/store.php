@@ -31,16 +31,25 @@ function kindi_store_assets(): void {
 	wp_localize_script(
 		'kindi-store',
 		'kindiStore',
-		array(
-			'productsUrl'  => esc_url_raw( rest_url( 'kindi/v1/products' ) ),
-			'hotUrl'       => esc_url_raw( rest_url( 'kindi/v1/hot' ) ),
-			'subscribeUrl' => esc_url_raw( rest_url( 'kindi/v1/subscribe' ) ),
-			'ajaxUrl'      => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
-			'wcAjaxUrl'    => class_exists( 'WC_AJAX' ) ? esc_url_raw( WC_AJAX::get_endpoint( '%%endpoint%%' ) ) : '',
-			'nonce'        => wp_create_nonce( 'wp_rest' ),
-			'qtyNonce'     => wp_create_nonce( 'kindi_cart_qty' ),
-			'couponApplyNonce'  => wp_create_nonce( 'apply-coupon' ),
-			'couponRemoveNonce' => wp_create_nonce( 'remove-coupon' ),
+		/**
+		 * Filter the data localised to the store script (e.g. checkout upsells add
+		 * their AJAX nonce here).
+		 *
+		 * @param array<string,mixed> $data Localised data.
+		 */
+		apply_filters(
+			'kindi_store_localize',
+			array(
+				'productsUrl'  => esc_url_raw( rest_url( 'kindi/v1/products' ) ),
+				'hotUrl'       => esc_url_raw( rest_url( 'kindi/v1/hot' ) ),
+				'subscribeUrl' => esc_url_raw( rest_url( 'kindi/v1/subscribe' ) ),
+				'ajaxUrl'      => esc_url_raw( admin_url( 'admin-ajax.php' ) ),
+				'wcAjaxUrl'    => class_exists( 'WC_AJAX' ) ? esc_url_raw( WC_AJAX::get_endpoint( '%%endpoint%%' ) ) : '',
+				'nonce'        => wp_create_nonce( 'wp_rest' ),
+				'qtyNonce'     => wp_create_nonce( 'kindi_cart_qty' ),
+				'couponApplyNonce'  => wp_create_nonce( 'apply-coupon' ),
+				'couponRemoveNonce' => wp_create_nonce( 'remove-coupon' ),
+			)
 		)
 	);
 }

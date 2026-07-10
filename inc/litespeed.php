@@ -35,6 +35,7 @@ function kindi_cache_nonce_actions(): array {
 	return array(
 		'wp_rest',          // REST search / products / bundle / pixel.
 		'kindi_cart_qty',   // mini-cart quantity AJAX (store.js).
+		'kindi_upsell',     // checkout order-bump add/remove (store.js).
 		'apply-coupon',     // summary coupon apply (store.js).
 		'remove-coupon',    // summary coupon remove (store.js).
 		'kindi_save_cart',  // saved-cart form.

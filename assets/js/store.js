@@ -581,6 +581,26 @@
 		if ( btn ) { btn.click(); }
 	} );
 
+	/* Checkout order-bumps: add / remove the offered product, then let
+	   WooCommerce re-render the order review (which recomputes the card state
+	   and totals server-side). The button is locked while the request runs. */
+	document.addEventListener( 'click', function ( e ) {
+		var btn = e.target.closest( '[data-kindi-upsell-toggle]' );
+		if ( ! btn || btn.disabled ) { return; }
+		var index = btn.getAttribute( 'data-kindi-upsell-toggle' );
+		var body = new URLSearchParams();
+		body.append( 'action', 'kindi_upsell' );
+		body.append( 'nonce', cfg.upsellNonce || '' );
+		body.append( 'index', index );
+		body.append( 'do', btn.getAttribute( 'data-action' ) || 'add' );
+		btn.disabled = true;
+		btn.classList.add( 'is-busy' );
+		fetch( cfg.ajaxUrl, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() } )
+			.then( function ( r ) { return r.json(); } )
+			.then( function () { refreshCheckout(); } )
+			.catch( function () { btn.disabled = false; btn.classList.remove( 'is-busy' ); } );
+	} );
+
 	/* Gift-wrap box collapse toggle (checkout). */
 	document.addEventListener( 'click', function ( e ) {
 		var gift = e.target.closest( '[data-kindi-gift-toggle]' );

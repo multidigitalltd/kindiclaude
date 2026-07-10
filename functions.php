@@ -90,6 +90,10 @@ if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'checkout-fields.php' );
 	kindi_require( 'club-points.php' );
 	kindi_require( 'order-webhook.php' );
+	kindi_require( 'upsells.php' );
+	if ( is_admin() ) {
+		kindi_require( 'upsells-admin.php' );
+	}
 	kindi_require( 'bundle.php' );
 	kindi_require( 'merchant-feed.php' );
 	kindi_require( 'gift-finder.php' );
