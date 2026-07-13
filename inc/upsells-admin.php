@@ -141,8 +141,8 @@ function kindi_upsells_admin_render(): void {
 	echo '<input type="text" id="kindi_upsell_heading" name="kindi_upsell_settings[heading]" class="regular-text" dir="rtl" value="' . esc_attr( $data['settings']['heading'] ) . '"></td></tr>';
 	echo '<tr><th scope="row"><label for="kindi_upsell_position">' . esc_html__( 'מיקום', 'kindi' ) . '</label></th><td>';
 	echo '<select id="kindi_upsell_position" name="kindi_upsell_settings[position]">';
-	echo '<option value="before_payment"' . selected( $data['settings']['position'], 'before_payment', false ) . '>' . esc_html__( 'מעל אמצעי התשלום', 'kindi' ) . '</option>';
-	echo '<option value="after_order_table"' . selected( $data['settings']['position'], 'after_order_table', false ) . '>' . esc_html__( 'מתחת לסיכום ההזמנה', 'kindi' ) . '</option>';
+	echo '<option value="before_payment"' . selected( $data['settings']['position'], 'before_payment', false ) . '>' . esc_html__( 'בתוך סיכום ההזמנה — מעל הסכומים', 'kindi' ) . '</option>';
+	echo '<option value="after_order_table"' . selected( $data['settings']['position'], 'after_order_table', false ) . '>' . esc_html__( 'בתחתית סיכום ההזמנה — מתחת לסה"כ', 'kindi' ) . '</option>';
 	echo '</select></td></tr>';
 	echo '</tbody></table>';
 

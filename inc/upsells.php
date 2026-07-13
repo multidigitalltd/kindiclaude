@@ -70,12 +70,12 @@ function kindi_upsell_defaults(): array {
 /* ============================ Front-end display ============================ */
 
 /**
- * Hook the bump block onto the configured position. The theme's custom
- * checkout templates never fire woocommerce_review_order_before_payment, so
- * "before payment" hangs between the order review and the payment box
- * (woocommerce_checkout_order_review @15 — review renders at 10, payment at
- * 20) and refreshes through its own update_order_review fragment; "after the
- * order table" sits inside the review template, which refreshes wholesale.
+ * Hook the bump block onto the configured position — both INSIDE the order
+ * summary template (.woocommerce-checkout-review-order-table), because that is
+ * the fragment WooCommerce re-renders wholesale on every checkout refresh.
+ * Anything printed next to it (rather than within it) needs its own fragment
+ * plumbing and can flash-and-vanish after the first update_order_review; the
+ * summary's own hooks make the cards part of the refreshed markup itself.
  *
  * @return void
  */
@@ -84,25 +84,15 @@ function kindi_upsells_hook(): void {
 		return;
 	}
 	if ( 'after_order_table' === kindi_upsells_data()['settings']['position'] ) {
+		// At the bottom of the summary, right under the grand total.
 		add_action( 'woocommerce_review_order_after_order_total', 'kindi_upsells_render' );
 	} else {
-		add_action( 'woocommerce_checkout_order_review', 'kindi_upsells_render', 15 );
-		add_filter( 'woocommerce_update_order_review_fragments', 'kindi_upsells_fragment' );
+		// Mid-summary: below the coupon / gift-card area (its markers run at
+		// priorities 6–90), above the totals.
+		add_action( 'kindi_summary_after_coupon', 'kindi_upsells_render', 97 );
 	}
 }
 add_action( 'wp', 'kindi_upsells_hook' );
-
-/**
- * Keep the bump block fresh on every checkout recalculation (cards disappear
- * when their product lands in the cart, conditions re-evaluate, etc.).
- *
- * @param array<string,string> $fragments update_order_review fragments.
- * @return array<string,string>
- */
-function kindi_upsells_fragment( array $fragments ): array {
-	$fragments['.kindi-upsells-wrap'] = '<div class="kindi-upsells-wrap">' . kindi_upsells_cards_html() . '</div>';
-	return $fragments;
-}
 
 /**
  * Does the cart already contain this product (added as this bump)?
@@ -168,9 +158,7 @@ function kindi_upsell_condition_met( array $item ): bool {
 }
 
 /**
- * Print the bump block (wrapped so the AJAX fragment can replace it — the
- * wrapper renders even when there are no cards, otherwise there is nothing to
- * swap when a card should re-appear).
+ * Print the bump block (once per request).
  *
  * @return void
  */
@@ -180,7 +168,7 @@ function kindi_upsells_render(): void {
 		return;
 	}
 	$done = true;
-	echo '<div class="kindi-upsells-wrap">' . kindi_upsells_cards_html() . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within.
+	echo kindi_upsells_cards_html(); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within.
 }
 
 /**
