@@ -153,9 +153,22 @@ function kindi_enqueue_scripts(): void {
 		true
 	);
 
-	// Live header cart count (WooCommerce core script, no jQuery UI bloat).
-	if ( class_exists( 'WooCommerce' ) ) {
+	// Live header cart count (WooCommerce core script, no jQuery UI bloat) —
+	// everywhere EXCEPT cart/checkout. Those pages have their own refresh
+	// systems, the mini-cart drawer is disabled there anyway, and the script
+	// replays sessionStorage-cached fragments captured on OTHER pages at the
+	// end of every load: on checkout that replay let a third-party fragment
+	// overwrite the order summary with markup rendered outside checkout
+	// context, silently deleting everything the theme prints inside it
+	// (the order-bump cards flashed once and vanished, with no network
+	// request to show for it).
+	$kindi_is_funnel = ( function_exists( 'is_cart' ) && is_cart() )
+		|| ( function_exists( 'is_checkout' ) && is_checkout() );
+	if ( class_exists( 'WooCommerce' ) && ! $kindi_is_funnel ) {
 		wp_enqueue_script( 'wc-cart-fragments' );
+	}
+
+	if ( class_exists( 'WooCommerce' ) ) {
 
 		wp_enqueue_script(
 			'kindi-search',
@@ -189,6 +202,23 @@ function kindi_enqueue_scripts(): void {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'kindi_enqueue_scripts' );
+
+/**
+ * Make sure NOBODY ships wc-cart-fragments on cart/checkout — WooCommerce core
+ * and plugins enqueue it independently of the theme, and its sessionStorage
+ * replay is what wiped theme output from the checkout summary (see the note in
+ * kindi_enqueue_scripts). Runs last.
+ *
+ * @return void
+ */
+function kindi_no_cart_fragments_in_funnel(): void {
+	$is_funnel = ( function_exists( 'is_cart' ) && is_cart() )
+		|| ( function_exists( 'is_checkout' ) && is_checkout() );
+	if ( $is_funnel ) {
+		wp_dequeue_script( 'wc-cart-fragments' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'kindi_no_cart_fragments_in_funnel', 9999 );
 
 /**
  * Neutralise wc-address-i18n on the checkout page.
