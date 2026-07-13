@@ -42,6 +42,10 @@ add_action( 'after_setup_theme', 'kindi_setup' );
  */
 function kindi_viewport_meta(): void {
 	echo '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">' . "\n";
+	// Deployment beacon: makes the RUNNING theme version verifiable from any
+	// page's source (deploys go through zips/auto-updates + several cache
+	// layers, so "which version is actually live?" must be answerable fast).
+	echo '<meta name="kindi-theme" content="' . esc_attr( (string) wp_get_theme( get_template() )->get( 'Version' ) ) . '">' . "\n";
 }
 add_action( 'wp_head', 'kindi_viewport_meta', 1 );
 

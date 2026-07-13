@@ -229,7 +229,7 @@ function kindi_upsells_cards_html(): string {
 
 	// Render trail — makes "why is nothing showing?" answerable from view-source
 	// on both the initial page and the AJAX-refreshed fragment.
-	$trail = '<!-- kindi-upsells v2 [' . esc_html( implode( ' ', $verdict ) ) . '] ' . ( wp_doing_ajax() || defined( 'WC_DOING_AJAX' ) ? 'ajax' : 'page' ) . ' -->';
+	$trail = '<!-- kindi-upsells ' . esc_html( (string) wp_get_theme( get_template() )->get( 'Version' ) ) . ' [' . esc_html( implode( ' ', $verdict ) ) . '] ' . ( wp_doing_ajax() || defined( 'WC_DOING_AJAX' ) ? 'ajax' : 'page' ) . ' -->';
 
 	if ( ! $cards ) {
 		return $trail;
