@@ -34,20 +34,25 @@ add_action( 'admin_menu', 'kindi_upsells_menu', 20 );
 /**
  * Load WooCommerce's product-search select assets on our screen only.
  *
- * @param string $hook Current admin page hook.
+ * The screen is identified by the page query arg — the hook suffix can't be
+ * compared reliably because the parent menu title is Hebrew, which WordPress
+ * URL-encodes into the hook name. Runs late (99) so WooCommerce has already
+ * registered the handles.
+ *
  * @return void
  */
-function kindi_upsells_admin_assets( string $hook ): void {
-	if ( 'kindi_page_kindi-upsells' !== $hook ) {
+function kindi_upsells_admin_assets(): void {
+	if ( ! isset( $_GET['page'] ) || 'kindi-upsells' !== sanitize_key( wp_unslash( $_GET['page'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- screen check only.
 		return;
 	}
-	if ( function_exists( 'wc_enqueue_js' ) ) {
-		wp_enqueue_script( 'wc-enhanced-select' );
-		wp_enqueue_style( 'woocommerce_admin_styles' );
-		wp_enqueue_style( 'select2' );
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
 	}
+	wp_enqueue_script( 'wc-enhanced-select' );
+	wp_enqueue_style( 'woocommerce_admin_styles' );
+	wp_enqueue_style( 'select2' );
 }
-add_action( 'admin_enqueue_scripts', 'kindi_upsells_admin_assets' );
+add_action( 'admin_enqueue_scripts', 'kindi_upsells_admin_assets', 99 );
 
 /**
  * Sanitise the posted repeater into the stored structure.
@@ -89,7 +94,7 @@ function kindi_upsells_sanitize_post(): array {
 			'discount_type'   => $dtype,
 			'discount_value'  => (float) ( $row['discount_value'] ?? 0 ),
 			'quantity'        => max( 1, absint( $row['quantity'] ?? 1 ) ),
-			'hide_if_in_cart' => empty( $row['hide_if_in_cart'] ) ? 0 : 1,
+			'hide_if_in_cart' => 1, // Store policy: a bump never shows once its product is in the cart.
 			'condition_type'  => $ctype,
 			'condition_value' => absint( $row['condition_value'] ?? 0 ),
 		);
@@ -215,10 +220,9 @@ function kindi_upsell_admin_row( $i, array $item ): string {
 	$o .= '<input type="number" step="0.01" min="0" name="' . esc_attr( $name ) . '[discount_value]" value="' . esc_attr( (string) $item['discount_value'] ) . '" style="width:100px">';
 	$o .= '</td></tr>';
 
-	// Quantity + hide-if-in-cart.
+	// Quantity. (Bumps always hide once their product is in the cart — no toggle.)
 	$o .= '<tr><th>' . esc_html__( 'כמות', 'kindi' ) . '</th><td>';
-	$o .= '<input type="number" min="1" name="' . esc_attr( $name ) . '[quantity]" value="' . esc_attr( (string) max( 1, (int) $item['quantity'] ) ) . '" style="width:80px"> ';
-	$o .= '<label style="margin-inline-start:1rem"><input type="checkbox" name="' . esc_attr( $name ) . '[hide_if_in_cart]" value="1"' . checked( ! empty( $item['hide_if_in_cart'] ), true, false ) . '> ' . esc_html__( 'להסתיר אחרי שנוסף', 'kindi' ) . '</label>';
+	$o .= '<input type="number" min="1" name="' . esc_attr( $name ) . '[quantity]" value="' . esc_attr( (string) max( 1, (int) $item['quantity'] ) ) . '" style="width:80px">';
 	$o .= '</td></tr>';
 
 	// Condition.
@@ -276,6 +280,17 @@ function kindi_upadmin_text( string $name, string $key, string $label, string $v
 function kindi_upsells_admin_footer_assets(): void {
 	?>
 	<script>
+	// Safety net: when WooCommerce's own localisation is absent for any reason,
+	// supply the minimal params the enhanced-select AJAX search needs.
+	window.wc_enhanced_select_params = window.wc_enhanced_select_params || <?php echo wp_json_encode( array(
+		'ajax_url'              => admin_url( 'admin-ajax.php' ),
+		'search_products_nonce' => wp_create_nonce( 'search-products' ),
+		'i18n_no_matches'       => __( 'לא נמצאו תוצאות', 'kindi' ),
+		'i18n_searching'        => __( 'מחפש…', 'kindi' ),
+		'i18n_input_too_short_1' => __( 'הקלידו תו אחד לפחות', 'kindi' ),
+		'i18n_input_too_short_n' => __( 'הקלידו עוד תווים', 'kindi' ),
+		'i18n_load_more'        => __( 'טעינת תוצאות נוספות…', 'kindi' ),
+	) ); ?>;
 	( function () {
 		var wrap = document.getElementById( 'kindi-upsell-rows' );
 		var tpl  = document.getElementById( 'kindi-upsell-template' );

@@ -141,8 +141,10 @@ function kindi_settings_tabs(): array {
 					'cookie_policy_url'  => array( 'type' => 'url', 'label' => 'קישור למדיניות פרטיות' ),
 				),
 				'מיילים של הזמנות — באנרים' => array(
-					'email_img_top'    => array( 'type' => 'image', 'label' => 'תמונה עליונה', 'help' => 'מוצגת מתחת לכותרת המייל, מעל פרטי ההזמנה — במיילים "הזמנה בטיפול" ו"הזמנה הושלמה". רוחב מומלץ: 600px. ריק = ללא תמונה.' ),
-					'email_img_bottom' => array( 'type' => 'image', 'label' => 'תמונה תחתונה', 'help' => 'מוצגת אחרי פרטי ההזמנה, מעל הפוטר של המייל. רוחב מומלץ: 600px. ריק = ללא תמונה.' ),
+					'email_proc_top'    => array( 'type' => 'image', 'label' => '"הזמנה בטיפול" — תמונה עליונה', 'help' => 'מוצגת מתחת לכותרת המייל, מעל פרטי ההזמנה. רוחב מומלץ: 600px. ריק = ללא תמונה.' ),
+					'email_proc_bottom' => array( 'type' => 'image', 'label' => '"הזמנה בטיפול" — תמונה תחתונה', 'help' => 'מוצגת אחרי פרטי ההזמנה, מעל הפוטר.' ),
+					'email_done_top'    => array( 'type' => 'image', 'label' => '"הזמנה הושלמה" — תמונה עליונה' ),
+					'email_done_bottom' => array( 'type' => 'image', 'label' => '"הזמנה הושלמה" — תמונה תחתונה' ),
 				),
 				'מייל — חזרה למלאי' => array(
 					'wl_email_subject' => array( 'type' => 'text', 'label' => 'נושא המייל', 'help' => 'אפשר: {name}, {product}, {url}' ),

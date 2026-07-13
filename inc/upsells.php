@@ -103,6 +103,24 @@ function kindi_upsell_cart_key( int $upsell_index, int $product_id ): string {
 }
 
 /**
+ * Is this product in the cart at all (as a bump line or a regular line)?
+ *
+ * @param int $product_id Product ID.
+ * @return bool
+ */
+function kindi_upsell_product_in_cart( int $product_id ): bool {
+	if ( ! WC()->cart ) {
+		return false;
+	}
+	foreach ( WC()->cart->get_cart() as $ci ) {
+		if ( (int) $ci['product_id'] === $product_id || (int) $ci['variation_id'] === $product_id ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * Is a bump's display condition satisfied by the current cart?
  *
  * @param array<string,mixed> $item Upsell config.
@@ -155,11 +173,12 @@ function kindi_upsells_render(): void {
 			continue;
 		}
 
-		$in_cart = '' !== kindi_upsell_cart_key( (int) $index, (int) $item['product_id'] );
-		if ( $in_cart && ! empty( $item['hide_if_in_cart'] ) ) {
+		// A bump never shows when its product is already in the cart — whether it
+		// got there through the bump or straight from the shop.
+		if ( kindi_upsell_product_in_cart( (int) $item['product_id'] ) ) {
 			continue;
 		}
-		$cards[] = kindi_upsell_card_html( (int) $index, $item, $product, $in_cart );
+		$cards[] = kindi_upsell_card_html( (int) $index, $item, $product, false );
 	}
 
 	if ( ! $cards ) {

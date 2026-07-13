@@ -119,12 +119,22 @@ function kindi_wc_email_rtl( string $css ): string {
 add_filter( 'woocommerce_email_styles', 'kindi_wc_email_rtl', 99 );
 
 /**
- * Which WooCommerce emails carry the top/bottom banner images.
+ * Panel option key for an email's banner — each email has its own pair of
+ * images. Filterable to add more emails.
  *
- * @return string[] Email IDs.
+ * @param string $email_id WC_Email id.
+ * @param string $pos      'top' or 'bottom'.
+ * @return string Option key, or '' when this email carries no banners.
  */
-function kindi_email_banner_ids(): array {
-	return (array) apply_filters( 'kindi_email_banner_ids', array( 'customer_processing_order', 'customer_completed_order' ) );
+function kindi_email_banner_opt( string $email_id, string $pos ): string {
+	$map = (array) apply_filters(
+		'kindi_email_banner_map',
+		array(
+			'customer_processing_order' => array( 'top' => 'email_proc_top', 'bottom' => 'email_proc_bottom' ),
+			'customer_completed_order'  => array( 'top' => 'email_done_top', 'bottom' => 'email_done_bottom' ),
+		)
+	);
+	return (string) ( $map[ $email_id ][ $pos ] ?? '' );
 }
 
 /**
@@ -144,18 +154,17 @@ function kindi_email_banner_html( string $opt_key, string $margin ): string {
 }
 
 /**
- * Top banner — right below the email header, above the order content
- * (הזמנה בטיפול / הזמנה הושלמה only).
+ * Top banner — right below the email header, above the order content.
  *
  * @param string        $heading Email heading (unused).
  * @param WC_Email|null $email   Email object.
  * @return void
  */
 function kindi_email_top_banner( $heading = '', $email = null ): void {
-	if ( ! is_object( $email ) || ! in_array( (string) $email->id, kindi_email_banner_ids(), true ) ) {
-		return;
+	$opt = is_object( $email ) ? kindi_email_banner_opt( (string) $email->id, 'top' ) : '';
+	if ( '' !== $opt ) {
+		echo kindi_email_banner_html( $opt, '0 0 20px' ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within.
 	}
-	echo kindi_email_banner_html( 'email_img_top', '0 0 20px' ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within.
 }
 // Priority 20: after WooCommerce prints its header template (10).
 add_action( 'woocommerce_email_header', 'kindi_email_top_banner', 20, 2 );
@@ -167,10 +176,10 @@ add_action( 'woocommerce_email_header', 'kindi_email_top_banner', 20, 2 );
  * @return void
  */
 function kindi_email_bottom_banner( $email = null ): void {
-	if ( ! is_object( $email ) || ! in_array( (string) $email->id, kindi_email_banner_ids(), true ) ) {
-		return;
+	$opt = is_object( $email ) ? kindi_email_banner_opt( (string) $email->id, 'bottom' ) : '';
+	if ( '' !== $opt ) {
+		echo kindi_email_banner_html( $opt, '20px 0 0' ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within.
 	}
-	echo kindi_email_banner_html( 'email_img_bottom', '20px 0 0' ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within.
 }
 // Priority 5: before WooCommerce prints its footer template (10).
 add_action( 'woocommerce_email_footer', 'kindi_email_bottom_banner', 5 );
