@@ -213,7 +213,11 @@ function kindi_waitlist_admin_page(): void {
 				esc_html( $entry['name'] ?? '' ),
 				esc_html( $entry['email'] ?? '' ),
 				esc_html( ! empty( $entry['time'] ) ? wp_date( 'd/m/Y', (int) $entry['time'] ) : '' ),
-				! empty( $entry['notified'] ) ? '✅ עודכן' : '⏳ ממתין'
+				// Text-only status (no emoji — the theme strips WP's emoji script,
+				// leaving broken image fallbacks in admin tables).
+				! empty( $entry['notified'] )
+					? '<span style="color:#15803d;font-weight:600">עודכן</span>'
+					: '<span style="color:#996800;font-weight:600">ממתין</span>'
 			);
 		}
 	}

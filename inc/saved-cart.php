@@ -139,7 +139,7 @@ function kindi_saved_cart_save(): void {
 	wp_send_json_success(
 		array(
 			'url'     => $url,
-			'message' => is_email( $email ) ? '✅ נשמר! שלחנו את הקישור למייל. אפשר גם להעתיק:' : '✅ העגלה נשמרה! העתיקו את הקישור לשחזור:',
+			'message' => is_email( $email ) ? 'נשמר! שלחנו את הקישור למייל. אפשר גם להעתיק:' : 'העגלה נשמרה! העתיקו את הקישור לשחזור:',
 		)
 	);
 }
@@ -335,14 +335,20 @@ function kindi_saved_cart_admin_page(): void {
 		$token     = (string) get_post_meta( $cart->ID, '_kindi_cart_token', true );
 		$recovered = (int) get_post_meta( $cart->ID, '_kindi_cart_recovered', true );
 		$reminded  = (int) get_post_meta( $cart->ID, '_kindi_cart_reminded', true );
-		$status    = $recovered ? '✅ שוחזרה' : ( $reminded ? '🔔 נשלחה תזכורת' : '⏳ ממתינה' );
+		// Text-only status (no emoji — the theme strips WP's emoji script,
+		// leaving broken image fallbacks in admin tables).
+		$status = $recovered
+			? '<span style="color:#15803d;font-weight:600">שוחזרה</span>'
+			: ( $reminded
+				? '<span style="color:#1d4ed8;font-weight:600">נשלחה תזכורת</span>'
+				: '<span style="color:#996800;font-weight:600">ממתינה</span>' );
 		printf(
 			'<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td><a href="%s" target="_blank" rel="noopener">פתיחה ↗</a></td></tr>',
 			esc_html( get_the_date( 'd/m/Y H:i', $cart ) ),
 			esc_html( (string) get_post_meta( $cart->ID, '_kindi_cart_email', true ) ?: '—' ),
 			esc_html( (string) get_post_meta( $cart->ID, '_kindi_cart_count', true ) ),
 			wp_kses_post( (string) get_post_meta( $cart->ID, '_kindi_cart_total', true ) ),
-			esc_html( $status ),
+			wp_kses( $status, array( 'span' => array( 'style' => true ) ) ),
 			esc_url( kindi_saved_cart_url( $token ) )
 		);
 	}

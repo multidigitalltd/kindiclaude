@@ -88,6 +88,10 @@ function kindi_default_options(): array {
 		// Order-completed webhook (Pabbly / Zapier / Make). Off until switched on.
 		'webhook_enable'  => '0',
 		'webhook_url'     => '',
+
+		// Order-email banner images (processing + completed emails).
+		'email_img_top'    => '',
+		'email_img_bottom' => '',
 		'faq_outro'       => 'קינדר טויס היא חנות משפחתית עם אלפי מוצרים, שירות אישי ואהבה אמיתית לילדים ולמשחק. אנחנו כאן לכל שאלה — תמיד.',
 
 		// Homepage categories + products control.

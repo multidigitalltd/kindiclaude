@@ -117,3 +117,60 @@ function kindi_wc_email_rtl( string $css ): string {
 	';
 }
 add_filter( 'woocommerce_email_styles', 'kindi_wc_email_rtl', 99 );
+
+/**
+ * Which WooCommerce emails carry the top/bottom banner images.
+ *
+ * @return string[] Email IDs.
+ */
+function kindi_email_banner_ids(): array {
+	return (array) apply_filters( 'kindi_email_banner_ids', array( 'customer_processing_order', 'customer_completed_order' ) );
+}
+
+/**
+ * Banner <img> markup for emails (inline styles only — email clients ignore
+ * stylesheets). Empty when no image is configured.
+ *
+ * @param string $opt_key Panel option key.
+ * @param string $margin  CSS margin for the wrapping paragraph.
+ * @return string
+ */
+function kindi_email_banner_html( string $opt_key, string $margin ): string {
+	$src = function_exists( 'kindi_opt' ) ? trim( (string) kindi_opt( $opt_key ) ) : '';
+	if ( '' === $src ) {
+		return '';
+	}
+	return '<p style="margin:' . esc_attr( $margin ) . ';text-align:center"><img src="' . esc_url( $src ) . '" alt="" style="max-width:100%;height:auto;border:0;border-radius:8px" /></p>';
+}
+
+/**
+ * Top banner — right below the email header, above the order content
+ * (הזמנה בטיפול / הזמנה הושלמה only).
+ *
+ * @param string        $heading Email heading (unused).
+ * @param WC_Email|null $email   Email object.
+ * @return void
+ */
+function kindi_email_top_banner( $heading = '', $email = null ): void {
+	if ( ! is_object( $email ) || ! in_array( (string) $email->id, kindi_email_banner_ids(), true ) ) {
+		return;
+	}
+	echo kindi_email_banner_html( 'email_img_top', '0 0 20px' ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within.
+}
+// Priority 20: after WooCommerce prints its header template (10).
+add_action( 'woocommerce_email_header', 'kindi_email_top_banner', 20, 2 );
+
+/**
+ * Bottom banner — right after the order content, above the email footer.
+ *
+ * @param WC_Email|null $email Email object.
+ * @return void
+ */
+function kindi_email_bottom_banner( $email = null ): void {
+	if ( ! is_object( $email ) || ! in_array( (string) $email->id, kindi_email_banner_ids(), true ) ) {
+		return;
+	}
+	echo kindi_email_banner_html( 'email_img_bottom', '20px 0 0' ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within.
+}
+// Priority 5: before WooCommerce prints its footer template (10).
+add_action( 'woocommerce_email_footer', 'kindi_email_bottom_banner', 5 );
