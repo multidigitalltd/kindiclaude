@@ -427,6 +427,60 @@ add_action( 'after_switch_theme', 'kindi_flush_feed_cache' ); // Fresh XML right
 add_action( 'woocommerce_update_product', 'kindi_flush_feed_cache' );
 
 /**
+ * Image changes that DON'T pass through a product save also refresh the feeds:
+ * swapping a product's featured image (the _thumbnail_id meta) and replacing an
+ * attachment's file in the media library. Without these, the feed keeps the old
+ * image until the next cron run and Google shows a stale picture.
+ *
+ * @param int    $meta_id  Meta row ID (unused).
+ * @param int    $post_id  Post ID.
+ * @param string $meta_key Meta key.
+ * @return void
+ */
+function kindi_feed_on_thumbnail_change( $meta_id, $post_id, $meta_key ): void {
+	if ( '_thumbnail_id' === $meta_key && 'product' === get_post_type( (int) $post_id ) ) {
+		kindi_flush_feed_cache();
+		kindi_queue_legacy_feeds_refresh();
+	}
+}
+add_action( 'updated_post_meta', 'kindi_feed_on_thumbnail_change', 10, 3 );
+add_action( 'added_post_meta', 'kindi_feed_on_thumbnail_change', 10, 3 );
+
+/**
+ * A replaced/edited media file → refresh (debounced, so bulk edits still queue
+ * a single regeneration).
+ *
+ * @return void
+ */
+function kindi_feed_on_attachment_change(): void {
+	kindi_flush_feed_cache();
+	kindi_queue_legacy_feeds_refresh();
+}
+add_action( 'attachment_updated', 'kindi_feed_on_attachment_change' );
+
+/**
+ * Manual "רענון פידים עכשיו" — rebuilds the XML/CSV immediately.
+ *
+ * @return void
+ */
+function kindi_feeds_manual_refresh(): void {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'אין הרשאה.', 'kindi' ) );
+	}
+	check_admin_referer( 'kindi_feeds_refresh' );
+
+	kindi_flush_feed_cache();
+	kindi_write_legacy_feeds();
+
+	wp_safe_redirect( add_query_arg(
+		array( 'page' => 'kindi-settings', 'tab' => 'pixel', 'kindi_feeds' => 'done' ),
+		admin_url( 'admin.php' )
+	) );
+	exit;
+}
+add_action( 'admin_post_kindi_feeds_refresh', 'kindi_feeds_manual_refresh' );
+
+/**
  * Show copy-able feed/sitemap URLs at the bottom of the Kindi settings screen.
  *
  * @return void
@@ -442,26 +496,38 @@ function kindi_feeds_admin_panel(): void {
 	// woo-feed plugin used — Google/Meta stay configured as-is, zero changes.
 	$up   = wp_upload_dir();
 	$feed_base = trailingslashit( $up['baseurl'] ) . 'woo-feed/';
+	$dir_base  = trailingslashit( $up['basedir'] ) . 'woo-feed/';
 	$rows = array(
-		array( 'Google Merchant — פיד מוצרים', $feed_base . 'google/xml/kinder27125.xml', 'הכתובת זהה לפיד הישן — לא צריך לשנות דבר ב-Google Merchant Center.' ),
-		array( 'Facebook / Meta — פיד קטלוג', $feed_base . 'facebook/csv/kindermetactx.csv', 'הכתובת זהה לפיד הישן — לא צריך לשנות דבר ב-Meta Commerce Manager.' ),
+		array( 'Google Merchant — פיד מוצרים', $feed_base . 'google/xml/kinder27125.xml', $dir_base . 'google/xml/kinder27125.xml', 'הכתובת זהה לפיד הישן — לא צריך לשנות דבר ב-Google Merchant Center.' ),
+		array( 'Facebook / Meta — פיד קטלוג', $feed_base . 'facebook/csv/kindermetactx.csv', $dir_base . 'facebook/csv/kindermetactx.csv', 'הכתובת זהה לפיד הישן — לא צריך לשנות דבר ב-Meta Commerce Manager.' ),
 	);
 
 	echo '<hr><h2>' . esc_html__( 'פידים למוצרים', 'kindi' ) . '</h2>';
-	echo '<p class="description">' . esc_html__( 'הכתובות זהות לפיד של התוסף הישן — גוגל ומטא ממשיכים למשוך מאותו מקום. הקבצים מתעדכנים פעמיים ביום וכ-10 דקות אחרי כל שינוי מוצר.', 'kindi' ) . '</p>';
+	if ( isset( $_GET['kindi_feeds'] ) && 'done' === $_GET['kindi_feeds'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display flag only.
+		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'הפידים נבנו מחדש עכשיו עם התמונות והנתונים העדכניים.', 'kindi' ) . '</p></div>';
+	}
+	echo '<p class="description">' . esc_html__( 'הכתובות זהות לפיד של התוסף הישן — גוגל ומטא ממשיכים למשוך מאותו מקום. הקבצים מתעדכנים פעמיים ביום, כ-10 דקות אחרי כל שינוי מוצר או תמונה, ומיידית עם הכפתור למטה.', 'kindi' ) . '</p>';
 	echo '<table class="form-table" role="presentation"><tbody>';
 	foreach ( $rows as $i => $row ) {
-		list( $label, $url, $help ) = $row;
-		$id = 'kindi-feed-' . $i;
+		list( $label, $url, $path, $help ) = $row;
+		$id    = 'kindi-feed-' . $i;
+		$mtime = file_exists( $path ) ? (int) filemtime( $path ) : 0;
+		$stamp = $mtime > 0
+			? sprintf( /* translators: %s: local date-time. */ __( 'עודכן לאחרונה: %s', 'kindi' ), wp_date( 'd.m.Y H:i', $mtime ) )
+			: __( 'הקובץ עוד לא נבנה — לחצו על "רענון הפידים עכשיו".', 'kindi' );
 		echo '<tr><th scope="row">' . esc_html( $label ) . '</th><td>';
 		echo '<div style="display:flex;gap:8px;max-width:680px">';
 		echo '<input type="text" id="' . esc_attr( $id ) . '" value="' . esc_url( $url ) . '" readonly class="regular-text" style="flex:1;direction:ltr;text-align:left" onclick="this.select()">';
 		echo '<button type="button" class="button" data-kindi-copy="' . esc_attr( $id ) . '">' . esc_html__( 'העתקה', 'kindi' ) . '</button>';
 		echo '<a class="button" href="' . esc_url( $url ) . '" target="_blank" rel="noopener">' . esc_html__( 'פתיחה', 'kindi' ) . '</a>';
-		echo '</div><p class="description">' . esc_html( $help ) . '</p>';
+		echo '</div><p class="description">' . esc_html( $help ) . ' <strong>' . esc_html( $stamp ) . '</strong></p>';
 		echo '</td></tr>';
 	}
 	echo '</tbody></table>';
+
+	$refresh_url = wp_nonce_url( admin_url( 'admin-post.php?action=kindi_feeds_refresh' ), 'kindi_feeds_refresh' );
+	echo '<p><a class="button button-secondary" href="' . esc_url( $refresh_url ) . '">' . esc_html__( 'רענון הפידים עכשיו', 'kindi' ) . '</a> ';
+	echo '<span class="description">' . esc_html__( 'בונה מחדש את שני הקבצים מיידית — למשל אחרי החלפת תמונות מוצר.', 'kindi' ) . '</span></p>';
 	?>
 	<script>
 	document.querySelectorAll('[data-kindi-copy]').forEach(function(b){b.addEventListener('click',function(){var el=document.getElementById(b.getAttribute('data-kindi-copy'));if(!el)return;el.select();if(navigator.clipboard){navigator.clipboard.writeText(el.value);}else{document.execCommand('copy');}var t=b.textContent;b.textContent='הועתק ✓';setTimeout(function(){b.textContent=t;},1500);});});
