@@ -195,49 +195,39 @@ function kindi_upsells_render(): void {
  */
 function kindi_upsells_cards_html(): string {
 	if ( ! function_exists( 'WC' ) || ! WC()->cart || WC()->cart->is_empty() ) {
-		return '<!-- kindi-upsells: no cart -->';
+		return '';
 	}
 
-	$data    = kindi_upsells_data();
-	$cards   = array();
-	$verdict = array();
+	$data  = kindi_upsells_data();
+	$cards = array();
 
 	foreach ( $data['items'] as $index => $item ) {
 		$item = array_merge( kindi_upsell_defaults(), (array) $item );
 		if ( empty( $item['active'] ) || $item['product_id'] <= 0 ) {
-			$verdict[] = $index . ':off';
 			continue;
 		}
 		$product = wc_get_product( (int) $item['product_id'] );
 		if ( ! $product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
-			$verdict[] = $index . ':product';
 			continue;
 		}
 		if ( ! kindi_upsell_condition_met( $item ) ) {
-			$verdict[] = $index . ':condition';
 			continue;
 		}
 
 		// A bump never shows when its product is already in the cart — whether it
 		// got there through the bump or straight from the shop.
 		if ( kindi_upsell_product_in_cart( (int) $item['product_id'] ) ) {
-			$verdict[] = $index . ':in-cart';
 			continue;
 		}
-		$verdict[] = $index . ':show';
 		kindi_upsell_track_view( (string) $item['uid'] );
 		$cards[] = kindi_upsell_card_html( (int) $index, $item, $product, false );
 	}
 
-	// Render trail — makes "why is nothing showing?" answerable from view-source
-	// on both the initial page and the AJAX-refreshed fragment.
-	$trail = '<!-- kindi-upsells ' . esc_html( (string) wp_get_theme( get_template() )->get( 'Version' ) ) . ' [' . esc_html( implode( ' ', $verdict ) ) . '] ' . ( wp_doing_ajax() || defined( 'WC_DOING_AJAX' ) ? 'ajax' : 'page' ) . ' -->';
-
 	if ( ! $cards ) {
-		return $trail;
+		return '';
 	}
 
-	$out = $trail . '<section class="kindi-upsells" aria-label="' . esc_attr__( 'הצעות להוספה להזמנה', 'kindi' ) . '">';
+	$out = '<section class="kindi-upsells" aria-label="' . esc_attr__( 'הצעות להוספה להזמנה', 'kindi' ) . '">';
 	if ( '' !== $data['settings']['heading'] ) {
 		$out .= '<h3 class="kindi-upsells__title">' . esc_html( $data['settings']['heading'] ) . '</h3>';
 	}
@@ -334,66 +324,6 @@ function kindi_upsell_apply_discount( float $price, array $item ): float {
 	}
 	return $price;
 }
-
-/* ============================ Wiper tracer (admins) ============================ */
-
-/**
- * Diagnostic sentinel — shop admins only, checkout only. Something on the live
- * site removes the upsell cards right after page load with no network request;
- * this hooks jQuery's DOM-removal methods and a MutationObserver, and when the
- * cards (or an ancestor) get removed, paints an on-screen red box naming the
- * responsible script from the call stack. Zero effect for customers.
- *
- * @return void
- */
-function kindi_upsells_wiper_tracer(): void {
-	if ( ! is_checkout() || ! current_user_can( 'manage_options' ) ) {
-		return;
-	}
-	$js = <<<'JS'
-(function(){
-	var reported = 0;
-	function report(kind, extra) {
-		if (reported++ > 2) { return; }
-		var stack = (new Error('t').stack || '').split('\n').slice(2, 9).join('\n');
-		var box = document.createElement('div');
-		box.style.cssText = 'position:fixed;z-index:2147483647;bottom:10px;right:10px;left:10px;background:#b91c1c;color:#fff;padding:14px;font:12px/1.6 monospace;direction:ltr;text-align:left;white-space:pre-wrap;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.4)';
-		box.textContent = 'KINDI UPSELL WIPER #' + reported + ': ' + kind + '\n' + (extra || '') + '\n--- stack ---\n' + stack;
-		(document.body || document.documentElement).appendChild(box);
-	}
-	function hitsUpsells(el) {
-		return el && el.nodeType === 1 && (
-			(el.classList && el.classList.contains('kindi-upsells')) ||
-			(el.querySelector && el.querySelector('.kindi-upsells'))
-		);
-	}
-	if (window.jQuery) {
-		['replaceWith', 'remove', 'html', 'empty', 'replaceAll'].forEach(function(fn){
-			var orig = window.jQuery.fn[fn];
-			if (!orig) { return; }
-			window.jQuery.fn[fn] = function(){
-				try {
-					var self = this;
-					self.each(function(){
-						if (hitsUpsells(this)) { report('jQuery.fn.' + fn, 'target: ' + (this.className || this.nodeName)); }
-					});
-				} catch (e) {}
-				return orig.apply(this, arguments);
-			};
-		});
-	}
-	new MutationObserver(function(muts){
-		muts.forEach(function(m){
-			Array.prototype.forEach.call(m.removedNodes || [], function(n){
-				if (hitsUpsells(n)) { report('DOM removal', 'removed from: ' + (m.target.className || m.target.id || m.target.nodeName)); }
-			});
-		});
-	}).observe(document.documentElement, { childList: true, subtree: true });
-})();
-JS;
-	wp_add_inline_script( 'jquery-core', $js, 'after' );
-}
-add_action( 'wp_enqueue_scripts', 'kindi_upsells_wiper_tracer', 20 );
 
 /* ================================ Analytics ================================ */
 
