@@ -186,10 +186,15 @@ function kindi_upsells_render(): void {
 /**
  * Build the order-bump cards markup ('' when nothing should show).
  *
+ * Deliberately NOT guarded by is_checkout(): every caller is a checkout-only
+ * hook, and inside the update_order_review AJAX request is_checkout() can
+ * report false — which returned an empty fragment and wiped the cards right
+ * after the first refresh ("appears for a second, then vanishes").
+ *
  * @return string
  */
 function kindi_upsells_cards_html(): string {
-	if ( ! is_checkout() || ! WC()->cart || WC()->cart->is_empty() ) {
+	if ( ! function_exists( 'WC' ) || ! WC()->cart || WC()->cart->is_empty() ) {
 		return '';
 	}
 
