@@ -333,6 +333,66 @@ function kindi_upsell_apply_discount( float $price, array $item ): float {
 	return $price;
 }
 
+/* ============================ Wiper tracer (admins) ============================ */
+
+/**
+ * Diagnostic sentinel — shop admins only, checkout only. Something on the live
+ * site removes the upsell cards right after page load with no network request;
+ * this hooks jQuery's DOM-removal methods and a MutationObserver, and when the
+ * cards (or an ancestor) get removed, paints an on-screen red box naming the
+ * responsible script from the call stack. Zero effect for customers.
+ *
+ * @return void
+ */
+function kindi_upsells_wiper_tracer(): void {
+	if ( ! is_checkout() || ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	$js = <<<'JS'
+(function(){
+	var reported = 0;
+	function report(kind, extra) {
+		if (reported++ > 2) { return; }
+		var stack = (new Error('t').stack || '').split('\n').slice(2, 9).join('\n');
+		var box = document.createElement('div');
+		box.style.cssText = 'position:fixed;z-index:2147483647;bottom:10px;right:10px;left:10px;background:#b91c1c;color:#fff;padding:14px;font:12px/1.6 monospace;direction:ltr;text-align:left;white-space:pre-wrap;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.4)';
+		box.textContent = 'KINDI UPSELL WIPER #' + reported + ': ' + kind + '\n' + (extra || '') + '\n--- stack ---\n' + stack;
+		(document.body || document.documentElement).appendChild(box);
+	}
+	function hitsUpsells(el) {
+		return el && el.nodeType === 1 && (
+			(el.classList && el.classList.contains('kindi-upsells')) ||
+			(el.querySelector && el.querySelector('.kindi-upsells'))
+		);
+	}
+	if (window.jQuery) {
+		['replaceWith', 'remove', 'html', 'empty', 'replaceAll'].forEach(function(fn){
+			var orig = window.jQuery.fn[fn];
+			if (!orig) { return; }
+			window.jQuery.fn[fn] = function(){
+				try {
+					var self = this;
+					self.each(function(){
+						if (hitsUpsells(this)) { report('jQuery.fn.' + fn, 'target: ' + (this.className || this.nodeName)); }
+					});
+				} catch (e) {}
+				return orig.apply(this, arguments);
+			};
+		});
+	}
+	new MutationObserver(function(muts){
+		muts.forEach(function(m){
+			Array.prototype.forEach.call(m.removedNodes || [], function(n){
+				if (hitsUpsells(n)) { report('DOM removal', 'removed from: ' + (m.target.className || m.target.id || m.target.nodeName)); }
+			});
+		});
+	}).observe(document.documentElement, { childList: true, subtree: true });
+})();
+JS;
+	wp_add_inline_script( 'jquery-core', $js, 'after' );
+}
+add_action( 'wp_enqueue_scripts', 'kindi_upsells_wiper_tracer', 20 );
+
 /* ================================ Analytics ================================ */
 
 /**
