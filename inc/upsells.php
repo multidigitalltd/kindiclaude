@@ -168,16 +168,18 @@ function kindi_upsell_condition_met( array $item ): bool {
 }
 
 /**
- * Print the bump block (once per request).
+ * Print the bump block.
+ *
+ * NO once-per-request guard here — that guard was the vanish bug: plugins may
+ * re-render the review-order fragment a second time inside the same
+ * update_order_review request (rebuilding the fragment array), and with a
+ * static flag the second render — the one actually sent to the browser — came
+ * out empty. Duplicate output within one template render is already prevented
+ * by the position wrappers (exactly one of render_top/render_bottom prints).
  *
  * @return void
  */
 function kindi_upsells_render(): void {
-	static $done = false;
-	if ( $done ) {
-		return;
-	}
-	$done = true;
 	echo kindi_upsells_cards_html(); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within.
 }
 
