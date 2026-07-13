@@ -1029,41 +1029,51 @@ add_filter( 'the_content', 'kindi_cart_checkout_trust', 20 );
  */
 
 /**
- * Force the theme's form-checkout.php via the locate step (runs before caching).
+ * Force any checkout/* template the theme overrides, via the locate step
+ * (runs before WooCommerce caches the resolution).
+ *
+ * Covers every template under woocommerce/checkout/ — not only
+ * form-checkout.php: review-order.php is re-rendered inside every
+ * update_order_review AJAX refresh, and when a plugin filter or a stale
+ * object-cached path (Redis persists WooCommerce's template resolutions
+ * across requests, e.g. from the moment the theme folder was being replaced
+ * by an update) serves a foreign copy there, everything the theme prints
+ * inside the summary — upsells included — silently disappears on the first
+ * refresh.
  *
  * @param string $template      Resolved template path.
  * @param string $template_name Template name relative to the WC templates dir.
  * @return string
  */
-function kindi_locate_checkout_form( string $template, string $template_name ): string {
-	if ( 'checkout/form-checkout.php' === $template_name ) {
-		$override = KINDI_DIR . 'woocommerce/checkout/form-checkout.php';
+function kindi_locate_checkout_template( string $template, string $template_name ): string {
+	if ( 0 === strpos( $template_name, 'checkout/' ) ) {
+		$override = KINDI_DIR . 'woocommerce/' . $template_name;
 		if ( is_readable( $override ) ) {
 			return $override;
 		}
 	}
 	return $template;
 }
-add_filter( 'woocommerce_locate_template', 'kindi_locate_checkout_form', 9999, 2 );
+add_filter( 'woocommerce_locate_template', 'kindi_locate_checkout_template', 9999, 2 );
 
 /**
- * Force the theme's form-checkout.php at the include step (runs even when the
- * path was already cached by wc_get_template's internal wp_cache_get).
+ * Same enforcement at the include step — runs even when the path was already
+ * cached by wc_get_template's internal wp_cache_get.
  *
  * @param string $template      Template path about to be included.
  * @param string $template_name Template name relative to the WC templates dir.
  * @return string
  */
-function kindi_use_checkout_form( string $template, string $template_name ): string {
-	if ( 'checkout/form-checkout.php' === $template_name ) {
-		$override = KINDI_DIR . 'woocommerce/checkout/form-checkout.php';
+function kindi_use_checkout_template( string $template, string $template_name ): string {
+	if ( 0 === strpos( $template_name, 'checkout/' ) ) {
+		$override = KINDI_DIR . 'woocommerce/' . $template_name;
 		if ( is_readable( $override ) ) {
 			return $override;
 		}
 	}
 	return $template;
 }
-add_filter( 'wc_get_template', 'kindi_use_checkout_form', 9999, 2 );
+add_filter( 'wc_get_template', 'kindi_use_checkout_template', 9999, 2 );
 
 /**
  * Full testimonials section after the checkout form — identical markup and
