@@ -48,6 +48,7 @@ function kindi_upsells_data(): array {
  */
 function kindi_upsell_defaults(): array {
 	return array(
+		'uid'             => '',
 		'active'          => 1,
 		'product_id'      => 0,
 		'badge'           => '',
@@ -69,7 +70,12 @@ function kindi_upsell_defaults(): array {
 /* ============================ Front-end display ============================ */
 
 /**
- * Hook the bump block onto the configured order-review position.
+ * Hook the bump block onto the configured position. The theme's custom
+ * checkout templates never fire woocommerce_review_order_before_payment, so
+ * "before payment" hangs between the order review and the payment box
+ * (woocommerce_checkout_order_review @15 — review renders at 10, payment at
+ * 20) and refreshes through its own update_order_review fragment; "after the
+ * order table" sits inside the review template, which refreshes wholesale.
  *
  * @return void
  */
@@ -77,11 +83,26 @@ function kindi_upsells_hook(): void {
 	if ( ! class_exists( 'WooCommerce' ) ) {
 		return;
 	}
-	$pos  = kindi_upsells_data()['settings']['position'];
-	$hook = 'after_order_table' === $pos ? 'woocommerce_review_order_after_order_total' : 'woocommerce_review_order_before_payment';
-	add_action( $hook, 'kindi_upsells_render' );
+	if ( 'after_order_table' === kindi_upsells_data()['settings']['position'] ) {
+		add_action( 'woocommerce_review_order_after_order_total', 'kindi_upsells_render' );
+	} else {
+		add_action( 'woocommerce_checkout_order_review', 'kindi_upsells_render', 15 );
+		add_filter( 'woocommerce_update_order_review_fragments', 'kindi_upsells_fragment' );
+	}
 }
 add_action( 'wp', 'kindi_upsells_hook' );
+
+/**
+ * Keep the bump block fresh on every checkout recalculation (cards disappear
+ * when their product lands in the cart, conditions re-evaluate, etc.).
+ *
+ * @param array<string,string> $fragments update_order_review fragments.
+ * @return array<string,string>
+ */
+function kindi_upsells_fragment( array $fragments ): array {
+	$fragments['.kindi-upsells-wrap'] = '<div class="kindi-upsells-wrap">' . kindi_upsells_cards_html() . '</div>';
+	return $fragments;
+}
 
 /**
  * Does the cart already contain this product (added as this bump)?
@@ -147,14 +168,29 @@ function kindi_upsell_condition_met( array $item ): bool {
 }
 
 /**
- * Render the order-bump cards inside the checkout order review.
+ * Print the bump block (wrapped so the AJAX fragment can replace it — the
+ * wrapper renders even when there are no cards, otherwise there is nothing to
+ * swap when a card should re-appear).
  *
  * @return void
  */
 function kindi_upsells_render(): void {
 	static $done = false;
-	if ( $done || ! is_checkout() || ! WC()->cart || WC()->cart->is_empty() ) {
+	if ( $done ) {
 		return;
+	}
+	$done = true;
+	echo '<div class="kindi-upsells-wrap">' . kindi_upsells_cards_html() . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped within.
+}
+
+/**
+ * Build the order-bump cards markup ('' when nothing should show).
+ *
+ * @return string
+ */
+function kindi_upsells_cards_html(): string {
+	if ( ! is_checkout() || ! WC()->cart || WC()->cart->is_empty() ) {
+		return '';
 	}
 
 	$data  = kindi_upsells_data();
@@ -178,20 +214,19 @@ function kindi_upsells_render(): void {
 		if ( kindi_upsell_product_in_cart( (int) $item['product_id'] ) ) {
 			continue;
 		}
+		kindi_upsell_track_view( (string) $item['uid'] );
 		$cards[] = kindi_upsell_card_html( (int) $index, $item, $product, false );
 	}
 
 	if ( ! $cards ) {
-		return;
+		return '';
 	}
-	$done = true;
 
-	echo '<section class="kindi-upsells" aria-label="' . esc_attr__( 'הצעות להוספה להזמנה', 'kindi' ) . '">';
+	$out = '<section class="kindi-upsells" aria-label="' . esc_attr__( 'הצעות להוספה להזמנה', 'kindi' ) . '">';
 	if ( '' !== $data['settings']['heading'] ) {
-		echo '<h3 class="kindi-upsells__title">' . esc_html( $data['settings']['heading'] ) . '</h3>';
+		$out .= '<h3 class="kindi-upsells__title">' . esc_html( $data['settings']['heading'] ) . '</h3>';
 	}
-	echo implode( '', $cards ); // phpcs:ignore WordPress.Security.EscapeOutput -- each card built with escaping below.
-	echo '</section>';
+	return $out . implode( '', $cards ) . '</section>';
 }
 
 /**
@@ -285,6 +320,107 @@ function kindi_upsell_apply_discount( float $price, array $item ): float {
 	return $price;
 }
 
+/* ================================ Analytics ================================ */
+
+/**
+ * Read a bump's lifetime stats (stored in a non-autoloaded option, keyed by
+ * the bump's stable uid so reordering/removing bumps never mixes numbers).
+ *
+ * @param string $uid Bump uid.
+ * @return array{views:int,adds:int,orders:int,revenue:float}
+ */
+function kindi_upsell_stats( string $uid ): array {
+	$all = get_option( 'kindi_upsell_stats' );
+	$row = is_array( $all ) && isset( $all[ $uid ] ) && is_array( $all[ $uid ] ) ? $all[ $uid ] : array();
+	return array(
+		'views'   => (int) ( $row['views'] ?? 0 ),
+		'adds'    => (int) ( $row['adds'] ?? 0 ),
+		'orders'  => (int) ( $row['orders'] ?? 0 ),
+		'revenue' => (float) ( $row['revenue'] ?? 0 ),
+	);
+}
+
+/**
+ * Increment one stat counter.
+ *
+ * @param string $uid    Bump uid.
+ * @param string $key    views|adds|orders|revenue.
+ * @param float  $amount Increment.
+ * @return void
+ */
+function kindi_upsell_stat_bump( string $uid, string $key, float $amount = 1 ): void {
+	if ( '' === $uid ) {
+		return;
+	}
+	$all = get_option( 'kindi_upsell_stats' );
+	$all = is_array( $all ) ? $all : array();
+	$all[ $uid ][ $key ] = ( isset( $all[ $uid ][ $key ] ) ? (float) $all[ $uid ][ $key ] : 0 ) + $amount;
+	update_option( 'kindi_upsell_stats', $all, false );
+}
+
+/**
+ * Count an impression — once per shopper session per bump, so the checkout's
+ * frequent AJAX re-renders don't inflate the number.
+ *
+ * @param string $uid Bump uid.
+ * @return void
+ */
+function kindi_upsell_track_view( string $uid ): void {
+	if ( '' === $uid || ! WC()->session ) {
+		return;
+	}
+	$seen = (array) WC()->session->get( 'kindi_upsells_seen', array() );
+	if ( isset( $seen[ $uid ] ) ) {
+		return;
+	}
+	$seen[ $uid ] = 1;
+	WC()->session->set( 'kindi_upsells_seen', $seen );
+	kindi_upsell_stat_bump( $uid, 'views' );
+}
+
+/**
+ * Persist the bump identity onto the order line item (hidden meta), so sales
+ * can be attributed after checkout.
+ *
+ * @param WC_Order_Item_Product $item          Order line item.
+ * @param string                $cart_item_key Cart key (unused).
+ * @param array<string,mixed>   $values        Cart item values.
+ * @return void
+ */
+function kindi_upsell_order_item_meta( $item, $cart_item_key, $values ): void {
+	if ( ! isset( $values['kindi_upsell'] ) ) {
+		return;
+	}
+	$conf = kindi_upsells_data()['items'][ (int) $values['kindi_upsell'] ] ?? null;
+	$uid  = is_array( $conf ) ? (string) ( $conf['uid'] ?? '' ) : '';
+	if ( '' !== $uid ) {
+		$item->add_meta_data( '_kindi_upsell_uid', $uid, true );
+	}
+}
+add_action( 'woocommerce_checkout_create_order_line_item', 'kindi_upsell_order_item_meta', 10, 3 );
+
+/**
+ * When an order is placed, credit each bump line to its stats (orders count +
+ * line revenue).
+ *
+ * @param int $order_id Order ID.
+ * @return void
+ */
+function kindi_upsell_order_stats( $order_id ): void {
+	$order = wc_get_order( $order_id );
+	if ( ! $order instanceof WC_Order ) {
+		return;
+	}
+	foreach ( $order->get_items() as $order_item ) {
+		$uid = (string) $order_item->get_meta( '_kindi_upsell_uid' );
+		if ( '' !== $uid ) {
+			kindi_upsell_stat_bump( $uid, 'orders' );
+			kindi_upsell_stat_bump( $uid, 'revenue', (float) $order_item->get_total() );
+		}
+	}
+}
+add_action( 'woocommerce_checkout_order_processed', 'kindi_upsell_order_stats' );
+
 /* ============================== Cart plumbing ============================== */
 
 /**
@@ -376,6 +512,9 @@ function kindi_upsells_ajax(): void {
 		wp_send_json_error( array( 'msg' => 'product' ), 400 );
 	}
 	$added = WC()->cart->add_to_cart( $product_id, max( 1, (int) $conf['quantity'] ), 0, array(), array( 'kindi_upsell' => $index ) );
+	if ( $added ) {
+		kindi_upsell_stat_bump( (string) $conf['uid'], 'adds' );
+	}
 	wp_send_json_success( array( 'state' => $added ? 'added' : 'error' ) );
 }
 add_action( 'wp_ajax_kindi_upsell', 'kindi_upsells_ajax' );

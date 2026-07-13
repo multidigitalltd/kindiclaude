@@ -82,6 +82,8 @@ function kindi_upsells_sanitize_post(): array {
 		$ctype = in_array( $row['condition_type'] ?? 'always', array( 'always', 'if_product', 'if_category' ), true ) ? $row['condition_type'] : 'always';
 
 		$items[] = array(
+			// Stable identity for the stats ledger — survives reorder/removal.
+			'uid'             => '' !== sanitize_key( (string) ( $row['uid'] ?? '' ) ) ? sanitize_key( (string) $row['uid'] ) : uniqid( 'up' ),
 			'active'          => empty( $row['active'] ) ? 0 : 1,
 			'product_id'      => absint( $row['product_id'] ),
 			'badge'           => sanitize_text_field( (string) ( $row['badge'] ?? '' ) ),
@@ -176,13 +178,38 @@ function kindi_upsell_admin_row( $i, array $item ): string {
 	$name = 'kindi_upsell[' . $i . ']';
 	$pid  = (int) $item['product_id'];
 
-	$product_opt = '';
-	if ( $pid > 0 && ( $p = wc_get_product( $pid ) ) ) { // phpcs:ignore Squiz.PHP.DisallowMultipleAssignments
-		$product_opt = '<option value="' . esc_attr( (string) $pid ) . '" selected>' . esc_html( wp_strip_all_tags( $p->get_formatted_name() ) ) . '</option>';
+	$product     = $pid > 0 ? wc_get_product( $pid ) : null;
+	$product_opt = $product
+		? '<option value="' . esc_attr( (string) $pid ) . '" selected>' . esc_html( wp_strip_all_tags( $product->get_formatted_name() ) ) . '</option>'
+		: '';
+
+	// Card header: product name, an active/inactive dot and the lifetime stats.
+	$title = $product ? wp_strip_all_tags( $product->get_name() ) : __( 'אפסייל חדש — בחרו מוצר', 'kindi' );
+	$stats = '';
+	$uid   = (string) ( $item['uid'] ?? '' );
+	if ( is_int( $i ) && '' !== $uid && function_exists( 'kindi_upsell_stats' ) ) {
+		$s     = kindi_upsell_stats( $uid );
+		$stats = sprintf(
+			/* translators: 1: impressions, 2: adds, 3: orders, 4: revenue. */
+			__( 'הופעות: %1$d · הוספות: %2$d · הזמנות: %3$d · הכנסה: %4$s', 'kindi' ),
+			$s['views'],
+			$s['adds'],
+			$s['orders'],
+			wp_strip_all_tags( wc_price( $s['revenue'] ) )
+		);
 	}
 
-	$o  = '<div class="kindi-uprow postbox" style="padding:1rem;margin:0 0 1rem;max-width:820px">';
-	$o .= '<div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:.75rem">';
+	// New/product-less cards start open; configured cards start collapsed.
+	$o  = '<details class="kindi-uprow postbox" style="margin:0 0 1rem;max-width:820px"' . ( $product ? '' : ' open' ) . '>';
+	$o .= '<summary style="padding:0.85rem 1rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:1rem">';
+	$o .= '<span style="font-weight:600;display:inline-flex;align-items:center;gap:0.5rem"><span style="width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:' . ( ! empty( $item['active'] ) ? '#15803d' : '#b91c1c' ) . '"></span>' . esc_html( $title ) . '</span>';
+	if ( '' !== $stats ) {
+		$o .= '<span class="description">' . esc_html( $stats ) . '</span>';
+	}
+	$o .= '</summary>';
+	$o .= '<div style="padding:0.25rem 1rem 1rem;border-top:1px solid #dcdcde">';
+	$o .= '<input type="hidden" name="' . esc_attr( $name ) . '[uid]" value="' . esc_attr( $uid ) . '">';
+	$o .= '<div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;margin:0.75rem 0">';
 	$o .= '<label style="font-weight:600"><input type="checkbox" name="' . esc_attr( $name ) . '[active]" value="1"' . checked( ! empty( $item['active'] ), true, false ) . '> ' . esc_html__( 'פעיל', 'kindi' ) . '</label>';
 	$o .= '<button type="button" class="button-link kindi-uprow-remove" style="color:#b32d2e">' . esc_html__( 'הסרה', 'kindi' ) . '</button>';
 	$o .= '</div>';
@@ -253,7 +280,7 @@ function kindi_upsell_admin_row( $i, array $item ): string {
 	$o .= '<input type="hidden" class="kindi-upcond-value" name="' . esc_attr( $name ) . '[condition_value]" value="' . esc_attr( (string) $cond_val ) . '">';
 	$o .= '</td></tr>';
 
-	$o .= '</tbody></table></div>';
+	$o .= '</tbody></table></div></details>';
 	return $o;
 }
 
@@ -279,6 +306,11 @@ function kindi_upadmin_text( string $name, string $key, string $label, string $v
  */
 function kindi_upsells_admin_footer_assets(): void {
 	?>
+	<style>
+	/* select2 opens at zero width when initialised inside a collapsed card. */
+	.kindi-uprow .select2-container { width: 100% !important; max-width: 420px; }
+	.kindi-uprow summary::-webkit-details-marker { display: none; }
+	</style>
 	<script>
 	// Safety net: when WooCommerce's own localisation is absent for any reason,
 	// supply the minimal params the enhanced-select AJAX search needs.
