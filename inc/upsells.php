@@ -69,30 +69,40 @@ function kindi_upsell_defaults(): array {
 
 /* ============================ Front-end display ============================ */
 
+/*
+ * The bump block prints INSIDE the order-summary template
+ * (.woocommerce-checkout-review-order-table) — the fragment WooCommerce
+ * re-renders wholesale on every checkout refresh — so the cards are part of
+ * the refreshed markup itself and cannot flash-and-vanish. Both position
+ * hooks are registered unconditionally at load time (no dependency on the
+ * 'wp' action, which request lifecycles like wc-ajax may treat differently);
+ * the configured position is resolved at render time.
+ */
+
 /**
- * Hook the bump block onto the configured position — both INSIDE the order
- * summary template (.woocommerce-checkout-review-order-table), because that is
- * the fragment WooCommerce re-renders wholesale on every checkout refresh.
- * Anything printed next to it (rather than within it) needs its own fragment
- * plumbing and can flash-and-vanish after the first update_order_review; the
- * summary's own hooks make the cards part of the refreshed markup itself.
+ * Mid-summary position: below the coupon / gift-card area (its markers run at
+ * priorities 6–90), above the totals.
  *
  * @return void
  */
-function kindi_upsells_hook(): void {
-	if ( ! class_exists( 'WooCommerce' ) ) {
-		return;
-	}
-	if ( 'after_order_table' === kindi_upsells_data()['settings']['position'] ) {
-		// At the bottom of the summary, right under the grand total.
-		add_action( 'woocommerce_review_order_after_order_total', 'kindi_upsells_render' );
-	} else {
-		// Mid-summary: below the coupon / gift-card area (its markers run at
-		// priorities 6–90), above the totals.
-		add_action( 'kindi_summary_after_coupon', 'kindi_upsells_render', 97 );
+function kindi_upsells_render_top(): void {
+	if ( 'after_order_table' !== kindi_upsells_data()['settings']['position'] ) {
+		kindi_upsells_render();
 	}
 }
-add_action( 'wp', 'kindi_upsells_hook' );
+add_action( 'kindi_summary_after_coupon', 'kindi_upsells_render_top', 97 );
+
+/**
+ * Bottom position: right under the grand total.
+ *
+ * @return void
+ */
+function kindi_upsells_render_bottom(): void {
+	if ( 'after_order_table' === kindi_upsells_data()['settings']['position'] ) {
+		kindi_upsells_render();
+	}
+}
+add_action( 'woocommerce_review_order_after_order_total', 'kindi_upsells_render_bottom' );
 
 /**
  * Does the cart already contain this product (added as this bump)?
@@ -183,39 +193,49 @@ function kindi_upsells_render(): void {
  */
 function kindi_upsells_cards_html(): string {
 	if ( ! function_exists( 'WC' ) || ! WC()->cart || WC()->cart->is_empty() ) {
-		return '';
+		return '<!-- kindi-upsells: no cart -->';
 	}
 
-	$data  = kindi_upsells_data();
-	$cards = array();
+	$data    = kindi_upsells_data();
+	$cards   = array();
+	$verdict = array();
 
 	foreach ( $data['items'] as $index => $item ) {
 		$item = array_merge( kindi_upsell_defaults(), (array) $item );
 		if ( empty( $item['active'] ) || $item['product_id'] <= 0 ) {
+			$verdict[] = $index . ':off';
 			continue;
 		}
 		$product = wc_get_product( (int) $item['product_id'] );
 		if ( ! $product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+			$verdict[] = $index . ':product';
 			continue;
 		}
 		if ( ! kindi_upsell_condition_met( $item ) ) {
+			$verdict[] = $index . ':condition';
 			continue;
 		}
 
 		// A bump never shows when its product is already in the cart — whether it
 		// got there through the bump or straight from the shop.
 		if ( kindi_upsell_product_in_cart( (int) $item['product_id'] ) ) {
+			$verdict[] = $index . ':in-cart';
 			continue;
 		}
+		$verdict[] = $index . ':show';
 		kindi_upsell_track_view( (string) $item['uid'] );
 		$cards[] = kindi_upsell_card_html( (int) $index, $item, $product, false );
 	}
 
+	// Render trail — makes "why is nothing showing?" answerable from view-source
+	// on both the initial page and the AJAX-refreshed fragment.
+	$trail = '<!-- kindi-upsells v2 [' . esc_html( implode( ' ', $verdict ) ) . '] ' . ( wp_doing_ajax() || defined( 'WC_DOING_AJAX' ) ? 'ajax' : 'page' ) . ' -->';
+
 	if ( ! $cards ) {
-		return '';
+		return $trail;
 	}
 
-	$out = '<section class="kindi-upsells" aria-label="' . esc_attr__( 'הצעות להוספה להזמנה', 'kindi' ) . '">';
+	$out = $trail . '<section class="kindi-upsells" aria-label="' . esc_attr__( 'הצעות להוספה להזמנה', 'kindi' ) . '">';
 	if ( '' !== $data['settings']['heading'] ) {
 		$out .= '<h3 class="kindi-upsells__title">' . esc_html( $data['settings']['heading'] ) . '</h3>';
 	}
