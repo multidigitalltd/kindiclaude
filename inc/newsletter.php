@@ -187,13 +187,13 @@ add_action( 'kindi_newsletter_subscribe', 'kindi_newsletter_flashy', 10, 2 );
 function kindi_flashy_status_html(): string {
 	$key = trim( (string) kindi_opt( 'flashy_key' ) );
 	if ( '' === $key ) {
-		return '<p class="description">' . esc_html__( 'הזינו מפתח API ושמרו — הסטטוס והרשימות מהחשבון יוצגו כאן.', 'kindi' ) . '</p>';
+		return '<p class="description">' . esc_html__( 'הזינו מפתח API ושמרו — הסטטוס והרשימות מהחשבון יוצגו כאן.', 'kindi' ) . '</p>' . kindi_flashy_export_button();
 	}
 
 	$cache = 'kindi_flashy_status_' . md5( $key );
 	$html  = get_transient( $cache );
 	if ( is_string( $html ) && '' !== $html ) {
-		return $html . kindi_flashy_log_html();
+		return $html . kindi_flashy_log_html() . kindi_flashy_export_button();
 	}
 
 	$args = array( 'timeout' => 8, 'headers' => array( 'x-api-key' => $key ) );
@@ -218,7 +218,7 @@ function kindi_flashy_status_html(): string {
 	}
 
 	set_transient( $cache, $html, 5 * MINUTE_IN_SECONDS );
-	return $html . kindi_flashy_log_html();
+	return $html . kindi_flashy_log_html() . kindi_flashy_export_button();
 }
 
 /**
@@ -239,4 +239,91 @@ function kindi_flashy_log_html(): string {
 		$html .= '<tr><td>' . esc_html( (string) ( $row['time'] ?? '' ) ) . '</td><td style="direction:ltr;text-align:left">' . esc_html( (string) ( $row['email'] ?? '' ) ) . '</td><td><span style="color:' . ( $ok ? '#15803d' : '#b91c1c' ) . ';font-weight:600">' . esc_html( (string) ( $row['info'] ?? '' ) ) . '</span></td></tr>';
 	}
 	return $html . '</tbody></table>';
+}
+
+/**
+ * Export the site's WooCommerce product reviews as CSV in Flashy's reviews
+ * import format (header per Flashy's template, verbatim). Streams in chunks
+ * so large catalogues export without memory pressure; reviews without a
+ * rating or a valid email are skipped (both are required by Flashy).
+ *
+ * @return void
+ */
+function kindi_flashy_reviews_export(): void {
+	if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		wp_die( esc_html__( 'אין הרשאה.', 'kindi' ) );
+	}
+	check_admin_referer( 'kindi_flashy_reviews_export' );
+
+	header( 'Content-Type: text/csv; charset=utf-8' );
+	header( 'Content-Disposition: attachment; filename=kindi-reviews-for-flashy.csv' );
+	$out = fopen( 'php://output', 'w' );
+	fwrite( $out, "\xEF\xBB\xBF" ); // UTF-8 BOM — keeps Hebrew intact in Excel/Sheets.
+	// Flashy's template header, verbatim.
+	fwrite( $out, 'Review ID*,Email*,UserName,Product ID*,Order ID,Review content*,Raiting (1-5)*,images link to the image,videos link to the video,verified true/false*,"status  0 = pending, 1 = published, 2 = rejected*",created_at format date and time*' . "\n" );
+
+	$page = 0;
+	do {
+		$reviews = get_comments(
+			array(
+				'type'      => 'review',
+				'post_type' => 'product',
+				'status'    => 'all', // Approved + pending; spam/trash are excluded by core.
+				'number'    => 500,
+				'offset'    => $page * 500,
+				'orderby'   => 'comment_ID',
+				'order'     => 'ASC',
+			)
+		);
+
+		foreach ( $reviews as $review ) {
+			$rating = (int) get_comment_meta( (int) $review->comment_ID, 'rating', true );
+			$email  = (string) $review->comment_author_email;
+			if ( $rating < 1 || $rating > 5 || ! is_email( $email ) ) {
+				continue;
+			}
+			fputcsv(
+				$out,
+				array(
+					(int) $review->comment_ID,
+					$email,
+					(string) $review->comment_author,
+					(int) $review->comment_post_ID,
+					'',
+					(string) $review->comment_content,
+					$rating,
+					'',
+					'',
+					get_comment_meta( (int) $review->comment_ID, 'verified', true ) ? 'true' : 'false',
+					'1' === (string) $review->comment_approved ? 1 : 0,
+					(string) $review->comment_date,
+				)
+			);
+		}
+		$page++;
+	} while ( 500 === count( $reviews ) );
+
+	fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+	exit;
+}
+add_action( 'admin_post_kindi_flashy_reviews_export', 'kindi_flashy_reviews_export' );
+
+/**
+ * The export button (shown in the panel's Flashy section, works with or
+ * without an API key — the export reads local data only).
+ *
+ * @return string
+ */
+function kindi_flashy_export_button(): string {
+	$count = (int) get_comments(
+		array(
+			'type'      => 'review',
+			'post_type' => 'product',
+			'status'    => 'all',
+			'count'     => true,
+		)
+	);
+	$url = wp_nonce_url( admin_url( 'admin-post.php?action=kindi_flashy_reviews_export' ), 'kindi_flashy_reviews_export' );
+	return '<p style="margin-top:1.2em"><a class="button" href="' . esc_url( $url ) . '">' . esc_html__( 'ייצוא ביקורות האתר ל-Flashy (CSV)', 'kindi' ) . '</a> '
+		. '<span class="description">' . esc_html( sprintf( /* translators: %d: reviews count. */ __( '%d ביקורות מוצרים באתר — הקובץ בפורמט הייבוא של Flashy.', 'kindi' ), $count ) ) . '</span></p>';
 }
