@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
 
 const KINDI_WEBHOOK_LOG   = 'kindi_webhook_log';
 const KINDI_WEBHOOK_SENT  = '_kindi_webhook_sent';
-const KINDI_WEBHOOK_LIMIT = 10;
+const KINDI_WEBHOOK_LIMIT = 5;
 
 /**
  * Is the webhook switched on and pointed at a valid https endpoint?

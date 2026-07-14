@@ -25,6 +25,7 @@ function kindi_register_subscribe_route(): void {
 			'permission_callback' => '__return_true',
 			'args'                => array(
 				'email' => array( 'type' => 'string', 'required' => true, 'sanitize_callback' => 'sanitize_email' ),
+				'name'  => array( 'type' => 'string', 'required' => false, 'sanitize_callback' => 'sanitize_text_field' ),
 			),
 		)
 	);
@@ -73,12 +74,15 @@ function kindi_rest_subscribe( WP_REST_Request $request ): WP_REST_Response {
 		update_option( 'kindi_subscribers', $list, false );
 	}
 
+	$name = mb_substr( sanitize_text_field( (string) $request->get_param( 'name' ) ), 0, 80 );
+
 	/**
 	 * Integrate with an external ESP / mailing list.
 	 *
 	 * @param string $email Subscriber email.
+	 * @param string $name  Subscriber first name ('' when not given).
 	 */
-	do_action( 'kindi_newsletter_subscribe', $email );
+	do_action( 'kindi_newsletter_subscribe', $email, $name );
 
 	return new WP_REST_Response( array( 'message' => 'תודה! קוד ההנחה בדרך אליכם למייל.' ), 200 );
 }
@@ -117,15 +121,19 @@ add_action( 'admin_post_kindi_export_subscribers', 'kindi_export_subscribers' );
  * backup source of truth either way.
  *
  * @param string $email Subscriber email.
+ * @param string $name  Subscriber first name (optional).
  * @return void
  */
-function kindi_newsletter_flashy( string $email ): void {
+function kindi_newsletter_flashy( string $email, string $name = '' ): void {
 	$key = trim( (string) kindi_opt( 'flashy_key' ) );
 	if ( '' === $key ) {
 		return;
 	}
 
 	$contact = array( 'email' => $email );
+	if ( '' !== $name ) {
+		$contact['first_name'] = $name;
+	}
 	$list_id = trim( (string) kindi_opt( 'flashy_list' ) );
 	if ( '' !== $list_id ) {
 		$contact['lists'] = array( $list_id => true );
@@ -166,9 +174,9 @@ function kindi_newsletter_flashy( string $email ): void {
 			'info'  => $info,
 		)
 	);
-	update_option( 'kindi_flashy_log', array_slice( $log, 0, 10 ), false );
+	update_option( 'kindi_flashy_log', array_slice( $log, 0, 5 ), false );
 }
-add_action( 'kindi_newsletter_subscribe', 'kindi_newsletter_flashy' );
+add_action( 'kindi_newsletter_subscribe', 'kindi_newsletter_flashy', 10, 2 );
 
 /**
  * Connection status + account lists for the settings panel (admin only,
@@ -214,7 +222,7 @@ function kindi_flashy_status_html(): string {
 }
 
 /**
- * The last newsletter→Flashy pushes, so the admin can verify each signup
+ * The last 5 newsletter→Flashy pushes, so the admin can verify each signup
  * actually reached the list. Rendered fresh (outside the status cache).
  *
  * @return string

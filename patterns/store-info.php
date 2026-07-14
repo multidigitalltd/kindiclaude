@@ -49,6 +49,11 @@ $kindi_details = array(
 			<p class="kindi-news__sub"><?php echo esc_html( kindi_opt( 'news_sub' ) ); ?></p>
 		</div>
 		<form class="kindi-news__form" action="#" method="post" novalidate>
+			<label class="kindi-news__field kindi-news__field--name">
+				<span class="screen-reader-text">שם פרטי</span>
+				<?php echo kindi_icon( 'user', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+				<input type="text" name="kindi_newsletter_name" autocomplete="given-name" placeholder="השם שלכם...">
+			</label>
 			<label class="kindi-news__field">
 				<span class="screen-reader-text">כתובת אימייל</span>
 				<?php echo kindi_icon( 'mail', 'kindi-icon--lg' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>

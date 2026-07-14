@@ -157,6 +157,7 @@
 		form.addEventListener( 'submit', function ( e ) {
 			e.preventDefault();
 			var input = form.querySelector( 'input[type="email"]' );
+			var nameInput = form.querySelector( 'input[name="kindi_newsletter_name"]' );
 			var consent = form.querySelector( 'input[name="kindi_newsletter_consent"]' );
 			var btn = form.querySelector( 'button' );
 			if ( ! input || ! input.value || input.value.indexOf( '@' ) < 1 ) {
@@ -177,7 +178,7 @@
 			fetch( window.kindiStore.subscribeUrl, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': window.kindiStore.nonce },
-				body: JSON.stringify( { email: input.value, consent: 1 } ),
+				body: JSON.stringify( { email: input.value, name: nameInput ? nameInput.value.trim() : '', consent: 1 } ),
 			} )
 				.then( function ( r ) { return r.json().then( function ( data ) { return { ok: r.ok, data: data }; } ); } )
 				.then( function ( res ) {
