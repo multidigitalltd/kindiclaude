@@ -78,3 +78,61 @@ function kindi_register_pattern_category(): void {
 	);
 }
 add_action( 'init', 'kindi_register_pattern_category' );
+
+/**
+ * Seed the physical front page with the homepage sections (one-time).
+ *
+ * The front-page template renders the page's own content (post-content), so
+ * the physical "דף הבית" page is the single source of truth — what Google
+ * indexes, what SEO plugins analyse and what the admin edits are all the same
+ * document. This seeder writes the canonical section stack into that page
+ * once; any text already on the page is kept BELOW the sections (the SEO-text
+ * slot). Skipped when the page already contains the sections.
+ *
+ * @return void
+ */
+function kindi_seed_front_page(): void {
+	if ( ! is_admin() || get_option( 'kindi_front_seeded' ) ) {
+		return;
+	}
+	if ( 'page' !== get_option( 'show_on_front' ) ) {
+		return;
+	}
+	$page_id = (int) get_option( 'page_on_front' );
+	$page    = $page_id > 0 ? get_post( $page_id ) : null;
+	if ( ! $page instanceof WP_Post ) {
+		return;
+	}
+
+	if ( false !== strpos( (string) $page->post_content, 'kindi/hero' ) ) {
+		update_option( 'kindi_front_seeded', 1, false ); // Already section-based.
+		return;
+	}
+
+	$sections = implode(
+		"\n\n",
+		array(
+			'<!-- wp:pattern {"slug":"kindi/hero"} /-->',
+			'<!-- wp:pattern {"slug":"kindi/usp-strip"} /-->',
+			'<!-- wp:kindi/categories /-->',
+			'<!-- wp:pattern {"slug":"kindi/promo-banners"} /-->',
+			'<!-- wp:kindi/featured-products /-->',
+			'<!-- wp:pattern {"slug":"kindi/age-rail"} /-->',
+			'<!-- wp:pattern {"slug":"kindi/brands"} /-->',
+			'<!-- wp:pattern {"slug":"kindi/kindy-zone"} /-->',
+			'<!-- wp:pattern {"slug":"kindi/testimonials"} /-->',
+			'<!-- wp:pattern {"slug":"kindi/values"} /-->',
+			'<!-- wp:pattern {"slug":"kindi/store-info"} /-->',
+		)
+	);
+
+	$old = trim( (string) $page->post_content );
+	wp_update_post(
+		array(
+			'ID'           => $page_id,
+			'post_content' => $sections . ( '' !== $old ? "\n\n" . $old : '' ),
+		)
+	);
+	update_option( 'kindi_front_seeded', 1, false );
+}
+add_action( 'admin_init', 'kindi_seed_front_page' );

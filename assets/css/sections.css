@@ -429,15 +429,18 @@ picture.kindi-store__mascot { display: block; width: fit-content; }
   .kindi-ages > .kindi-age { flex: 0 0 43%; scroll-snap-align: start; }
 }
 
-/* ============ Homepage page-content (the physical front page's text) ============ */
-/* Styles live on the CHILDREN so an empty front page leaves zero footprint. */
-.kindi-home-content { padding: 0; }
-.kindi-home-content > * { margin: 0 0 1rem; }
-.kindi-home-content > *:first-child { margin-top: 2.5rem; }
-.kindi-home-content > *:last-child { margin-bottom: 3rem; }
-.kindi-home-content h2, .kindi-home-content h3 { font-family: var(--wp--preset--font-family--display); font-weight: 800; color: var(--brand-navy); }
-.kindi-home-content h2 { font-size: 1.45rem; }
-.kindi-home-content h3 { font-size: 1.15rem; }
-.kindi-home-content p, .kindi-home-content li { color: var(--foreground); line-height: 1.75; font-size: 0.95rem; }
-.kindi-home-content a { color: var(--brand-blue); text-decoration: underline; }
-.kindi-home-content ul, .kindi-home-content ol { padding-inline-start: 1.25rem; }
+/* ========== Homepage prose (loose text typed into the physical front page) ========== */
+/* The page content IS the homepage (post-content renders the section patterns);
+   these style only LOOSE prose elements between/below the sections. */
+.kindi-main > .wp-block-post-content > h2,
+.kindi-main > .wp-block-post-content > h3 { font-family: var(--wp--preset--font-family--display); font-weight: 800; color: var(--brand-navy); margin: 2rem 0 0.75rem; }
+.kindi-main > .wp-block-post-content > h2 { font-size: 1.45rem; }
+.kindi-main > .wp-block-post-content > h3 { font-size: 1.15rem; }
+.kindi-main > .wp-block-post-content > p,
+.kindi-main > .wp-block-post-content > ul,
+.kindi-main > .wp-block-post-content > ol { color: var(--foreground); line-height: 1.75; font-size: 0.95rem; margin: 0 0 1rem; }
+.kindi-main > .wp-block-post-content > p a,
+.kindi-main > .wp-block-post-content > ul a,
+.kindi-main > .wp-block-post-content > ol a { color: var(--brand-blue); text-decoration: underline; }
+.kindi-main > .wp-block-post-content > ul,
+.kindi-main > .wp-block-post-content > ol { padding-inline-start: 1.25rem; }
