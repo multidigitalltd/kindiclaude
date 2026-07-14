@@ -532,8 +532,9 @@ function kindi_remove_native_reviews_tab( array $tabs ): array {
 add_filter( 'woocommerce_product_tabs', 'kindi_remove_native_reviews_tab', 98 );
 
 /**
- * Render the Flashy reviews element for THIS product, between the tabs (10)
- * and the related products (20). The Flashy plugin's own script populates it.
+ * Render the Flashy reviews element for THIS product — right after the tabs
+ * (10) and BEFORE the upsells (15) / related products (20). The Flashy
+ * plugin's own script populates it.
  *
  * @return void
  */
@@ -547,4 +548,4 @@ function kindi_flashy_reviews_render(): void {
 	echo '<div data-inject-flashy-element="' . esc_attr( $element ) . '" data-item-id="' . esc_attr( (string) $product->get_id() ) . '"></div>';
 	echo '</section>';
 }
-add_action( 'woocommerce_after_single_product_summary', 'kindi_flashy_reviews_render', 15 );
+add_action( 'woocommerce_after_single_product_summary', 'kindi_flashy_reviews_render', 12 );
