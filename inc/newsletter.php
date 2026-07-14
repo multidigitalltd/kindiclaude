@@ -111,8 +111,10 @@ add_action( 'admin_post_kindi_export_subscribers', 'kindi_export_subscribers' );
 
 /**
  * Push a new subscriber to Flashy as a contact (create-or-update), optionally
- * straight into a list (marketing-eligible). Non-blocking — never delays the
- * visitor; the local subscribers option remains the backup source of truth.
+ * straight into a list (marketing-eligible). The response is read and written
+ * to a short admin log (last 10 pushes) so the panel shows whether each
+ * signup really reached Flashy; the local subscribers option remains the
+ * backup source of truth either way.
  *
  * @param string $email Subscriber email.
  * @return void
@@ -129,16 +131,15 @@ function kindi_newsletter_flashy( string $email ): void {
 		$contact['lists'] = array( $list_id => true );
 	}
 
-	wp_remote_post(
+	$resp = wp_remote_post(
 		'https://api.flashy.app/contact',
 		array(
-			'timeout'  => 5,
-			'blocking' => false,
-			'headers'  => array(
+			'timeout' => 4,
+			'headers' => array(
 				'Content-Type' => 'application/json',
 				'x-api-key'    => $key,
 			),
-			'body'     => wp_json_encode(
+			'body'    => wp_json_encode(
 				array(
 					'primary_key' => 'email',
 					'overwrite'   => true,
@@ -147,6 +148,25 @@ function kindi_newsletter_flashy( string $email ): void {
 			),
 		)
 	);
+
+	$body = ! is_wp_error( $resp ) ? json_decode( wp_remote_retrieve_body( $resp ), true ) : null;
+	$ok   = ! is_wp_error( $resp ) && ! empty( $body['success'] );
+	$info = $ok
+		? ( '' !== $list_id ? sprintf( 'נוסף/עודכן וצורף לרשימה %s', $list_id ) : 'נוסף/עודכן (ללא רשימה)' )
+		: ( is_wp_error( $resp ) ? $resp->get_error_message() : 'קוד ' . wp_remote_retrieve_response_code( $resp ) );
+
+	$log = get_option( 'kindi_flashy_log' );
+	$log = is_array( $log ) ? $log : array();
+	array_unshift(
+		$log,
+		array(
+			'time'  => current_time( 'mysql' ),
+			'email' => $email,
+			'ok'    => $ok ? 1 : 0,
+			'info'  => $info,
+		)
+	);
+	update_option( 'kindi_flashy_log', array_slice( $log, 0, 10 ), false );
 }
 add_action( 'kindi_newsletter_subscribe', 'kindi_newsletter_flashy' );
 
@@ -165,7 +185,7 @@ function kindi_flashy_status_html(): string {
 	$cache = 'kindi_flashy_status_' . md5( $key );
 	$html  = get_transient( $cache );
 	if ( is_string( $html ) && '' !== $html ) {
-		return $html;
+		return $html . kindi_flashy_log_html();
 	}
 
 	$args = array( 'timeout' => 8, 'headers' => array( 'x-api-key' => $key ) );
@@ -190,5 +210,25 @@ function kindi_flashy_status_html(): string {
 	}
 
 	set_transient( $cache, $html, 5 * MINUTE_IN_SECONDS );
-	return $html;
+	return $html . kindi_flashy_log_html();
+}
+
+/**
+ * The last newsletter→Flashy pushes, so the admin can verify each signup
+ * actually reached the list. Rendered fresh (outside the status cache).
+ *
+ * @return string
+ */
+function kindi_flashy_log_html(): string {
+	$log = get_option( 'kindi_flashy_log' );
+	if ( ! is_array( $log ) || ! $log ) {
+		return '';
+	}
+	$html = '<p style="margin:1em 0 .3em"><strong>' . esc_html__( 'צירופים אחרונים ל-Flashy:', 'kindi' ) . '</strong></p>';
+	$html .= '<table class="widefat striped" style="max-width:640px"><thead><tr><th>' . esc_html__( 'זמן', 'kindi' ) . '</th><th>' . esc_html__( 'אימייל', 'kindi' ) . '</th><th>' . esc_html__( 'תוצאה', 'kindi' ) . '</th></tr></thead><tbody>';
+	foreach ( $log as $row ) {
+		$ok    = ! empty( $row['ok'] );
+		$html .= '<tr><td>' . esc_html( (string) ( $row['time'] ?? '' ) ) . '</td><td style="direction:ltr;text-align:left">' . esc_html( (string) ( $row['email'] ?? '' ) ) . '</td><td><span style="color:' . ( $ok ? '#15803d' : '#b91c1c' ) . ';font-weight:600">' . esc_html( (string) ( $row['info'] ?? '' ) ) . '</span></td></tr>';
+	}
+	return $html . '</tbody></table>';
 }
