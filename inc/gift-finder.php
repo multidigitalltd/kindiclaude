@@ -105,7 +105,8 @@ function kindi_gift_filter_query( WP_Query $query ): void {
 		return;
 	}
 	$is_store = ( function_exists( 'is_shop' ) && is_shop() )
-		|| ( function_exists( 'is_product_taxonomy' ) && is_product_taxonomy() );
+		|| ( function_exists( 'is_product_taxonomy' ) && is_product_taxonomy() )
+		|| ( is_search() && 'product' === $query->get( 'post_type' ) );
 	if ( ! $is_store ) {
 		return;
 	}
@@ -115,11 +116,22 @@ function kindi_gift_filter_query( WP_Query $query ): void {
 	$age_key = get_query_var( 'kindi_age' );
 	$bands   = kindi_age_bands();
 	if ( $age_key && isset( $bands[ $age_key ] ) ) {
+		// Exact band tag first (products tagged with the fixed age bands), OR the
+		// legacy numeric mirror parsed from the old free-text field — so the
+		// filter keeps matching products that were never re-tagged.
 		$meta[] = array(
-			'key'     => '_kindi_age_min',
-			'value'   => array( $bands[ $age_key ]['min'], $bands[ $age_key ]['max'] ),
-			'type'    => 'NUMERIC',
-			'compare' => 'BETWEEN',
+			'relation' => 'OR',
+			array(
+				'key'     => '_kindi_age_band',
+				'value'   => $age_key,
+				'compare' => '=',
+			),
+			array(
+				'key'     => '_kindi_age_min',
+				'value'   => array( $bands[ $age_key ]['min'], $bands[ $age_key ]['max'] ),
+				'type'    => 'NUMERIC',
+				'compare' => 'BETWEEN',
+			),
 		);
 	}
 

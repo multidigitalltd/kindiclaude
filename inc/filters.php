@@ -419,6 +419,26 @@ function kindi_archive_sidebar(): void {
 		echo '</div></details>';
 	}
 
+	// Recommended-age facet — the fixed age bands (same five as the homepage
+	// tiles), single-select pills driving the kindi_age query var.
+	if ( function_exists( 'kindi_age_bands' ) ) {
+		$kindi_cur_age = (string) get_query_var( 'kindi_age' );
+		echo '<details class="kindi-side__group" open><summary>' . esc_html__( 'גיל מומלץ', 'kindi' ) . '</summary><div class="kindi-side__opts kindi-side__opts--age">';
+		foreach ( kindi_age_bands() as $kindi_band_key => $kindi_band ) {
+			$kindi_on  = $kindi_cur_age === $kindi_band_key;
+			$kindi_url = $kindi_on
+				? remove_query_arg( array( 'kindi_age', 'paged' ) )
+				: add_query_arg( 'kindi_age', $kindi_band_key, remove_query_arg( 'paged' ) );
+			printf(
+				'<a class="kindi-fopt kindi-fopt--pill%s" href="%s">%s</a>',
+				$kindi_on ? ' is-active' : '',
+				esc_url( $kindi_url ),
+				esc_html( $kindi_band['label'] )
+			);
+		}
+		echo '</div></details>';
+	}
+
 	// Attribute facets — only those relevant to the current category with results.
 	// Colour → round swatches; age → pills; everything else → checkable options.
 	foreach ( kindi_archive_attribute_terms() as $facet ) {
@@ -487,11 +507,10 @@ function kindi_archive_reset_url(): string {
 			$remove[] = (string) $gk;
 		}
 	}
-	if ( isset( $_GET['min_price'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$remove[] = 'min_price';
-	}
-	if ( isset( $_GET['max_price'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$remove[] = 'max_price';
+	foreach ( array( 'min_price', 'max_price', 'kindi_age', 'kindi_budget' ) as $qk ) {
+		if ( isset( $_GET[ $qk ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$remove[] = $qk;
+		}
 	}
 	if ( ! $remove ) {
 		return '';
