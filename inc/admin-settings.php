@@ -164,11 +164,6 @@ function kindi_settings_tabs(): array {
 					'cart_reminder_subject' => array( 'type' => 'text', 'label' => 'תזכורת — נושא', 'help' => 'אפשר: {site}, {name}, {url}, {count}, {total}' ),
 					'cart_reminder_body'    => array( 'type' => 'textarea', 'label' => 'תזכורת — תוכן', 'help' => 'אפשר: {site}, {name}, {url}, {count}, {total}' ),
 				),
-				'ניוזלטר ודיוור' => array(
-					'newsletter_webhook' => array( 'type' => 'text', 'label' => 'Webhook URL', 'help' => 'כתובת ה-webhook של מערכת הדיוור (Zapier / Make / ActiveTrail / smoove ועוד). בכל הרשמה תישלח אליה בקשת POST עם האימייל בפורמט JSON.' ),
-					'newsletter_field'   => array( 'type' => 'text', 'label' => 'שם שדה האימייל', 'help' => 'שם המפתח שבו תישלח כתובת האימייל (ברירת מחדל: email).' ),
-					'newsletter_secret'  => array( 'type' => 'text', 'label' => 'סוד אימות (אופציונלי)', 'help' => 'אם תוגדר — תישלח ככותרת X-Kindi-Secret לאימות מקור הבקשה.' ),
-				),
 				'ביקורות גוגל' => array(
 					'_reviews_note'  => array( 'type' => 'note', 'label' => '', 'help' => 'ביקורות גוגל האמיתיות נמשכות אוטומטית מהתוסף Rich Showcase for Google Reviews ומוצגות בעיצוב של קינדי. הביקורות הידניות שלמטה משמשות רק כגיבוי כשאין ביקורות מהתוסף.' ),
 					'reviews_manual' => array( 'type' => 'textarea', 'label' => 'ביקורות ידניות (גיבוי)', 'help' => 'שורה לכל ביקורת: שם | דירוג (1-5) | טקסט.' ),

@@ -160,9 +160,6 @@ function kindi_default_options(): array {
 		'cookie_policy_text' => 'מדיניות הפרטיות',
 
 		// Newsletter → external mailing list (webhook).
-		'newsletter_webhook' => '',
-		'newsletter_field'   => 'email',
-		'newsletter_secret'  => '',
 
 		// Back-in-stock (waitlist) email.
 		'wl_email_subject' => '{product} חזר למלאי!',
