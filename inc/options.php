@@ -89,6 +89,11 @@ function kindi_default_options(): array {
 		'webhook_enable'  => '0',
 		'webhook_url'     => '',
 
+		// Flashy — newsletter contact push + product-reviews element.
+		'flashy_key'     => '',
+		'flashy_list'    => '',
+		'flashy_reviews' => '1480',
+
 		// Order-email banner images — a separate pair per email.
 		'email_proc_top'    => '',
 		'email_proc_bottom' => '',

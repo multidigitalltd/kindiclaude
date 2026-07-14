@@ -315,7 +315,10 @@ function kindi_pdp_rating(): void {
 		echo '<span class="kindi-pdp__rnum">' . esc_html( number_format( $average, 1 ) ) . '</span>';
 		echo wc_get_rating_html( $average, $count ); // phpcs:ignore WordPress.Security.EscapeOutput -- WooCommerce core markup.
 		if ( $count > 0 ) {
-			echo '<a href="#tab-reviews" class="kindi-pdp__reviews" data-kindi-tab="reviews" rel="nofollow">('
+			// With Flashy reviews active the native tab is gone — jump to the
+			// Flashy section instead.
+			$kindi_flashy = function_exists( 'kindi_flashy_reviews_element' ) && '' !== kindi_flashy_reviews_element();
+			echo '<a href="' . esc_attr( $kindi_flashy ? '#kindi-flashy-reviews' : '#tab-reviews' ) . '" class="kindi-pdp__reviews"' . ( $kindi_flashy ? '' : ' data-kindi-tab="reviews"' ) . ' rel="nofollow">('
 				. esc_html( sprintf( _n( '%s ביקורת', '%s ביקורות', $count, 'kindi' ), number_format_i18n( $count ) ) )
 				. ')</a>';
 		}
@@ -501,3 +504,47 @@ function kindi_pdp_shipping_tab_content(): void {
 	}
 	echo '</div>';
 }
+
+/* ============================ Flashy product reviews ============================ */
+
+/**
+ * The Flashy reviews element ID ('' = feature off, native reviews tab returns).
+ *
+ * @return string
+ */
+function kindi_flashy_reviews_element(): string {
+	return trim( (string) kindi_opt( 'flashy_reviews' ) );
+}
+
+/**
+ * Drop WooCommerce's native reviews tab while Flashy reviews render — one
+ * reviews block on the page, not two.
+ *
+ * @param array<string,array<string,mixed>> $tabs Product tabs.
+ * @return array<string,array<string,mixed>>
+ */
+function kindi_remove_native_reviews_tab( array $tabs ): array {
+	if ( '' !== kindi_flashy_reviews_element() ) {
+		unset( $tabs['reviews'] );
+	}
+	return $tabs;
+}
+add_filter( 'woocommerce_product_tabs', 'kindi_remove_native_reviews_tab', 98 );
+
+/**
+ * Render the Flashy reviews element for THIS product, between the tabs (10)
+ * and the related products (20). The Flashy plugin's own script populates it.
+ *
+ * @return void
+ */
+function kindi_flashy_reviews_render(): void {
+	global $product;
+	$element = kindi_flashy_reviews_element();
+	if ( '' === $element || ! $product instanceof WC_Product ) {
+		return;
+	}
+	echo '<section id="kindi-flashy-reviews" class="kindi-section kindi-flashy-reviews" aria-label="' . esc_attr__( 'ביקורות על המוצר', 'kindi' ) . '">';
+	echo '<div data-inject-flashy-element="' . esc_attr( $element ) . '" data-item-id="' . esc_attr( (string) $product->get_id() ) . '"></div>';
+	echo '</section>';
+}
+add_action( 'woocommerce_after_single_product_summary', 'kindi_flashy_reviews_render', 15 );

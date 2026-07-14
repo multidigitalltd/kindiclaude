@@ -113,6 +113,12 @@ function kindi_settings_tabs(): array {
 				'עדכוני תבנית' => array(
 					'update_token' => array( 'type' => 'text', 'label' => 'GitHub Token לעדכונים (אופציונלי)', 'help' => 'עדכוני התבנית מגיעים אוטומטית מהריפו הציבורי — אין צורך בטוקן. רק אם הריפו יהפוך פרטי: Fine-grained token עם הרשאת Contents: Read-only, כאן או כ-KINDI_UPDATE_TOKEN ב-wp-config.php.' ),
 				),
+				'Flashy' => array(
+					'flashy_key'     => array( 'type' => 'text', 'label' => 'מפתח API', 'help' => 'מ-Flashy: הגדרות החשבון ← API. נדרש רק לצירוף נרשמי הניוזלטר כאנשי קשר; הביקורות עובדות דרך התוסף בלי מפתח.' ),
+					'flashy_list'    => array( 'type' => 'text', 'label' => 'מזהה רשימת ניוזלטר (List ID)', 'help' => 'אחרי שמירת המפתח, רשימות החשבון יוצגו למטה — העתיקו מהן את המזהה.' ),
+					'flashy_reviews' => array( 'type' => 'text', 'label' => 'מזהה אלמנט ביקורות בעמוד מוצר', 'help' => 'ה-Element ID מ-Flashy (למשל 1480). כשמוגדר — הביקורות של Flashy מוצגות בעמוד המוצר ולשונית הביקורות המובנית מוסתרת. ריק = חזרה לביקורות המובנות.' ),
+					'_flashy_status' => array( 'type' => 'note', 'label' => 'סטטוס חיבור', 'help_cb' => 'kindi_flashy_status_html' ),
+				),
 				'Webhook — הזמנה שהושלמה (Pabbly)' => array(
 					'webhook_enable' => array( 'type' => 'select', 'label' => 'הפעלת ה-Webhook', 'options' => array( '0' => 'כבוי', '1' => 'מופעל' ), 'help' => 'כשמופעל: בכל פעם שהזמנה עוברת לסטטוס "הושלמה", נשלחים פרטי ההזמנה (שם, טלפון, מוצרים עם קישור, מספר חשבונית) לכתובת ה-Webhook. כיבוי כאן עוצר הכל מיידית.' ),
 					'webhook_url'    => array( 'type' => 'text', 'label' => 'כתובת ה-Webhook', 'help' => 'ה-URL של ה-Workflow ב-Pabbly (או Zapier/Make). חייב להתחיל ב-https://.' ),

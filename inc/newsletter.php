@@ -142,3 +142,89 @@ function kindi_export_subscribers(): void {
 	exit;
 }
 add_action( 'admin_post_kindi_export_subscribers', 'kindi_export_subscribers' );
+
+/* ================================ Flashy ================================ */
+
+/**
+ * Push a new subscriber to Flashy as a contact (create-or-update), optionally
+ * straight into a list (marketing-eligible). Non-blocking — never delays the
+ * visitor; the local subscribers option remains the backup source of truth.
+ *
+ * @param string $email Subscriber email.
+ * @return void
+ */
+function kindi_newsletter_flashy( string $email ): void {
+	$key = trim( (string) kindi_opt( 'flashy_key' ) );
+	if ( '' === $key ) {
+		return;
+	}
+
+	$contact = array( 'email' => $email );
+	$list_id = trim( (string) kindi_opt( 'flashy_list' ) );
+	if ( '' !== $list_id ) {
+		$contact['lists'] = array( $list_id => true );
+	}
+
+	wp_remote_post(
+		'https://api.flashy.app/contact',
+		array(
+			'timeout'  => 5,
+			'blocking' => false,
+			'headers'  => array(
+				'Content-Type' => 'application/json',
+				'x-api-key'    => $key,
+			),
+			'body'     => wp_json_encode(
+				array(
+					'primary_key' => 'email',
+					'overwrite'   => true,
+					'contact'     => $contact,
+				)
+			),
+		)
+	);
+}
+add_action( 'kindi_newsletter_subscribe', 'kindi_newsletter_flashy' );
+
+/**
+ * Connection status + account lists for the settings panel (admin only,
+ * cached 5 minutes per key so the panel doesn't hit the API on every load).
+ *
+ * @return string
+ */
+function kindi_flashy_status_html(): string {
+	$key = trim( (string) kindi_opt( 'flashy_key' ) );
+	if ( '' === $key ) {
+		return '<p class="description">' . esc_html__( 'הזינו מפתח API ושמרו — הסטטוס והרשימות מהחשבון יוצגו כאן.', 'kindi' ) . '</p>';
+	}
+
+	$cache = 'kindi_flashy_status_' . md5( $key );
+	$html  = get_transient( $cache );
+	if ( is_string( $html ) && '' !== $html ) {
+		return $html;
+	}
+
+	$args = array( 'timeout' => 8, 'headers' => array( 'x-api-key' => $key ) );
+	$resp = wp_remote_get( 'https://api.flashy.app/account', $args );
+	$body = ! is_wp_error( $resp ) ? json_decode( wp_remote_retrieve_body( $resp ), true ) : null;
+
+	if ( is_wp_error( $resp ) || 200 !== wp_remote_retrieve_response_code( $resp ) || empty( $body['success'] ) ) {
+		$html = '<p style="color:#b91c1c;font-weight:600">● ' . esc_html__( 'החיבור נכשל — בדקו שהמפתח נכון ושהחשבון מאומת ב-Flashy.', 'kindi' ) . '</p>';
+	} else {
+		$name = (string) ( $body['data']['name'] ?? '' );
+		$html = '<p style="color:#15803d;font-weight:600">● ' . esc_html( sprintf( /* translators: %s: Flashy account name. */ __( 'מחובר לחשבון Flashy: %s', 'kindi' ), $name ) ) . '</p>';
+
+		$lists_resp = wp_remote_get( 'https://api.flashy.app/lists', $args );
+		$lists_body = ! is_wp_error( $lists_resp ) ? json_decode( wp_remote_retrieve_body( $lists_resp ), true ) : null;
+		if ( ! empty( $lists_body['data'] ) && is_array( $lists_body['data'] ) ) {
+			$html .= '<p class="description">' . esc_html__( 'הרשימות בחשבון — העתיקו את המזהה של רשימת הניוזלטר לשדה למעלה:', 'kindi' ) . '</p><ul style="margin:0.25em 1em">';
+			foreach ( $lists_body['data'] as $flist ) {
+				$html .= '<li><code>' . esc_html( (string) ( $flist['id'] ?? '' ) ) . '</code> — ' . esc_html( (string) ( $flist['title'] ?? '' ) ) . '</li>';
+			}
+			$html .= '</ul>';
+		}
+	}
+
+	set_transient( $cache, $html, 5 * MINUTE_IN_SECONDS );
+	return $html;
+}
