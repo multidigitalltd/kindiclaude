@@ -164,7 +164,12 @@ add_action( 'pre_get_posts', 'kindi_gift_filter_query' );
  */
 function kindi_gift_url( string $age_key, string $budget_key = '' ): string {
 	$base = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' );
-	$args = array( 'kindi_age' => $age_key );
+	// WooCommerce-native attribute filtering when the age attribute + term
+	// exist (filter_{attribute}={slug}); legacy kindi_age otherwise.
+	$arg  = function_exists( 'kindi_age_filter_arg' )
+		? kindi_age_filter_arg( $age_key )
+		: array( 'param' => 'kindi_age', 'value' => $age_key );
+	$args = array( $arg['param'] => $arg['value'] );
 	if ( '' !== $budget_key ) {
 		$args['kindi_budget'] = $budget_key;
 	}
@@ -181,7 +186,16 @@ function kindi_gift_finder_shortcode(): string {
 	$tiers  = kindi_budget_tiers();
 	$action = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' );
 
-	$cur_age    = (string) get_query_var( 'kindi_age' );
+	// One radio group — the native attribute param when available (all bands
+	// share the same attribute), the legacy kindi_age param otherwise.
+	$age_args  = array();
+	$age_param = 'kindi_age';
+	foreach ( array_keys( $bands ) as $band_key ) {
+		$arg                    = function_exists( 'kindi_age_filter_arg' ) ? kindi_age_filter_arg( $band_key ) : array( 'param' => 'kindi_age', 'value' => $band_key );
+		$age_args[ $band_key ]  = $arg['value'];
+		$age_param              = $arg['param'];
+	}
+	$cur_age    = isset( $_GET[ $age_param ] ) ? sanitize_text_field( wp_unslash( $_GET[ $age_param ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$cur_budget = (string) get_query_var( 'kindi_budget' );
 
 	ob_start();
@@ -192,7 +206,7 @@ function kindi_gift_finder_shortcode(): string {
 			<div class="kindi-giftfinder__chips">
 				<?php foreach ( $bands as $key => $band ) : ?>
 					<label class="kindi-chip">
-						<input type="radio" name="kindi_age" value="<?php echo esc_attr( $key ); ?>" <?php checked( $cur_age, $key ); ?> required>
+						<input type="radio" name="<?php echo esc_attr( $age_param ); ?>" value="<?php echo esc_attr( $age_args[ $key ] ?? $key ); ?>" <?php checked( $cur_age, $age_args[ $key ] ?? $key ); ?> required>
 						<span><?php echo esc_html( $band['label'] ); ?></span>
 					</label>
 				<?php endforeach; ?>

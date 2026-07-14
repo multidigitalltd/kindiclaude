@@ -79,6 +79,7 @@ kindi_require( 'litespeed.php' );
 if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'woocommerce.php' );
 	kindi_require( 'product-card.php' );
+	kindi_require( 'attributes.php' );
 	kindi_require( 'product-meta.php' );
 	kindi_require( 'single-product.php' );
 	kindi_require( 'variation-swatches.php' );

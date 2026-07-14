@@ -16,14 +16,12 @@ defined( 'ABSPATH' ) || exit;
  * @return array<string,array{label:string,type:string,placeholder:string}>
  */
 function kindi_product_meta_defs(): array {
+	// Only the CONTENT fields remain here — the product PROPERTIES (age, brand,
+	// pieces, players, play time, skills) are WooCommerce attributes now, edited
+	// in the product's "תכונות" tab (see inc/attributes.php).
 	return array(
-		'_kindi_brand_label' => array( 'label' => 'מותג', 'type' => 'text', 'placeholder' => 'LEGO' ),
-		'_kindi_pieces'      => array( 'label' => 'מספר חלקים', 'type' => 'text', 'placeholder' => '1,036' ),
-		'_kindi_players'     => array( 'label' => 'מספר שחקנים', 'type' => 'text', 'placeholder' => '1-4' ),
-		'_kindi_play_time'   => array( 'label' => 'זמן משחק/בנייה', 'type' => 'text', 'placeholder' => '~45 דקות' ),
-		'_kindi_skills'      => array( 'label' => 'מיומנויות', 'type' => 'textarea', 'placeholder' => 'שורה אחת (או מופרד בפסיקים) לכל מיומנות' ),
-		'_kindi_highlights'  => array( 'label' => 'נקודות בולטות', 'type' => 'textarea', 'placeholder' => 'שורה אחת לכל נקודה' ),
-		'_kindi_in_box'      => array( 'label' => 'מה בקופסה', 'type' => 'textarea', 'placeholder' => 'שורה אחת לכל פריט' ),
+		'_kindi_highlights' => array( 'label' => 'נקודות בולטות', 'type' => 'textarea', 'placeholder' => 'שורה אחת לכל נקודה' ),
+		'_kindi_in_box'     => array( 'label' => 'מה בקופסה', 'type' => 'textarea', 'placeholder' => 'שורה אחת לכל פריט' ),
 	);
 }
 
@@ -34,29 +32,6 @@ function kindi_product_meta_defs(): array {
  */
 function kindi_product_meta_fields(): void {
 	echo '<div class="options_group">';
-
-	// "גיל מומלץ" — fixed age-band tags (the same five bands the homepage tiles
-	// and the archive filter use), replacing the old free-text field. Multiple
-	// bands per product are welcome ("3-5" + "6-8" = suits 3-8).
-	if ( function_exists( 'kindi_age_bands' ) ) {
-		global $post;
-		$chosen = $post instanceof WP_Post ? (array) get_post_meta( $post->ID, '_kindi_age_band' ) : array();
-		$legacy = $post instanceof WP_Post ? (string) get_post_meta( $post->ID, '_kindi_age', true ) : '';
-		echo '<p class="form-field"><label>' . esc_html__( 'גיל מומלץ', 'kindi' ) . '</label><span style="display:inline-flex;flex-wrap:wrap;gap:10px 16px">';
-		foreach ( kindi_age_bands() as $band_key => $band ) {
-			printf(
-				'<label style="margin:0;display:inline-flex;align-items:center;gap:4px;float:none;width:auto"><input type="checkbox" name="_kindi_age_bands[]" value="%s"%s style="margin:0"> %s</label>',
-				esc_attr( $band_key ),
-				checked( in_array( $band_key, $chosen, true ), true, false ),
-				esc_html( $band['label'] )
-			);
-		}
-		echo '</span>';
-		if ( ! $chosen && '' !== $legacy ) {
-			echo '<span class="description" style="display:block;margin-top:4px">' . esc_html( sprintf( /* translators: %s: legacy free-text age. */ __( 'ערך ישן (טקסט חופשי): "%s" — סמנו טווחים ושמרו כדי לעבור לתגיות.', 'kindi' ), $legacy ) ) . '</span>';
-		}
-		echo '</p>';
-	}
 
 	foreach ( kindi_product_meta_defs() as $key => $field ) {
 		if ( 'textarea' === $field['type'] ) {
@@ -84,28 +59,6 @@ function kindi_save_product_meta( $product ): void {
 		$product->update_meta_data( $key, 'textarea' === $field['type'] ? sanitize_textarea_field( $raw ) : sanitize_text_field( $raw ) );
 	}
 
-	// Age-band tags: one meta row per band (indexable equality queries), plus a
-	// regenerated display label in the legacy _kindi_age key (the product page
-	// keeps reading it) and the numeric _kindi_age_min mirror used by the
-	// gift-finder range logic.
-	if ( function_exists( 'kindi_age_bands' ) ) {
-		$bands  = kindi_age_bands();
-		$posted = isset( $_POST['_kindi_age_bands'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST['_kindi_age_bands'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$posted = array_values( array_intersect( $posted, array_keys( $bands ) ) );
-
-		delete_post_meta( $product->get_id(), '_kindi_age_band' );
-		$labels = array();
-		$min    = null;
-		foreach ( $posted as $band_key ) {
-			add_post_meta( $product->get_id(), '_kindi_age_band', $band_key );
-			$labels[] = '13plus' === $band_key ? '13+' : $band_key;
-			$min      = null === $min ? $bands[ $band_key ]['min'] : min( $min, $bands[ $band_key ]['min'] );
-		}
-		if ( $posted ) {
-			$product->update_meta_data( '_kindi_age', implode( ', ', $labels ) );
-			$product->update_meta_data( '_kindi_age_min', (string) $min );
-		}
-	}
 }
 add_action( 'woocommerce_admin_process_product_object', 'kindi_save_product_meta' );
 
@@ -117,6 +70,20 @@ add_action( 'woocommerce_admin_process_product_object', 'kindi_save_product_meta
  * @return string
  */
 function kindi_pmeta( $product, string $key ): string {
+	// Attribute-first: the property lives as a WooCommerce attribute when the
+	// product carries one; the legacy meta below covers unmigrated products.
+	if ( function_exists( 'kindi_attr_tax_for' ) ) {
+		$tax = kindi_attr_tax_for( $key );
+		if ( '' !== $tax && taxonomy_exists( $tax ) ) {
+			$terms = get_the_terms( $product->get_id(), $tax );
+			if ( $terms && ! is_wp_error( $terms ) ) {
+				$names = wp_list_pluck( $terms, 'name' );
+				usort( $names, 'strnatcmp' );
+				return implode( ', ', $names );
+			}
+		}
+	}
+
 	$value = (string) $product->get_meta( '_kindi_' . $key );
 	if ( '' === $value && function_exists( 'kindi_resolve_field' ) ) {
 		$value = kindi_resolve_field( $product->get_id(), $key );
@@ -144,6 +111,15 @@ function kindi_pmeta_lines( $product, string $key ): array {
  * @return array<int,string>
  */
 function kindi_skill_items( $product ): array {
+	if ( function_exists( 'kindi_attr_tax_for' ) ) {
+		$tax = kindi_attr_tax_for( 'skills' );
+		if ( '' !== $tax && taxonomy_exists( $tax ) ) {
+			$terms = get_the_terms( $product->get_id(), $tax );
+			if ( $terms && ! is_wp_error( $terms ) ) {
+				return array_values( wp_list_pluck( $terms, 'name' ) );
+			}
+		}
+	}
 	$raw = kindi_pmeta( $product, 'skills' );
 	if ( '' === $raw ) {
 		return array();
