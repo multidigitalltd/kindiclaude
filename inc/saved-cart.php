@@ -197,7 +197,7 @@ function kindi_saved_cart_restore(): void {
 
 	wc_add_notice(
 		$restored
-			? sprintf( 'שחזרנו %d פריטים לעגלה שלך 🎉', $restored )
+			? sprintf( 'שחזרנו %d פריטים לעגלה שלך!', $restored )
 			: 'חלק מהפריטים בעגלה השמורה אינם זמינים יותר.',
 		$restored ? 'success' : 'notice'
 	);

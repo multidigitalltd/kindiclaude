@@ -74,7 +74,7 @@ function kindi_rest_subscribe( WP_REST_Request $request ): WP_REST_Response {
 	 */
 	do_action( 'kindi_newsletter_subscribe', $email );
 
-	return new WP_REST_Response( array( 'message' => '🎉 תודה! קוד ההנחה בדרך אליכם למייל.' ), 200 );
+	return new WP_REST_Response( array( 'message' => 'תודה! קוד ההנחה בדרך אליכם למייל.' ), 200 );
 }
 
 /**

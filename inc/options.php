@@ -160,7 +160,7 @@ function kindi_default_options(): array {
 		'newsletter_secret'  => '',
 
 		// Back-in-stock (waitlist) email.
-		'wl_email_subject' => '{product} חזר למלאי! 🎉',
+		'wl_email_subject' => '{product} חזר למלאי!',
 		'wl_email_body'    => "היי {name},\n\nהמוצר \"{product}\" שחיכית לו חזר למלאי!\nכדאי למהר — הכמות מוגבלת.\n\nצוות קינדר טויס",
 
 		// Saved cart — emails + reminder timing.

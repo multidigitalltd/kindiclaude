@@ -420,7 +420,7 @@ function kindi_gift_wrap_box(): void {
 		<header class="kindi-cobox__head kindi-giftbox__head">
 			<span class="kindi-giftbox__ic"><?php echo kindi_icon( 'gift', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			<div class="kindi-cobox__heading">
-				<h3 class="kindi-giftbox__title"><?php esc_html_e( 'זו מתנה? נארוז ונוסיף ברכה', 'kindi' ); ?> <span aria-hidden="true">❤️</span></h3>
+				<h3 class="kindi-giftbox__title"><?php esc_html_e( 'זו מתנה? נארוז ונוסיף ברכה', 'kindi' ); ?> <span aria-hidden="true"><?php echo kindi_icon( 'heart', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span></h3>
 				<p class="kindi-cobox__sub"><?php printf( esc_html__( 'אריזת מתנה חינם • כרטיס ברכה %d₪', 'kindi' ), $card_fee ); ?></p>
 			</div>
 			<button type="button" class="kindi-giftbox__toggle" data-kindi-gift-toggle aria-label="<?php esc_attr_e( 'כיווץ', 'kindi' ); ?>"><?php echo $chevron; // phpcs:ignore WordPress.Security.EscapeOutput ?></button>

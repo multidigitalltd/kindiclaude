@@ -94,7 +94,7 @@ function kindi_waitlist_signup(): void {
 	);
 	update_post_meta( $pid, '_kindi_waitlist', $list );
 
-	wp_send_json_success( array( 'message' => 'מעולה! נעדכן אותך במייל כשהמוצר יחזור 🎉' ) );
+	wp_send_json_success( array( 'message' => 'מעולה! נעדכן אותך במייל כשהמוצר יחזור.' ) );
 }
 add_action( 'wp_ajax_kindi_waitlist', 'kindi_waitlist_signup' );
 add_action( 'wp_ajax_nopriv_kindi_waitlist', 'kindi_waitlist_signup' );
