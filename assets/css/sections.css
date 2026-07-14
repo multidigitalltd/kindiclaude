@@ -343,6 +343,13 @@ picture.kindi-store__mascot { display: block; width: fit-content; }
 .kindi-news__field input { flex: 1; background: transparent; border: 0; outline: none; padding-block: 0.75rem; font-size: 0.875rem; text-align: right; font-family: inherit; }
 .kindi-news__btn { background: var(--brand-red); color: #fff; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-weight: 700; white-space: nowrap; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 0.375rem; justify-content: center; }
 .kindi-news__btn:hover { background: var(--brand-red-dark); }
+@media (min-width: 640px) { .kindi-news__form { flex-wrap: wrap; } }
+.kindi-news__consent { flex-basis: 100%; display: flex; align-items: flex-start; gap: 0.45rem; padding: 0.1rem 0.75rem 0.4rem; font-size: 0.78rem; line-height: 1.45; color: var(--muted-foreground); cursor: pointer; }
+.kindi-news__consent input { margin: 2px 0 0; flex: 0 0 auto; accent-color: var(--brand-red); cursor: pointer; }
+.kindi-news__consent a { color: var(--brand-blue); text-decoration: underline; }
+.kindi-news__msg { flex-basis: 100%; margin: 0; padding: 0 0.75rem 0.45rem; font-size: 0.85rem; font-weight: 700; color: #15803d; }
+.kindi-news__msg.is-error { color: var(--brand-red-dark); }
+.kindi-news__done { margin: 0; padding: 0.9rem 1rem; font-weight: 800; font-size: 1rem; color: #15803d; text-align: center; }
 
 /* Shared mascot stage helpers */
 .kindi-ground-shadow { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); width: 13rem; height: 0.75rem; border-radius: 50%; background: rgba(0,0,0,0.45); filter: blur(8px); }

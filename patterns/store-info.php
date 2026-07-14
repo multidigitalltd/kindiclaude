@@ -55,6 +55,11 @@ $kindi_details = array(
 				<input type="email" name="kindi_newsletter_email" required placeholder="האימייל שלכם...">
 			</label>
 			<button type="submit" class="kindi-news__btn">קבלו הנחה<?php echo kindi_icon( 'gift', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
+			<?php $kindi_privacy = get_privacy_policy_url() ? get_privacy_policy_url() : home_url( '/privacy-policy/' ); ?>
+			<label class="kindi-news__consent">
+				<input type="checkbox" name="kindi_newsletter_consent" value="1" required>
+				<span>אני מסכים לקבל דיוור פרסומי באמצעות דואר אלקטרוני והודעות טקסט (<a href="<?php echo esc_url( $kindi_privacy ); ?>" target="_blank" rel="noopener">מדיניות הפרטיות</a>)</span>
+			</label>
 		</form>
 	</div>
 

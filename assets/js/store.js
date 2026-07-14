@@ -141,14 +141,34 @@
 
 	/* ---------------- Newsletter subscribe ---------------- */
 	document.querySelectorAll( '.kindi-news__form' ).forEach( function ( form ) {
+		// Inline feedback line — every outcome (missing consent, bad email,
+		// server error, network error) says something; silence reads as broken.
+		var note = function ( text, isError ) {
+			var m = form.querySelector( '.kindi-news__msg' );
+			if ( ! m ) {
+				m = document.createElement( 'p' );
+				m.className = 'kindi-news__msg';
+				m.setAttribute( 'role', 'alert' );
+				form.appendChild( m );
+			}
+			m.classList.toggle( 'is-error', !! isError );
+			m.textContent = text;
+		};
 		form.addEventListener( 'submit', function ( e ) {
 			e.preventDefault();
-			if ( typeof window.kindiStore === 'undefined' ) {
+			var input = form.querySelector( 'input[type="email"]' );
+			var consent = form.querySelector( 'input[name="kindi_newsletter_consent"]' );
+			var btn = form.querySelector( 'button' );
+			if ( ! input || ! input.value || input.value.indexOf( '@' ) < 1 ) {
+				note( 'הזינו כתובת אימייל תקינה.', true );
 				return;
 			}
-			var input = form.querySelector( 'input[type="email"]' );
-			var btn = form.querySelector( 'button' );
-			if ( ! input || ! input.value ) {
+			if ( consent && ! consent.checked ) {
+				note( 'כדי להירשם יש לאשר את קבלת הדיוור.', true );
+				return;
+			}
+			if ( typeof window.kindiStore === 'undefined' ) {
+				note( 'אירעה שגיאה בטעינת העמוד — רעננו ונסו שוב.', true );
 				return;
 			}
 			if ( btn ) {
@@ -157,13 +177,19 @@
 			fetch( window.kindiStore.subscribeUrl, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': window.kindiStore.nonce },
-				body: JSON.stringify( { email: input.value } ),
+				body: JSON.stringify( { email: input.value, consent: 1 } ),
 			} )
-				.then( function ( r ) { return r.json(); } )
-				.then( function ( data ) {
-					form.innerHTML = '<p class="kindi-news__done" role="status">' + ( data.message || 'תודה!' ) + '</p>';
+				.then( function ( r ) { return r.json().then( function ( data ) { return { ok: r.ok, data: data }; } ); } )
+				.then( function ( res ) {
+					if ( res.ok ) {
+						form.innerHTML = '<p class="kindi-news__done" role="status">' + ( res.data.message || 'תודה!' ) + '</p>';
+					} else {
+						note( res.data.message || 'אירעה שגיאה. נסו שוב.', true );
+						if ( btn ) { btn.disabled = false; }
+					}
 				} )
 				.catch( function () {
+					note( 'אירעה שגיאה בשליחה. נסו שוב בעוד רגע.', true );
 					if ( btn ) {
 						btn.disabled = false;
 					}

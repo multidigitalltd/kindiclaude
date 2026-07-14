@@ -58,6 +58,12 @@ function kindi_rest_subscribe( WP_REST_Request $request ): WP_REST_Response {
 		return new WP_REST_Response( array( 'message' => 'כתובת אימייל לא תקינה.' ), 400 );
 	}
 
+	// Marketing consent is required (privacy-policy checkbox on the form) —
+	// enforced server-side too, not only in the UI.
+	if ( '1' !== (string) $request->get_param( 'consent' ) ) {
+		return new WP_REST_Response( array( 'message' => 'כדי להירשם יש לאשר את קבלת הדיוור.' ), 400 );
+	}
+
 	$list = get_option( 'kindi_subscribers', array() );
 	if ( ! is_array( $list ) ) {
 		$list = array();
