@@ -3,6 +3,18 @@
  * that appear on every view. Faithful port of the Lovable Header/Footer.
  */
 
+/* ============================ Buttons ============================ */
+/* Brand buttons are used by always-on components (cookie banner, waitlist,
+   sticky bars) as well as the home sections — so they live in this
+   every-view layer, not in the conditionally-loaded sections.css. */
+.kindi-btn { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; border-radius: 1rem; padding: 0.75rem 1.5rem; text-decoration: none; transition: all 0.2s; cursor: pointer; border: 0; }
+.kindi-btn--red { background: var(--brand-red); color: #fff; box-shadow: var(--shadow-pop); }
+.kindi-btn--red:hover { background: var(--brand-red-dark); transform: scale(1.03); color: #fff; }
+.kindi-btn--ghost { background: rgba(255,255,255,0.8); color: var(--brand-navy); border: 2px solid color-mix(in oklab, var(--brand-navy) 15%, transparent); }
+.kindi-btn--ghost:hover { background: #fff; color: var(--brand-navy); }
+.kindi-btn--navy { background: var(--brand-navy); color: #fff; }
+.kindi-btn--navy:hover { background: var(--brand-navy-dark); }
+
 /* ============================ Header shell ============================ */
 /* The header box dissolves into the flow (display:contents) so the category nav
    can be the only sticky element — the promo strips + search row scroll away. */

@@ -34,7 +34,7 @@ function kindi_waitlist_form(): void {
 			<input type="email" id="kindi-wl-email" name="email" placeholder="אימייל" required>
 		</div>
 		<label class="kindi-waitlist__terms"><input type="checkbox" name="terms" required> אני מאשר/ת קבלת עדכון על המוצר</label>
-		<button type="submit" class="kindi-btn kindi-btn--red">עדכנו אותי כשחוזר</button>
+		<button type="submit">עדכנו אותי כשחוזר</button>
 		<p class="kindi-waitlist__msg" aria-live="polite"></p>
 	</form>
 	<?php

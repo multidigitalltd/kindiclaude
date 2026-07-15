@@ -39,6 +39,11 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Form controls don't inherit the page font by default (browsers use the system
+   UI font) — force the brand font on every button/field, including ones
+   rendered outside the styled sections (cookie banner, plugin forms). */
+button, input, select, textarea { font-family: inherit; }
+
 /* Accessibility: always-visible, high-contrast focus ring */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 3px solid var(--brand-red);

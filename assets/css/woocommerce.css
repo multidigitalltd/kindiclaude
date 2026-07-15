@@ -411,9 +411,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-waitlist__row input:focus { outline: none; border-color: var(--brand-red); }
 .kindi-waitlist__terms { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--brand-navy); }
 .kindi-waitlist__msg { margin: 0; font-weight: 700; color: var(--brand-navy); }
-/* The submit button in the site's language (sections.css .kindi-btn isn't loaded
-   on product pages, so the "notify me" button would fall back to a plain grey). */
-.kindi-waitlist .kindi-btn,
+/* Full-width brand submit — component-specific sizing, kept self-contained. */
 .kindi-waitlist button[type="submit"] {
   display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
   width: 100%; box-sizing: border-box; height: 3rem; padding-inline: 1.5rem;
@@ -421,7 +419,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 1rem;
   cursor: pointer; box-shadow: var(--shadow-pop); transition: background 0.15s ease;
 }
-.kindi-waitlist .kindi-btn:hover,
 .kindi-waitlist button[type="submit"]:hover { background: var(--brand-red-dark); color: #fff; }
 
 /* ---------- Checkout / cart progress steps ---------- */
@@ -980,8 +977,7 @@ body.kindi-wait-open { overflow: hidden; }
 .kindi-stickycart__title { font-weight: 700; font-size: 0.85rem; color: var(--brand-navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kindi-stickycart__price { font-weight: 700; font-size: 0.95rem; color: var(--brand-red); }
 .kindi-stickycart__price del { color: var(--muted-foreground); font-weight: 500; font-size: 0.8rem; margin-inline-start: 0.35rem; }
-/* Brand-styled button in the site's font (sections.css .kindi-btn isn't loaded
-   on product pages, so style it here). */
+/* Compact brand button — component-specific sizing, kept self-contained. */
 .kindi-stickycart__btn {
   flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
   background: var(--brand-red); color: #fff; border: 0; border-radius: 0.9rem;
@@ -1027,8 +1023,6 @@ body.kindi-wait-open { overflow: hidden; }
 .kindi-skill { display: inline-flex; align-items: center; padding: 0.35rem 0.85rem; border-radius: 999px; background: var(--brand-blue-soft); color: var(--brand-navy); font-weight: 600; font-size: 0.85rem; border: 1px solid color-mix(in oklab, var(--brand-blue) 18%, transparent); }
 
 /* ---------- Save & share cart ---------- */
-.kindi-btn--navy { background: var(--brand-navy); color: #fff; }
-.kindi-btn--navy:hover { background: var(--brand-navy-dark); }
 .kindi-savecart { margin: 1.5rem 0; padding: 1.25rem 1.5rem; border-radius: 1.25rem; background: var(--brand-blue-soft); border: 1px solid color-mix(in oklab, var(--brand-blue) 16%, transparent); }
 .kindi-savecart__head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.9rem; }
 .kindi-savecart__head .kindi-icon { color: var(--brand-red); flex: 0 0 auto; }

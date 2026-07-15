@@ -78,7 +78,7 @@ function kindi_sticky_cart_bar(): void {
 				<span class="kindi-stickycart__price" data-kindi-stickycart-price><?php echo wp_kses_post( $product->get_price_html() ); ?></span>
 			</span>
 		</div>
-		<button type="button" class="kindi-btn kindi-btn--red kindi-stickycart__btn" data-kindi-stickycart-add>
+		<button type="button" class="kindi-stickycart__btn" data-kindi-stickycart-add>
 			<?php echo kindi_icon( 'cart', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 			<span><?php esc_html_e( 'הוספה לסל', 'kindi' ); ?></span>
 		</button>
