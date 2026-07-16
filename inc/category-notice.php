@@ -191,62 +191,6 @@ function kindi_sanitize_cat_notices( array $rows ): array {
 	return $out;
 }
 
-/**
- * One-time carry-over: earlier versions stored notices as product_cat term meta
- * (edited on the category screen). Move any such values into the panel option
- * and clean up the old meta. Self-terminating via a flag.
- *
- * @return void
- */
-function kindi_cat_notice_migrate(): void {
-	if ( ! is_admin() || get_option( 'kindi_catnotice_migrated' ) || ! taxonomy_exists( 'product_cat' ) ) {
-		return;
-	}
-	$terms = get_terms(
-		array(
-			'taxonomy'   => 'product_cat',
-			'hide_empty' => false,
-			'meta_key'   => 'kindi_cat_notice', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-			'fields'     => 'ids',
-		)
-	);
-	if ( is_wp_error( $terms ) ) {
-		return;
-	}
-
-	if ( $terms ) {
-		$opts = get_option( 'kindi_options', array() );
-		if ( ! is_array( $opts ) ) {
-			$opts = array();
-		}
-		$rows     = ( isset( $opts['cat_notices'] ) && is_array( $opts['cat_notices'] ) ) ? $opts['cat_notices'] : array();
-		$existing = array();
-		foreach ( $rows as $r ) {
-			if ( isset( $r['cat'] ) ) {
-				$existing[ (int) $r['cat'] ] = true;
-			}
-		}
-		foreach ( $terms as $tid ) {
-			$tid  = (int) $tid;
-			$text = trim( (string) get_term_meta( $tid, 'kindi_cat_notice', true ) );
-			if ( '' !== $text && empty( $existing[ $tid ] ) ) {
-				$rows[] = array(
-					'cat'      => $tid,
-					'text'     => $text,
-					'children' => '1' === (string) get_term_meta( $tid, 'kindi_cat_notice_children', true ) ? '1' : '',
-				);
-			}
-			delete_term_meta( $tid, 'kindi_cat_notice' );
-			delete_term_meta( $tid, 'kindi_cat_notice_children' );
-		}
-		$opts['cat_notices'] = $rows;
-		update_option( 'kindi_options', $opts );
-	}
-
-	update_option( 'kindi_catnotice_migrated', 1, false );
-}
-add_action( 'admin_init', 'kindi_cat_notice_migrate' );
-
 /* ------------------------------------------------------------------ *
  * Resolution
  * ------------------------------------------------------------------ */
