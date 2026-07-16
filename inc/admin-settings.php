@@ -353,6 +353,13 @@ function kindi_settings_render(): void {
 				}
 				continue;
 			}
+			if ( 'cat_notices' === $field['type'] ) {
+				if ( isset( $_POST['kindi__present'][ $key ] ) && function_exists( 'kindi_sanitize_cat_notices' ) ) {
+					$rows          = isset( $_POST['kindi'][ $key ] ) ? (array) wp_unslash( $_POST['kindi'][ $key ] ) : array();
+					$clean[ $key ] = kindi_sanitize_cat_notices( $rows );
+				}
+				continue;
+			}
 			if ( ! isset( $_POST['kindi'][ $key ] ) ) {
 				continue;
 			}
@@ -450,6 +457,8 @@ function kindi_settings_render(): void {
 					);
 				}
 				echo '</div>';
+			} elseif ( 'cat_notices' === $field['type'] && function_exists( 'kindi_cat_notices_field_render' ) ) {
+				kindi_cat_notices_field_render( $key, $value );
 			} else {
 				// URLs render as text so relative paths (e.g. /shop/) are accepted.
 				$input_type = 'number' === $field['type'] ? 'number' : 'text';
