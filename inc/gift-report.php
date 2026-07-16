@@ -63,6 +63,11 @@ function kindi_gift_report_page(): void {
 
 	echo '<div class="wrap"><h1>' . esc_html__( 'הזמנות עם ברכה אישית', 'kindi' ) . '</h1>';
 	echo '<p class="description">' . esc_html( sprintf( _n( 'נמצאה %d הזמנה עם ברכה.', 'נמצאו %d הזמנות עם ברכה.', count( $ids ), 'kindi' ), count( $ids ) ) ) . '</p>';
+
+	if ( $ids ) {
+		$export_url = wp_nonce_url( admin_url( 'admin-post.php?action=kindi_gift_export' ), 'kindi_gift_export' );
+		echo '<p><a class="button button-primary" href="' . esc_url( $export_url ) . '">' . esc_html__( 'ייצוא לאקסל (CSV)', 'kindi' ) . '</a></p>';
+	}
 	echo '<table class="widefat striped"><thead><tr>'
 		. '<th>' . esc_html__( 'הזמנה', 'kindi' ) . '</th>'
 		. '<th>' . esc_html__( 'תאריך', 'kindi' ) . '</th>'
@@ -98,3 +103,52 @@ function kindi_gift_report_page(): void {
 
 	echo '</tbody></table></div>';
 }
+
+/**
+ * Download the report as a CSV (opens in Excel; UTF-8 BOM keeps Hebrew intact).
+ *
+ * @return void
+ */
+function kindi_gift_export_csv(): void {
+	if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		wp_die( esc_html__( 'אין הרשאה.', 'kindi' ) );
+	}
+	check_admin_referer( 'kindi_gift_export' );
+
+	$ids = kindi_gift_report_ids();
+
+	nocache_headers();
+	header( 'Content-Type: text/csv; charset=utf-8' );
+	header( 'Content-Disposition: attachment; filename=gift-messages-' . gmdate( 'Y-m-d' ) . '.csv' );
+
+	$out = fopen( 'php://output', 'w' );
+	fwrite( $out, "\xEF\xBB\xBF" ); // UTF-8 BOM for Excel.
+	fputcsv( $out, array( 'הזמנה', 'תאריך', 'לקוח', 'טלפון', 'מתנה', 'ברכה' ) );
+
+	foreach ( $ids as $id ) {
+		$order = wc_get_order( $id );
+		if ( ! $order instanceof WC_Order ) {
+			continue;
+		}
+		$gift = function_exists( 'kindi_gift_details' )
+			? kindi_gift_details( $order )
+			: array( 'bits' => array(), 'message' => (string) $order->get_meta( '_kindi_gift_message' ) );
+		$date = $order->get_date_created();
+
+		fputcsv(
+			$out,
+			array(
+				'#' . $order->get_order_number(),
+				$date ? wc_format_datetime( $date, 'd/m/Y H:i' ) : '',
+				trim( $order->get_formatted_billing_full_name() ),
+				$order->get_billing_phone(),
+				implode( ' + ', $gift['bits'] ),
+				$gift['message'],
+			)
+		);
+	}
+
+	fclose( $out );
+	exit;
+}
+add_action( 'admin_post_kindi_gift_export', 'kindi_gift_export_csv' );
