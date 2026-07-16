@@ -52,6 +52,7 @@ kindi_require( 'newsletter.php' );
 kindi_require( 'accessibility.php' );
 kindi_require( 'cookie-consent.php' );
 kindi_require( 'schema.php' );
+kindi_require( 'opengraph.php' );
 kindi_require( 'pixel.php' );
 kindi_require( 'critical-css.php' );
 kindi_require( 'emails.php' );

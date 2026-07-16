@@ -495,6 +495,81 @@ function kindi_save_gift_wrap( WC_Order $order ): void {
 }
 add_action( 'woocommerce_checkout_create_order', 'kindi_save_gift_wrap' );
 
+/**
+ * Collect the gift choice + personal greeting from an order (empty when none).
+ *
+ * @param WC_Order $order Order.
+ * @return array{bits:string[],message:string}
+ */
+function kindi_gift_details( WC_Order $order ): array {
+	$bits = array();
+	if ( 'yes' === $order->get_meta( '_kindi_gift_wrap' ) ) {
+		$bits[] = __( 'אריזת מתנה', 'kindi' );
+	}
+	if ( 'yes' === $order->get_meta( '_kindi_gift_card' ) ) {
+		$bits[] = __( 'כרטיס ברכה', 'kindi' );
+	}
+	return array( 'bits' => $bits, 'message' => (string) $order->get_meta( '_kindi_gift_message' ) );
+}
+
+/**
+ * Show the gift choice + personal greeting on the admin order screen, so the
+ * packer can print the card. (The greeting is stored as order meta
+ * `_kindi_gift_message`; without this it stays hidden behind the underscore.)
+ *
+ * @param WC_Order $order Order.
+ * @return void
+ */
+function kindi_admin_gift_details( $order ): void {
+	if ( ! $order instanceof WC_Order ) {
+		return;
+	}
+	$gift = kindi_gift_details( $order );
+	if ( ! $gift['bits'] && '' === $gift['message'] ) {
+		return;
+	}
+	echo '<p><strong>' . esc_html__( 'מתנה', 'kindi' ) . ':</strong> ' . esc_html( implode( ' + ', $gift['bits'] ) );
+	if ( '' !== $gift['message'] ) {
+		echo '<br><strong>' . esc_html__( 'ברכה אישית', 'kindi' ) . ':</strong><br>' . nl2br( esc_html( $gift['message'] ) );
+	}
+	echo '</p>';
+}
+add_action( 'woocommerce_admin_order_data_after_shipping_address', 'kindi_admin_gift_details' );
+
+/**
+ * Include the gift choice + greeting in order emails.
+ *
+ * @param WC_Order $order         Order.
+ * @param bool     $sent_to_admin Admin email?
+ * @param bool     $plain_text    Plain-text email?
+ * @return void
+ */
+function kindi_email_gift_details( $order, $sent_to_admin = false, $plain_text = false ): void {
+	if ( ! $order instanceof WC_Order ) {
+		return;
+	}
+	$gift = kindi_gift_details( $order );
+	if ( ! $gift['bits'] && '' === $gift['message'] ) {
+		return;
+	}
+	$label  = __( 'מתנה', 'kindi' );
+	$glabel = __( 'ברכה אישית', 'kindi' );
+	$line   = implode( ' + ', $gift['bits'] );
+	if ( $plain_text ) {
+		echo "\n" . esc_html( $label ) . ': ' . esc_html( $line ) . "\n";
+		if ( '' !== $gift['message'] ) {
+			echo esc_html( $glabel ) . ': ' . esc_html( $gift['message'] ) . "\n";
+		}
+	} else {
+		echo '<p><strong>' . esc_html( $label ) . ':</strong> ' . esc_html( $line );
+		if ( '' !== $gift['message'] ) {
+			echo '<br><strong>' . esc_html( $glabel ) . ':</strong><br>' . nl2br( esc_html( $gift['message'] ) );
+		}
+		echo '</p>';
+	}
+}
+add_action( 'woocommerce_email_order_meta', 'kindi_email_gift_details', 15, 3 );
+
 /*
  * ---------------------------------------------------------------------------
  * Checkout layout — two columns: the process (contact, shipping, payment) on
