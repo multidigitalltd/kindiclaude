@@ -1139,6 +1139,14 @@ body.kindi-wait-open { overflow: hidden; }
 .kindi-pdp__dtxt strong { color: var(--brand-navy); font-weight: 800; font-size: 0.95rem; }
 .kindi-pdp__dtxt span { color: var(--muted-foreground); font-size: 0.82rem; display: flex; align-items: center; gap: 0.3rem; }
 
+/* Category notice — availability message beside add-to-cart and in the cart. */
+.kindi-catnotice { display: flex; align-items: flex-start; gap: 0.7rem; margin: 1rem 0; padding: 0.85rem 1rem; border-radius: 1rem; background: var(--brand-red-soft); border: 1px solid color-mix(in oklab, var(--brand-red) 30%, transparent); }
+.kindi-catnotice--cart { margin: 0 0 1.25rem; }
+.kindi-catnotice__ic { flex: 0 0 auto; display: inline-flex; margin-top: 0.05rem; }
+.kindi-catnotice__txt { min-width: 0; }
+.kindi-catnotice__txt p { margin: 0; color: var(--brand-navy); font-weight: 600; font-size: 0.9rem; line-height: 1.5; }
+.kindi-catnotice__txt p + p { margin-top: 0.5rem; }
+
 /* Shipping & returns tab. */
 .kindi-pdp-ship p { margin: 0 0 0.75rem; line-height: 1.7; }
 .kindi-pdp-ship strong { color: var(--brand-navy); }
