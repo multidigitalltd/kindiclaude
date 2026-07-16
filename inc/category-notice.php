@@ -122,8 +122,29 @@ function kindi_cat_notice_meta( int $term_id ): array {
 }
 
 /**
- * Unique notice texts that apply to a product: the notices on its own
- * categories, plus any ancestor category whose notice includes subcategories.
+ * Notice texts attached to a single category: its own notice (always) plus any
+ * ancestor whose notice is flagged to include subcategories.
+ *
+ * @param int $term_id Category term ID.
+ * @return string[] Notice texts, keyed by the term they came from.
+ */
+function kindi_term_category_notices( int $term_id ): array {
+	$notices = array();
+	$own     = kindi_cat_notice_meta( $term_id );
+	if ( '' !== $own['text'] ) {
+		$notices[ $term_id ] = $own['text']; // Own notice always applies.
+	}
+	foreach ( get_ancestors( $term_id, 'product_cat', 'taxonomy' ) as $aid ) {
+		$anc = kindi_cat_notice_meta( (int) $aid );
+		if ( '' !== $anc['text'] && $anc['children'] ) {
+			$notices[ (int) $aid ] = $anc['text']; // Cascades to subcategories.
+		}
+	}
+	return $notices;
+}
+
+/**
+ * Unique notice texts that apply to a product, across all of its categories.
  *
  * @param int $product_id Product ID.
  * @return string[] Unique notice texts.
@@ -139,16 +160,7 @@ function kindi_product_category_notices( int $product_id ): array {
 
 	$notices = array(); // Keyed by term ID to de-duplicate shared parents.
 	foreach ( $term_ids as $tid ) {
-		$own = kindi_cat_notice_meta( (int) $tid );
-		if ( '' !== $own['text'] ) {
-			$notices[ (int) $tid ] = $own['text']; // Own notice always applies.
-		}
-		foreach ( get_ancestors( (int) $tid, 'product_cat', 'taxonomy' ) as $aid ) {
-			$anc = kindi_cat_notice_meta( (int) $aid );
-			if ( '' !== $anc['text'] && $anc['children'] ) {
-				$notices[ (int) $aid ] = $anc['text']; // Cascades to subcategories.
-			}
-		}
+		$notices += kindi_term_category_notices( (int) $tid );
 	}
 	return array_values( array_unique( $notices ) );
 }
@@ -190,6 +202,24 @@ function kindi_pdp_category_notice(): void {
 	kindi_cat_notice_box( kindi_product_category_notices( $product->get_id() ) );
 }
 add_action( 'woocommerce_single_product_summary', 'kindi_pdp_category_notice', 29 );
+
+/**
+ * Category archive — the current category's notice above and below the grid.
+ *
+ * @return void
+ */
+function kindi_archive_category_notice(): void {
+	if ( ! function_exists( 'is_product_category' ) || ! is_product_category() ) {
+		return;
+	}
+	$term = get_queried_object();
+	if ( ! $term instanceof WP_Term ) {
+		return;
+	}
+	kindi_cat_notice_box( array_values( kindi_term_category_notices( $term->term_id ) ), 'kindi-catnotice--archive' );
+}
+add_action( 'woocommerce_before_shop_loop', 'kindi_archive_category_notice', 5 );
+add_action( 'woocommerce_after_shop_loop', 'kindi_archive_category_notice', 5 );
 
 /**
  * Cart page — one notice for every distinct message among the cart's products.
