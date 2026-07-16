@@ -512,8 +512,48 @@
 		if ( window.jQuery ) { window.jQuery( document.body ).trigger( 'update_checkout' ); }
 	}
 
+	/* Per-line quantity writes are debounced and locked so that clicking the
+	   stepper several times fast (e.g. 14 → 2) can't fire a burst of racing
+	   cart writes whose responses land out of order — which made the quantity
+	   appear to "snap back" to a stale value. The shown number updates on every
+	   click; only the FINAL value is written, once, followed by a single
+	   checkout refresh. While a write is in flight, later clicks just update the
+	   target and are flushed when it returns. */
+	var qtyState = {}; // data-key -> { qty, timer, busy }
+
+	function flushQty( key ) {
+		var s = qtyState[ key ];
+		if ( ! s || s.busy ) { return; }
+		s.timer = null;
+		s.busy = true;
+		var sent = s.qty;
+		postQty( key, sent ).then( function () {
+			s.busy = false;
+			if ( s.qty !== sent ) {
+				flushQty( key ); // More clicks landed while in flight — send latest.
+			} else {
+				delete qtyState[ key ];
+				refreshCheckout();
+			}
+		} );
+	}
+
+	function scheduleQty( key, qty ) {
+		var s = qtyState[ key ] || ( qtyState[ key ] = {} );
+		s.qty = qty;
+		if ( s.busy ) { return; } // The in-flight write will pick up the new qty.
+		if ( s.timer ) { clearTimeout( s.timer ); }
+		s.timer = setTimeout( function () { flushQty( key ); }, 400 );
+	}
+
+	function cancelQty( key ) {
+		var s = qtyState[ key ];
+		if ( s && s.timer ) { clearTimeout( s.timer ); }
+		delete qtyState[ key ];
+	}
+
 	/* Checkout order-summary: quantity steppers + remove (delegated, survives the
-	   AJAX fragment refresh). After changing the cart, recalc the checkout. */
+	   AJAX fragment refresh). */
 	document.addEventListener( 'click', function ( e ) {
 		if ( ! e.target.closest( '.kindi-summary' ) ) { return; }
 		var stepBtn = e.target.closest( '.kindi-summary .kindi-mcqty__b' );
@@ -521,12 +561,21 @@
 		if ( stepBtn ) {
 			var wrap = stepBtn.closest( '.kindi-mcqty' );
 			var numEl = wrap.querySelector( '.kindi-mcqty__n' );
+			var key = wrap.getAttribute( 'data-key' );
 			var q = ( parseInt( numEl.textContent, 10 ) || 1 ) + parseInt( stepBtn.getAttribute( 'data-d' ), 10 );
-			if ( q < 0 ) { q = 0; }
+			if ( q < 1 ) {
+				// Minus below 1 removes the line (same as the ✕ button).
+				cancelQty( key );
+				numEl.textContent = '0';
+				postQty( key, 0 ).then( refreshCheckout );
+				return;
+			}
 			numEl.textContent = q;
-			postQty( wrap.getAttribute( 'data-key' ), q ).then( refreshCheckout );
+			scheduleQty( key, q );
 		} else if ( rm ) {
-			postQty( rm.getAttribute( 'data-key' ), 0 ).then( refreshCheckout );
+			var rkey = rm.getAttribute( 'data-key' );
+			cancelQty( rkey );
+			postQty( rkey, 0 ).then( refreshCheckout );
 		}
 	} );
 
