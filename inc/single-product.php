@@ -111,18 +111,13 @@ function kindi_pdp_delivery_card(): void {
 add_action( 'woocommerce_single_product_summary', 'kindi_pdp_delivery_card', 34 );
 
 /**
- * Product video URL: the Kindi field, falling back to the legacy Woodmart meta
- * so videos set on the previous theme reappear without re-entering them.
+ * Product video URL from the Kindi field.
  *
  * @param WC_Product $product Product.
  * @return string
  */
 function kindi_product_video_url( WC_Product $product ): string {
-	$url = (string) $product->get_meta( '_kindi_product_video' );
-	if ( '' === $url ) {
-		$url = (string) $product->get_meta( '_woodmart_product_video' );
-	}
-	return trim( $url );
+	return trim( (string) $product->get_meta( '_kindi_product_video' ) );
 }
 
 /**
