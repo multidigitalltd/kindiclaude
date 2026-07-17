@@ -35,15 +35,59 @@ function kindi_product_meta_fields(): void {
 	echo '<div class="options_group">';
 
 	foreach ( kindi_product_meta_defs() as $key => $field ) {
+		if ( '_kindi_product_video' === $key ) {
+			continue; // Rendered below with a media-library picker.
+		}
 		if ( 'textarea' === $field['type'] ) {
 			woocommerce_wp_textarea_input( array( 'id' => $key, 'label' => $field['label'], 'placeholder' => $field['placeholder'] ) );
 		} else {
 			woocommerce_wp_text_input( array( 'id' => $key, 'label' => $field['label'], 'placeholder' => $field['placeholder'] ) );
 		}
 	}
+
+	// Product video: a link field, plus a media-library picker for a self-hosted
+	// file. The note steers editors to a streaming embed (YouTube/Vimeo) for a
+	// fast page load, since a self-hosted file is heavier.
+	woocommerce_wp_text_input(
+		array(
+			'id'          => '_kindi_product_video',
+			'label'       => __( 'סרטון מוצר', 'kindi' ),
+			'placeholder' => 'https://youtu.be/…',
+			'description' => __( 'כדי לאפשר טעינה מהירה של העמוד לגולשים — ישנה עדיפות לשימוש בהטמעה משירות הזרמת מדיה כמו יוטיוב/וימאו, על פני העלאת קובץ וידאו לאתר. ניתן להזין קישור, או לבחור/להעלות קובץ מספריית המדיה.', 'kindi' ),
+		)
+	);
+	echo '<p class="form-field">'
+		. '<button type="button" class="button kindi-video-pick" data-target="_kindi_product_video">' . esc_html__( 'בחירה/העלאה מספריית המדיה', 'kindi' ) . '</button> '
+		. '<button type="button" class="button-link kindi-video-clear" data-target="_kindi_product_video">' . esc_html__( 'ניקוי', 'kindi' ) . '</button>'
+		. '</p>';
+
 	echo '</div>';
 }
 add_action( 'woocommerce_product_options_general_product_data', 'kindi_product_meta_fields' );
+
+/**
+ * Media-library picker wiring for the product-video field (product edit screen).
+ *
+ * @param string $hook Current admin page.
+ * @return void
+ */
+function kindi_product_video_admin_assets( string $hook ): void {
+	if ( 'post.php' !== $hook && 'post-new.php' !== $hook ) {
+		return;
+	}
+	$screen = get_current_screen();
+	if ( ! $screen || 'product' !== $screen->post_type ) {
+		return;
+	}
+	wp_enqueue_media();
+
+	$js = '(function(){function wire(){'
+		. 'document.querySelectorAll(".kindi-video-pick").forEach(function(btn){if(btn.dataset.wired)return;btn.dataset.wired="1";btn.addEventListener("click",function(e){e.preventDefault();if(typeof wp==="undefined"||!wp.media)return;var input=document.getElementById(btn.getAttribute("data-target"));var frame=wp.media({title:"בחירת סרטון",library:{type:"video"},button:{text:"שימוש בסרטון"},multiple:false});frame.on("select",function(){var a=frame.state().get("selection").first().toJSON();if(input){input.value=a.url;}});frame.open();});});'
+		. 'document.querySelectorAll(".kindi-video-clear").forEach(function(btn){if(btn.dataset.wired)return;btn.dataset.wired="1";btn.addEventListener("click",function(e){e.preventDefault();var input=document.getElementById(btn.getAttribute("data-target"));if(input){input.value="";}});});'
+		. '}if(document.readyState!=="loading"){wire();}else{document.addEventListener("DOMContentLoaded",wire);}})();';
+	wp_add_inline_script( 'media-editor', $js );
+}
+add_action( 'admin_enqueue_scripts', 'kindi_product_video_admin_assets' );
 
 /**
  * Persist the custom fields (WC handles the save nonce).
