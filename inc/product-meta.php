@@ -20,8 +20,9 @@ function kindi_product_meta_defs(): array {
 	// pieces, players, play time, skills) are WooCommerce attributes now, edited
 	// in the product's "תכונות" tab (see inc/attributes.php).
 	return array(
-		'_kindi_highlights' => array( 'label' => 'נקודות בולטות', 'type' => 'textarea', 'placeholder' => 'שורה אחת לכל נקודה' ),
-		'_kindi_in_box'     => array( 'label' => 'מה בקופסה', 'type' => 'textarea', 'placeholder' => 'שורה אחת לכל פריט' ),
+		'_kindi_highlights'    => array( 'label' => 'נקודות בולטות', 'type' => 'textarea', 'placeholder' => 'שורה אחת לכל נקודה' ),
+		'_kindi_in_box'        => array( 'label' => 'מה בקופסה', 'type' => 'textarea', 'placeholder' => 'שורה אחת לכל פריט' ),
+		'_kindi_product_video' => array( 'label' => 'סרטון מוצר', 'type' => 'url', 'placeholder' => 'קישור ליוטיוב/וימאו או לקובץ MP4' ),
 	);
 }
 
@@ -56,7 +57,14 @@ function kindi_save_product_meta( $product ): void {
 			continue;
 		}
 		$raw = wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$product->update_meta_data( $key, 'textarea' === $field['type'] ? sanitize_textarea_field( $raw ) : sanitize_text_field( $raw ) );
+		if ( 'textarea' === $field['type'] ) {
+			$clean = sanitize_textarea_field( $raw );
+		} elseif ( 'url' === $field['type'] ) {
+			$clean = esc_url_raw( trim( (string) $raw ) );
+		} else {
+			$clean = sanitize_text_field( $raw );
+		}
+		$product->update_meta_data( $key, $clean );
 	}
 
 }

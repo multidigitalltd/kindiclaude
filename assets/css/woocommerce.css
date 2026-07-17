@@ -1093,6 +1093,14 @@ body.kindi-wait-open { overflow: hidden; }
 .kindi-pdp__excerpt { color: var(--foreground); line-height: 1.7;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .kindi-pdp__excerpt.is-expanded { display: block; -webkit-line-clamp: unset; overflow: visible; }
+/* Product video under the gallery (self-hosted <video> or YouTube/Vimeo iframe). */
+.kindi-pdp__video { margin-top: 1rem; }
+.kindi-pdp__video-el,
+.kindi-pdp__video-oembed :where(iframe, video) {
+  display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0;
+  border-radius: 1.25rem; box-shadow: var(--shadow-card); background: #000;
+}
+.kindi-pdp__video-oembed { border-radius: 1.25rem; overflow: hidden; }
 .kindi-pdp__excerpt p { margin: 0; }
 .kindi-pdp__more[aria-expanded="true"] .kindi-icon { transform: rotate(180deg); }
 .kindi-pdp__more { display: inline-flex; align-items: center; gap: 0.25rem; margin: 0.35rem 0 0;

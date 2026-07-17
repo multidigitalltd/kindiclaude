@@ -111,6 +111,72 @@ function kindi_pdp_delivery_card(): void {
 add_action( 'woocommerce_single_product_summary', 'kindi_pdp_delivery_card', 34 );
 
 /**
+ * Product video URL: the Kindi field, falling back to the legacy Woodmart meta
+ * so videos set on the previous theme reappear without re-entering them.
+ *
+ * @param WC_Product $product Product.
+ * @return string
+ */
+function kindi_product_video_url( WC_Product $product ): string {
+	$url = (string) $product->get_meta( '_kindi_product_video' );
+	if ( '' === $url ) {
+		$url = (string) $product->get_meta( '_woodmart_product_video' );
+	}
+	return trim( $url );
+}
+
+/**
+ * Build a lazy, responsive embed for a video URL: self-hosted files play in a
+ * <video>; YouTube/Vimeo render as privacy-friendly, lazy-loaded iframes (no
+ * oEmbed network call); anything else falls back to WordPress oEmbed then a link.
+ *
+ * @param string $url Video URL.
+ * @return string HTML.
+ */
+function kindi_video_embed_html( string $url ): string {
+	if ( preg_match( '/\.(mp4|webm|ogv|ogg)(\?.*)?$/i', $url ) ) {
+		return sprintf( '<video class="kindi-pdp__video-el" controls preload="none" playsinline src="%s"></video>', esc_url( $url ) );
+	}
+	if ( preg_match( '~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|youtu\.be/)([A-Za-z0-9_-]{11})~', $url, $m ) ) {
+		return sprintf(
+			'<iframe class="kindi-pdp__video-el" src="%s" title="%s" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+			esc_url( 'https://www.youtube-nocookie.com/embed/' . $m[1] ),
+			esc_attr__( 'סרטון מוצר', 'kindi' )
+		);
+	}
+	if ( preg_match( '~vimeo\.com/(?:video/)?(\d+)~', $url, $m ) ) {
+		return sprintf(
+			'<iframe class="kindi-pdp__video-el" src="%s" title="%s" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>',
+			esc_url( 'https://player.vimeo.com/video/' . $m[1] ),
+			esc_attr__( 'סרטון מוצר', 'kindi' )
+		);
+	}
+	$embed = wp_oembed_get( $url );
+	if ( $embed ) {
+		return '<div class="kindi-pdp__video-oembed">' . $embed . '</div>'; // WP oEmbed provider HTML.
+	}
+	return sprintf( '<a href="%1$s" target="_blank" rel="noopener">%2$s</a>', esc_url( $url ), esc_html__( 'צפייה בסרטון', 'kindi' ) );
+}
+
+/**
+ * Render the product video under the gallery (left media column).
+ *
+ * @return void
+ */
+function kindi_pdp_video(): void {
+	global $product;
+	if ( ! $product instanceof WC_Product ) {
+		return;
+	}
+	$url = kindi_product_video_url( $product );
+	if ( '' === $url ) {
+		return;
+	}
+	echo '<div class="kindi-pdp__video">' . kindi_video_embed_html( $url ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- builder escapes each URL/attr; oEmbed HTML is trusted.
+}
+add_action( 'woocommerce_before_single_product_summary', 'kindi_pdp_video', 25 );
+
+/**
  * Toy key-facts cards (pieces / age / play-time / players) — only those present.
  *
  * @param WC_Product $product Product.
