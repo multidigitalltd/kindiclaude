@@ -280,15 +280,14 @@ function kindi_pdp_short_excerpt(): void {
 	if ( '' === $body ) {
 		return;
 	}
-	echo '<div class="kindi-pdp__excerpt">' . wp_kses_post( wpautop( $body ) ) . '</div>';
-	// Only offer "מידע נוסף" when there's a long description to expand to (a
-	// Description tab exists); otherwise the button would lead nowhere.
-	if ( '' !== $long ) {
-		echo '<button type="button" class="kindi-pdp__more" data-kindi-tab="description">'
-			. esc_html__( 'מידע נוסף', 'kindi' )
-			. kindi_icon( 'chevrondown', 'kindi-icon--xs' ) // phpcs:ignore WordPress.Security.EscapeOutput
-			. '</button>';
-	}
+	echo '<div class="kindi-pdp__excerpt" data-kindi-excerpt>' . wp_kses_post( wpautop( $body ) ) . '</div>';
+	// "קרא עוד" expands the clamped text in place. Rendered hidden and revealed by
+	// JS only when the text actually overflows the two-line clamp, so it never
+	// shows on short descriptions that already fit.
+	echo '<button type="button" class="kindi-pdp__more" data-kindi-readmore aria-expanded="false" hidden>'
+		. esc_html__( 'קרא עוד', 'kindi' )
+		. kindi_icon( 'chevrondown', 'kindi-icon--xs' ) // phpcs:ignore WordPress.Security.EscapeOutput
+		. '</button>';
 }
 
 /**

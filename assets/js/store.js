@@ -437,6 +437,26 @@
 	} );
 }() );
 
+/* Product summary "קרא עוד" — reveal the toggle only when the short description
+   is actually clamped, then expand/collapse it in place. */
+( function () {
+	function init() {
+		var ex = document.querySelector( '[data-kindi-excerpt]' );
+		var btn = document.querySelector( '[data-kindi-readmore]' );
+		if ( ! ex || ! btn ) { return; }
+		if ( ex.scrollHeight - ex.clientHeight > 2 ) { btn.hidden = false; }
+		btn.addEventListener( 'click', function () {
+			var expanded = ex.classList.toggle( 'is-expanded' );
+			btn.setAttribute( 'aria-expanded', expanded ? 'true' : 'false' );
+			if ( btn.firstChild && 3 === btn.firstChild.nodeType ) {
+				btn.firstChild.nodeValue = expanded ? 'הצג פחות' : 'קרא עוד';
+			}
+		} );
+	}
+	if ( 'loading' !== document.readyState ) { init(); }
+	else { document.addEventListener( 'DOMContentLoaded', init ); }
+}() );
+
 /* "Buy now" — set the flag so the add-to-cart redirects to checkout. */
 ( function () {
 	document.addEventListener( 'click', function ( e ) {
