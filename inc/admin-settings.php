@@ -94,7 +94,7 @@ function kindi_settings_tabs(): array {
 					'whatsapp_to'          => array( 'type' => 'number', 'label' => 'וואטסאפ — שעת סגירה (0-23)' ),
 					'whatsapp_product_msg' => array( 'type' => 'textarea', 'label' => 'הודעת וואטסאפ מעמוד מוצר', 'help' => 'אפשר להשתמש ב-{product} ו-{url}.' ),
 					'free_shipping'        => array( 'type' => 'number', 'label' => 'סף משלוח חינם (₪)' ),
-					'gift_wrap_enable'     => array( 'type' => 'select', 'label' => 'אריזת מתנה וכרטיס ברכה (עמוד תשלום)', 'options' => array( '1' => 'מופעל', '0' => 'כבוי' ), 'help' => 'כיבוי מסתיר את קוביית "זו מתנה?" בעמוד התשלום — נוח לזמני עומס בחנות.' ),
+					'gift_wrap_enable'     => array( 'type' => 'select', 'label' => 'אריזת מתנה וכרטיס ברכה (עמוד תשלום)', 'options' => array( '1' => 'מופעל', '0' => 'כבוי' ), 'help' => 'כיבוי מסתיר את קוביית "זו מתנה?" בעמוד התשלום.' ),
 					'bundle_coupon'        => array( 'type' => 'text', 'label' => 'קוד קופון לחבילה "נקנה יחד"', 'help' => 'אופציונלי — אם יוגדר, הקופון יוחל אוטומטית בלחיצה על "הוספת הנבחרים לסל" בעמוד המוצר.' ),
 				),
 				'משלוח והחזרות (Schema)' => array(
