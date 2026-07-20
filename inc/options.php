@@ -29,6 +29,7 @@ function kindi_default_options(): array {
 		'whatsapp_to'          => 21,
 		'whatsapp_product_msg' => "היי, יש לי שאלה על המוצר:\n{product}\n{url}",
 		'free_shipping' => 299,
+		'gift_wrap_enable' => '1', // Gift-wrap + greeting-card box on checkout.
 
 		// Product schema — shipping & returns (Google Merchant Listing fields).
 		'ship_cost'     => 29,   // Flat domestic shipping rate (₪); 0 = always free.

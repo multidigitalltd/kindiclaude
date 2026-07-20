@@ -406,12 +406,25 @@ function kindi_gift_card_fee(): int {
 }
 
 /**
+ * Whether the gift-wrap / greeting-card add-ons are offered at checkout. Toggled
+ * off from the Kindi panel (e.g. during peak load in the shop).
+ *
+ * @return bool
+ */
+function kindi_gift_enabled(): bool {
+	return '0' !== (string) ( function_exists( 'kindi_opt' ) ? kindi_opt( 'gift_wrap_enable', '1' ) : '1' );
+}
+
+/**
  * Render the gift box below the payment card: two independent add-ons — free
  * gift wrapping and a paid greeting card — plus a personal-greeting textarea.
  *
  * @return void
  */
 function kindi_gift_wrap_box(): void {
+	if ( ! kindi_gift_enabled() ) {
+		return;
+	}
 	$card_fee = kindi_gift_card_fee();
 	$chevron  = '<svg class="kindi-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 	$message  = isset( $_POST['kindi_gift_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['kindi_gift_message'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -471,6 +484,9 @@ function kindi_gift_wrap_fee_add( WC_Cart $cart ): void {
 	if ( is_admin() && ! wp_doing_ajax() ) {
 		return;
 	}
+	if ( ! kindi_gift_enabled() ) {
+		return;
+	}
 	if ( kindi_gift_option_selected( 'kindi_gift_card' ) ) {
 		$cart->add_fee( __( 'כרטיס ברכה', 'kindi' ), kindi_gift_card_fee() );
 	}
@@ -484,6 +500,9 @@ add_action( 'woocommerce_cart_calculate_fees', 'kindi_gift_wrap_fee_add' );
  * @return void
  */
 function kindi_save_gift_wrap( WC_Order $order ): void {
+	if ( ! kindi_gift_enabled() ) {
+		return;
+	}
 	$wrap = isset( $_POST['kindi_gift_wrap'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['kindi_gift_wrap'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$card = isset( $_POST['kindi_gift_card'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['kindi_gift_card'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$msg  = isset( $_POST['kindi_gift_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['kindi_gift_message'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
