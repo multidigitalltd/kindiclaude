@@ -1,12 +1,11 @@
 <?php
 /**
  * Dashboard cleanup — choose which top-level admin menus (plugin tabs, WordPress
- * settings) are hidden, to give the site owner a tidy dashboard.
+ * settings) are hidden, for a tidy dashboard. Managed from a "לוח בקרה" tab in
+ * the Kindi panel.
  *
- * Safety: hiding applies to everyone EXCEPT the exempt users (by email — the
- * agency), so you never lock your own menu away. Hiding only removes the menu
- * link; every page stays reachable by its direct URL. The Kindi menu and this
- * tool are never hidden.
+ * Hiding only removes the menu link; every page stays reachable by its direct
+ * URL. The Kindi menu is never hidden, so the setting is always reversible.
  *
  * @package Kindi
  */
@@ -16,93 +15,47 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Hidden top-level menu slugs.
+ * Hidden top-level menu slugs (from the panel).
  *
  * @return string[]
  */
 function kindi_dashclean_hidden(): array {
-	$v = get_option( 'kindi_hidden_menus', array() );
+	$v = function_exists( 'kindi_opt' ) ? kindi_opt( 'hidden_menus' ) : array();
 	return is_array( $v ) ? $v : array();
 }
 
 /**
- * Exempt user emails (always see the full menu), lowercased.
- *
- * @return string[]
- */
-function kindi_dashclean_exempt(): array {
-	$raw = (string) get_option( 'kindi_menu_exempt', '' );
-	$out = array();
-	foreach ( preg_split( '/[\s,]+/', $raw ) ?: array() as $e ) {
-		$e = strtolower( trim( $e ) );
-		if ( '' !== $e ) {
-			$out[] = $e;
-		}
-	}
-	return $out;
-}
-
-/**
- * Is the current user exempt (agency)? True when their email is on the list.
- *
- * @return bool
- */
-function kindi_dashclean_is_exempt(): bool {
-	$user = wp_get_current_user();
-	if ( ! $user || ! $user->exists() ) {
-		return false;
-	}
-	return in_array( strtolower( (string) $user->user_email ), kindi_dashclean_exempt(), true );
-}
-
-/**
- * May the current user open the cleanup tool? Yes for exempt users, or for any
- * admin while no exempt list exists yet (so it can be set up).
- *
- * @return bool
- */
-function kindi_dashclean_can_manage(): bool {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		return false;
-	}
-	$exempt = kindi_dashclean_exempt();
-	return empty( $exempt ) || kindi_dashclean_is_exempt();
-}
-
-/**
- * Register the tool under the Kindi menu (only for those who may manage it).
+ * Capture the full top-level menu (slug => title) so the panel checklist can
+ * list every menu even on pages where some are removed. Updated only on change.
  *
  * @return void
  */
-function kindi_dashclean_menu(): void {
-	if ( ! kindi_dashclean_can_manage() ) {
+function kindi_dashclean_capture(): void {
+	global $menu;
+	if ( empty( $menu ) || ! is_array( $menu ) ) {
 		return;
 	}
-	add_submenu_page(
-		'kindi-settings',
-		__( 'ניקוי לוח בקרה', 'kindi' ),
-		__( 'ניקוי לוח בקרה', 'kindi' ),
-		'manage_options',
-		'kindi-dashboard',
-		'kindi_dashclean_page'
-	);
+	$catalog = array();
+	foreach ( $menu as $item ) {
+		$slug  = isset( $item[2] ) ? (string) $item[2] : '';
+		$title = isset( $item[0] ) ? trim( wp_strip_all_tags( (string) $item[0] ) ) : '';
+		if ( '' === $slug || '' === $title || false !== strpos( $slug, 'separator' ) || 'kindi-settings' === $slug ) {
+			continue;
+		}
+		$catalog[ $slug ] = $title;
+	}
+	if ( get_option( 'kindi_menu_catalog' ) !== $catalog ) {
+		update_option( 'kindi_menu_catalog', $catalog, false );
+	}
 }
-add_action( 'admin_menu', 'kindi_dashclean_menu' );
+add_action( 'admin_menu', 'kindi_dashclean_capture', 9990 );
 
 /**
- * Remove the chosen menus for non-exempt users. Never runs on the tool's own
- * page (so the full list is always available to re-enable), and never hides the
- * Kindi menu.
+ * Remove the chosen menus. Never hides the Kindi menu.
  *
  * @return void
  */
 function kindi_dashclean_apply(): void {
-	if ( isset( $_GET['page'] ) && 'kindi-dashboard' === $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		return;
-	}
-	if ( kindi_dashclean_is_exempt() ) {
-		return;
-	}
 	foreach ( kindi_dashclean_hidden() as $slug ) {
 		if ( 'kindi-settings' === $slug ) {
 			continue;
@@ -113,65 +66,76 @@ function kindi_dashclean_apply(): void {
 add_action( 'admin_menu', 'kindi_dashclean_apply', 9999 );
 
 /**
- * Render the cleanup screen.
+ * Register the "לוח בקרה" tab in the Kindi panel.
  *
+ * @param array<string,array<string,mixed>> $tabs Settings tabs.
+ * @return array<string,array<string,mixed>>
+ */
+function kindi_dashclean_tab( array $tabs ): array {
+	$tabs['dashboard'] = array(
+		'label'    => 'לוח בקרה',
+		'sections' => array(
+			'ניקוי תפריטי לוח הבקרה' => array(
+				'hidden_menus' => array(
+					'type'  => 'menu_toggles',
+					'label' => 'תפריטים להסתרה',
+					'help'  => 'סמנו אילו תפריטים להסתיר מלוח הבקרה. ההסתרה מסתירה את הקישור בלבד — הדפים עדיין נגישים דרך הכתובת הישירה. תפריט קינדי לעולם לא מוסתר.',
+				),
+			),
+		),
+	);
+	return $tabs;
+}
+add_filter( 'kindi_settings_tabs', 'kindi_dashclean_tab' );
+
+/**
+ * Render the menu checklist in the panel (dispatched from the settings render).
+ *
+ * @param string $key   Field key ('hidden_menus').
+ * @param mixed  $value Stored hidden slugs.
  * @return void
  */
-function kindi_dashclean_page(): void {
-	if ( ! kindi_dashclean_can_manage() ) {
+function kindi_dashclean_field_render( string $key, $value ): void {
+	$hidden  = is_array( $value ) ? $value : array();
+	$catalog = get_option( 'kindi_menu_catalog', array() );
+	if ( ! is_array( $catalog ) ) {
+		$catalog = array();
+	}
+
+	// Marker so unchecking everything still saves (empties the list).
+	echo '<input type="hidden" name="kindi__present[' . esc_attr( $key ) . ']" value="1">';
+
+	if ( ! $catalog ) {
+		echo '<p>' . esc_html__( 'רשימת התפריטים תיטען לאחר רענון העמוד.', 'kindi' ) . '</p>';
 		return;
 	}
 
-	if ( isset( $_POST['kindi_dashclean_save'] ) && check_admin_referer( 'kindi_dashclean' ) ) {
-		$hide = isset( $_POST['hide'] ) ? (array) wp_unslash( $_POST['hide'] ) : array();
-		$hide = array_values( array_filter( array_map( 'sanitize_text_field', $hide ), static function ( $s ) {
-			return 'kindi-settings' !== $s;
-		} ) );
-		update_option( 'kindi_hidden_menus', $hide, false );
-
-		$exempt = isset( $_POST['exempt'] ) ? sanitize_textarea_field( wp_unslash( $_POST['exempt'] ) ) : '';
-		update_option( 'kindi_menu_exempt', $exempt, false );
-
-		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'נשמר.', 'kindi' ) . '</p></div>';
-	}
-
-	global $menu;
-	$hidden     = kindi_dashclean_hidden();
-	$exempt_raw = (string) get_option( 'kindi_menu_exempt', '' );
-	if ( '' === $exempt_raw ) {
-		$exempt_raw = (string) wp_get_current_user()->user_email; // Prefill so setup can't lock you out.
-	}
-
-	echo '<div class="wrap"><h1>' . esc_html__( 'ניקוי לוח הבקרה', 'kindi' ) . '</h1>';
-	echo '<p class="description">' . esc_html__( 'סמנו אילו תפריטים להסתיר מבעל האתר. ההסתרה חלה על כל המשתמשים חוץ מהאימיילים שברשימת הפטורים — כך אתם תמיד רואים הכל. הסתרה מסתירה רק את הקישור בתפריט; הדפים עצמם נגישים תמיד דרך הכתובת הישירה.', 'kindi' ) . '</p>';
-
-	echo '<form method="post" action="">';
-	wp_nonce_field( 'kindi_dashclean' );
-
-	echo '<h2>' . esc_html__( 'משתמשים פטורים (רואים את התפריט המלא)', 'kindi' ) . '</h2>';
-	echo '<textarea name="exempt" rows="2" class="large-text" dir="ltr" placeholder="name@example.com">' . esc_textarea( $exempt_raw ) . '</textarea>';
-	echo '<p class="description">' . esc_html__( 'אימייל אחד בכל שורה (או מופרד בפסיקים). מומלץ להשאיר כאן את האימייל שלכם.', 'kindi' ) . '</p>';
-
-	echo '<h2>' . esc_html__( 'תפריטים להסתרה', 'kindi' ) . '</h2>';
-	echo '<table class="widefat striped" style="max-width:640px"><tbody>';
-
-	foreach ( (array) $menu as $item ) {
-		$slug  = isset( $item[2] ) ? (string) $item[2] : '';
-		$title = isset( $item[0] ) ? trim( wp_strip_all_tags( (string) $item[0] ) ) : '';
-		// Skip separators, empty rows, and the Kindi menu itself.
-		if ( '' === $slug || '' === $title || false !== strpos( $slug, 'separator' ) || 'kindi-settings' === $slug ) {
-			continue;
-		}
+	echo '<div style="max-width:640px">';
+	foreach ( $catalog as $slug => $title ) {
 		printf(
-			'<tr><td><label><input type="checkbox" name="hide[]" value="%s"%s> %s</label> <code style="opacity:.6">%s</code></td></tr>',
-			esc_attr( $slug ),
-			checked( in_array( $slug, $hidden, true ), true, false ),
-			esc_html( $title ),
-			esc_html( $slug )
+			'<label style="display:block;margin:5px 0"><input type="checkbox" name="kindi[%1$s][]" value="%2$s"%3$s> %4$s <code style="opacity:.55">%2$s</code></label>',
+			esc_attr( $key ),
+			esc_attr( (string) $slug ),
+			checked( in_array( (string) $slug, $hidden, true ), true, false ),
+			esc_html( (string) $title )
 		);
 	}
+	echo '</div>';
+}
 
-	echo '</tbody></table>';
-	submit_button( __( 'שמירה', 'kindi' ), 'primary', 'kindi_dashclean_save' );
-	echo '</form></div>';
+/**
+ * Sanitise the checklist on save (drops the Kindi slug defensively).
+ *
+ * @param array<int,mixed> $slugs Posted slugs.
+ * @return string[]
+ */
+function kindi_dashclean_sanitize( array $slugs ): array {
+	$out = array();
+	foreach ( $slugs as $slug ) {
+		$slug = sanitize_text_field( (string) $slug );
+		if ( '' !== $slug && 'kindi-settings' !== $slug ) {
+			$out[] = $slug;
+		}
+	}
+	return array_values( array_unique( $out ) );
 }
