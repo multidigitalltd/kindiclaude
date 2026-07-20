@@ -175,9 +175,13 @@ add_filter( 'woocommerce_add_to_cart_fragments', 'kindi_cart_fragments' );
  */
 
 /**
- * Term ids of the "ריהוט" product categories, including all their
- * subcategories. Matched by name so the rule keeps working if the category
- * slug is technical; cached for the request.
+ * Term ids of the categories excluded from free shipping, including all their
+ * subcategories (cached for the request).
+ *
+ * Source: the categories chosen in the Kindi panel
+ * (free_ship_exclude_cats). When none are chosen, falls back to the legacy
+ * behaviour — categories whose name contains "ריהוט" — so existing sites keep
+ * working until they configure the field.
  *
  * @return int[]
  */
@@ -186,19 +190,29 @@ function kindi_furniture_term_ids(): array {
 	if ( null !== $ids ) {
 		return $ids;
 	}
-	$ids   = array();
-	$roots = get_terms(
-		array(
-			'taxonomy'   => 'product_cat',
-			'fields'     => 'ids',
-			'hide_empty' => false,
-			'name__like' => 'ריהוט',
-		)
-	);
-	if ( is_wp_error( $roots ) || ! $roots ) {
-		return $ids;
+	$ids = array();
+
+	// Manually chosen categories take precedence.
+	$chosen = function_exists( 'kindi_opt' ) ? kindi_opt( 'free_ship_exclude_cats' ) : array();
+	if ( is_array( $chosen ) && $chosen ) {
+		$roots = array_map( 'intval', $chosen );
+	} else {
+		// Legacy fallback: match categories by the name "ריהוט".
+		$roots = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'fields'     => 'ids',
+				'hide_empty' => false,
+				'name__like' => 'ריהוט',
+			)
+		);
+		if ( is_wp_error( $roots ) || ! $roots ) {
+			return $ids;
+		}
+		$roots = array_map( 'intval', $roots );
 	}
-	$ids = array_map( 'intval', $roots );
+
+	$ids = $roots;
 	foreach ( $roots as $kindi_tid ) {
 		$children = get_term_children( (int) $kindi_tid, 'product_cat' );
 		if ( ! is_wp_error( $children ) ) {
