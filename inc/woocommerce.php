@@ -178,10 +178,9 @@ add_filter( 'woocommerce_add_to_cart_fragments', 'kindi_cart_fragments' );
  * Term ids of the categories excluded from free shipping, including all their
  * subcategories (cached for the request).
  *
- * Source: the categories chosen in the Kindi panel
- * (free_ship_exclude_cats). When none are chosen, falls back to the legacy
- * behaviour — categories whose name contains "ריהוט" — so existing sites keep
- * working until they configure the field.
+ * Source: the categories chosen in the Kindi panel (free_ship_exclude_cats).
+ * When none are chosen there is no exclusion at all — every product qualifies
+ * for free shipping by the usual threshold.
  *
  * @return int[]
  */
@@ -192,27 +191,13 @@ function kindi_furniture_term_ids(): array {
 	}
 	$ids = array();
 
-	// Manually chosen categories take precedence.
 	$chosen = function_exists( 'kindi_opt' ) ? kindi_opt( 'free_ship_exclude_cats' ) : array();
-	if ( is_array( $chosen ) && $chosen ) {
-		$roots = array_map( 'intval', $chosen );
-	} else {
-		// Legacy fallback: match categories by the name "ריהוט".
-		$roots = get_terms(
-			array(
-				'taxonomy'   => 'product_cat',
-				'fields'     => 'ids',
-				'hide_empty' => false,
-				'name__like' => 'ריהוט',
-			)
-		);
-		if ( is_wp_error( $roots ) || ! $roots ) {
-			return $ids;
-		}
-		$roots = array_map( 'intval', $roots );
+	if ( ! is_array( $chosen ) || ! $chosen ) {
+		return $ids; // Nothing configured → no free-shipping exclusions.
 	}
 
-	$ids = $roots;
+	$roots = array_map( 'intval', $chosen );
+	$ids   = $roots;
 	foreach ( $roots as $kindi_tid ) {
 		$children = get_term_children( (int) $kindi_tid, 'product_cat' );
 		if ( ! is_wp_error( $children ) ) {
