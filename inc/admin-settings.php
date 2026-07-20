@@ -87,6 +87,7 @@ function kindi_settings_tabs(): array {
 			'label'    => 'טקסטים והגדרות',
 			'sections' => array(
 				'כללי'         => array(
+					'favicon'              => array( 'type' => 'image', 'label' => 'אייקון האתר (Favicon)', 'help' => 'תמונה מרובעת (מומלץ 512×512, PNG). מופיעה בלשונית הדפדפן ובתוצאות החיפוש של גוגל. אם מוגדר "סמל אתר" בוורדפרס — הוא גובר.' ),
 					'phone'                => array( 'type' => 'text', 'label' => 'טלפון' ),
 					'whatsapp'             => array( 'type' => 'text', 'label' => 'מספר וואטסאפ (בינלאומי, ללא +)', 'help' => 'לדוגמה: 972500000000' ),
 					'whatsapp_hours'       => array( 'type' => 'text', 'label' => 'שעות שירות וואטסאפ (תצוגה)' ),
