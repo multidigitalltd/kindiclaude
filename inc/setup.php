@@ -45,30 +45,6 @@ function kindi_viewport_meta(): void {
 }
 add_action( 'wp_head', 'kindi_viewport_meta', 1 );
 
-/**
- * Print a favicon so browsers and Google have a site icon.
- *
- * Uses a square 512×512 icon derived from the brand logo (assets/img/favicon.png),
- * so it works automatically with no configuration. Skipped when a WordPress Site
- * Icon is configured (core already prints that, with all its sizes) so the two
- * never duplicate.
- *
- * @return void
- */
-function kindi_favicon(): void {
-	if ( function_exists( 'has_site_icon' ) && has_site_icon() ) {
-		return;
-	}
-	$icon = function_exists( 'kindi_img' ) ? (string) kindi_img( 'favicon.png' ) : '';
-	if ( '' === $icon ) {
-		return;
-	}
-	$icon = esc_url( $icon );
-	echo '<link rel="icon" type="image/png" href="' . $icon . '" sizes="512x512">' . "\n";
-	echo '<link rel="apple-touch-icon" href="' . $icon . '">' . "\n";
-}
-add_action( 'wp_head', 'kindi_favicon', 2 );
-
 // Drop core's block-theme viewport tag so exactly one is printed (ours).
 add_action(
 	'init',
