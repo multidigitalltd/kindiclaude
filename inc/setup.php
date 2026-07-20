@@ -50,8 +50,32 @@ add_action(
 	'init',
 	static function (): void {
 		remove_action( 'wp_head', '_block_template_viewport_meta_tag', 0 );
+		// The WordPress Site Icon links point at /wp-content/uploads/, which this
+		// site blocks in robots.txt — so Google can't fetch the favicon and shows
+		// none. Drop those links; kindi_favicon() serves the same icon from the
+		// (crawlable) theme folder instead. See kindi_favicon().
+		remove_action( 'wp_head', 'wp_site_icon', 99 );
 	}
 );
+
+/**
+ * Print the favicon from the theme folder so it stays crawlable even when
+ * /wp-content/uploads/ (where the WordPress Site Icon lives) is blocked in
+ * robots.txt. Serves the same brand icon; the uploads-path core links are
+ * removed above so Google only sees this fetchable one.
+ *
+ * @return void
+ */
+function kindi_favicon(): void {
+	$icon = function_exists( 'kindi_img' ) ? (string) kindi_img( 'favicon.png' ) : '';
+	if ( '' === $icon ) {
+		return;
+	}
+	$icon = esc_url( $icon );
+	echo '<link rel="icon" type="image/png" href="' . $icon . '" sizes="192x192">' . "\n";
+	echo '<link rel="apple-touch-icon" href="' . $icon . '">' . "\n";
+}
+add_action( 'wp_head', 'kindi_favicon', 2 );
 
 /**
  * Editor styles so the block editor mirrors the front end exactly.
