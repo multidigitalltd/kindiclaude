@@ -74,6 +74,7 @@ kindi_require( 'about.php' );
 kindi_require( 'post-nav.php' );
 kindi_require( 'cancel-form.php' );
 kindi_require( 'contact-form.php' );
+kindi_require( 'returns.php' );
 kindi_require( 'performance.php' );
 kindi_require( 'security.php' );
 kindi_require( 'litespeed.php' );
