@@ -63,6 +63,7 @@ if ( is_admin() ) {
 	kindi_require( 'admin-settings.php' );
 	kindi_require( 'nav-menu-fields.php' );
 	kindi_require( 'dashboard-clean.php' );
+	kindi_require( 'elementor-convert.php' );
 }
 // Theme updates are checked from the dashboard and WP-Cron only — the front
 // end never talks to GitHub.
