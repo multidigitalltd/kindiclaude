@@ -160,3 +160,45 @@ function kindi_seed_front_page(): void {
 	update_option( 'kindi_front_seeded', 1, false );
 }
 add_action( 'admin_init', 'kindi_seed_front_page' );
+
+/**
+ * Clear stale Elementor page templates (one-time, self-terminating).
+ *
+ * Elementor stored its own page template (elementor_canvas /
+ * elementor_header_footer) in _wp_page_template. After the plugin was removed
+ * that template no longer exists, so the block editor's template lookup
+ * (/wp/v2/templates/lookup?slug=page-…) never resolves and the editor hangs on
+ * those pages. Resetting the value to "default" — and dropping the leftover
+ * builder flag — lets the pages open normally. Runs once, then flags itself off.
+ *
+ * @return void
+ */
+function kindi_clear_elementor_templates(): void {
+	if ( ! is_admin() || get_option( 'kindi_elementor_tpl_cleared' ) ) {
+		return;
+	}
+
+	$ids = get_posts(
+		array(
+			'post_type'   => 'any',
+			'post_status' => 'any',
+			'numberposts' => -1,
+			'fields'      => 'ids',
+			'meta_query'  => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				array(
+					'key'     => '_wp_page_template',
+					'value'   => 'elementor',
+					'compare' => 'LIKE',
+				),
+			),
+		)
+	);
+
+	foreach ( $ids as $id ) {
+		update_post_meta( (int) $id, '_wp_page_template', 'default' );
+		delete_post_meta( (int) $id, '_elementor_edit_mode' );
+	}
+
+	update_option( 'kindi_elementor_tpl_cleared', 1, false );
+}
+add_action( 'admin_init', 'kindi_clear_elementor_templates' );
