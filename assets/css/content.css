@@ -126,27 +126,6 @@
 .kindi-cancel__notice--ok { background: color-mix(in oklab, #16a34a 10%, #fff); border: 1px solid color-mix(in oklab, #16a34a 30%, transparent); color: #15803d; }
 .kindi-cancel__notice--err { background: var(--brand-red-soft); border: 1px solid color-mix(in oklab, var(--brand-red) 25%, transparent); color: var(--brand-red-dark); }
 
-/* ---------- Returns & exchanges policy ([kindi_returns]) ---------- */
-.kindi-returns { max-width: 860px; margin-inline: auto; }
-.kindi-returns__intro { text-align: center; margin-bottom: 1.5rem; }
-.kindi-returns__intro h2 { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.2rem); line-height: 1.15; margin: 0 0 0.75rem; }
-.kindi-returns__intro p { color: var(--foreground); line-height: 1.7; margin: 0 auto 0.4rem; max-width: 60ch; }
-.kindi-returns__store { color: var(--muted-foreground); font-weight: 600; }
-.kindi-returns__store a { color: var(--brand-red); font-weight: 700; }
-.kindi-returns__ship { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1rem; background: var(--brand-blue-soft); color: var(--brand-navy); font-weight: 600; padding: 0.7rem 1.1rem; border-radius: 0.9rem; font-size: 0.95rem; line-height: 1.4; text-align: start; }
-.kindi-returns__ship .kindi-icon { flex: 0 0 auto; }
-.kindi-returns__num { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 999px; background: var(--brand-red); color: #fff; font-size: 0.85rem; font-weight: 800; margin-inline-end: 0.55rem; flex: 0 0 auto; }
-.kindi-returns__q { display: inline-flex; align-items: center; text-align: start; }
-.kindi-returns__acc .kindi-faq__answer ul { margin: 0.4rem 0 0; padding-inline-start: 1.3rem; }
-.kindi-returns__acc .kindi-faq__answer li { margin: 0.25rem 0; }
-.kindi-returns__sub { font-weight: 800; color: var(--brand-navy); margin: 0.9rem 0 0.25rem; }
-.kindi-returns__ok { display: inline-flex; align-items: center; gap: 0.4rem; color: #128C3E; font-weight: 700; }
-.kindi-returns__note { background: var(--brand-red-soft); border: 1px solid color-mix(in oklab, var(--brand-red) 30%, transparent); border-radius: 0.9rem; padding: 0.8rem 1rem; margin-top: 0.9rem; color: var(--brand-navy); font-weight: 600; line-height: 1.6; }
-.kindi-returns__example { margin-top: 1.5rem; background: var(--muted); border: 1px solid var(--border); border-radius: 1rem; padding: 1.1rem 1.25rem; max-width: 860px; margin-inline: auto; }
-.kindi-returns__example strong { display: block; font-family: var(--wp--preset--font-family--display); color: var(--brand-navy); font-size: 1.1rem; margin-bottom: 0.4rem; }
-.kindi-returns__example p { margin: 0 0 0.4rem; line-height: 1.65; }
-.kindi-returns__example p:last-child { margin-bottom: 0; }
-
 /* ---------- Contact page (page-contact template) ---------- */
 .kindi-contactpage__head { text-align: center; max-width: 44rem; margin: 0 auto 2rem; }
 .kindi-contactpage .kindi-eyebrow { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--brand-blue-soft); color: var(--brand-navy); border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.8rem; font-weight: 700; }
