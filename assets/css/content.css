@@ -126,6 +126,10 @@
 .kindi-cancel__notice--ok { background: color-mix(in oklab, #16a34a 10%, #fff); border: 1px solid color-mix(in oklab, #16a34a 30%, transparent); color: #15803d; }
 .kindi-cancel__notice--err { background: var(--brand-red-soft); border: 1px solid color-mix(in oklab, var(--brand-red) 25%, transparent); color: var(--brand-red-dark); }
 
+/* ---------- Canvas page template (no header/footer, full width) ---------- */
+.kindi-canvas { width: 100%; max-width: 100%; margin: 0; padding: 0; }
+.kindi-canvas > * { max-width: 100%; }
+
 /* ---------- Contact page (page-contact template) ---------- */
 .kindi-contactpage__head { text-align: center; max-width: 44rem; margin: 0 auto 2rem; }
 .kindi-contactpage .kindi-eyebrow { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--brand-blue-soft); color: var(--brand-navy); border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.8rem; font-weight: 700; }

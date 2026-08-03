@@ -149,7 +149,8 @@
     { "name": "footer", "title": "Footer", "area": "footer" }
   ],
   "customTemplates": [
-    { "name": "page-no-title", "title": "Page (No Title)", "postTypes": ["page"] },
+    { "name": "page-no-title", "title": "עמוד ללא כותרת (Kindi)", "postTypes": ["page"] },
+    { "name": "page-canvas", "title": "עמוד ריק — רוחב מלא, ללא הידר ופוטר (Kindi)", "postTypes": ["page"] },
     { "name": "page-about", "title": "אודות (Kindi)", "postTypes": ["page"] },
     { "name": "page-contact", "title": "יצירת קשר (Kindi)", "postTypes": ["page"] }
   ]
