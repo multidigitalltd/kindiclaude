@@ -34,8 +34,13 @@ add_action( 'wp_enqueue_scripts', 'kindi_a11y_assets' );
  * @return void
  */
 function kindi_floating_buttons(): void {
+	// The canvas template is deliberately chrome-free (landing pages), so the
+	// floating WhatsApp button is skipped there. The accessibility button stays
+	// on every view — it is a legal requirement (ת"י 5568 / WCAG 2.2 AA).
+	$canvas = function_exists( 'kindi_is_canvas_page' ) && kindi_is_canvas_page();
+
 	$wa = preg_replace( '/\D+/', '', (string) ( function_exists( 'kindi_opt' ) ? kindi_opt( 'whatsapp' ) : '' ) );
-	if ( '' !== $wa ) {
+	if ( '' !== $wa && ! $canvas ) {
 		echo '<a class="kindi-float kindi-float--wa" href="' . esc_url( 'https://wa.me/' . $wa ) . '" aria-label="צ׳אט בוואטסאפ" target="_blank" rel="noopener">' . kindi_icon( 'whatsapp', 'kindi-icon--xl kindi-icon--white' ) . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	}
 	echo '<button class="kindi-float kindi-float--a11y" type="button" aria-label="הגדרות נגישות" aria-controls="kindi-a11y-panel" aria-expanded="false" data-kindi-a11y>' . kindi_icon( 'accessibility', 'kindi-icon--md kindi-icon--white' ) . '</button>'; // phpcs:ignore WordPress.Security.EscapeOutput

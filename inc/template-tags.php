@@ -243,3 +243,14 @@ function kindi_hot_products_shortcode(): string {
 	return kindi_hot_products_html( (string) kindi_opt( 'home_products_source', 'popularity' ), (int) kindi_opt( 'home_products_count', 10 ) );
 }
 add_shortcode( 'kindi_hot_products', 'kindi_hot_products_shortcode' );
+
+/**
+ * Is the current view using the blank canvas page template (no header, footer
+ * or chrome)? Used to keep that template genuinely empty — e.g. landing pages
+ * where the floating WhatsApp button would distract from the single CTA.
+ *
+ * @return bool
+ */
+function kindi_is_canvas_page(): bool {
+	return is_page() && 'page-canvas' === get_page_template_slug( get_queried_object_id() );
+}
