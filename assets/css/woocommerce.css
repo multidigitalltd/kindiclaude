@@ -966,16 +966,35 @@ body.kindi-wait-open { overflow: hidden; }
   .woocommerce-cart .cart-collaterals .cart_totals { width: 100%; float: none; }
   .woocommerce-cart .cart-collaterals .cross-sells { display: none; }
 }
-/* Mobile: the totals card sticks to the bottom of the screen so the checkout
-   button stays reachable while the items scroll above it. */
+/* Mobile: the totals card scrolls with the page. It used to be stuck to the
+   bottom of the screen, which covered the cart items — the checkout button is
+   kept reachable by the floating jump pill (.kindi-jump) instead, which only
+   appears while the real button is off-screen and hides the moment it isn't. */
 @media (max-width: 1023.98px) {
-  .woocommerce-cart .cart-collaterals { position: sticky; bottom: 0; z-index: 40; margin: 0; }
-  .woocommerce-cart .cart-collaterals .cart_totals {
-    box-shadow: 0 -10px 28px rgba(20, 35, 63, 0.16);
-    border-bottom-left-radius: 0; border-bottom-right-radius: 0;
-  }
+  .woocommerce-cart .cart-collaterals { margin: 0; }
   .woocommerce-cart .cart-collaterals .cross-sells { display: none; }
 }
+
+/* ---------- Floating "jump to checkout" pill (cart + checkout) ---------- */
+/* Shown only while the real action button is out of view, so nothing is ever
+   permanently covered: a compact pill, centred, that scrolls to / triggers the
+   real button. Built by store.js — no markup when JS is off. */
+.kindi-jump {
+  position: fixed; z-index: 140; inset-inline-start: 50%;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  padding: 0.7rem 1.3rem; border: 0; border-radius: 999px;
+  background: var(--brand-red); color: #fff; cursor: pointer;
+  font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 1rem;
+  box-shadow: 0 12px 32px rgba(20, 35, 63, 0.32);
+  opacity: 0; pointer-events: none;
+  transform: translateX(-50%) translateY(150%);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.kindi-jump.is-on { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+.kindi-jump:hover { background: var(--brand-red-dark); }
+.kindi-jump__sum { background: rgba(255, 255, 255, 0.2); border-radius: 999px; padding: 0.1rem 0.55rem; font-size: 0.9rem; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .kindi-jump { transition: none; } }
 .woocommerce-cart table.cart td.actions .button { border-radius: 0.875rem; }
 .woocommerce-cart .quantity { border-radius: 0.6rem; }
 /* Mobile: keep the qty stepper a tight single row (it was wrapping in the narrow

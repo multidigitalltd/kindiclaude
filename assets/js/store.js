@@ -873,3 +873,89 @@
 	// stale overlay.
 	window.addEventListener( 'pageshow', hide );
 }() );
+
+/* Floating "jump to checkout" pill (cart + checkout).
+ * A long cart pushes the action button below the fold. Rather than pinning a
+ * panel over the order (which hides the items), a compact pill appears ONLY
+ * while the real button is out of view and disappears the moment it scrolls
+ * back in — so nothing is permanently covered. Clicking it triggers the real
+ * button, which keeps all of WooCommerce's own validation intact. */
+( function () {
+	'use strict';
+	var body = document.body;
+	var isCart = body.classList.contains( 'woocommerce-cart' );
+	var isCheckout = body.classList.contains( 'woocommerce-checkout' ) && ! body.classList.contains( 'woocommerce-order-received' );
+	if ( ( ! isCart && ! isCheckout ) || ! ( 'IntersectionObserver' in window ) ) {
+		return;
+	}
+
+	var pill = null;
+	var observer = null;
+	var target = null;
+
+	var findTarget = function () {
+		return isCheckout
+			? document.getElementById( 'place_order' )
+			: document.querySelector( '.woocommerce-cart .checkout-button' );
+	};
+
+	var totalText = function () {
+		var el = document.querySelector( '.kindi-summary__grand-amount, .order-total .woocommerce-Price-amount, .order-total .amount' );
+		return el ? el.textContent.trim() : '';
+	};
+
+	var build = function () {
+		pill = document.createElement( 'button' );
+		pill.type = 'button';
+		pill.className = 'kindi-jump';
+		pill.innerHTML = '<span class="kindi-jump__label"></span><span class="kindi-jump__sum"></span>';
+		pill.addEventListener( 'click', function () {
+			var t = findTarget();
+			if ( ! t ) { return; }
+			// Bring the real control into view, then trigger it — so shoppers see
+			// the terms checkbox / validation messages attached to it.
+			t.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+			t.click();
+		} );
+		document.body.appendChild( pill );
+	};
+
+	var paint = function () {
+		if ( ! pill ) { return; }
+		var sum = totalText();
+		pill.querySelector( '.kindi-jump__label' ).textContent = isCheckout ? 'השלמת ההזמנה' : 'מעבר לתשלום';
+		pill.querySelector( '.kindi-jump__sum' ).textContent = sum;
+		pill.querySelector( '.kindi-jump__sum' ).hidden = '' === sum;
+	};
+
+	var watch = function () {
+		var next = findTarget();
+		if ( ! next ) { return; }
+		if ( observer ) { observer.disconnect(); }
+		target = next;
+		observer = new IntersectionObserver( function ( entries ) {
+			var visible = entries[ 0 ] && entries[ 0 ].isIntersecting;
+			if ( ! pill ) { build(); }
+			paint();
+			pill.classList.toggle( 'is-on', ! visible );
+		}, { threshold: 0.15 } );
+		observer.observe( target );
+	};
+
+	watch();
+
+	// The review-order fragment replaces #place_order on every recalculation.
+	if ( window.jQuery ) {
+		window.jQuery( document.body ).on( 'updated_checkout updated_cart_totals', function () {
+			watch();
+			paint();
+		} );
+	}
+
+	// Never leave the pill up while the order is being submitted.
+	document.addEventListener( 'click', function ( e ) {
+		if ( e.target.closest && e.target.closest( '#place_order' ) && pill ) {
+			pill.classList.remove( 'is-on' );
+		}
+	} );
+}() );
