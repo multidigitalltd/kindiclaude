@@ -820,17 +820,32 @@
 		}
 	};
 
+	// Safety net: whatever happens, the overlay must never hold a shopper
+	// hostage. If the submission has not navigated away (or reported an error
+	// that clears it) within this window, the page is handed back so the order
+	// can be retried. A genuine redirect happens long before this fires.
+	var FAILSAFE_MS = 25000;
+	var failsafe = null;
+
+	var hide = function () {
+		if ( failsafe ) {
+			window.clearTimeout( failsafe );
+			failsafe = null;
+		}
+		overlay.hidden = true;
+		document.body.classList.remove( 'kindi-wait-open' );
+		form.removeAttribute( 'aria-busy' );
+		lockBtn( false );
+	};
 	var show = function () {
 		overlay.hidden = false;
 		document.body.classList.add( 'kindi-wait-open' );
 		form.setAttribute( 'aria-busy', 'true' );
 		lockBtn( true );
-	};
-	var hide = function () {
-		overlay.hidden = true;
-		document.body.classList.remove( 'kindi-wait-open' );
-		form.removeAttribute( 'aria-busy' );
-		lockBtn( false );
+		if ( failsafe ) {
+			window.clearTimeout( failsafe );
+		}
+		failsafe = window.setTimeout( hide, FAILSAFE_MS );
 	};
 
 	form.addEventListener( 'submit', function () {
@@ -841,19 +856,28 @@
 		show();
 	} );
 
-	// Instant feedback: WooCommerce runs its own validation/AJAX before the
-	// submit event fires, which on a slow connection left the shopper staring at
-	// an unchanged page for seconds and clicking again. React on the click
-	// itself — delegated, so it survives the review-order fragment refresh.
+	// NOTE: the overlay is deliberately tied to the form's submit event only.
+	// Showing it on the button's click looked snappier, but any path where
+	// WooCommerce then decided NOT to submit (its own validation, a gateway
+	// check) left the overlay up with no event to clear it — shoppers were
+	// trapped behind "אנא המתינו…" and could not order. Instant feedback is
+	// handled by the button's own busy state instead, which is purely visual.
 	document.addEventListener( 'click', function ( e ) {
 		var btn = e.target.closest && e.target.closest( '#place_order' );
 		if ( ! btn || btn.disabled ) {
 			return;
 		}
 		if ( 'function' === typeof form.checkValidity && ! form.checkValidity() ) {
-			return; // Let the browser point at the missing field instead.
+			return;
 		}
-		show();
+		btn.setAttribute( 'aria-busy', 'true' );
+		// Release the visual state if nothing came of the click.
+		window.setTimeout( function () {
+			if ( ! overlay.hidden ) {
+				return; // A real submission is in progress.
+			}
+			btn.removeAttribute( 'aria-busy' );
+		}, 4000 );
 	} );
 
 	// WooCommerce signals failures/refreshes through jQuery events (it always
@@ -868,6 +892,19 @@
 	if ( notices && 'MutationObserver' in window ) {
 		new MutationObserver( hide ).observe( notices, { childList: true, subtree: true } );
 	}
+
+	// Manual escape hatch — Escape, or a click on the backdrop, always returns
+	// the page. Better a shopper who dismissed it early than one who is stuck.
+	overlay.addEventListener( 'click', function ( e ) {
+		if ( e.target === overlay ) {
+			hide();
+		}
+	} );
+	document.addEventListener( 'keydown', function ( e ) {
+		if ( 'Escape' === e.key && ! overlay.hidden ) {
+			hide();
+		}
+	} );
 
 	// Returning via the browser back button (bfcache) must never restore a
 	// stale overlay.
