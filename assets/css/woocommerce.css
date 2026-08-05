@@ -646,6 +646,35 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-summary__place #place_order::after { content: "←"; font-size: 1.05em; line-height: 1; }
 .kindi-summary__place .button.kindi-placeorder:hover,
 .kindi-summary__place #place_order:hover { background: var(--brand-red-dark); transform: translateY(-1px); }
+/* Busy state — the click is acknowledged instantly, before WooCommerce has
+   finished validating, so nobody clicks twice thinking nothing happened. */
+.kindi-summary__place #place_order[aria-busy="true"] {
+  background: var(--brand-red-dark); opacity: 0.85; cursor: progress; transform: none;
+}
+.kindi-summary__place #place_order[aria-busy="true"]::after {
+  content: ""; width: 1.05em; height: 1.05em; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.45); border-top-color: #fff;
+  animation: kindi-po-spin 0.7s linear infinite;
+}
+@keyframes kindi-po-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .kindi-summary__place #place_order[aria-busy="true"]::after { animation: none; }
+}
+
+/* Long carts pushed the place-order button far below the fold on phones, so
+   the totals + button block sticks to the bottom of the viewport while the
+   summary is on screen. */
+@media (max-width: 1023.98px) {
+  .kindi-summary__place {
+    position: sticky; bottom: 0; z-index: 30;
+    background: #fff; margin-inline: -1rem; padding: 0.9rem 1rem calc(0.9rem + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -10px 30px rgba(20, 35, 63, 0.14);
+  }
+  /* Fine print stays available but must not eat the small screen. */
+  .kindi-summary__place .woocommerce-privacy-policy-text { display: none; }
+}
+
 .kindi-summary__place .woocommerce-terms-and-conditions-wrapper,
 .kindi-summary__place .woocommerce-privacy-policy-text { margin-top: 0.85rem; }
 .kindi-summary__place .woocommerce-privacy-policy-text p,

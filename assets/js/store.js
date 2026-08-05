@@ -841,6 +841,21 @@
 		show();
 	} );
 
+	// Instant feedback: WooCommerce runs its own validation/AJAX before the
+	// submit event fires, which on a slow connection left the shopper staring at
+	// an unchanged page for seconds and clicking again. React on the click
+	// itself — delegated, so it survives the review-order fragment refresh.
+	document.addEventListener( 'click', function ( e ) {
+		var btn = e.target.closest && e.target.closest( '#place_order' );
+		if ( ! btn || btn.disabled ) {
+			return;
+		}
+		if ( 'function' === typeof form.checkValidity && ! form.checkValidity() ) {
+			return; // Let the browser point at the missing field instead.
+		}
+		show();
+	} );
+
 	// WooCommerce signals failures/refreshes through jQuery events (it always
 	// loads jQuery on checkout; the guard is for safety only).
 	if ( window.jQuery ) {
