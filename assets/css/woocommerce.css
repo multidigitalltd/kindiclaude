@@ -661,18 +661,32 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   .kindi-summary__place #place_order[aria-busy="true"]::after { animation: none; }
 }
 
-/* Long carts pushed the place-order button far below the fold on phones, so
-   the totals + button block sticks to the bottom of the viewport while the
-   summary is on screen. */
+/* Long carts push the place-order button far below the fold — on phones down
+   the page, and on desktop below the fold of a summary column taller than the
+   viewport (the column is sticky, but its bottom still scrolls away). So the
+   totals + button block sticks to the bottom of the viewport on every size
+   while the summary is on screen. */
+.kindi-summary__place {
+  position: sticky; bottom: 0; z-index: 30;
+  background: #fff;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -10px 30px rgba(20, 35, 63, 0.12);
+}
 @media (max-width: 1023.98px) {
+  /* Full-bleed on phones so the bar spans the screen edge to edge. */
   .kindi-summary__place {
-    position: sticky; bottom: 0; z-index: 30;
-    background: #fff; margin-inline: -1rem; padding: 0.9rem 1rem calc(0.9rem + env(safe-area-inset-bottom));
-    border-top: 1px solid var(--border);
-    box-shadow: 0 -10px 30px rgba(20, 35, 63, 0.14);
+    margin-inline: -1rem;
+    padding: 0.9rem 1rem calc(0.9rem + env(safe-area-inset-bottom));
   }
   /* Fine print stays available but must not eat the small screen. */
   .kindi-summary__place .woocommerce-privacy-policy-text { display: none; }
+}
+@media (min-width: 1024px) {
+  .kindi-summary__place {
+    margin-inline: -1.25rem; padding-inline: 1.25rem; padding-bottom: 0.9rem;
+    border-radius: 0 0 1.25rem 1.25rem;
+  }
 }
 
 .kindi-summary__place .woocommerce-terms-and-conditions-wrapper,
