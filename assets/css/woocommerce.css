@@ -589,7 +589,17 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-summary__free--nudge { background: var(--brand-blue-soft); border-color: color-mix(in oklab, var(--brand-blue) 30%, transparent); color: var(--brand-navy); }
 .kindi-summary__free--nudge .kindi-icon { color: var(--brand-blue); }
 
-.kindi-summary__items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+/* A long cart used to push the totals and the place-order button far below the
+   fold. Instead of floating the button over the order (which would hide the
+   items), the item list gets its own scroll: the summary stays compact and the
+   button sits right under it. Short carts are unaffected — the cap only kicks
+   in once the list is genuinely long. */
+.kindi-summary__items {
+  list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column;
+  max-height: 22rem; overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+@media (max-width: 1023.98px) { .kindi-summary__items { max-height: 17rem; } }
 .kindi-summary__item { display: grid; grid-template-columns: 3.25rem 1fr auto; gap: 0.75rem; align-items: start; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
 .kindi-summary__img img { width: 3.25rem; height: 3.25rem; object-fit: contain; border-radius: 0.6rem; background: var(--brand-cream, #FBF6EC); }
 .kindi-summary__info { min-width: 0; display: flex; flex-direction: column; gap: 0.35rem; }
@@ -661,33 +671,6 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   .kindi-summary__place #place_order[aria-busy="true"]::after { animation: none; }
 }
 
-/* Long carts push the place-order button far below the fold — on phones down
-   the page, and on desktop below the fold of a summary column taller than the
-   viewport (the column is sticky, but its bottom still scrolls away). So the
-   totals + button block sticks to the bottom of the viewport on every size
-   while the summary is on screen. */
-.kindi-summary__place {
-  position: sticky; bottom: 0; z-index: 30;
-  background: #fff;
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--border);
-  box-shadow: 0 -10px 30px rgba(20, 35, 63, 0.12);
-}
-@media (max-width: 1023.98px) {
-  /* Full-bleed on phones so the bar spans the screen edge to edge. */
-  .kindi-summary__place {
-    margin-inline: -1rem;
-    padding: 0.9rem 1rem calc(0.9rem + env(safe-area-inset-bottom));
-  }
-  /* Fine print stays available but must not eat the small screen. */
-  .kindi-summary__place .woocommerce-privacy-policy-text { display: none; }
-}
-@media (min-width: 1024px) {
-  .kindi-summary__place {
-    margin-inline: -1.25rem; padding-inline: 1.25rem; padding-bottom: 0.9rem;
-    border-radius: 0 0 1.25rem 1.25rem;
-  }
-}
 
 .kindi-summary__place .woocommerce-terms-and-conditions-wrapper,
 .kindi-summary__place .woocommerce-privacy-policy-text { margin-top: 0.85rem; }
