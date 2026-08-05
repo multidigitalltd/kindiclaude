@@ -994,7 +994,26 @@ body.kindi-wait-open { overflow: hidden; }
 .kindi-jump.is-on { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
 .kindi-jump:hover { background: var(--brand-red-dark); }
 .kindi-jump__sum { background: rgba(255, 255, 255, 0.2); border-radius: 999px; padding: 0.1rem 0.55rem; font-size: 0.9rem; white-space: nowrap; }
-@media (prefers-reduced-motion: reduce) { .kindi-jump { transition: none; } }
+/* Required fields still missing — the pill says so instead of looking dead. */
+.kindi-jump.is-invalid { background: var(--brand-navy); animation: kindi-jump-nudge 0.4s ease; }
+.kindi-jump.is-invalid .kindi-jump__label::after { content: " — יש למלא את שדות החובה"; font-weight: 600; }
+.kindi-jump.is-invalid .kindi-jump__sum { display: none; }
+@keyframes kindi-jump-nudge {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  25% { transform: translateX(-50%) translateY(0) rotate(-1.5deg); }
+  75% { transform: translateX(-50%) translateY(0) rotate(1.5deg); }
+}
+/* Phones: keep the pill clear of the floating WhatsApp / accessibility buttons
+   and inside the thumb zone, and let a long label wrap instead of overflowing. */
+@media (max-width: 640px) {
+  .kindi-jump { max-width: calc(100vw - 7.5rem); font-size: 0.95rem; padding: 0.65rem 1.1rem; }
+  .kindi-jump__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body:has( .kindi-jump.is-on ) .kindi-float { bottom: calc(5.25rem + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kindi-jump { transition: none; }
+  .kindi-jump.is-invalid { animation: none; }
+}
 .woocommerce-cart table.cart td.actions .button { border-radius: 0.875rem; }
 .woocommerce-cart .quantity { border-radius: 0.6rem; }
 /* Mobile: keep the qty stepper a tight single row (it was wrapping in the narrow

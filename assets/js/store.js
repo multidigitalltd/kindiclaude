@@ -912,6 +912,24 @@
 		pill.addEventListener( 'click', function () {
 			var t = findTarget();
 			if ( ! t ) { return; }
+
+			// Missing required fields: say so on the pill itself and send the
+			// shopper straight to the offending field, instead of appearing to
+			// do nothing.
+			var form = isCheckout ? document.querySelector( 'form.checkout' ) : null;
+			if ( form && 'function' === typeof form.checkValidity && ! form.checkValidity() ) {
+				pill.classList.add( 'is-invalid' );
+				window.setTimeout( function () { pill.classList.remove( 'is-invalid' ); }, 1600 );
+				var missing = form.querySelector( ':invalid' );
+				if ( missing ) {
+					missing.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+				}
+				if ( 'function' === typeof form.reportValidity ) {
+					form.reportValidity();
+				}
+				return;
+			}
+
 			// Bring the real control into view, then trigger it — so shoppers see
 			// the terms checkbox / validation messages attached to it.
 			t.scrollIntoView( { behavior: 'smooth', block: 'center' } );
@@ -923,7 +941,7 @@
 	var paint = function () {
 		if ( ! pill ) { return; }
 		var sum = totalText();
-		pill.querySelector( '.kindi-jump__label' ).textContent = isCheckout ? 'השלמת ההזמנה' : 'מעבר לתשלום';
+		pill.querySelector( '.kindi-jump__label' ).textContent = isCheckout ? 'אישור הזמנה ותשלום' : 'מעבר לתשלום';
 		pill.querySelector( '.kindi-jump__sum' ).textContent = sum;
 		pill.querySelector( '.kindi-jump__sum' ).hidden = '' === sum;
 	};
