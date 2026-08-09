@@ -432,10 +432,13 @@ function kindi_archive_sidebar(): void {
 			$new   = $is_on ? array_diff( $chosen, array( $t['slug'] ) ) : array_merge( $chosen, array( $t['slug'] ) );
 			$url   = $new ? add_query_arg( $param, implode( ',', $new ) ) : remove_query_arg( $param );
 
+			// rel="nofollow" on every facet link: the filter URL space is
+			// effectively unlimited, and crawling it burns the crawl budget on
+			// pages that are noindex anyway (see inc/seo-facets.php).
 			if ( 'color' === $type ) {
 				$hex = function_exists( 'kindi_resolve_color' ) ? kindi_resolve_color( $t['name'], $t['slug'] ) : '';
 				printf(
-					'<a class="kindi-swatch%s" href="%s" title="%s" aria-label="%s" style="--sw:%s"></a>',
+					'<a class="kindi-swatch%s" href="%s" rel="nofollow" title="%s" aria-label="%s" style="--sw:%s"></a>',
 					$is_on ? ' is-active' : '',
 					esc_url( $url ),
 					esc_attr( $t['name'] ),
@@ -444,7 +447,7 @@ function kindi_archive_sidebar(): void {
 				);
 			} else {
 				printf(
-					'<a class="kindi-fopt%s%s" href="%s">%s</a>',
+					'<a class="kindi-fopt%s%s" href="%s" rel="nofollow">%s</a>',
 					$is_on ? ' is-active' : '',
 					'age' === $type ? ' kindi-fopt--pill' : '',
 					esc_url( $url ),
