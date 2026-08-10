@@ -97,6 +97,23 @@ function kindi_cart_remove_unavailable(): void {
 		WC()->session->set( 'kindi_removed_items', $removed );
 		WC()->session->set( 'kindi_adjusted_items', $adjusted );
 	}
+
+	// This hook also fires INSIDE order submission (process_checkout). There the
+	// cart may not change silently — the shopper would be charged for an order
+	// different from the one on their screen. The fix is applied, but the
+	// submission is halted with a clear message so they see the updated total
+	// and confirm again. Detected by WooCommerce's own checkout nonce field.
+	if ( isset( $_POST['woocommerce-process-checkout-nonce'] ) && function_exists( 'wc_add_notice' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- context detection only; WooCommerce verifies the nonce itself.
+		$names = array_merge( wp_list_pluck( $removed, 'name' ), wp_list_pluck( $adjusted, 'name' ) );
+		wc_add_notice(
+			sprintf(
+				/* translators: %s: product names. */
+				esc_html__( 'הסל עודכן לפי המלאי הזמין (%s). בדקו את הסכום המעודכן ולחצו שוב על אישור ההזמנה.', 'kindi' ),
+				esc_html( implode( ', ', array_filter( array_map( 'strval', $names ) ) ) )
+			),
+			'error'
+		);
+	}
 }
 // Priority 0: WooCommerce registers its own check_cart_items() at priority 1,
 // and once that has queued an error notice the checkout page refuses to render
@@ -142,7 +159,7 @@ function kindi_cart_alternatives( array $removed_ids, int $limit = 4 ): array {
 				array(
 					'taxonomy' => 'product_visibility',
 					'field'    => 'name',
-					'terms'    => array( 'outofstock' ),
+					'terms'    => array( 'outofstock', 'exclude-from-catalog' ),
 					'operator' => 'NOT IN',
 				),
 			),
