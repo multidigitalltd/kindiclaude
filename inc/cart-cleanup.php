@@ -16,24 +16,22 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Is this cart line still buyable at the requested quantity?
+ * Is the product itself still sellable at all (any quantity)?
  *
- * @param WC_Product $product  Product (variation when applicable).
- * @param int        $quantity Requested quantity.
+ * @param WC_Product $product Product (variation when applicable).
  * @return bool
  */
-function kindi_cart_line_available( WC_Product $product, int $quantity ): bool {
-	if ( ! $product->exists() || 'publish' !== $product->get_status() ) {
-		return false;
-	}
-	if ( ! $product->is_purchasable() || ! $product->is_in_stock() ) {
-		return false;
-	}
-	return $product->has_enough_stock( $quantity );
+function kindi_cart_product_sellable( WC_Product $product ): bool {
+	return $product->exists()
+		&& 'publish' === $product->get_status()
+		&& $product->is_purchasable()
+		&& $product->is_in_stock();
 }
 
 /**
- * Drop unavailable lines from the cart and remember them for the notice.
+ * Fix up the cart: drop what can no longer be sold, and where only part of the
+ * requested quantity is left, keep the line and reduce it to what's in stock —
+ * selling 2 of 5 beats losing the line entirely.
  *
  * @return void
  */
@@ -42,32 +40,51 @@ function kindi_cart_remove_unavailable(): void {
 		return;
 	}
 
-	$removed = array();
+	$removed  = array();
+	$adjusted = array();
 
 	foreach ( WC()->cart->get_cart() as $key => $item ) {
 		$product = $item['data'] ?? null;
 		if ( ! $product instanceof WC_Product ) {
 			continue;
 		}
-		if ( kindi_cart_line_available( $product, (int) ( $item['quantity'] ?? 0 ) ) ) {
+		$wanted    = (int) ( $item['quantity'] ?? 0 );
+		$parent_id = ! empty( $item['product_id'] ) ? (int) $item['product_id'] : $product->get_id();
+
+		if ( ! kindi_cart_product_sellable( $product ) ) {
+			$removed[] = array( 'name' => $product->get_name(), 'id' => $parent_id );
+			WC()->cart->remove_cart_item( $key );
 			continue;
 		}
 
-		$parent_id = ! empty( $item['product_id'] ) ? (int) $item['product_id'] : $product->get_id();
-		$removed[] = array(
-			'name' => $product->get_name(),
-			'id'   => $parent_id,
-		);
-		WC()->cart->remove_cart_item( $key );
+		// Enough stock (or backorders allowed) — nothing to do.
+		if ( $product->has_enough_stock( $wanted ) ) {
+			continue;
+		}
+
+		// Partial stock: keep the line at the quantity actually available.
+		$available = $product->managing_stock() ? (int) $product->get_stock_quantity() : 0;
+		if ( $available > 0 ) {
+			WC()->cart->set_quantity( $key, $available, false );
+			$adjusted[] = array(
+				'name'   => $product->get_name(),
+				'wanted' => $wanted,
+				'left'   => $available,
+			);
+		} else {
+			$removed[] = array( 'name' => $product->get_name(), 'id' => $parent_id );
+			WC()->cart->remove_cart_item( $key );
+		}
 	}
 
-	if ( ! $removed ) {
+	if ( ! $removed && ! $adjusted ) {
 		return;
 	}
 
 	WC()->cart->calculate_totals();
 	if ( WC()->session ) {
 		WC()->session->set( 'kindi_removed_items', $removed );
+		WC()->session->set( 'kindi_adjusted_items', $adjusted );
 	}
 }
 // Runs on both the cart page and checkout, before WooCommerce's own validation
@@ -126,25 +143,48 @@ function kindi_cart_removed_notice(): void {
 	if ( ! function_exists( 'WC' ) || ! WC()->session ) {
 		return;
 	}
-	$removed = WC()->session->get( 'kindi_removed_items' );
-	if ( ! is_array( $removed ) || ! $removed ) {
+	$removed  = WC()->session->get( 'kindi_removed_items' );
+	$adjusted = WC()->session->get( 'kindi_adjusted_items' );
+	$removed  = is_array( $removed ) ? $removed : array();
+	$adjusted = is_array( $adjusted ) ? $adjusted : array();
+	if ( ! $removed && ! $adjusted ) {
 		return;
 	}
 	// Show once — the shopper has been told.
 	WC()->session->set( 'kindi_removed_items', array() );
+	WC()->session->set( 'kindi_adjusted_items', array() );
 
 	$ids = array_values( array_filter( array_map( static function ( $r ) {
 		return isset( $r['id'] ) ? (int) $r['id'] : 0;
 	}, $removed ) ) );
 
-	echo '<div class="kindi-oos" role="alert">';
-	echo '<div class="kindi-oos__head">' . kindi_icon( 'info', 'kindi-icon--md' ) . '<strong>' . esc_html( _n( 'מוצר אחד הוסר מהסל — אזל מהמלאי', 'מוצרים הוסרו מהסל — אזלו מהמלאי', count( $removed ), 'kindi' ) ) . '</strong></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	$title = $removed
+		? _n( 'מוצר אחד הוסר מהסל — אזל מהמלאי', 'מוצרים הוסרו מהסל — אזלו מהמלאי', count( $removed ), 'kindi' )
+		: __( 'עדכנו את הכמות בסל לפי המלאי הזמין', 'kindi' );
 
-	echo '<ul class="kindi-oos__list">';
-	foreach ( $removed as $item ) {
-		echo '<li>' . esc_html( (string) ( $item['name'] ?? '' ) ) . '</li>';
+	echo '<div class="kindi-oos" role="alert">';
+	echo '<div class="kindi-oos__head">' . kindi_icon( 'info', 'kindi-icon--md' ) . '<strong>' . esc_html( $title ) . '</strong></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
+
+	if ( $removed ) {
+		echo '<ul class="kindi-oos__list">';
+		foreach ( $removed as $item ) {
+			echo '<li>' . esc_html( (string) ( $item['name'] ?? '' ) ) . '</li>';
+		}
+		echo '</ul>';
 	}
-	echo '</ul>';
+
+	if ( $adjusted ) {
+		echo '<ul class="kindi-oos__list kindi-oos__list--qty">';
+		foreach ( $adjusted as $item ) {
+			printf(
+				'<li>%1$s — <strong>%2$s</strong></li>',
+				esc_html( (string) ( $item['name'] ?? '' ) ),
+				esc_html( sprintf( /* translators: 1: quantity left, 2: quantity requested. */ __( 'נשארו %1$d במלאי במקום %2$d — הכמות עודכנה', 'kindi' ), (int) ( $item['left'] ?? 0 ), (int) ( $item['wanted'] ?? 0 ) ) )
+			);
+		}
+		echo '</ul>';
+	}
+
 	echo '<p class="kindi-oos__note">' . esc_html__( 'השארנו את שאר המוצרים בסל — אפשר להמשיך לתשלום.', 'kindi' ) . '</p>';
 
 	$alts = kindi_cart_alternatives( $ids );
