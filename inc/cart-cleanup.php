@@ -18,14 +18,25 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Is the product itself still sellable at all (any quantity)?
  *
+ * Deliberately limited to existence, publication and stock. `is_purchasable()`
+ * is NOT used as a removal reason: plugins price some legitimate lines at
+ * runtime (gift cards, club rewards, bundle children) and can report them as
+ * unpurchasable mid-request — deleting those from a shopper's cart would be far
+ * worse than the blocked checkout this module exists to prevent. WooCommerce
+ * still validates purchasability itself.
+ *
  * @param WC_Product $product Product (variation when applicable).
  * @return bool
  */
 function kindi_cart_product_sellable( WC_Product $product ): bool {
-	return $product->exists()
-		&& 'publish' === $product->get_status()
-		&& $product->is_purchasable()
-		&& $product->is_in_stock();
+	if ( ! $product->exists() ) {
+		return false;
+	}
+	$status = $product->get_status();
+	if ( '' !== $status && 'publish' !== $status ) {
+		return false;
+	}
+	return $product->is_in_stock();
 }
 
 /**
@@ -87,9 +98,11 @@ function kindi_cart_remove_unavailable(): void {
 		WC()->session->set( 'kindi_adjusted_items', $adjusted );
 	}
 }
-// Runs on both the cart page and checkout, before WooCommerce's own validation
-// would turn the same lines into a blocking error.
-add_action( 'woocommerce_check_cart_items', 'kindi_cart_remove_unavailable', 1 );
+// Priority 0: WooCommerce registers its own check_cart_items() at priority 1,
+// and once that has queued an error notice the checkout page refuses to render
+// at all — cleaning the cart afterwards would be too late. Running first means
+// there is nothing left for it to complain about.
+add_action( 'woocommerce_check_cart_items', 'kindi_cart_remove_unavailable', 0 );
 
 /**
  * In-stock alternatives for a removed product: siblings from its categories.
@@ -99,9 +112,12 @@ add_action( 'woocommerce_check_cart_items', 'kindi_cart_remove_unavailable', 1 )
  * @return int[] Product IDs.
  */
 function kindi_cart_alternatives( array $removed_ids, int $limit = 4 ): array {
+	if ( ! $removed_ids || ! function_exists( 'wc_get_product_term_ids' ) ) {
+		return array();
+	}
 	$cats = array();
 	foreach ( $removed_ids as $pid ) {
-		$cats = array_merge( $cats, wc_get_product_term_ids( (int) $pid, 'product_cat' ) );
+		$cats = array_merge( $cats, (array) wc_get_product_term_ids( (int) $pid, 'product_cat' ) );
 	}
 	if ( ! $cats ) {
 		return array();
@@ -162,8 +178,10 @@ function kindi_cart_removed_notice(): void {
 		? _n( 'מוצר אחד הוסר מהסל — אזל מהמלאי', 'מוצרים הוסרו מהסל — אזלו מהמלאי', count( $removed ), 'kindi' )
 		: __( 'עדכנו את הכמות בסל לפי המלאי הזמין', 'kindi' );
 
+	$icon = function_exists( 'kindi_icon' ) ? kindi_icon( 'info', 'kindi-icon--md' ) : '';
+
 	echo '<div class="kindi-oos" role="alert">';
-	echo '<div class="kindi-oos__head">' . kindi_icon( 'info', 'kindi-icon--md' ) . '<strong>' . esc_html( $title ) . '</strong></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	echo '<div class="kindi-oos__head">' . $icon . '<strong>' . esc_html( $title ) . '</strong></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
 
 	if ( $removed ) {
 		echo '<ul class="kindi-oos__list">';
