@@ -1512,3 +1512,20 @@ body.kindi-wait-open { overflow: hidden; }
 .kindi-upsell__urgency { display: flex; align-items: center; justify-content: center; gap: 0.3rem; margin: 0.5rem 0 0; font-size: 0.78rem; font-weight: 700; color: var(--brand-red-dark); }
 .kindi-upsell-tag { display: inline-block; margin-inline-start: 0.4rem; font-size: 0.68rem; font-weight: 700; color: var(--brand-blue); background: var(--brand-blue-soft, #eef4ff); border-radius: 0.4rem; padding: 0.05rem 0.4rem; vertical-align: middle; }
 @media (prefers-reduced-motion: reduce) { .kindi-upsell, .kindi-upsell__btn { transition: none; } }
+
+/* ---------- Out-of-stock cart cleanup notice ---------- */
+.kindi-oos { background: var(--brand-red-soft); border: 1px solid color-mix(in oklab, var(--brand-red) 28%, transparent); border-radius: 1.25rem; padding: 1.1rem 1.25rem; margin: 0 0 1.5rem; }
+.kindi-oos__head { display: flex; align-items: center; gap: 0.55rem; color: var(--brand-navy); font-size: 1.05rem; }
+.kindi-oos__head .kindi-icon { flex: 0 0 auto; }
+.kindi-oos__list { margin: 0.6rem 0 0; padding-inline-start: 1.4rem; color: var(--brand-navy); font-weight: 600; }
+.kindi-oos__list li { margin: 0.15rem 0; }
+.kindi-oos__note { margin: 0.6rem 0 0; color: var(--muted-foreground); font-size: 0.9rem; }
+.kindi-oos__alts { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid color-mix(in oklab, var(--brand-red) 20%, transparent); }
+.kindi-oos__altstitle { display: block; font-weight: 800; color: var(--brand-navy); margin-bottom: 0.7rem; }
+.kindi-oos__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 0.75rem; }
+.kindi-oos__card { display: flex; flex-direction: column; gap: 0.35rem; background: #fff; border: 1px solid var(--border); border-radius: 0.9rem; padding: 0.6rem; text-decoration: none; color: inherit; transition: box-shadow 0.15s ease, transform 0.15s ease; }
+.kindi-oos__card:hover { box-shadow: var(--shadow-card); transform: translateY(-2px); }
+.kindi-oos__card img { width: 100%; height: auto; border-radius: 0.6rem; display: block; }
+.kindi-oos__name { font-size: 0.82rem; font-weight: 700; color: var(--brand-navy); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.kindi-oos__price { font-size: 0.85rem; font-weight: 800; color: var(--brand-red); }
+@media (prefers-reduced-motion: reduce) { .kindi-oos__card { transition: none; } }
