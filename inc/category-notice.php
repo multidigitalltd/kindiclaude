@@ -1,15 +1,17 @@
 <?php
 /**
- * Category notices — a text message attached to a product category that shows
- * beside the add-to-cart button on its products, on the category archive (top
- * and bottom of the grid), and in the cart when such a product is present.
- * Optionally cascades to the category's subcategories.
+ * Site notices — a text message shown by display condition, managed from the
+ * Kindi panel (tab "הודעות קטגוריה").
  *
- * Use case: a whole category is temporarily out of supply ("no restock until
- * 1.1.27") and shoppers should see it wherever they meet the product.
+ * Conditions per row:
+ * - Product category: shows beside the add-to-cart button on its products, on
+ *   the category archive (top and bottom of the grid) and in the cart when such
+ *   a product is present; optionally cascades to subcategories.
+ * - Specific page: shows at the top of that page's content.
  *
- * Managed centrally from the Kindi panel (tab "הודעות קטגוריה"). Storage is one
- * option row per rule: category ID, text, and an include-subcategories flag.
+ * Rows are stored with a `type` field ('cat'/'page'); legacy rows without it
+ * are category rows, so existing notices keep working. New condition types slot
+ * in by extending the type select + one lookup.
  *
  * @package Kindi
  */
@@ -32,11 +34,11 @@ function kindi_cat_notices_settings_tab( array $tabs ): array {
 	$tabs['catnotices'] = array(
 		'label'    => 'הודעות קטגוריה',
 		'sections' => array(
-			'הודעות זמינות / מלאי לפי קטגוריה' => array(
+			'הודעות לפי תנאי תצוגה' => array(
 				'cat_notices' => array(
 					'type'  => 'cat_notices',
 					'label' => 'הודעות',
-					'help'  => 'בחרו קטגוריה והזינו טקסט. ההודעה תוצג ליד כפתור ההוספה לסל, בראש ובסוף ארכיון הקטגוריה, ובסל הקניות. סמנו "כולל תת-קטגוריות" כדי להחיל גם על הקטגוריות שמתחת.',
+					'help'  => 'בחרו תנאי תצוגה והזינו טקסט. קטגוריה: ההודעה תוצג ליד כפתור ההוספה לסל, בראש ובסוף ארכיון הקטגוריה ובסל הקניות (אפשר לכלול תת-קטגוריות). עמוד: ההודעה תוצג בראש תוכן העמוד שנבחר.',
 				),
 			),
 		),
@@ -44,6 +46,19 @@ function kindi_cat_notices_settings_tab( array $tabs ): array {
 	return $tabs;
 }
 add_filter( 'kindi_settings_tabs', 'kindi_cat_notices_settings_tab' );
+
+/**
+ * Pages for the condition select (id => title).
+ *
+ * @return array<int,string>
+ */
+function kindi_cn_admin_pages(): array {
+	$out = array();
+	foreach ( get_pages( array( 'sort_column' => 'post_title', 'number' => 300 ) ) as $page ) {
+		$out[ (int) $page->ID ] = (string) $page->post_title;
+	}
+	return $out;
+}
 
 /**
  * Render the repeater field in the panel (dispatched from the settings render).
@@ -56,10 +71,14 @@ function kindi_cat_notices_field_render( string $key, $value ): void {
 	$rows = is_array( $value ) ? $value : array();
 	$cats = function_exists( 'kindi_admin_product_cats' ) ? kindi_admin_product_cats() : array();
 
-	// Category <option> markup reused by every row and the JS template.
-	$options = '<option value="0">— בחרו קטגוריה —</option>';
+	// Option markup reused by every row and the JS template.
+	$cat_options = '<option value="0">— בחרו קטגוריה —</option>';
 	foreach ( $cats as $tid => $tname ) {
-		$options .= '<option value="' . (int) $tid . '">' . esc_html( $tname ) . '</option>';
+		$cat_options .= '<option value="' . (int) $tid . '">' . esc_html( $tname ) . '</option>';
+	}
+	$page_options = '<option value="0">— בחרו עמוד —</option>';
+	foreach ( kindi_cn_admin_pages() as $pid => $ptitle ) {
+		$page_options .= '<option value="' . (int) $pid . '">' . esc_html( $ptitle ) . '</option>';
 	}
 
 	// Marker so an emptied list (all rows removed) still saves.
@@ -72,10 +91,7 @@ function kindi_cat_notices_field_render( string $key, $value ): void {
 		if ( ! is_array( $row ) ) {
 			continue;
 		}
-		$cat      = isset( $row['cat'] ) ? (int) $row['cat'] : 0;
-		$text     = isset( $row['text'] ) ? (string) $row['text'] : '';
-		$children = ! empty( $row['children'] );
-		echo kindi_cat_notices_row_html( $key, $i, $options, $cat, $text, $children ); // phpcs:ignore WordPress.Security.EscapeOutput
+		echo kindi_cat_notices_row_html( $key, $i, $cat_options, $page_options, $row ); // phpcs:ignore WordPress.Security.EscapeOutput
 		$i++;
 	}
 
@@ -83,7 +99,7 @@ function kindi_cat_notices_field_render( string $key, $value ): void {
 	echo '<p><button type="button" class="button" data-kindi-cn-add>' . esc_html__( '+ הוספת הודעה', 'kindi' ) . '</button></p>';
 
 	// Prototype row for JS cloning (index placeholder __i__).
-	echo '<template data-kindi-cn-tpl>' . kindi_cat_notices_row_html( $key, '__i__', $options, 0, '', false ) . '</template>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	echo '<template data-kindi-cn-tpl>' . kindi_cat_notices_row_html( $key, '__i__', $cat_options, $page_options, array() ) . '</template>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	echo '</div>';
 
 	kindi_cat_notices_field_assets();
@@ -92,26 +108,34 @@ function kindi_cat_notices_field_render( string $key, $value ): void {
 /**
  * Markup for a single repeater row. All dynamic parts are pre-escaped.
  *
- * @param string     $key      Field key.
- * @param int|string $i        Row index (or '__i__' placeholder).
- * @param string     $options  Pre-built, escaped <option> list.
- * @param int        $cat      Selected category ID.
- * @param string     $text     Notice text.
- * @param bool       $children Include subcategories.
+ * @param string              $key          Field key.
+ * @param int|string          $i            Row index (or '__i__' placeholder).
+ * @param string              $cat_options  Pre-built, escaped category <option> list.
+ * @param string              $page_options Pre-built, escaped page <option> list.
+ * @param array<string,mixed> $row          Stored row (empty for the template).
  * @return string
  */
-function kindi_cat_notices_row_html( string $key, $i, string $options, int $cat, string $text, bool $children ): string {
-	$name  = 'kindi[' . $key . '][' . $i . ']';
-	// Inject selected= into the shared options string for this row's category.
-	$opts  = $cat > 0
-		? str_replace( 'value="' . $cat . '"', 'value="' . $cat . '" selected', $options )
-		: $options;
-	$check = $children ? ' checked' : '';
+function kindi_cat_notices_row_html( string $key, $i, string $cat_options, string $page_options, array $row ): string {
+	$name     = 'kindi[' . $key . '][' . $i . ']';
+	$type     = ( isset( $row['type'] ) && 'page' === $row['type'] ) ? 'page' : 'cat';
+	$cat      = isset( $row['cat'] ) ? (int) $row['cat'] : 0;
+	$page     = isset( $row['page'] ) ? (int) $row['page'] : 0;
+	$text     = isset( $row['text'] ) ? (string) $row['text'] : '';
+	$children = ! empty( $row['children'] );
 
-	return '<div class="kindi-cn__row" data-kindi-cn-row>'
-		. '<select name="' . esc_attr( $name ) . '[cat]" class="kindi-cn__cat">' . $opts . '</select>'
+	// Inject selected= into the shared option strings for this row.
+	$cat_opts  = $cat > 0 ? str_replace( 'value="' . $cat . '"', 'value="' . $cat . '" selected', $cat_options ) : $cat_options;
+	$page_opts = $page > 0 ? str_replace( 'value="' . $page . '"', 'value="' . $page . '" selected', $page_options ) : $page_options;
+
+	return '<div class="kindi-cn__row' . ( 'page' === $type ? ' is-type-page' : '' ) . '" data-kindi-cn-row>'
+		. '<select name="' . esc_attr( $name ) . '[type]" class="kindi-cn__type" aria-label="' . esc_attr__( 'תנאי תצוגה', 'kindi' ) . '">'
+			. '<option value="cat"' . selected( 'cat', $type, false ) . '>' . esc_html__( 'קטגוריה', 'kindi' ) . '</option>'
+			. '<option value="page"' . selected( 'page', $type, false ) . '>' . esc_html__( 'עמוד', 'kindi' ) . '</option>'
+		. '</select>'
+		. '<select name="' . esc_attr( $name ) . '[cat]" class="kindi-cn__cat">' . $cat_opts . '</select>'
+		. '<select name="' . esc_attr( $name ) . '[page]" class="kindi-cn__page">' . $page_opts . '</select>'
 		. '<textarea name="' . esc_attr( $name ) . '[text]" rows="2" class="kindi-cn__text" dir="rtl" placeholder="' . esc_attr__( 'טקסט ההודעה…', 'kindi' ) . '">' . esc_textarea( $text ) . '</textarea>'
-		. '<label class="kindi-cn__kids"><input type="checkbox" name="' . esc_attr( $name ) . '[children]" value="1"' . $check . '> ' . esc_html__( 'כולל תת-קטגוריות', 'kindi' ) . '</label>'
+		. '<label class="kindi-cn__kids"><input type="checkbox" name="' . esc_attr( $name ) . '[children]" value="1"' . ( $children ? ' checked' : '' ) . '> ' . esc_html__( 'כולל תת-קטגוריות', 'kindi' ) . '</label>'
 		. '<button type="button" class="button-link kindi-cn__del" data-kindi-cn-del aria-label="' . esc_attr__( 'הסרה', 'kindi' ) . '">✕</button>'
 		. '</div>';
 }
@@ -129,11 +153,15 @@ function kindi_cat_notices_field_assets(): void {
 	$done = true;
 	?>
 	<style>
-	.kindi-cn__row{display:flex;align-items:flex-start;gap:10px;padding:10px;margin-bottom:8px;background:#fff;border:1px solid #dcdcde;border-radius:8px;max-width:820px}
-	.kindi-cn__cat{flex:0 0 220px}
-	.kindi-cn__text{flex:1 1 auto;min-width:200px}
+	.kindi-cn__row{display:flex;align-items:flex-start;gap:10px;padding:10px;margin-bottom:8px;background:#fff;border:1px solid #dcdcde;border-radius:8px;max-width:900px}
+	.kindi-cn__type{flex:0 0 110px}
+	.kindi-cn__cat,.kindi-cn__page{flex:0 0 200px}
+	.kindi-cn__text{flex:1 1 auto;min-width:180px}
 	.kindi-cn__kids{flex:0 0 auto;white-space:nowrap;padding-top:6px;font-size:13px}
 	.kindi-cn__del{flex:0 0 auto;color:#b32d2e;text-decoration:none;font-size:16px;line-height:1;padding-top:6px}
+	.kindi-cn__row:not(.is-type-page) .kindi-cn__page{display:none}
+	.kindi-cn__row.is-type-page .kindi-cn__cat,
+	.kindi-cn__row.is-type-page .kindi-cn__kids{display:none}
 	</style>
 	<script>
 	( function () {
@@ -157,6 +185,13 @@ function kindi_cat_notices_field_assets(): void {
 					if ( row ) { row.remove(); }
 				}
 			} );
+			// Condition select swaps which target select the row shows.
+			box.addEventListener( 'change', function ( e ) {
+				var sel = e.target.closest( '.kindi-cn__type' );
+				if ( ! sel ) { return; }
+				var row = sel.closest( '[data-kindi-cn-row]' );
+				if ( row ) { row.classList.toggle( 'is-type-page', 'page' === sel.value ); }
+			} );
 		}
 		if ( 'loading' !== document.readyState ) { wire(); } else { document.addEventListener( 'DOMContentLoaded', wire ); }
 	}() );
@@ -165,11 +200,11 @@ function kindi_cat_notices_field_assets(): void {
 }
 
 /**
- * Sanitise the repeater rows on save. Empty rows (no category or no text) are
- * dropped.
+ * Sanitise the repeater rows on save. Rows without a text or without a target
+ * for their condition are dropped.
  *
  * @param array<int,mixed> $rows Raw posted rows.
- * @return array<int,array{cat:int,text:string,children:string}>
+ * @return array<int,array{type:string,cat:int,page:int,text:string,children:string}>
  */
 function kindi_sanitize_cat_notices( array $rows ): array {
 	$out = array();
@@ -177,15 +212,24 @@ function kindi_sanitize_cat_notices( array $rows ): array {
 		if ( ! is_array( $row ) ) {
 			continue;
 		}
+		$type = ( isset( $row['type'] ) && 'page' === $row['type'] ) ? 'page' : 'cat';
 		$cat  = isset( $row['cat'] ) ? absint( $row['cat'] ) : 0;
+		$page = isset( $row['page'] ) ? absint( $row['page'] ) : 0;
 		$text = isset( $row['text'] ) ? sanitize_textarea_field( (string) $row['text'] ) : '';
-		if ( ! $cat || '' === trim( $text ) ) {
+
+		if ( '' === trim( $text ) ) {
 			continue;
 		}
+		if ( ( 'cat' === $type && ! $cat ) || ( 'page' === $type && ! $page ) ) {
+			continue;
+		}
+
 		$out[] = array(
+			'type'     => $type,
 			'cat'      => $cat,
+			'page'     => $page,
 			'text'     => $text,
-			'children' => empty( $row['children'] ) ? '' : '1',
+			'children' => ( 'cat' === $type && ! empty( $row['children'] ) ) ? '1' : '',
 		);
 	}
 	return $out;
@@ -197,6 +241,7 @@ function kindi_sanitize_cat_notices( array $rows ): array {
 
 /**
  * Lookup of category ID => notice, built once per request from the option.
+ * Legacy rows without a `type` are category rows.
  *
  * @return array<int,array{text:string,children:bool}>
  */
@@ -209,13 +254,40 @@ function kindi_cat_notice_lookup(): array {
 	$rows   = function_exists( 'kindi_opt' ) ? kindi_opt( 'cat_notices' ) : array();
 	if ( is_array( $rows ) ) {
 		foreach ( $rows as $row ) {
-			if ( ! is_array( $row ) ) {
+			if ( ! is_array( $row ) || ( isset( $row['type'] ) && 'cat' !== $row['type'] ) ) {
 				continue;
 			}
 			$cat  = isset( $row['cat'] ) ? (int) $row['cat'] : 0;
 			$text = isset( $row['text'] ) ? trim( (string) $row['text'] ) : '';
 			if ( $cat > 0 && '' !== $text ) {
 				$lookup[ $cat ] = array( 'text' => $text, 'children' => ! empty( $row['children'] ) );
+			}
+		}
+	}
+	return $lookup;
+}
+
+/**
+ * Lookup of page ID => notice texts, built once per request from the option.
+ *
+ * @return array<int,string[]>
+ */
+function kindi_page_notice_lookup(): array {
+	static $lookup = null;
+	if ( null !== $lookup ) {
+		return $lookup;
+	}
+	$lookup = array();
+	$rows   = function_exists( 'kindi_opt' ) ? kindi_opt( 'cat_notices' ) : array();
+	if ( is_array( $rows ) ) {
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) || 'page' !== ( $row['type'] ?? 'cat' ) ) {
+				continue;
+			}
+			$pid  = isset( $row['page'] ) ? (int) $row['page'] : 0;
+			$text = isset( $row['text'] ) ? trim( (string) $row['text'] ) : '';
+			if ( $pid > 0 && '' !== $text ) {
+				$lookup[ $pid ][] = $text;
 			}
 		}
 	}
@@ -345,3 +417,24 @@ function kindi_cart_category_notice(): void {
 	kindi_cat_notice_box( array_values( $notices ), 'kindi-catnotice--cart' );
 }
 add_action( 'woocommerce_before_cart', 'kindi_cart_category_notice', 6 );
+
+/**
+ * Pages — a page-condition notice at the top of the page's content.
+ *
+ * @param string $content Post content.
+ * @return string
+ */
+function kindi_page_notice_content( string $content ): string {
+	if ( ! is_page() || ! in_the_loop() || ! is_main_query() ) {
+		return $content;
+	}
+	$lookup = kindi_page_notice_lookup();
+	$pid    = get_queried_object_id();
+	if ( empty( $lookup[ $pid ] ) ) {
+		return $content;
+	}
+	ob_start();
+	kindi_cat_notice_box( array_values( array_unique( $lookup[ $pid ] ) ), 'kindi-catnotice--page' );
+	return (string) ob_get_clean() . $content;
+}
+add_filter( 'the_content', 'kindi_page_notice_content', 8 );

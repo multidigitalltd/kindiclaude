@@ -383,3 +383,15 @@ a.kindi-mega__title--link:hover { text-decoration: underline; }
 .kindi-faq__answer p:last-child { margin-bottom: 0; }
 .kindi-faq__outro-title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); text-align: center; font-size: 1.25rem; margin: 2.25rem 0 0.5rem; }
 .kindi-faq__outro { text-align: center; color: var(--muted-foreground); max-width: 62ch; margin: 0 auto; line-height: 1.6; }
+
+/* ============================ Site notices ============================ */
+/* Availability/announcement box (Kindi ▸ הודעות קטגוריה) — shown beside
+   add-to-cart, on category archives, in the cart and at the top of chosen
+   pages, so it lives in this every-view layer. */
+.kindi-catnotice { display: flex; align-items: flex-start; gap: 0.7rem; margin: 1rem 0; padding: 0.85rem 1rem; border-radius: 1rem; background: var(--brand-red-soft); border: 1px solid color-mix(in oklab, var(--brand-red) 30%, transparent); }
+.kindi-catnotice--cart { margin: 0 0 1.25rem; }
+.kindi-catnotice--page { margin: 0 0 1.5rem; }
+.kindi-catnotice__ic { flex: 0 0 auto; display: inline-flex; margin-top: 0.05rem; }
+.kindi-catnotice__txt { min-width: 0; }
+.kindi-catnotice__txt p { margin: 0; color: var(--brand-navy); font-weight: 600; font-size: 0.9rem; line-height: 1.5; }
+.kindi-catnotice__txt p + p { margin-top: 0.5rem; }
