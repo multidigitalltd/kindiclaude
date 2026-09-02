@@ -87,6 +87,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'variation-swatches.php' );
 	kindi_require( 'waitlist.php' );
 	kindi_require( 'category-notice.php' );
+	kindi_require( 'holiday-popup.php' );
 	kindi_require( 'shipping-bar.php' );
 	kindi_require( 'recently-viewed.php' );
 	kindi_require( 'filters.php' );

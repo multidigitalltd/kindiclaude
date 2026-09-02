@@ -1525,3 +1525,11 @@ body.kindi-wait-open { overflow: hidden; }
 .kindi-oos__name { font-size: 0.82rem; font-weight: 700; color: var(--brand-navy); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .kindi-oos__price { font-size: 0.85rem; font-weight: 800; color: var(--brand-red); }
 @media (prefers-reduced-motion: reduce) { .kindi-oos__card { transition: none; } }
+
+/* ---- הודעת חגים בעמוד התשלום (inc/holiday-popup.php) ---- */
+.kindi-holiday { display: flex; align-items: flex-start; gap: 0.8rem; margin: 0 0 1.5rem; padding: 1rem 1.15rem; border-radius: 1rem; background: var(--brand-red-soft); border: 1px solid color-mix(in oklab, var(--brand-red) 35%, transparent); }
+.kindi-holiday__ic { flex: 0 0 auto; display: inline-flex; }
+.kindi-holiday__tt { margin: 0 0 0.35rem; font-size: 1.05rem; font-weight: 800; color: var(--brand-navy); }
+.kindi-holiday__txt { font-size: 0.9rem; line-height: 1.6; color: var(--foreground); }
+.kindi-holiday__txt p { margin: 0 0 0.6em; }
+.kindi-holiday__txt p:last-child { margin-bottom: 0; }
