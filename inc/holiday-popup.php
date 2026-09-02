@@ -157,6 +157,7 @@ function kindi_holiday_popup(): void {
 	</div>
 	<style>
 	.kindi-holipop{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:1rem}
+	.kindi-holipop[hidden]{display:none!important}
 	.kindi-holipop__backdrop{position:absolute;inset:0;background:color-mix(in oklab, var(--brand-navy) 55%, transparent);backdrop-filter:blur(2px)}
 	.kindi-holipop__card{position:relative;background:#fff;width:100%;max-width:29rem;max-height:calc(100dvh - 2rem);overflow-y:auto;border-radius:1.25rem;border-top:6px solid var(--brand-yellow);box-shadow:var(--shadow-pop);padding:2rem 1.75rem 1.75rem;text-align:center;opacity:0;transform:translateY(14px) scale(.97);transition:opacity .3s ease,transform .3s ease}
 	.kindi-holipop.is-on .kindi-holipop__card{opacity:1;transform:none}
