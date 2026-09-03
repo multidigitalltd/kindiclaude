@@ -953,6 +953,33 @@ function kindi_order_button_text(): string {
 add_filter( 'woocommerce_order_button_text', 'kindi_order_button_text' );
 
 /**
+ * Bank-transfer (BACS): append the account details and the "send us the
+ * receipt" contacts to the gateway description shown when the method is
+ * selected at checkout.
+ *
+ * @param mixed  $description Gateway description.
+ * @param string $gateway_id  Gateway id.
+ * @return string
+ */
+function kindi_bacs_description( $description, string $gateway_id ): string {
+	if ( 'bacs' !== $gateway_id ) {
+		return (string) $description;
+	}
+	$details = '<span class="kindi-bacs">'
+		. '<strong>' . esc_html__( 'פרטי החשבון להעברה:', 'kindi' ) . '</strong><br>'
+		. esc_html__( 'בנק לאומי · סניף 855 · מספר חשבון 4062071', 'kindi' ) . '<br>'
+		. esc_html__( 'על שם: קינדר טויס', 'kindi' ) . '<br>'
+		. esc_html__( 'לאחר ההעברה שלחו לנו צילום אסמכתא:', 'kindi' ) . ' '
+		. '<a href="https://wa.me/972585293383" target="_blank" rel="noopener">058-5293383</a>'
+		. ' ' . esc_html__( 'או במייל', 'kindi' ) . ' '
+		. '<a href="mailto:office@kindertoys.co.il">office@kindertoys.co.il</a>'
+		. '</span>';
+
+	return trim( (string) $description . ' ' . $details );
+}
+add_filter( 'woocommerce_gateway_description', 'kindi_bacs_description', 10, 2 );
+
+/**
  * Whether a gateway is a Gifta gift-card gateway (id or title mentions Gifta).
  *
  * @param string $id    Gateway id.

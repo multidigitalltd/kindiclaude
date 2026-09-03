@@ -189,6 +189,9 @@ function kindi_default_options(): array {
 		// created by ACF (the data outlives the removed plugin).
 		'acf_key_archive_desc' => 'תאור_תחתון_לארכיון',
 
+		// פופאפ שמירת עגלה — נפתח פעם אחת אחרי הוספת 2 מוצרים ומעלה לסל.
+		'savecart_popup_enable' => '1',
+
 		// פופאפ הודעת חגים (משלוחים) — נפתח אחרי הוספה לסל ומוצג בעמוד התשלום.
 		'holiday_enable' => '1',
 		'holiday_title'  => 'הודעה חשובה – משלוחים לקראת החגים',
