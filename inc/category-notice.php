@@ -558,7 +558,18 @@ function kindi_view_notice_render( string $view ): void {
 	if ( empty( $lookup[ $view ] ) ) {
 		return;
 	}
-	kindi_cat_notice_box( array_values( array_unique( $lookup[ $view ] ) ), 'kindi-catnotice--view' );
+
+	/**
+	 * Filter the notice texts of one view before rendering (e.g. the holiday
+	 * feature drops a checkout notice that repeats its own message).
+	 *
+	 * @param string[] $texts Notice texts.
+	 * @param string   $view  Condition key (shop/cart/checkout).
+	 */
+	$texts = apply_filters( 'kindi_view_notices', array_values( array_unique( $lookup[ $view ] ) ), $view );
+	if ( $texts ) {
+		kindi_cat_notice_box( $texts, 'kindi-catnotice--view' );
+	}
 }
 
 // Shop archive (top of the grid, before the category-archive notice at 5).

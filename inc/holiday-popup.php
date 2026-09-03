@@ -93,14 +93,72 @@ function kindi_holiday_checkout_box(): void {
 	if ( ! kindi_holiday_enabled() ) {
 		return;
 	}
-	echo '<div class="kindi-holiday" role="note">';
+	$key = substr( md5( (string) kindi_opt( 'holiday_title' ) . (string) kindi_opt( 'holiday_text' ) ), 0, 8 );
+
+	echo '<div class="kindi-holiday" role="note" data-kindi-holiday-box data-key="' . esc_attr( $key ) . '">';
 	echo '<span class="kindi-holiday__ic">' . kindi_icon( 'truck', 'kindi-icon--md' ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	echo '<div>';
 	echo '<p class="kindi-holiday__tt">' . esc_html( (string) kindi_opt( 'holiday_title' ) ) . '</p>';
 	echo '<div class="kindi-holiday__txt">' . kindi_holiday_body_html() . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in builder.
-	echo '</div></div>';
+	echo '</div>';
+	echo '<button type="button" class="kindi-holiday__x" data-kindi-holiday-box-close aria-label="' . esc_attr__( 'סגירת ההודעה', 'kindi' ) . '">' . kindi_icon( 'close' ) . '</button>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	echo '</div>';
+	?>
+	<script>
+	( function () {
+		var b = document.querySelector( '[data-kindi-holiday-box]' );
+		if ( ! b ) { return; }
+		var k = 'kindiHoliday.box.' + ( b.dataset.key || '1' );
+		try { if ( localStorage.getItem( k ) ) { b.hidden = true; } } catch ( e ) {}
+		b.addEventListener( 'click', function ( e ) {
+			if ( e.target.closest( '[data-kindi-holiday-box-close]' ) ) {
+				b.hidden = true;
+				try { localStorage.setItem( k, '1' ); } catch ( e ) {}
+			}
+		} );
+	}() );
+	</script>
+	<?php
 }
 add_action( 'woocommerce_before_checkout_form', 'kindi_holiday_checkout_box', 2 );
+
+/**
+ * Normalised text for duplicate comparison (whitespace-insensitive).
+ *
+ * @param string $s Raw text.
+ * @return string
+ */
+function kindi_holiday_norm( string $s ): string {
+	return (string) preg_replace( '/\s+/u', '', $s );
+}
+
+/**
+ * The holiday feature owns its message (the popup + the checkout box) — drop
+ * any shop/cart/checkout view-notice that repeats the same text, so a copy
+ * pasted into the notices tab never shows the message twice (or on the cart,
+ * where only the popup should appear).
+ *
+ * @param string[] $texts Notice texts of one view.
+ * @param string   $view  Condition key (shop/cart/checkout).
+ * @return string[]
+ */
+function kindi_holiday_dedupe_view_notices( array $texts, string $view ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+	if ( ! kindi_holiday_enabled() ) {
+		return $texts;
+	}
+	$body = kindi_holiday_norm( (string) kindi_opt( 'holiday_text' ) );
+	$full = kindi_holiday_norm( (string) kindi_opt( 'holiday_title' ) ) . $body;
+	$kept = array();
+	foreach ( $texts as $text ) {
+		$t = kindi_holiday_norm( (string) $text );
+		if ( '' !== $t && ( false !== strpos( $full, $t ) || false !== strpos( $t, $body ) ) ) {
+			continue; // Same message — already covered by the holiday feature.
+		}
+		$kept[] = $text;
+	}
+	return $kept;
+}
+add_filter( 'kindi_view_notices', 'kindi_holiday_dedupe_view_notices', 10, 2 );
 
 /* ------------------------------------------------------------------ *
  * Popup — after add to cart

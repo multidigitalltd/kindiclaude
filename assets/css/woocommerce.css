@@ -1533,3 +1533,7 @@ body.kindi-wait-open { overflow: hidden; }
 .kindi-holiday__txt { font-size: 0.9rem; line-height: 1.6; color: var(--foreground); }
 .kindi-holiday__txt p { margin: 0 0 0.6em; }
 .kindi-holiday__txt p:last-child { margin-bottom: 0; }
+.kindi-holiday { position: relative; }
+.kindi-holiday[hidden] { display: none !important; }
+.kindi-holiday__x { position: absolute; top: 0.5rem; inset-inline-end: 0.5rem; display: inline-flex; padding: 0.3rem; background: none; border: 0; border-radius: 50%; cursor: pointer; color: var(--brand-navy); }
+.kindi-holiday__x svg { width: 1.1rem; height: 1.1rem; }
