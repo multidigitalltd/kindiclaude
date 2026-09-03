@@ -737,6 +737,20 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   }
   .kindi-co__side { position: sticky; top: calc(var(--kindi-header-h, 7rem) + 1rem); }
 }
+/* Mobile: the order summary moves ABOVE the payment-method cards. The column
+   wrappers become display:contents so their children join one flex column and
+   can be reordered without touching the (desktop-driven) DOM:
+   details (0) → summary (1) → payment (2) → gift box (3) → extras (4).
+   WooCommerce's AJAX fragments replace #payment / the summary table in place,
+   so the ordering survives refreshes. */
+@media (max-width: 1023.98px) {
+  .kindi-co { display: flex; flex-direction: column; }
+  .kindi-co__main, .kindi-co__side { display: contents; }
+  .kindi-co #order_review { order: 1; margin-bottom: 1.25rem; }
+  .kindi-co #payment { order: 2; }
+  .kindi-co .kindi-giftbox { order: 3; }
+  .kindi-co .kindi-coextras { order: 4; }
+}
 /* Billing fields now hold the numbered .kindi-cobox cards, so the wrapper itself
    is transparent. The shipping/order-notes wrappers stay as soft white cards. */
 .woocommerce-checkout .woocommerce-billing-fields { background: none; border: 0; padding: 0; box-shadow: none; margin: 0; }
