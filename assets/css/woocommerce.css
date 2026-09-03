@@ -900,7 +900,16 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   border-color: var(--brand-red); background: var(--brand-red-soft);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 12%, transparent);
 }
-@media (max-width: 720px) { .woocommerce-checkout #payment ul.payment_methods li { flex-basis: calc(50% - 0.35rem); max-width: calc(50% - 0.35rem); } }
+/* Phones: exactly two cards per row. Grid instead of flex-basis math — two
+   calc(50% - gap/2) items plus the gap add up to exactly 100%, so any extra
+   pixel (borders, subpixel rounding) used to wrap the row to a single card. */
+@media (max-width: 720px) {
+  .woocommerce-checkout #payment ul.payment_methods { display: grid !important; grid-template-columns: 1fr 1fr; }
+  .woocommerce-checkout #payment ul.payment_methods li { flex: none; max-width: none; padding: 0.85rem 0.6rem; }
+  .woocommerce-checkout #payment ul.payment_methods li > label { font-size: 0.9rem; }
+  /* An odd count leaves the last card alone — stretch it across both columns. */
+  .woocommerce-checkout #payment ul.payment_methods li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
 /* Hide the native radio — the whole card is the control. */
 .woocommerce-checkout #payment ul.payment_methods li > input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
 .woocommerce-checkout #payment ul.payment_methods li > label {
@@ -979,8 +988,11 @@ body.kindi-wait-open { overflow: hidden; }
 /* Shown only while the real action button is out of view, so nothing is ever
    permanently covered: a compact pill, centred, that scrolls to / triggers the
    real button. Built by store.js — no markup when JS is off. */
+/* Physical left+translateX centring — inset-inline-start flips to `right` in
+   RTL while translateX(-50%) stays physical, shifting the pill a full width
+   off-centre and cutting it at the screen edge on phones. */
 .kindi-jump {
-  position: fixed; z-index: 140; inset-inline-start: 50%;
+  position: fixed; z-index: 140; left: 50%;
   bottom: calc(1rem + env(safe-area-inset-bottom));
   display: inline-flex; align-items: center; gap: 0.55rem;
   padding: 0.7rem 1.3rem; border: 0; border-radius: 999px;
