@@ -58,7 +58,17 @@ if ( ! wp_doing_ajax() ) {
 		<?php endif; ?>
 	<?php endif; ?>
 	<?php
-	// The place-order button + terms + nonce are rendered in the order-summary
-	// column instead (see checkout/review-order.php → kindi-summary__place).
+	// Consent/terms checkboxes + place-order button, at the end of the payment
+	// card so the button follows the payment-method choice. Kept inside #payment
+	// so WooCommerce's AJAX fragment refresh keeps button text/terms in sync.
+	// `.kindi-summary__place` carries the existing button/terms styling.
+	$kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place order', 'woocommerce' ) );
 	?>
+	<div class="form-row place-order kindi-summary__place">
+		<?php do_action( 'woocommerce_review_order_before_submit' ); ?>
+		<?php wc_get_template( 'checkout/terms.php' ); ?>
+		<?php echo apply_filters( 'woocommerce_order_button_html', '<button type="submit" class="button alt kindi-placeorder" name="woocommerce_checkout_place_order" id="place_order" value="' . esc_attr( $kindi_btn_text ) . '" data-value="' . esc_attr( $kindi_btn_text ) . '">' . esc_html( $kindi_btn_text ) . '</button>' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+		<?php do_action( 'woocommerce_review_order_after_submit' ); ?>
+		<?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
+	</div>
 </div>

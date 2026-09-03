@@ -43,8 +43,7 @@ if ( $kindi_cart->needs_shipping() && $kindi_cart->show_shipping() ) {
 		}
 	}
 }
-$kindi_count    = (int) $kindi_cart->get_cart_contents_count();
-$kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place order', 'woocommerce' ) );
+$kindi_count = (int) $kindi_cart->get_cart_contents_count();
 ?>
 <div class="shop_table woocommerce-checkout-review-order-table kindi-summary">
 	<div class="kindi-summary__head">
@@ -177,14 +176,10 @@ $kindi_btn_text = apply_filters( 'woocommerce_order_button_text', __( 'Place ord
 			<span class="kindi-summary__grand-amount"><?php wc_cart_totals_order_total_html(); ?></span>
 		</div>
 		<?php do_action( 'woocommerce_review_order_after_order_total' ); ?>
-		<?php do_action( 'woocommerce_review_order_before_submit' ); ?>
 		<?php
-		// Marketing-consent + terms checkboxes render here, stacked just above the
-		// place-order button (terms moved up from below the button).
-		wc_get_template( 'checkout/terms.php' );
+		// The consent/terms checkboxes + place-order button render at the end of
+		// the payment card instead (checkout/payment.php), so the button follows
+		// the payment-method choice.
 		?>
-		<?php echo apply_filters( 'woocommerce_order_button_html', '<button type="submit" class="button alt kindi-placeorder" name="woocommerce_checkout_place_order" id="place_order" value="' . esc_attr( $kindi_btn_text ) . '" data-value="' . esc_attr( $kindi_btn_text ) . '">' . esc_html( $kindi_btn_text ) . '</button>' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-		<?php do_action( 'woocommerce_review_order_after_submit' ); ?>
-		<?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
 	</div>
 </div>

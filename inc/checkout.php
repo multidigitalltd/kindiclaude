@@ -452,7 +452,9 @@ function kindi_gift_wrap_box(): void {
 	</section>
 	<?php
 }
-add_action( 'woocommerce_checkout_after_customer_details', 'kindi_gift_wrap_box', 24 );
+// Before the payment card opens at 18 — the place-order button now ends the
+// payment card, so nothing should render after it.
+add_action( 'woocommerce_checkout_after_customer_details', 'kindi_gift_wrap_box', 16 );
 
 /**
  * Whether a gift add-on checkbox is selected, reading either the direct POST

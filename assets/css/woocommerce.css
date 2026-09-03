@@ -750,8 +750,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
   .kindi-co__main, .kindi-co__side { display: contents; }
   .kindi-co #order_review { order: 1; margin-bottom: 1.25rem; }
   .kindi-co #kindi-box-payment { order: 2; }
-  .kindi-co .kindi-giftbox { order: 3; }
-  .kindi-co .kindi-coextras { order: 4; }
+  .kindi-co .kindi-coextras { order: 3; }
 }
 /* Billing fields now hold the numbered .kindi-cobox cards, so the wrapper itself
    is transparent. The shipping/order-notes wrappers stay as soft white cards. */
