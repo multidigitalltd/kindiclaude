@@ -739,15 +739,17 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 }
 /* Mobile: the order summary moves ABOVE the payment-method cards. The column
    wrappers become display:contents so their children join one flex column and
-   can be reordered without touching the (desktop-driven) DOM:
-   details (0) → summary (1) → payment (2) → gift box (3) → extras (4).
-   WooCommerce's AJAX fragments replace #payment / the summary table in place,
-   so the ordering survives refreshes. */
+   can be reordered without touching the (desktop-driven) DOM: details (0) →
+   summary (1) → payment step-4 card (2) → gift box (3) → extras (4). The
+   payment area's direct-child is the numbered #kindi-box-payment card (which
+   holds #payment), so that is what gets ordered. WooCommerce's AJAX fragments
+   replace #payment / the summary table in place, so the ordering survives
+   refreshes. */
 @media (max-width: 1023.98px) {
   .kindi-co { display: flex; flex-direction: column; }
   .kindi-co__main, .kindi-co__side { display: contents; }
   .kindi-co #order_review { order: 1; margin-bottom: 1.25rem; }
-  .kindi-co #payment { order: 2; }
+  .kindi-co #kindi-box-payment { order: 2; }
   .kindi-co .kindi-giftbox { order: 3; }
   .kindi-co .kindi-coextras { order: 4; }
 }
@@ -916,13 +918,16 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 }
 /* Phones: exactly two cards per row. Grid instead of flex-basis math — two
    calc(50% - gap/2) items plus the gap add up to exactly 100%, so any extra
-   pixel (borders, subpixel rounding) used to wrap the row to a single card. */
+   pixel (borders, subpixel rounding) used to wrap the row to a single card.
+   dense packing: the payment plugin (SUMIT/OfficeGuy) injects hidden helper
+   nodes into the list that silently occupy grid cells and punch holes in the
+   rows — dense lets the real cards backfill them. (No child-count-based
+   spanning here for the same reason.) */
 @media (max-width: 720px) {
-  .woocommerce-checkout #payment ul.payment_methods { display: grid !important; grid-template-columns: 1fr 1fr; }
+  .woocommerce-checkout #payment ul.payment_methods { display: grid !important; grid-template-columns: 1fr 1fr; grid-auto-flow: dense; }
   .woocommerce-checkout #payment ul.payment_methods li { flex: none; max-width: none; padding: 0.85rem 0.6rem; }
   .woocommerce-checkout #payment ul.payment_methods li > label { font-size: 0.9rem; }
-  /* An odd count leaves the last card alone — stretch it across both columns. */
-  .woocommerce-checkout #payment ul.payment_methods li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .woocommerce-checkout #payment ul.payment_methods > *:empty { display: none; }
 }
 /* Hide the native radio — the whole card is the control. */
 .woocommerce-checkout #payment ul.payment_methods li > input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
