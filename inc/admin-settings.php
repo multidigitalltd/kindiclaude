@@ -261,6 +261,10 @@ function kindi_sanitize_field( string $type, $value ) {
 			return sanitize_textarea_field( (string) $value );
 		case 'html':
 			return wp_kses_post( (string) $value );
+		case 'code':
+			// Verbatim embed slot (inc/custom-code.php). Raw script tags may only
+			// be saved by users trusted with unfiltered HTML; others get kses.
+			return current_user_can( 'unfiltered_html' ) ? trim( (string) $value ) : wp_kses_post( (string) $value );
 		default:
 			return sanitize_text_field( (string) $value );
 	}
@@ -412,13 +416,17 @@ function kindi_settings_render(): void {
 			$id    = 'kindi_' . $key;
 			echo '<tr><th scope="row"><label for="' . esc_attr( $id ) . '">' . esc_html( $field['label'] ) . '</label></th><td>';
 
-			if ( 'textarea' === $field['type'] || 'html' === $field['type'] ) {
+			if ( 'textarea' === $field['type'] || 'html' === $field['type'] || 'code' === $field['type'] ) {
+				$is_code = 'code' === $field['type'];
 				printf(
-					'<textarea id="%1$s" name="kindi[%2$s]" rows="%4$d" class="large-text" dir="rtl">%3$s</textarea>',
+					'<textarea id="%1$s" name="kindi[%2$s]" rows="%4$d" class="large-text%5$s" dir="%6$s"%7$s>%3$s</textarea>',
 					esc_attr( $id ),
 					esc_attr( $key ),
 					esc_textarea( (string) $value ),
-					'html' === $field['type'] ? 12 : 4
+					'textarea' === $field['type'] ? 4 : 12,
+					$is_code ? ' code' : '',
+					$is_code ? 'ltr' : 'rtl',
+					$is_code ? ' spellcheck="false"' : ''
 				);
 			} elseif ( 'select' === $field['type'] ) {
 				echo '<select id="' . esc_attr( $id ) . '" name="kindi[' . esc_attr( $key ) . ']">';
