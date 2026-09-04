@@ -1,0 +1,1569 @@
+/*
+ * Kindi WooCommerce — full store styling in the brand design language.
+ * Loaded only on store views (shop, product, cart, checkout, account) and the
+ * front page product grid. Uses theme.json tokens via base.css aliases.
+ */
+
+/* ---------- Layout container ---------- */
+.woocommerce-page .kindi-main,
+.woocommerce .kindi-main { max-width: 1440px; margin-inline: auto; }
+.woocommerce .woocommerce-notices-wrapper:empty { display: none; }
+
+/* ---------- Page header / breadcrumbs ---------- */
+.woocommerce-breadcrumb {
+  font-size: 0.8125rem; color: var(--muted-foreground); margin-bottom: 1.25rem;
+}
+.woocommerce-breadcrumb a { color: var(--brand-navy); text-decoration: none; font-weight: 600; }
+.woocommerce-breadcrumb a:hover { color: var(--brand-red); }
+.woocommerce-products-header__title,
+.woocommerce h1.entry-title,
+.wc-block-store-notices + .wp-block-post-title {
+  font-family: var(--wp--preset--font-family--display); font-weight: 900;
+  color: var(--brand-navy); font-size: clamp(1.5rem, 1.2rem + 1.6vw, 2.25rem);
+}
+.term-description, .woocommerce-products-header { margin-bottom: 1.5rem; }
+
+/* ---------- Notices ---------- */
+.woocommerce-message, .woocommerce-info, .woocommerce-error, .wc-block-components-notice-banner {
+  border-radius: 1rem; border: 0; box-shadow: var(--shadow-card); font-weight: 600;
+}
+.woocommerce-message { border-inline-start: 4px solid var(--brand-blue); }
+.woocommerce-error { border-inline-start: 4px solid var(--brand-red); }
+.woocommerce-message .button, .woocommerce-info .button { border-radius: 0.75rem; }
+
+/* ---------- Result count + ordering ---------- */
+.woocommerce-result-count { color: var(--muted-foreground); font-size: 0.875rem; }
+.woocommerce-ordering select, .woocommerce select.orderby {
+  border: 2px solid color-mix(in oklab, var(--brand-navy) 12%, transparent);
+  border-radius: 0.75rem; padding: 0.5rem 0.75rem; font-weight: 600; background: #fff; color: var(--brand-navy);
+}
+
+/* ---------- Product grid + card ---------- */
+.woocommerce ul.products, ul.products {
+  display: grid; gap: 1rem; list-style: none; margin: 0; padding: 0;
+  grid-template-columns: repeat(2, 1fr);
+}
+/* WooCommerce's default clearfix pseudo-elements become stray grid cells (an
+   empty first slot, top-right in RTL) once the list is display:grid — remove. */
+.woocommerce ul.products::before, .woocommerce ul.products::after,
+ul.products::before, ul.products::after { content: none; display: none; }
+/* Instant-filter loading state: dim + block interaction while fetching. */
+ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { ul.products[aria-busy="true"] { transition: none; } }
+@media (min-width: 640px) { .woocommerce ul.products, ul.products { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1024px) { .woocommerce ul.products, ul.products { grid-template-columns: repeat(4, 1fr); } }
+.woocommerce ul.products.columns-5, ul.products.columns-5 { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 1024px) { .woocommerce ul.products.columns-5, ul.products.columns-5 { grid-template-columns: repeat(5, 1fr); } }
+
+.woocommerce ul.products li.product, ul.products li.product {
+  background: #fff; border: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); border-radius: 1rem;
+  padding: 0; text-align: right; box-shadow: var(--shadow-card); transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  margin: 0 !important; width: auto !important; float: none !important; position: relative; display: flex; flex-direction: column; overflow: hidden;
+}
+.woocommerce ul.products li.product:hover {
+  box-shadow: var(--shadow-pop); transform: translateY(-4px);
+  border-color: color-mix(in oklab, var(--brand-red) 30%, transparent);
+}
+/* ---------- Kindi product card (1:1 with the Lovable hot-products card) ---------- */
+.kindi-pc__media { position: relative; background: #FBF6EC; aspect-ratio: 1; overflow: hidden; }
+.kindi-pc__media .kindi-pc__imglink { display: block; height: 100%; }
+.kindi-pc__media img { width: 100%; height: 100%; object-fit: cover; margin: 0 !important; border-radius: 0; transition: transform 0.5s; }
+.woocommerce ul.products li.product:hover .kindi-pc__media img { transform: scale(1.05); }
+.kindi-pc__badges { position: absolute; top: 0.5rem; inset-inline-end: 0.5rem; z-index: 2; display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-end; }
+.kindi-pc__badge { font-size: 0.625rem; font-weight: 800; padding: 0.25rem 0.5rem; border-radius: 999px; color: #fff; line-height: 1.4; }
+.kindi-pc__badge--best { background: var(--brand-red); }
+.kindi-pc__badge--sale { background: var(--brand-blue); }
+.kindi-pc__badge--new { background: var(--brand-navy); }
+.kindi-pc__wish { position: absolute; top: 0.5rem; inset-inline-start: 0.5rem; z-index: 2; width: 2rem; height: 2rem; border-radius: 999px; background: rgba(255,255,255,0.95); border: 0; display: grid; place-items: center; cursor: pointer; color: var(--brand-navy); box-shadow: 0 2px 6px rgba(0,0,0,0.12); transition: color 0.2s, transform 0.2s; }
+.kindi-pc__wish:hover { transform: scale(1.1); }
+.kindi-pc__wish:hover, .kindi-pc__wish.is-active { color: var(--brand-red); }
+.kindi-pc__wish.is-active .kindi-icon path { fill: var(--brand-red); }
+.woocommerce ul.products li.product .kindi-pc__brand,
+.woocommerce ul.products li.product .kindi-pc__title,
+.woocommerce ul.products li.product .kindi-pc__rating,
+.woocommerce ul.products li.product .kindi-pc__foot { padding-inline: 1rem; }
+.kindi-pc__brand { display: block; font-size: 0.6875rem; color: var(--brand-red); font-weight: 700; letter-spacing: 0.02em; margin-top: 0.85rem; }
+.kindi-pc__title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 1rem; font-weight: 700; color: var(--brand-navy); line-height: 1.35; min-height: 2.7rem; text-decoration: none; margin: 0.25rem 0 0; }
+.kindi-pc__title:hover { color: var(--brand-red); }
+.kindi-pc__rating { display: flex; align-items: center; gap: 0.4rem; margin: 0.5rem 0 0; }
+.kindi-pc__rating .star-rating { color: var(--brand-red); font-size: 0.85rem; width: 5.4em; height: 1.2em; line-height: 1.2; margin: 0; }
+.kindi-pc__rating .star-rating::before { color: color-mix(in oklab, var(--brand-navy) 18%, transparent); }
+.kindi-pc__rcount { font-size: 0.6875rem; color: var(--muted-foreground); font-weight: 600; }
+.kindi-pc__foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.75rem; padding-bottom: 1rem; border-top: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); }
+.kindi-pc__price { color: var(--brand-red); font-weight: 900; font-size: 1.125rem; line-height: 1.15; }
+.kindi-pc__price del { display: block; color: var(--muted-foreground); font-weight: 600; font-size: 0.6875rem; opacity: 0.85; margin: 0 0 0.1rem; }
+.kindi-pc__price ins { text-decoration: none; }
+.kindi-pc__foot .added_to_cart { display: none; }
+.woocommerce ul.products li.product .button.kindi-pc__add {
+  width: 2.25rem; height: 2.25rem; min-width: 2.25rem; padding: 0; border-radius: 999px; background: var(--brand-red);
+  display: grid; place-items: center; font-size: 0; position: relative; margin: 0; flex-shrink: 0;
+  box-shadow: 0 6px 14px -4px color-mix(in oklab, var(--brand-red) 50%, transparent);
+}
+/* Thin, perfectly centred plus drawn from two bars (instead of a heavy glyph). */
+.woocommerce ul.products li.product .button.kindi-pc__add::before,
+.woocommerce ul.products li.product .button.kindi-pc__add::after {
+  content: ""; position: absolute; top: 50%; left: 50%; background: #fff; border-radius: 2px;
+}
+.woocommerce ul.products li.product .button.kindi-pc__add::before { width: 0.85rem; height: 1.5px; transform: translate(-50%, -50%); }
+.woocommerce ul.products li.product .button.kindi-pc__add::after { width: 1.5px; height: 0.85rem; transform: translate(-50%, -50%); }
+.woocommerce ul.products li.product .button.kindi-pc__add:hover { background: var(--brand-red-dark); transform: scale(1.08); }
+.woocommerce ul.products li.product .button.kindi-pc__add.added { background: #22c55e; }
+
+/* ---------- Buttons ---------- */
+.woocommerce a.button, .woocommerce button.button, .woocommerce input.button,
+.woocommerce a.button.alt, .woocommerce button.button.alt, .woocommerce #respond input#submit,
+.woocommerce ul.products li.product .button, .woocommerce .added_to_cart,
+.wc-block-components-button, .wp-block-button__link {
+  background: var(--brand-navy); color: #fff; border-radius: 0.875rem; font-weight: 700;
+  padding: 0.6rem 1.1rem; border: 0; transition: background 0.2s, transform 0.1s; box-shadow: none; text-decoration: none;
+}
+.woocommerce a.button:hover, .woocommerce button.button:hover, .woocommerce input.button:hover,
+.woocommerce a.button.alt:hover, .woocommerce button.button.alt:hover, .woocommerce #respond input#submit:hover,
+.woocommerce ul.products li.product .button:hover, .woocommerce .added_to_cart:hover,
+.wc-block-components-button:hover, .wp-block-button__link:hover { background: var(--brand-red); color: #fff; }
+.woocommerce a.button:active, .woocommerce button.button:active { transform: scale(0.98); }
+.woocommerce .button.loading::after { vertical-align: middle; }
+
+/* Single product add-to-cart = red primary */
+.woocommerce div.product form.cart .button.single_add_to_cart_button,
+.woocommerce-cart .wc-proceed-to-checkout a.checkout-button,
+.wc-block-cart__submit-button, .wc-block-components-checkout-place-order-button {
+  background: var(--brand-red); font-size: 1rem; padding: 0.9rem 1.75rem; border-radius: 1rem;
+}
+.woocommerce div.product form.cart .button.single_add_to_cart_button:hover,
+.woocommerce-cart .wc-proceed-to-checkout a.checkout-button:hover { background: var(--brand-red-dark); }
+
+/* ---------- Pagination ---------- */
+/* Breathing room above the page numbers so they don't touch the product grid. */
+.woocommerce nav.woocommerce-pagination { margin-top: 2rem; }
+/* flex-wrap + no shrink: on narrow screens the chips keep their size and wrap
+   to a second row instead of squeezing over one another. */
+.woocommerce nav.woocommerce-pagination ul { border: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+.woocommerce nav.woocommerce-pagination ul li { border: 0; flex: 0 0 auto; float: none; }
+.woocommerce nav.woocommerce-pagination ul li a, .woocommerce nav.woocommerce-pagination ul li span {
+  border-radius: 0.75rem; min-width: 2.5rem; height: 2.5rem; line-height: 2.5rem; padding: 0; font-weight: 700;
+  background: #fff; border: 1px solid var(--border); color: var(--brand-navy);
+}
+.woocommerce nav.woocommerce-pagination ul li span.current,
+.woocommerce nav.woocommerce-pagination ul li a:hover { background: var(--brand-red); color: #fff; border-color: var(--brand-red); }
+/* Mobile: a compact single row — arrows + the current page with its two
+   neighbours only (the wrap rule above stays as the no-:has fallback). */
+@media (max-width: 767px) {
+  @supports selector(li:has(a)) {
+    .woocommerce nav.woocommerce-pagination ul li { display: none; }
+    .woocommerce nav.woocommerce-pagination ul li:has(a.prev),
+    .woocommerce nav.woocommerce-pagination ul li:has(a.next),
+    .woocommerce nav.woocommerce-pagination ul li:has(.current),
+    .woocommerce nav.woocommerce-pagination ul li:has(+ li .current),
+    .woocommerce nav.woocommerce-pagination ul li:has(.current) + li { display: block; }
+  }
+}
+
+/* ---------- Single product (custom Lovable layout) ---------- */
+.woocommerce div.product.kindi-pdp { display: block; }
+.kindi-pdp__grid { display: grid; gap: 1.5rem; }
+@media (min-width: 1024px) { .kindi-pdp__grid { grid-template-columns: 1.05fr 1fr; gap: 3rem; align-items: start; } }
+.kindi-pdp__media { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; position: relative; }
+/* Gallery badges (sale % + new) over the image, top start (right in RTL). */
+.kindi-pdp__media .onsale.kindi-pdp__sale { position: absolute; top: 0.85rem; inset-inline-start: 0.85rem; z-index: 5; margin: 0; min-width: 0; min-height: 0; display: inline-flex; align-items: center; justify-content: center; text-align: center; background: var(--brand-red); color: #fff; border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 0.72rem; font-weight: 800; line-height: 1; }
+.kindi-pdp__newbadge { position: absolute; top: 2.9rem; inset-inline-start: 0.85rem; z-index: 5; display: inline-flex; align-items: center; gap: 0.3rem; background: var(--brand-navy); color: #fff; border-radius: 999px; padding: 0.3rem 0.75rem; font-size: 0.72rem; font-weight: 800; line-height: 1.3; }
+.kindi-pdp__summary.summary { margin: 0; float: none; width: auto; }
+.kindi-pdp__below { margin-top: 3rem; }
+.kindi-pdp__below .related.products, .kindi-pdp__below .upsells.products { margin-top: 3rem; }
+/* Gallery: a soft cream stage for the main image (rounded, generous padding),
+   with the extra images as boxed thumbnails stacked one under the other in a
+   column to the RIGHT of the main image (RTL) at every viewport, navigable by
+   click. The active thumbnail gets a red ring to match the design. */
+.woocommerce div.product .woocommerce-product-gallery {
+  margin: 0; float: none; width: auto;
+  display: flex; flex-direction: row-reverse; gap: 0.75rem; align-items: flex-start;
+}
+.woocommerce div.product .woocommerce-product-gallery .woocommerce-product-gallery__wrapper {
+  flex: 1 1 auto; min-width: 0;
+  margin: 0; background: var(--brand-cream, #FBF6EC); border-radius: 1.5rem;
+  border: 1px solid color-mix(in oklab, var(--brand-navy) 8%, transparent);
+  padding: clamp(1rem, 0.5rem + 3vw, 2.5rem);
+}
+.woocommerce div.product .woocommerce-product-gallery__wrapper img { border-radius: 1rem; mix-blend-mode: multiply; }
+.woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs {
+  flex: 0 0 3.75rem; display: flex; flex-direction: column; flex-wrap: nowrap;
+  gap: 0.6rem; margin: 0; padding: 0; list-style: none;
+}
+.woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs li {
+  width: 100%; margin: 0; list-style: none;
+}
+.woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs img {
+  border-radius: 0.85rem; border: 2px solid transparent; padding: 0.25rem;
+  background: var(--brand-cream, #FBF6EC); opacity: 0.85; cursor: pointer;
+  transition: border-color 0.15s, opacity 0.15s;
+}
+.woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs img:hover,
+.woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs img.flex-active {
+  border-color: var(--brand-red); opacity: 1;
+}
+@media (min-width: 1024px) {
+  .woocommerce div.product .woocommerce-product-gallery { gap: 1rem; }
+  .woocommerce div.product .woocommerce-product-gallery .flex-control-thumbs { flex-basis: 4.75rem; }
+}
+/* Gallery arrows: subtle round prev/next over the main image (never over the
+   thumb column), fading in on hover/focus. FlexSlider disables both when the
+   gallery has a single image, so they show only when there's more than one. */
+.woocommerce div.product .woocommerce-product-gallery { position: relative; }
+.woocommerce div.product .flex-direction-nav {
+  position: absolute; inset: 0 calc(3.75rem + 1.35rem) 0 0; margin: 0; padding: 0;
+  list-style: none; pointer-events: none; z-index: 4;
+}
+.woocommerce div.product .flex-direction-nav li { position: static; margin: 0; list-style: none; }
+.woocommerce div.product .flex-direction-nav a {
+  pointer-events: auto; position: absolute; top: 50%; transform: translateY(-50%);
+  width: 2.5rem; height: 2.5rem; border-radius: 999px; display: grid; place-items: center;
+  background: color-mix(in oklab, #fff 88%, transparent);
+  border: 1px solid color-mix(in oklab, var(--brand-navy) 12%, transparent);
+  box-shadow: var(--shadow-card, 0 6px 16px rgba(20, 30, 60, 0.1));
+  color: var(--brand-navy); font-size: 0; text-indent: 0; overflow: hidden;
+  opacity: 1; transition: opacity 0.2s, background 0.15s, color 0.15s;
+}
+/* Absolutely centre the chevron inside the circle. FlexSlider puts hidden
+   "Previous/Next" text in the <a>, which as a grid item would shove the ::after
+   off-centre — position it dead-centre instead so it's independent of that. */
+.woocommerce div.product .flex-direction-nav a::after {
+  content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 0.9rem; height: 0.9rem; background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6 9 12l6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6 9 12l6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.woocommerce div.product .flex-direction-nav a.flex-prev { inset-inline-start: 0.75rem; }
+.woocommerce div.product .flex-direction-nav a.flex-next { inset-inline-end: 0.75rem; }
+/* flex-prev sits on the right (RTL "previous"), so its chevron points right. */
+.woocommerce div.product .flex-direction-nav a.flex-prev::after { transform: translate(-50%, -50%) scaleX(-1); }
+.woocommerce div.product .flex-direction-nav a:hover,
+.woocommerce div.product .flex-direction-nav a:focus-visible { background: #fff; color: var(--brand-red); }
+/* Single-image galleries: FlexSlider disables both arrows — keep them hidden. */
+.woocommerce div.product .flex-direction-nav a.flex-disabled { opacity: 0 !important; pointer-events: none; }
+.woocommerce div.product .product_title {
+  font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy);
+  font-size: clamp(1.5rem, 1.2rem + 1.6vw, 2.25rem); line-height: 1.15;
+}
+.woocommerce div.product p.price, .woocommerce div.product span.price { color: var(--brand-red); font-weight: 900; font-size: 1.75rem; }
+.woocommerce div.product .woocommerce-product-details__short-description { color: var(--foreground); line-height: 1.7; }
+.woocommerce div.product form.cart { margin-top: 1rem; }
+/* Quantity stepper: minus | number | plus in one rounded pill, on a single
+   row. !important on the layout props because WooCommerce's own stylesheet (and
+   some optimizers) set float/display on .quantity and .qty, which would drop the
+   buttons onto their own lines. */
+.woocommerce .quantity {
+  display: inline-flex !important; flex-direction: row !important; flex-wrap: nowrap;
+  align-items: stretch; overflow: hidden; width: auto; max-width: max-content;
+  border: 2px solid color-mix(in oklab, var(--brand-navy) 12%, transparent); border-radius: 0.75rem;
+}
+.woocommerce .quantity .qty {
+  flex: 0 0 auto; float: none !important; margin: 0 !important;
+  border: 0; height: 3rem; width: 3rem; min-width: 3rem; text-align: center; font-weight: 700; background: transparent;
+  -moz-appearance: textfield; appearance: textfield;
+}
+.woocommerce .quantity .qty::-webkit-outer-spin-button,
+.woocommerce .quantity .qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.kindi-qbtn {
+  flex: 0 0 auto; width: 2.75rem; align-self: stretch; border: 0; background: var(--muted); color: var(--brand-navy);
+  font-size: 1.4rem; font-weight: 700; line-height: 1; cursor: pointer;
+  display: grid; place-items: center; user-select: none; transition: background 0.15s, color 0.15s;
+}
+.kindi-qbtn:hover { background: var(--brand-navy); color: #fff; }
+.kindi-qbtn:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: -2px; }
+/* Match the qty stepper height to the add-to-cart button so the buy row reads as
+   one consistent size on every viewport (the pill was taller than the button). */
+.woocommerce div.product form.cart .button.single_add_to_cart_button {
+  height: 3rem; padding-block: 0; display: inline-flex; align-items: center; justify-content: center;
+}
+.woocommerce div.product .quantity { height: 3rem; box-sizing: border-box; }
+/* Stretch the number field to the full height and reset padding/line-height so
+   the value sits vertically centred (it was sinking to the bottom). */
+.woocommerce div.product .quantity .qty { height: auto; align-self: stretch; padding: 0; line-height: normal; }
+/* Mobile: also slim the +/- buttons so the row doesn't read as oversized. */
+@media (max-width: 1023.98px) {
+  .woocommerce div.product .quantity .qty { width: 2.5rem; min-width: 2.5rem; }
+  .woocommerce div.product .kindi-qbtn { width: 2.5rem; font-size: 1.25rem; }
+}
+/* Variation swatches — replace the attribute <select> with colour circles /
+   pills. The select stays in the DOM (hidden) as WooCommerce's source of truth. */
+.kindi-select--hidden {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); border: 0; white-space: nowrap;
+}
+.kindi-swatches { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.15rem 0 0.25rem; }
+.kindi-swatch {
+  cursor: pointer; padding: 0; background: #fff; border: 2px solid var(--border); border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center; line-height: 1;
+  transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+.kindi-swatch:hover { transform: translateY(-1px); border-color: color-mix(in oklab, var(--brand-navy) 35%, transparent); }
+.kindi-swatch--color { width: 2.25rem; height: 2.25rem; position: relative; }
+.kindi-swatch--color::after {
+  content: ""; position: absolute; inset: 3px; border-radius: 999px;
+  background: var(--sw, #ccc); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+.kindi-swatch--multi::after { background: conic-gradient(#e23b3b, #ffcf33, #3bb45a, #2f6fed, #8a4fd6, #e23b3b); }
+.kindi-swatch--text {
+  min-width: 2.5rem; height: 2.25rem; padding: 0 0.85rem; border-radius: 999px;
+  font-weight: 700; font-size: 0.9rem; color: var(--brand-navy);
+}
+/* Name tooltip on the colour circles — shows on hover AND keyboard focus
+   (WCAG 2.2 §1.4.13), dismissable with Esc (.kindi-tip-off), motion-aware. The
+   ::after pseudo is the colour fill, so the bubble uses ::before. */
+.kindi-swatch--color[data-label]::before {
+  content: attr(data-label);
+  position: absolute; bottom: calc(100% + 0.5rem); left: 50%; transform: translate(-50%, 0.25rem);
+  background: var(--brand-navy); color: #fff; font-size: 0.78rem; font-weight: 700; line-height: 1.1;
+  white-space: nowrap; padding: 0.4rem 0.6rem; border-radius: 0.5rem; z-index: 6;
+  opacity: 0; pointer-events: none; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.15s, transform 0.15s;
+}
+.kindi-swatch--color[data-label]:hover::before,
+.kindi-swatch--color[data-label]:focus-visible::before { opacity: 1; transform: translate(-50%, 0); }
+.kindi-swatch--color.kindi-tip-off::before { opacity: 0 !important; }
+@media (prefers-reduced-motion: reduce) {
+  .kindi-swatch--color[data-label]::before { transition: none; }
+}
+
+.kindi-swatch.is-active { border-color: var(--brand-red); box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 22%, transparent); }
+.kindi-swatch--text.is-active { background: var(--brand-navy); color: #fff; border-color: var(--brand-navy); }
+.kindi-swatch.is-unavailable { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+.kindi-swatch--text.is-unavailable { text-decoration: line-through; }
+.kindi-swatch:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 2px; }
+
+.woocommerce div.product .woocommerce-tabs ul.tabs { display: flex; gap: 0.5rem; border: 0; padding: 0; margin-bottom: 1rem; }
+.woocommerce div.product .woocommerce-tabs ul.tabs::before { display: none; }
+.woocommerce div.product .woocommerce-tabs ul.tabs li {
+  border: 0; background: var(--muted); border-radius: 0.75rem; margin: 0;
+}
+.woocommerce div.product .woocommerce-tabs ul.tabs li::before, .woocommerce div.product .woocommerce-tabs ul.tabs li::after { display: none; }
+.woocommerce div.product .woocommerce-tabs ul.tabs li a { color: var(--brand-navy); font-weight: 700; padding: 0.5rem 1rem; }
+.woocommerce div.product .woocommerce-tabs ul.tabs li.active { background: var(--brand-navy); }
+.woocommerce div.product .woocommerce-tabs ul.tabs li.active a { color: #fff; }
+/* Mobile: equal-width, centred, equal-height tabs so the row reads uniformly. */
+@media (max-width: 767px) {
+  .woocommerce div.product .woocommerce-tabs ul.tabs { gap: 0.4rem; }
+  .woocommerce div.product .woocommerce-tabs ul.tabs li { flex: 1 1 0; display: flex; }
+  .woocommerce div.product .woocommerce-tabs ul.tabs li a {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    text-align: center; line-height: 1.25; padding: 0.5rem 0.4rem; font-size: 0.85rem;
+  }
+}
+.related.products, .upsells.products { grid-column: 1 / -1; margin-top: 1rem; }
+.related.products > h2, .upsells.products > h2, .cross-sells > h2 {
+  font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy);
+  font-size: clamp(1.5rem, 1.2rem + 1.6vw, 2.25rem); line-height: 1.1; margin-bottom: 1.25rem;
+}
+
+/* ---------- Cart / Checkout / Account forms ---------- */
+.woocommerce form .form-row input.input-text, .woocommerce form .form-row textarea,
+.woocommerce-cart table.cart, .woocommerce #order_review,
+.wc-block-components-text-input input, .select2-container--default .select2-selection--single {
+  border-radius: 0.875rem;
+}
+.woocommerce form .form-row input.input-text, .woocommerce form .form-row textarea, .woocommerce form .form-row select {
+  border: 2px solid color-mix(in oklab, var(--brand-navy) 12%, transparent); padding: 0.7rem 0.9rem; font-size: 0.9375rem;
+}
+.woocommerce form .form-row input.input-text:focus, .woocommerce form .form-row textarea:focus { outline: none; border-color: var(--brand-red); }
+.woocommerce table.shop_table { border-radius: 1rem; border-color: var(--border); }
+.woocommerce-cart table.cart img { border-radius: 0.5rem; }
+.cart_totals h2, .woocommerce-checkout #order_review_heading {
+  font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy);
+}
+
+/* My Account */
+.woocommerce-account .woocommerce-MyAccount-navigation ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+.woocommerce-account .woocommerce-MyAccount-navigation li a {
+  display: block; padding: 0.6rem 1rem; border-radius: 0.75rem; font-weight: 700; color: var(--brand-navy); text-decoration: none;
+}
+.woocommerce-account .woocommerce-MyAccount-navigation li.is-active a, .woocommerce-account .woocommerce-MyAccount-navigation li a:hover { background: var(--brand-blue-soft); color: var(--brand-navy); }
+
+/* ---------- Free-shipping progress ---------- */
+.kindi-freeship { background: var(--brand-blue-soft); border-radius: 1rem; padding: 0.75rem 1rem; margin-bottom: 1rem; }
+.kindi-freeship p { display: flex; align-items: center; gap: 0.4rem; margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 600; color: var(--brand-navy); }
+.kindi-freeship__ic { display: inline-flex; flex: 0 0 auto; color: var(--brand-blue); }
+.kindi-freeship.is-reached .kindi-freeship__ic { color: var(--brand-red); }
+.kindi-freeship__bar { height: 8px; border-radius: 999px; background: #fff; overflow: hidden; }
+.kindi-freeship__bar span { display: block; height: 100%; background: linear-gradient(to left, var(--brand-red), var(--brand-navy)); transition: width 0.4s; }
+
+/* ---------- Archive chips (hero + sidebar) ---------- */
+.kindi-chip { display: inline-flex; align-items: center; padding: 0.4rem 0.9rem; border-radius: 999px; background: #fff; border: 1px solid var(--border); font-size: 0.8125rem; font-weight: 700; color: var(--brand-navy); text-decoration: none; cursor: pointer; transition: all 0.15s; }
+.kindi-chip:hover { border-color: var(--brand-blue); }
+.kindi-chip.is-active { background: var(--brand-navy); color: #fff; border-color: var(--brand-navy); }
+.kindi-chip--reset { color: var(--brand-red); border-color: color-mix(in oklab, var(--brand-red) 45%, transparent); gap: 0.25rem; }
+.kindi-chip--reset:hover { background: var(--brand-red); color: #fff; border-color: var(--brand-red); }
+.kindi-chip--reset .kindi-icon { width: 13px; height: 13px; }
+
+/* ---------- Newsletter done ---------- */
+.kindi-news__done { font-weight: 700; color: var(--brand-navy); padding: 0.75rem; text-align: center; margin: 0; }
+
+/* ---------- Product meta (highlights / specs / in the box) ---------- */
+.kindi-highlights { list-style: none; margin: 1rem 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.kindi-highlights li { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.9375rem; color: var(--foreground); font-weight: 600; }
+.kindi-highlights .kindi-icon { color: var(--brand-red); flex-shrink: 0; margin-top: 2px; }
+
+/* ---------- Waitlist ---------- */
+.kindi-hp { position: absolute !important; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; clip: rect(0 0 0 0); clip-path: inset(50%); }
+.kindi-waitlist { background: var(--brand-blue-soft); border-radius: 1.25rem; padding: 1.25rem; margin: 1rem 0; display: flex; flex-direction: column; gap: 0.75rem; }
+.kindi-waitlist h3 { display: flex; align-items: center; gap: 0.5rem; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); margin: 0; font-size: 1.0625rem; }
+.kindi-waitlist__row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.kindi-waitlist__row input { flex: 1; min-width: 8rem; height: 2.75rem; border: 2px solid color-mix(in oklab, var(--brand-navy) 12%, transparent); border-radius: 0.75rem; padding-inline: 0.8rem; font-size: 0.9375rem; }
+.kindi-waitlist__row input:focus { outline: none; border-color: var(--brand-red); }
+.kindi-waitlist__terms { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--brand-navy); }
+.kindi-waitlist__msg { margin: 0; font-weight: 700; color: var(--brand-navy); }
+/* Full-width brand submit — component-specific sizing, kept self-contained. */
+.kindi-waitlist button[type="submit"] {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  width: 100%; box-sizing: border-box; height: 3rem; padding-inline: 1.5rem;
+  background: var(--brand-red); color: #fff; border: 0; border-radius: 0.95rem;
+  font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 1rem;
+  cursor: pointer; box-shadow: var(--shadow-pop); transition: background 0.15s ease;
+}
+.kindi-waitlist button[type="submit"]:hover { background: var(--brand-red-dark); color: #fff; }
+
+/* ---------- Checkout / cart progress steps ---------- */
+.kindi-steps { display: flex; align-items: center; justify-content: center; gap: 0; list-style: none; margin: 0 0 1.5rem; padding: 1rem; background: #fff; border: 1px solid var(--border); border-radius: 1rem; flex-wrap: wrap; box-shadow: var(--shadow-card); }
+.kindi-step { display: flex; align-items: center; gap: 0.5rem; color: var(--muted-foreground); font-weight: 700; font-size: 0.875rem; }
+.kindi-step:not(:last-child)::after { content: ""; width: 1.75rem; height: 2px; background: var(--border); margin-inline: 0.6rem; }
+.kindi-step__n { width: 1.75rem; height: 1.75rem; border-radius: 999px; background: var(--muted); display: grid; place-items: center; font-size: 0.8125rem; }
+.kindi-step.is-active { color: var(--brand-navy); }
+.kindi-step.is-active .kindi-step__n { background: var(--brand-red); color: #fff; }
+.kindi-step.is-done { color: var(--brand-navy); }
+.kindi-step.is-done .kindi-step__n { background: #22c55e; color: #fff; }
+
+
+/* ====================================================================== */
+/* Checkout — numbered section cards (1 contact · 2 address · 3 shipping ·  */
+/* 4 payment) shared frame.                                                 */
+/* ====================================================================== */
+.kindi-cobox { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; box-shadow: var(--shadow-card); margin-bottom: 1.25rem; }
+.kindi-cobox__head { display: flex; align-items: center; gap: 0.75rem; padding: 1.1rem 1.4rem; border-bottom: 1px solid var(--border); }
+.kindi-cobox__n { flex: 0 0 auto; width: 2.1rem; height: 2.1rem; display: grid; place-items: center; border-radius: 999px; background: var(--brand-navy); color: #fff; font-weight: 800; font-size: 0.95rem; }
+.kindi-cobox__heading { flex: 1; text-align: right; }
+.kindi-cobox__title { margin: 0; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.2rem; }
+.kindi-cobox__sub { margin: 0.1rem 0 0; color: var(--muted-foreground); font-size: 0.85rem; font-weight: 600; }
+.kindi-cobox__body { padding: 1.4rem; }
+
+/* Two-up field grid inside the contact/address cards. */
+.kindi-cobox__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.25rem; align-items: start; }
+/* Override WooCommerce's float-based form-row-first/last (47% wide) so each
+   field is a full-width grid cell and the two fields span the whole row. */
+.kindi-cobox__grid > .form-row,
+.kindi-cobox__grid .form-row { width: 100% !important; max-width: 100% !important; float: none !important; clear: none !important; margin: 0 !important; padding: 0; min-width: 0; }
+.kindi-cobox__grid .form-row .woocommerce-input-wrapper { display: block; width: 100%; }
+.kindi-cobox__grid .form-row input,
+.kindi-cobox__grid .form-row select,
+.kindi-cobox__grid .form-row textarea,
+.kindi-cobox__grid .form-row .select2-container { width: 100% !important; box-sizing: border-box; max-width: none; }
+.kindi-cobox__grid .form-row-wide,
+.kindi-cobox__grid #order_comments_field { grid-column: 1 / -1; }
+/* Pin the address fields two-up in a fixed visual order (רחוב · מספר / עיר ·
+   מיקוד) regardless of the width class OR the DOM order WooCommerce's locale JS
+   applies — `order` fixes the layout even if the fields are reordered, and
+   `span 1` stops them jumping to full width. */
+.kindi-cobox__grid #billing_address_1_field,
+.kindi-cobox__grid #billing_address_2_field,
+.kindi-cobox__grid #billing_city_field,
+.kindi-cobox__grid #billing_postcode_field { grid-column: auto / span 1 !important; }
+.kindi-cobox__grid #billing_address_1_field { order: 1; }
+.kindi-cobox__grid #billing_address_2_field { order: 2; }
+.kindi-cobox__grid #billing_city_field { order: 3; }
+.kindi-cobox__grid #billing_postcode_field { order: 4; }
+/* The same two-up lock for the ship-to-a-different-address fields. */
+.kindi-cobox__grid #shipping_address_1_field,
+.kindi-cobox__grid #shipping_address_2_field,
+.kindi-cobox__grid #shipping_city_field,
+.kindi-cobox__grid #shipping_postcode_field { grid-column: auto / span 1 !important; }
+.kindi-cobox__grid #shipping_address_1_field { order: 1; }
+.kindi-cobox__grid #shipping_address_2_field { order: 2; }
+.kindi-cobox__grid #shipping_city_field { order: 3; }
+.kindi-cobox__grid #shipping_postcode_field { order: 4; }
+
+/* "משלוח לכתובת אחרת" toggle card (form-shipping.php) — sits under Box 2; the
+   fields inside open/close via WooCommerce's own checkout JS. */
+.woocommerce-checkout .kindi-shipto .kindi-shipto__toggle { margin: 0; font-size: 1.1rem; }
+.kindi-shipto .kindi-shipto__toggle label { display: flex; align-items: center; gap: 0.6rem; margin: 0; cursor: pointer; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.1rem; }
+.kindi-shipto .kindi-shipto__toggle input { width: 1.25rem; height: 1.25rem; accent-color: var(--brand-red); margin: 0; flex: 0 0 auto; }
+.kindi-shipto .kindi-shipto__fields { padding-top: 1.1rem; }
+@media (max-width: 600px) { .kindi-cobox__grid { grid-template-columns: 1fr; } }
+.kindi-hidden-field { display: none !important; }
+/* Hide stray technical/empty checkout fields (e.g. Datalogics platform id) that
+   carry no input — otherwise they take a grid cell and knock the address column
+   pairing out of place (leaving "רחוב" alone and "עיר" misaligned). */
+.kindi-cobox__grid .form-row:has(> .woocommerce-input-wrapper:empty),
+.kindi-cobox__grid .form-row:not(:has(input, select, textarea)),
+.woocommerce-checkout .kindi-cobox__grid [id*="datalogics"],
+.woocommerce-checkout [id="datalogics_n_code_platform_id_field"] { display: none !important; }
+
+/* In-field icons (positioned at the trailing/left edge in RTL). */
+.kindi-cobox__grid #billing_email_field input,
+.kindi-cobox__grid #billing_phone_field input,
+.kindi-cobox__grid #billing_first_name_field input,
+.kindi-cobox__grid #billing_last_name_field input,
+.kindi-cobox__grid #billing_address_1_field input { padding-left: 2.6rem; background-repeat: no-repeat; background-position: left 0.9rem center; background-size: 1.15rem 1.15rem; }
+.kindi-cobox__grid #billing_email_field input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='m3 7 9 6 9-6'/%3E%3C/svg%3E"); }
+.kindi-cobox__grid #billing_phone_field input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z'/%3E%3C/svg%3E"); }
+.kindi-cobox__grid #billing_first_name_field input,
+.kindi-cobox__grid #billing_last_name_field input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1'/%3E%3C/svg%3E"); }
+.kindi-cobox__grid #billing_address_1_field input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E"); }
+
+/* Simply Club box in the contact card (step 1) — centred, with its button
+   (a#open-auth-popup.clubBtnSty) recoloured to the brand blue, not black. */
+.kindi-clublogin { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; margin: 0 0 1rem; }
+.kindi-clublogin .clubBtnSty,
+.kindi-clublogin #open-auth-popup,
+.kindi-clublogin button,
+.kindi-clublogin input[type="submit"],
+.kindi-clublogin a.button,
+.kindi-clublogin [class*="button" i],
+.kindi-clublogin [class*="btn" i] {
+  background: var(--brand-navy) !important;
+  border-color: var(--brand-navy) !important;
+  color: #fff !important;
+}
+.kindi-clublogin .clubBtnSty:hover,
+.kindi-clublogin #open-auth-popup:hover,
+.kindi-clublogin button:hover,
+.kindi-clublogin input[type="submit"]:hover,
+.kindi-clublogin a.button:hover,
+.kindi-clublogin [class*="button" i]:hover,
+.kindi-clublogin [class*="btn" i]:hover {
+  background: var(--brand-navy-dark) !important;
+  border-color: var(--brand-navy-dark) !important;
+}
+
+/* ---------- Box 3: shipping-method cards ---------- */
+.kindi-ship { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; }
+/* The whole row is the card: truck (right) · title (middle) · price · radio (left). */
+.kindi-ship__item {
+  display: flex; align-items: center; gap: 0.85rem; margin: 0; cursor: pointer;
+  padding: 0.85rem 1rem; border: 2px solid var(--border); border-radius: 1rem; background: #fff;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.kindi-ship__item:hover { border-color: color-mix(in oklab, var(--brand-red) 35%, transparent); }
+.kindi-ship__item:has(input:checked) {
+  border-color: var(--brand-red); background: var(--brand-red-soft);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 12%, transparent);
+}
+.kindi-ship__item:focus-within { outline: 2px solid var(--brand-blue); outline-offset: 2px; }
+.kindi-ship__item > input { order: 2; flex: 0 0 auto; width: 1.2rem; height: 1.2rem; accent-color: var(--brand-red); margin: 0; }
+.kindi-ship__item > label { order: 0; flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.85rem; margin: 0; cursor: pointer; }
+.kindi-ship__ic { flex: 0 0 auto; width: 2.5rem; height: 2.5rem; display: grid; place-items: center; background: var(--brand-blue-soft); border-radius: 0.75rem; }
+.kindi-ship__ic .kindi-icon { width: 1.4rem; height: 1.4rem; }
+.kindi-ship__main { flex: 1; min-width: 0; }
+.kindi-ship__title { display: block; font-weight: 800; color: var(--brand-navy); line-height: 1.35; font-size: 0.92rem; }
+.kindi-ship__price { flex: 0 0 auto; font-weight: 800; color: var(--brand-navy); white-space: nowrap; }
+.kindi-ship__free { color: #16a34a; }
+.kindi-ship__coord { color: var(--brand-navy); font-weight: 700; font-size: 0.8rem; white-space: normal; text-align: end; max-width: 8.5rem; line-height: 1.25; }
+.kindi-ship__none { margin: 0; color: var(--muted-foreground); font-weight: 600; }
+
+/* Payment card wrapper resets — the #payment cards already styled below. */
+.kindi-cobox--payment .kindi-cobox__body #payment { background: transparent; }
+
+/* ---------- Gift-wrap add-on box (below payment) ---------- */
+.kindi-giftbox__ic { flex: 0 0 auto; width: 2.6rem; height: 2.6rem; display: grid; place-items: center; background: var(--brand-red-soft); border-radius: 0.75rem; }
+.kindi-giftbox__ic .kindi-icon { width: 1.5rem; height: 1.5rem; }
+.kindi-giftbox__title { margin: 0; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-red); font-size: 1.12rem; }
+.kindi-giftbox__toggle { margin-inline-start: auto; flex: 0 0 auto; width: 2.1rem; height: 2.1rem; display: grid; place-items: center; background: none; border: 0; color: var(--brand-navy); cursor: pointer; transition: transform 0.2s ease; }
+.kindi-giftbox.is-collapsed .kindi-giftbox__toggle { transform: rotate(180deg); }
+.kindi-giftbox.is-collapsed .kindi-giftbox__body { display: none; }
+.kindi-giftbox__body { display: flex; flex-direction: column; gap: 0.85rem; }
+.kindi-giftbox__check { display: flex; align-items: center; gap: 0.5rem; margin: 0; font-weight: 700; color: var(--brand-navy); cursor: pointer; }
+.kindi-giftbox__check input { width: 1.2rem; height: 1.2rem; accent-color: var(--brand-red); margin: 0; }
+.kindi-giftbox__msg { width: 100%; box-sizing: border-box; min-height: 5rem; resize: vertical; border: 1.5px solid color-mix(in oklab, var(--brand-navy) 14%, transparent); border-radius: 0.8rem; padding: 0.7rem 0.9rem; font-size: 1rem; color: var(--brand-navy); font-family: inherit; background: #fff; }
+.kindi-giftbox__msg:focus { outline: none; border-color: var(--brand-red); box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 14%, transparent); }
+
+/* ====================================================================== */
+/* Box (summary) — interactive order summary in the 1/3 column.            */
+/* ====================================================================== */
+.kindi-summary { display: block; width: 100%; border: 0; background: none; }
+.kindi-summary__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+.kindi-summary__headtext { display: flex; flex-direction: column; }
+.kindi-summary__headtext strong { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.25rem; }
+.kindi-summary__headtext span { color: var(--muted-foreground); font-size: 0.85rem; font-weight: 600; }
+.kindi-summary__edit { color: var(--brand-red); font-weight: 800; font-size: 0.85rem; text-decoration: none; white-space: nowrap; }
+.kindi-summary__edit:hover { text-decoration: underline; }
+.kindi-summary__free { display: flex; align-items: center; gap: 0.5rem; margin: 0.9rem 0; padding: 0.7rem 0.9rem; background: color-mix(in oklab, #16a34a 10%, #fff); border: 1px solid color-mix(in oklab, #16a34a 30%, transparent); border-radius: 0.85rem; color: #15803d; font-weight: 800; font-size: 0.9rem; }
+.kindi-summary__free .kindi-icon { color: #16a34a; flex: 0 0 auto; }
+/* Below the threshold: "עוד ₪X למשלוח חינם" nudge (blue, not celebratory green). */
+.kindi-summary__free--nudge { background: var(--brand-blue-soft); border-color: color-mix(in oklab, var(--brand-blue) 30%, transparent); color: var(--brand-navy); }
+.kindi-summary__free--nudge .kindi-icon { color: var(--brand-blue); }
+
+/* A long cart used to push the totals and the place-order button far below the
+   fold. Instead of floating the button over the order (which would hide the
+   items), the item list gets its own scroll: the summary stays compact and the
+   button sits right under it. Short carts are unaffected — the cap only kicks
+   in once the list is genuinely long. */
+.kindi-summary__items {
+  list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column;
+  max-height: 22rem; overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+@media (max-width: 1023.98px) { .kindi-summary__items { max-height: 17rem; } }
+.kindi-summary__item { display: grid; grid-template-columns: 3.25rem 1fr auto; gap: 0.75rem; align-items: start; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+.kindi-summary__img img { width: 3.25rem; height: 3.25rem; object-fit: contain; border-radius: 0.6rem; background: var(--brand-cream, #FBF6EC); }
+.kindi-summary__info { min-width: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.kindi-summary__title { font-weight: 800; color: var(--brand-navy); line-height: 1.3; text-decoration: none; font-size: 0.95rem; }
+.kindi-summary__title:hover { color: var(--brand-red); }
+.kindi-summary__meta { color: var(--muted-foreground); font-size: 0.8rem; font-weight: 600; }
+.kindi-summary__controls { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.15rem; }
+.kindi-summary__remove { width: 1.8rem; height: 1.8rem; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid var(--border); background: #fff; border-radius: 999px; color: var(--muted-foreground); font-size: 1.1rem; line-height: 1; cursor: pointer; transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease; }
+.kindi-summary__remove:hover { background: var(--brand-red); color: #fff; border-color: var(--brand-red); }
+.kindi-summary__price { font-weight: 800; color: var(--brand-red); white-space: nowrap; font-size: 0.95rem; }
+.kindi-summary__price del { display: block; color: var(--muted-foreground); font-weight: 600; font-size: 0.8rem; opacity: 0.8; }
+.kindi-summary__price ins { text-decoration: none; }
+
+/* Coupon box. */
+.kindi-coupon { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; padding: 0.35rem 0.35rem 0.35rem 0.75rem; border: 1.5px solid var(--border); border-radius: 0.85rem; background: #fff; }
+.kindi-coupon__ic { flex: 0 0 auto; display: inline-flex; }
+.kindi-coupon__input { flex: 1; min-width: 0; border: 0; background: none; font-size: 0.95rem; color: var(--brand-navy); padding: 0.5rem 0.25rem; }
+.kindi-coupon__input:focus { outline: none; }
+.kindi-coupon__btn { flex: 0 0 auto; background: var(--brand-navy); color: #fff; border: 0; border-radius: 0.65rem; padding: 0.55rem 1.2rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; cursor: pointer; transition: background 0.12s ease; }
+.kindi-coupon__btn:hover { background: var(--brand-navy-dark, #16224a); }
+.kindi-coupon__remove { border: 0; background: none; color: var(--brand-red); font-size: 1rem; line-height: 1; cursor: pointer; padding: 0 0.25rem; }
+.kindi-coupon__btn:disabled { opacity: 0.6; cursor: wait; }
+/* WooCommerce's apply/remove-coupon notice, rendered under the coupon box. */
+.kindi-coupon__msg { margin: -0.4rem 0 1rem; font-size: 0.85rem; font-weight: 700; color: #15803d; }
+.kindi-coupon__msg.is-error { color: var(--brand-red-dark); }
+/* The club-points note (.kindi-coupon__off, shown instead of the coupon box
+   while a redemption is active) shares the Gifta notice styling below. */
+
+.kindi-summary__totals { margin-top: 0.5rem; padding-top: 0.5rem; }
+.kindi-summary__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; color: var(--brand-navy); font-weight: 600; }
+.kindi-summary__row--coupon { color: var(--brand-red); font-weight: 700; }
+/* The summary rows also carry WooCommerce's core classes (cart-subtotal /
+   cart-discount / order-total) for third-party plugins that read amounts from
+   the DOM (e.g. Simply Club). Pin the current colours at higher specificity so
+   no core/plugin stylesheet can re-tint them via those classes. */
+.kindi-summary__row--coupon.cart-discount,
+.kindi-summary__row--coupon.cart-discount .amount { color: var(--brand-red); }
+
+/* Grand total + place-order button + terms, at the foot of the summary. */
+.kindi-summary__place { margin-top: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.kindi-summary__grand { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.9rem; }
+.kindi-summary__grand-label { display: flex; flex-direction: column; font-weight: 700; color: var(--muted-foreground); font-size: 0.9rem; }
+.kindi-summary__grand-label small { font-size: 0.75rem; font-weight: 600; }
+.kindi-summary__grand-amount { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.7rem; color: var(--brand-navy); white-space: nowrap; }
+.kindi-summary__grand-amount .woocommerce-Price-amount { color: var(--brand-navy); }
+.kindi-summary__place .button.kindi-placeorder,
+.kindi-summary__place #place_order {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: var(--brand-red); color: #fff; border: 0; border-radius: 0.95rem;
+  padding: 1.05rem 1.5rem; font-family: var(--wp--preset--font-family--sans); font-size: 1.12rem; font-weight: 800; cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.kindi-summary__place .button.kindi-placeorder::after,
+.kindi-summary__place #place_order::after { content: "←"; font-size: 1.05em; line-height: 1; }
+.kindi-summary__place .button.kindi-placeorder:hover,
+.kindi-summary__place #place_order:hover { background: var(--brand-red-dark); transform: translateY(-1px); }
+/* Busy state — the click is acknowledged instantly, before WooCommerce has
+   finished validating, so nobody clicks twice thinking nothing happened. */
+.kindi-summary__place #place_order[aria-busy="true"] {
+  background: var(--brand-red-dark); opacity: 0.85; cursor: progress; transform: none;
+}
+.kindi-summary__place #place_order[aria-busy="true"]::after {
+  content: ""; width: 1.05em; height: 1.05em; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.45); border-top-color: #fff;
+  animation: kindi-po-spin 0.7s linear infinite;
+}
+@keyframes kindi-po-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .kindi-summary__place #place_order[aria-busy="true"]::after { animation: none; }
+}
+
+
+.kindi-summary__place .woocommerce-terms-and-conditions-wrapper,
+.kindi-summary__place .woocommerce-privacy-policy-text { margin-top: 0.85rem; }
+.kindi-summary__place .woocommerce-privacy-policy-text p,
+.kindi-summary__place .woocommerce-terms-and-conditions-wrapper p { font-size: 0.8rem; color: var(--muted-foreground); text-align: center; margin: 0; line-height: 1.5; }
+.kindi-summary__place a { color: var(--brand-red); }
+
+/* Trust badges + WhatsApp help box, below the summary in the side column. */
+.kindi-coextras { margin-top: 1.25rem; display: flex; flex-direction: column; gap: 1rem; width: 100%; }
+/* The trust strip + help box match the summary card's width (same side column). */
+.kindi-co__side > .kindi-summary,
+.kindi-co__side > .kindi-coextras,
+.kindi-coextras > .kindi-cobenefits,
+.kindi-coextras > .kindi-helpbox { width: 100%; box-sizing: border-box; }
+/* Benefits card under the place-order button ("למה שווה מאד לקנות אצלנו?"). */
+.kindi-cobenefits { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; box-shadow: var(--shadow-card); padding: 1.1rem 1.25rem; }
+.kindi-cobenefits__title { margin: 0 0 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.1rem; }
+.kindi-cobenefits ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.kindi-cobenefits li { display: flex; align-items: flex-start; gap: 0.5rem; font-weight: 600; color: var(--brand-navy); font-size: 0.88rem; line-height: 1.45; }
+.kindi-cobenefits li .kindi-icon { flex: 0 0 auto; margin-top: 2px; }
+.kindi-helpbox { display: flex; align-items: center; gap: 0.85rem; background: color-mix(in oklab, #16a34a 8%, #fff); border: 1px solid color-mix(in oklab, #16a34a 30%, transparent); border-radius: 1.25rem; padding: 1rem 1.1rem; text-decoration: none; transition: background 0.15s ease; }
+.kindi-helpbox:hover { background: color-mix(in oklab, #16a34a 14%, #fff); }
+.kindi-helpbox__text { display: flex; flex-direction: column; gap: 0.1rem; }
+.kindi-helpbox__text strong { color: #15803d; font-weight: 900; font-size: 1.05rem; }
+.kindi-helpbox__text span { color: #15803d; font-size: 0.85rem; opacity: 0.9; }
+.kindi-helpbox__wa { margin-inline-start: auto; flex: 0 0 auto; width: 2.75rem; height: 2.75rem; display: grid; place-items: center; background: #25D366; border-radius: 999px; }
+.kindi-helpbox__wa .kindi-icon { width: 1.5rem; height: 1.5rem; }
+
+/* ---------- Checkout: let the page use the full width ----------
+   Block themes constrain content (~650px) via .is-layout-constrained, which
+   squashes the two columns. Widen the checkout content wrappers so the 2/3 + 1/3
+   grid has room. Scoped to the checkout body class only. */
+.woocommerce-checkout .is-layout-constrained > .woocommerce,
+.woocommerce-checkout .wp-block-post-content > .woocommerce,
+.woocommerce-checkout .entry-content > .woocommerce,
+.woocommerce-checkout .wp-block-woocommerce-checkout,
+.woocommerce-checkout .woocommerce,
+.woocommerce-checkout .entry-content,
+.woocommerce-checkout .wp-block-post-content,
+.woocommerce-checkout .is-layout-constrained > * {
+  max-width: min(1240px, 94vw) !important;
+}
+.woocommerce-checkout .woocommerce { margin-inline: auto; width: 100%; }
+
+/* ---------- Checkout layout — process (2/3) + sticky summary (1/3) ---------- */
+.woocommerce-checkout form.checkout.woocommerce-checkout { display: block; max-width: 1240px; margin-inline: auto; }
+/* Neutralise WooCommerce's float-based columns — billing + shipping stack
+   inside the process column; the .kindi-co wrappers drive the two-column grid. */
+.woocommerce-checkout form.checkout #customer_details,
+.woocommerce-checkout form.checkout #order_review,
+.woocommerce-checkout #customer_details .col2-set,
+.woocommerce-checkout #customer_details .col-1,
+.woocommerce-checkout #customer_details .col-2 { float: none !important; width: 100% !important; }
+.woocommerce-checkout form.checkout #customer_details { display: block; margin-bottom: 0; }
+
+/* Two-column wrapper injected around the checkout (see inc/checkout.php):
+   .kindi-co__main = contact + shipping + payment, .kindi-co__side = summary. */
+.kindi-co { display: block; }
+.kindi-co__main, .kindi-co__side { min-width: 0; }
+@media (min-width: 1024px) {
+  .kindi-co {
+    display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 2rem; align-items: start;
+  }
+  .kindi-co__side { position: sticky; top: calc(var(--kindi-header-h, 7rem) + 1rem); }
+}
+/* Mobile: the order summary moves ABOVE the payment-method cards. The column
+   wrappers become display:contents so their children join one flex column and
+   can be reordered without touching the (desktop-driven) DOM: details (0) →
+   summary (1) → payment step-4 card (2) → gift box (3) → extras (4). The
+   payment area's direct-child is the numbered #kindi-box-payment card (which
+   holds #payment), so that is what gets ordered. WooCommerce's AJAX fragments
+   replace #payment / the summary table in place, so the ordering survives
+   refreshes. */
+@media (max-width: 1023.98px) {
+  .kindi-co { display: flex; flex-direction: column; }
+  .kindi-co__main, .kindi-co__side { display: contents; }
+  .kindi-co #order_review { order: 1; margin-bottom: 1.25rem; }
+  .kindi-co #kindi-box-payment { order: 2; }
+  .kindi-co .kindi-coextras { order: 3; }
+}
+/* Billing fields now hold the numbered .kindi-cobox cards, so the wrapper itself
+   is transparent. The shipping/order-notes wrappers stay as soft white cards. */
+.woocommerce-checkout .woocommerce-billing-fields { background: none; border: 0; padding: 0; box-shadow: none; margin: 0; }
+.woocommerce-checkout .woocommerce-additional-fields,
+.woocommerce-checkout .woocommerce-shipping-fields:has(.form-row),
+.woocommerce-checkout .woocommerce-shipping-fields:has(h3) {
+  background: #fff; border: 1px solid var(--border); border-radius: 1.25rem;
+  padding: 1.25rem 1.5rem; box-shadow: var(--shadow-card); margin-bottom: 1.25rem;
+}
+/* With ship-to-billing there are no shipping fields — hide the empty wrapper so
+   it doesn't leave a blank white box above the order-notes section. */
+.woocommerce-checkout .woocommerce-shipping-fields:not(:has(.form-row)):not(:has(h3)) { display: none; }
+.woocommerce-checkout .woocommerce-billing-fields h3,
+.woocommerce-checkout .woocommerce-shipping-fields h3,
+.woocommerce-checkout #order_review_heading { font-size: 1.35rem; margin: 0 0 1rem; }
+/* The custom summary card has its own heading, so hide WooCommerce's. */
+.woocommerce-checkout #order_review_heading { display: none; }
+.woocommerce-checkout .form-row { margin-bottom: 1rem; }
+.woocommerce-checkout form.checkout #order_review { position: static; width: 100%; }
+.woocommerce-checkout h3, .woocommerce-checkout #order_review_heading { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); }
+.woocommerce-checkout #order_review, .woocommerce-cart .cart_totals { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.25rem; box-shadow: var(--shadow-card); box-sizing: border-box; }
+.woocommerce-checkout #payment { background: transparent; border-radius: 1rem; }
+.woocommerce-checkout #payment ul.payment_methods { border: 0; padding: 0; }
+.woocommerce-checkout #payment div.payment_box { background: var(--brand-blue-soft); border-radius: 0.75rem; }
+.woocommerce-checkout #payment div.payment_box::before { display: none; }
+.woocommerce form .form-row label { font-weight: 600; color: var(--brand-navy); font-size: 0.875rem; }
+.woocommerce table.shop_table { background: transparent; }
+.woocommerce-checkout #order_review .cart_item img, .woocommerce-cart .cart_item img { width: 48px; border-radius: 0.5rem; }
+
+/* Order-review table — product name fills the row, the amount hugs the far
+   (left, RTL) edge instead of floating mid-row, with clean separators. */
+.woocommerce-checkout #order_review table.shop_table { width: 100%; border-collapse: collapse; }
+.woocommerce-checkout #order_review table.shop_table th,
+.woocommerce-checkout #order_review table.shop_table td {
+  padding: 0.8rem 0; border: 0; border-bottom: 1px solid var(--border); vertical-align: top;
+}
+.woocommerce-checkout #order_review table.shop_table tfoot tr:last-child th,
+.woocommerce-checkout #order_review table.shop_table tfoot tr:last-child td { border-bottom: 0; }
+.woocommerce-checkout #order_review table.shop_table thead th,
+.woocommerce-checkout #order_review table.shop_table .product-name,
+.woocommerce-checkout #order_review table.shop_table tfoot th { text-align: right; }
+.woocommerce-checkout #order_review table.shop_table .product-name { width: 100%; font-weight: 700; color: var(--brand-navy); }
+.woocommerce-checkout #order_review table.shop_table .product-total,
+.woocommerce-checkout #order_review table.shop_table thead th.product-total,
+.woocommerce-checkout #order_review table.shop_table tfoot td {
+  width: 1%; white-space: nowrap; text-align: left; padding-inline-start: 1rem; font-weight: 700;
+}
+.woocommerce-checkout #order_review table.shop_table .order-total th,
+.woocommerce-checkout #order_review table.shop_table .order-total td { font-size: 1.1rem; color: var(--brand-red); }
+/* Shipping choices as selectable cards (truck icon + label + price). The
+   selected card gets a red border + soft-red background + red radio. */
+.woocommerce-checkout #order_review #shipping_method { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+.woocommerce-checkout #order_review #shipping_method li {
+  display: flex; align-items: center; gap: 0.55rem; margin: 0; padding: 0.7rem 0.85rem;
+  background: #fff; border: 2px solid var(--border); border-radius: 0.95rem;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.woocommerce-checkout #order_review #shipping_method li:hover { border-color: color-mix(in oklab, var(--brand-red) 35%, transparent); }
+.woocommerce-checkout #order_review #shipping_method li:has(input:checked) {
+  border-color: var(--brand-red); background: var(--brand-red-soft);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 12%, transparent);
+}
+.woocommerce-checkout #order_review #shipping_method li input { margin: 0; flex: 0 0 auto; accent-color: var(--brand-red); width: 1.15rem; height: 1.15rem; }
+.woocommerce-checkout #order_review #shipping_method li label {
+  flex: 1; display: flex; align-items: center; gap: 0.5rem; margin: 0;
+  font-weight: 700; color: var(--brand-navy); line-height: 1.3;
+}
+.woocommerce-checkout #order_review #shipping_method li label .kindi-ship__ic { flex: 0 0 auto; display: inline-flex; }
+.woocommerce-checkout #order_review #shipping_method li label .kindi-ship__txt { flex: 1; }
+.woocommerce-checkout #order_review #shipping_method li label .woocommerce-Price-amount,
+.woocommerce-checkout #order_review #shipping_method li label .amount { margin-inline-start: auto; color: #16a34a; font-weight: 800; white-space: nowrap; }
+
+/* Coupon + login prompts as tidy info cards above the form. */
+.woocommerce-checkout .woocommerce-form-coupon-toggle,
+.woocommerce-checkout .woocommerce-form-login-toggle { max-width: 760px; margin: 0 auto 1rem; }
+.woocommerce-checkout .woocommerce-form-coupon-toggle .woocommerce-info,
+.woocommerce-checkout .woocommerce-form-login-toggle .woocommerce-info,
+.woocommerce form.checkout_coupon, .woocommerce form.login {
+  background: var(--brand-blue-soft); border: 1px solid color-mix(in oklab, var(--brand-blue) 16%, transparent);
+  border-radius: 1rem; padding: 1rem 1.25rem; color: var(--brand-navy); font-weight: 600;
+}
+.woocommerce-checkout .woocommerce-info::before { color: var(--brand-blue); }
+.woocommerce form.checkout_coupon, .woocommerce form.login { max-width: 760px; margin: 0 auto 1.25rem; }
+.woocommerce form.checkout_coupon .form-row, .woocommerce form.login .form-row { margin-bottom: 0.75rem; }
+.woocommerce form.checkout_coupon .button,
+.woocommerce form.login .button {
+  background: var(--brand-navy); color: #fff; border-radius: 0.75rem; padding: 0.65rem 1.4rem; font-weight: 800;
+}
+/* Gift-card redemption (YITH + Gifta), re-hooked below the coupon in the summary
+   (see inc/checkout.php) and stacked one below the other. */
+.kindi-giftcards { display: flex; flex-direction: column; gap: 0.75rem; margin: 1rem 0 0; }
+.kindi-giftcards__col { width: 100%; min-width: 0; background: #fff; border: 1px solid var(--border); border-radius: 0.875rem; padding: 0.85rem 0.95rem; }
+.kindi-giftcards__col:empty { display: none; }
+.kindi-giftcards__col > *,
+.kindi-giftcards__col #gifta_coupon_section,
+.kindi-giftcards__col .ywgc_have_code,
+.kindi-giftcards__col .ywgc_enter_code { max-width: none; margin: 0; }
+.kindi-giftcards__col .ywgc_enter_code { margin-top: 0.6rem; }
+.kindi-giftcards__col input[type="text"],
+.kindi-giftcards__col input:not([type="checkbox"]):not([type="radio"]) { width: 100%; box-sizing: border-box; margin: 0.35rem 0; }
+.kindi-giftcards__col .button,
+.kindi-giftcards__col .gifta_button,
+.kindi-giftcards__col .ywgc_apply_gift_card_button { width: 100%; margin: 0.25rem 0 0; }
+.kindi-giftcards__col .form-row { width: auto; margin: 0; padding: 0; float: none; }
+.kindi-giftcards .kindi-gifta-note { margin: 0.6rem 0 0; font-size: 0.82rem; }
+@media (max-width: 600px) { .kindi-giftcards__col { flex-basis: 100%; } }
+
+/* Gifta + coupon notice before the payment methods; the club-points note in
+   the summary uses the identical look. */
+.woocommerce-checkout .kindi-gifta-note,
+.woocommerce-checkout .kindi-coupon__off {
+  background: var(--brand-yellow-soft, color-mix(in oklab, var(--wp--preset--color--accent, #f6c544) 22%, #fff));
+  border: 1px solid color-mix(in oklab, var(--wp--preset--color--accent, #f6c544) 45%, transparent);
+  border-radius: 0.875rem; padding: 0.8rem 1rem; margin: 0 0 1rem;
+  color: var(--brand-navy); font-weight: 600; font-size: 0.9rem; line-height: 1.55;
+}
+
+/* Fields: branded rounded inputs with a clear focus ring — no raw boxes. */
+.woocommerce-checkout .form-row input.input-text,
+.woocommerce-checkout .form-row textarea,
+.woocommerce-checkout .form-row select,
+.woocommerce-checkout .select2-container .select2-selection,
+.woocommerce form.checkout_coupon .input-text {
+  width: 100%; box-sizing: border-box; min-height: 3rem;
+  padding: 0.7rem 0.9rem; line-height: 1.4; font-size: 1rem; color: var(--brand-navy);
+  background: #fff; border: 1.5px solid color-mix(in oklab, var(--brand-navy) 14%, transparent);
+  border-radius: 0.8rem; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.woocommerce-checkout .select2-container .select2-selection { display: flex; align-items: center; }
+.woocommerce-checkout .select2-container--default .select2-selection--single .select2-selection__arrow { top: 0.6rem; }
+.woocommerce-checkout .form-row input.input-text:focus,
+.woocommerce-checkout .form-row textarea:focus,
+.woocommerce-checkout .form-row select:focus,
+.woocommerce-checkout .select2-container--focus .select2-selection {
+  border-color: var(--brand-blue); box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-blue) 18%, transparent); outline: none;
+}
+.woocommerce-checkout .form-row textarea { min-height: 5rem; resize: vertical; }
+.woocommerce-checkout .woocommerce-additional-fields h3 { font-size: 1.35rem; margin: 0 0 0.35rem; }
+.woocommerce-checkout .woocommerce-additional-fields__field-wrapper { margin-top: 0.75rem; }
+
+/* Order-review product rows: thumbnail + name, breathing room. */
+.woocommerce-checkout #order_review table.shop_table .cart_item td { padding-block: 0.9rem; }
+.woocommerce-checkout #order_review .cart_item img,
+.woocommerce-cart .cart_item img { width: 52px; height: 52px; object-fit: contain; border-radius: 0.6rem; background: var(--brand-cream, #FBF6EC); margin-inline-end: 0.6rem; vertical-align: middle; }
+.woocommerce-checkout #order_review table.shop_table .product-name .product-quantity { color: var(--muted-foreground); font-weight: 600; }
+
+/* Payment methods as a row of selectable cards (12 payments / PayPal / bit /
+   credit card …). All cards stay in the row; the fields for the selected method
+   render in .kindi-payfields below the row (see checkout/payment.php). */
+.woocommerce-checkout #payment ul.payment_methods {
+  display: flex !important; flex-wrap: wrap; justify-content: center; gap: 0.7rem; margin: 0 0 1.25rem; border: 0; padding: 0;
+}
+.woocommerce-checkout #payment ul.payment_methods li {
+  flex: 1 1 calc(33.333% - 0.47rem); max-width: calc(33.333% - 0.47rem);
+  position: relative; margin: 0; background: #fff;
+  border: 2px solid var(--border); border-radius: 1rem; padding: 1rem 0.85rem;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.woocommerce-checkout #payment ul.payment_methods li:hover { border-color: color-mix(in oklab, var(--brand-red) 35%, transparent); }
+.woocommerce-checkout #payment ul.payment_methods li:has(input:checked) {
+  border-color: var(--brand-red); background: var(--brand-red-soft);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 12%, transparent);
+}
+/* Phones: exactly two cards per row. Grid instead of flex-basis math — two
+   calc(50% - gap/2) items plus the gap add up to exactly 100%, so any extra
+   pixel (borders, subpixel rounding) used to wrap the row to a single card.
+   dense packing: the payment plugin (SUMIT/OfficeGuy) injects hidden helper
+   nodes into the list that silently occupy grid cells and punch holes in the
+   rows — dense lets the real cards backfill them. (No child-count-based
+   spanning here for the same reason.) */
+@media (max-width: 720px) {
+  .woocommerce-checkout #payment ul.payment_methods { display: grid !important; grid-template-columns: 1fr 1fr; grid-auto-flow: dense; }
+  .woocommerce-checkout #payment ul.payment_methods li { flex: none; max-width: none; padding: 0.85rem 0.6rem; }
+  .woocommerce-checkout #payment ul.payment_methods li > label { font-size: 0.9rem; }
+  .woocommerce-checkout #payment ul.payment_methods > *:empty { display: none; }
+}
+/* Hide the native radio — the whole card is the control. */
+.woocommerce-checkout #payment ul.payment_methods li > input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.woocommerce-checkout #payment ul.payment_methods li > label {
+  display: flex; flex-direction: column-reverse; align-items: center; justify-content: center;
+  gap: 0.4rem; margin: 0; cursor: pointer; text-align: center;
+  font-weight: 800; color: var(--brand-navy); font-size: 0.95rem; min-height: 2.6rem;
+}
+.woocommerce-checkout #payment ul.payment_methods li img { max-height: 26px; width: auto; margin: 0 0.15rem; vertical-align: middle; }
+/* Fields panel for the selected method — opens as a clear soft-red card directly
+   below the payment-method row (only the chosen method's box is shown). */
+.woocommerce-checkout #payment .kindi-payfields { margin: 0; }
+.woocommerce-checkout #payment div.payment_box {
+  margin: 0.25rem 0 0; padding: 1.1rem 1.25rem; font-size: 0.9rem;
+  background: var(--brand-red-soft);
+  border: 1px solid color-mix(in oklab, var(--brand-red) 18%, transparent);
+  border-radius: 0.9rem;
+}
+.woocommerce-checkout #payment div.payment_box .form-row { margin-bottom: 0.85rem; }
+.woocommerce-checkout #payment div.payment_box .form-row:last-child { margin-bottom: 0; }
+/* Custom-styled selects inside the method fields (expiry year/month, instalments)
+   so the dropdown chevron never overlaps the text in RTL. */
+.woocommerce-checkout #payment div.payment_box select {
+  appearance: none; -webkit-appearance: none;
+  padding-inline: 0.9rem 2.1rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a93a8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: left 0.8rem center; background-size: 0.85rem;
+}
+.woocommerce-checkout #payment .place-order { padding: 1rem 0 0; }
+.woocommerce-checkout #place_order { width: 100%; padding: 1rem 1.5rem; font-size: 1.1rem; font-weight: 800; border-radius: 0.95rem; }
+.woocommerce-checkout #payment .woocommerce-terms-and-conditions-wrapper { margin-bottom: 1rem; }
+
+/* "Please wait" overlay while the order submits (markup in inc/checkout.php,
+   behaviour in store.js). Above everything, including the floating buttons. */
+.kindi-wait { position: fixed; inset: 0; z-index: 260; display: flex; align-items: center; justify-content: center; background: rgba(20, 35, 63, 0.55); }
+.kindi-wait[hidden] { display: none; }
+.kindi-wait__box {
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem; text-align: center;
+  background: #fff; border-radius: 1.25rem; box-shadow: var(--shadow-pop); padding: 1.75rem 2rem;
+  width: min(90vw, 24rem);
+}
+.kindi-wait__logo { width: 72px; height: 72px; object-fit: contain; animation: kindi-wait-pulse 1.2s ease-in-out infinite; }
+.kindi-wait__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.2rem; margin-top: 0.5rem; }
+.kindi-wait__sub { color: var(--muted-foreground); font-size: 0.9rem; line-height: 1.5; }
+@keyframes kindi-wait-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+@media (prefers-reduced-motion: reduce) { .kindi-wait__logo { animation: none; } }
+body.kindi-wait-open { overflow: hidden; }
+
+/* Cart: shipping method is chosen at checkout, so hide the shipping row +
+   calculator from the cart totals (no method-changing on the cart page). */
+.woocommerce-cart .cart_totals .woocommerce-shipping-totals,
+.woocommerce-cart .cart_totals tr.shipping,
+.woocommerce-cart .cart_totals .shipping-calculator-form,
+.woocommerce-cart .cart_totals .woocommerce-shipping-calculator { display: none !important; }
+
+/* ---------- Cart layout — keep the checkout button always in view ---------- */
+/* Desktop: items in a scrolling main column, totals + checkout in a sticky
+   sidebar that never leaves the viewport however long the cart gets. */
+@media (min-width: 1024px) {
+  .woocommerce-cart .woocommerce { display: grid; grid-template-columns: minmax(0, 1fr) 22rem; gap: 2rem; align-items: start; }
+  .woocommerce-cart .woocommerce > .woocommerce-notices-wrapper { grid-column: 1 / -1; }
+  .woocommerce-cart .woocommerce-cart-form { grid-column: 1; width: 100%; float: none; min-width: 0; }
+  .woocommerce-cart .cart-collaterals { grid-column: 2; width: 100%; margin: 0; position: sticky; top: calc(var(--kindi-header-h, 7rem) + 1rem); }
+  .woocommerce-cart .cart-collaterals .cart_totals { width: 100%; float: none; }
+  .woocommerce-cart .cart-collaterals .cross-sells { display: none; }
+}
+/* Mobile: the totals card scrolls with the page. It used to be stuck to the
+   bottom of the screen, which covered the cart items — the checkout button is
+   kept reachable by the floating jump pill (.kindi-jump) instead, which only
+   appears while the real button is off-screen and hides the moment it isn't. */
+@media (max-width: 1023.98px) {
+  .woocommerce-cart .cart-collaterals { margin: 0; }
+  .woocommerce-cart .cart-collaterals .cross-sells { display: none; }
+}
+
+/* ---------- Floating "jump to checkout" pill (cart + checkout) ---------- */
+/* Shown only while the real action button is out of view, so nothing is ever
+   permanently covered: a compact pill, centred, that scrolls to / triggers the
+   real button. Built by store.js — no markup when JS is off. */
+/* Physical left+translateX centring — inset-inline-start flips to `right` in
+   RTL while translateX(-50%) stays physical, shifting the pill a full width
+   off-centre and cutting it at the screen edge on phones. */
+.kindi-jump {
+  position: fixed; z-index: 140; left: 50%;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  padding: 0.7rem 1.3rem; border: 0; border-radius: 999px;
+  background: var(--brand-red); color: #fff; cursor: pointer;
+  font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 1rem;
+  box-shadow: 0 12px 32px rgba(20, 35, 63, 0.32);
+  opacity: 0; pointer-events: none;
+  transform: translateX(-50%) translateY(150%);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.kindi-jump.is-on { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+.kindi-jump:hover { background: var(--brand-red-dark); }
+.kindi-jump__sum { background: rgba(255, 255, 255, 0.2); border-radius: 999px; padding: 0.1rem 0.55rem; font-size: 0.9rem; white-space: nowrap; }
+/* Required fields still missing — the pill says so instead of looking dead. */
+.kindi-jump.is-invalid { background: var(--brand-navy); animation: kindi-jump-nudge 0.4s ease; }
+.kindi-jump.is-invalid .kindi-jump__label::after { content: " — יש למלא את שדות החובה"; font-weight: 600; }
+.kindi-jump.is-invalid .kindi-jump__sum { display: none; }
+@keyframes kindi-jump-nudge {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  25% { transform: translateX(-50%) translateY(0) rotate(-1.5deg); }
+  75% { transform: translateX(-50%) translateY(0) rotate(1.5deg); }
+}
+/* Phones: keep the pill clear of the floating WhatsApp / accessibility buttons
+   and inside the thumb zone, and let a long label wrap instead of overflowing. */
+@media (max-width: 640px) {
+  .kindi-jump { max-width: calc(100vw - 7.5rem); font-size: 0.95rem; padding: 0.65rem 1.1rem; }
+  .kindi-jump__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body:has( .kindi-jump.is-on ) .kindi-float { bottom: calc(5.25rem + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kindi-jump { transition: none; }
+  .kindi-jump.is-invalid { animation: none; }
+}
+.woocommerce-cart table.cart td.actions .button { border-radius: 0.875rem; }
+.woocommerce-cart .quantity { border-radius: 0.6rem; }
+/* Mobile: keep the qty stepper a tight single row (it was wrapping in the narrow
+   cart cell) — sized to content with slightly smaller controls. */
+@media (max-width: 767px) {
+  .woocommerce-cart .quantity {
+    display: inline-flex !important; flex-wrap: nowrap !important;
+    width: max-content !important; max-width: max-content !important;
+  }
+  .woocommerce-cart .quantity .qty { width: 2.4rem; min-width: 2.4rem; }
+  .woocommerce-cart .kindi-qbtn { width: 2.2rem; }
+}
+.woocommerce a.remove { color: var(--brand-red) !important; border-radius: 999px; font-weight: 700; }
+.woocommerce a.remove:hover { background: var(--brand-red) !important; color: #fff !important; }
+
+/* ---------- Front-page empty state ---------- */
+.kindi-prod-empty { text-align: center; padding: 3rem 1.5rem; background: #fff; border: 1px dashed color-mix(in oklab, var(--brand-navy) 20%, transparent); border-radius: 1.5rem; color: var(--muted-foreground); font-weight: 600; }
+
+/* ---------- Sticky mobile add-to-cart ---------- */
+.kindi-stickycart { position: fixed; inset-inline: 0; bottom: 0; z-index: 150; display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.9rem calc(0.6rem + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid var(--border); box-shadow: 0 -8px 24px rgba(20,35,63,0.12); }
+.kindi-stickycart[hidden] { display: none; }
+.kindi-stickycart__info { display: flex; align-items: center; gap: 0.6rem; min-width: 0; flex: 1; }
+.kindi-stickycart__img { width: 48px; height: 48px; object-fit: contain; border-radius: 0.6rem; background: var(--muted); flex: 0 0 auto; }
+.kindi-stickycart__meta { display: flex; flex-direction: column; min-width: 0; }
+.kindi-stickycart__title { font-weight: 700; font-size: 0.85rem; color: var(--brand-navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kindi-stickycart__price { font-weight: 700; font-size: 0.95rem; color: var(--brand-red); }
+.kindi-stickycart__price del { color: var(--muted-foreground); font-weight: 500; font-size: 0.8rem; margin-inline-start: 0.35rem; }
+/* Compact brand button — component-specific sizing, kept self-contained. */
+.kindi-stickycart__btn {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  background: var(--brand-red); color: #fff; border: 0; border-radius: 0.9rem;
+  padding: 0.7rem 1.4rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 1rem;
+  cursor: pointer; box-shadow: var(--shadow-pop); transition: background 0.15s ease;
+}
+.kindi-stickycart__btn:hover { background: var(--brand-red-dark); color: #fff; }
+@media (min-width: 1024px) { .kindi-stickycart { display: none !important; } }
+/* When the mobile sticky add-to-cart bar is showing, lift the floating WhatsApp
+   + accessibility buttons above it so the bar never covers them. */
+@media (max-width: 1023.98px) {
+  body:has( .kindi-stickycart:not([hidden]) ) .kindi-float { bottom: calc(6rem + env(safe-area-inset-bottom)); }
+}
+
+/* ---------- WhatsApp enquiry button (product) ---------- */
+.kindi-wa-ask { display: flex; align-items: center; gap: 0.7rem; margin: 1rem 0; padding: 0.8rem 1rem; border-radius: 1rem; background: color-mix(in oklab, #25D366 12%, #fff); border: 1px solid color-mix(in oklab, #25D366 35%, transparent); color: var(--brand-navy); font-weight: 600; transition: background 0.15s ease; }
+.kindi-wa-ask:hover { background: color-mix(in oklab, #25D366 20%, #fff); }
+.kindi-wa-ask .kindi-icon { color: #25D366; flex: 0 0 auto; }
+.kindi-wa-ask__txt { display: flex; flex-direction: column; line-height: 1.3; font-size: 0.9rem; font-weight: 500; }
+.kindi-wa-ask__txt strong { font-size: 0.98rem; color: var(--brand-navy); }
+.kindi-wa-ask__dot { font-size: 0.72rem; font-weight: 700; padding: 0.05rem 0.45rem; border-radius: 999px; margin-inline-start: 0.25rem; }
+.kindi-wa-ask__dot--on { background: color-mix(in oklab, #25D366 22%, #fff); color: #128C3E; }
+.kindi-wa-ask__dot--off { background: var(--muted); color: var(--muted-foreground); }
+.kindi-wa-ask__hours { margin-inline-start: auto; font-size: 0.78rem; color: var(--muted-foreground); white-space: nowrap; }
+@media (max-width: 600px) { .kindi-wa-ask__hours { display: none; } }
+
+/* ---------- Gift finder ---------- */
+.kindi-giftfinder { display: flex; flex-direction: column; gap: 1.1rem; background: #fff; border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; box-shadow: var(--shadow-card); max-width: 720px; margin-inline: auto; }
+.kindi-giftfinder__row { display: flex; flex-direction: column; gap: 0.6rem; }
+.kindi-giftfinder__label { font-weight: 700; color: var(--brand-navy); }
+.kindi-giftfinder__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.kindi-chip { position: relative; }
+.kindi-chip input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.kindi-chip span { display: inline-block; padding: 0.5rem 1rem; border-radius: 999px; border: 2px solid var(--border); font-weight: 600; font-size: 0.9rem; transition: all 0.15s ease; }
+.kindi-chip input:checked + span { background: var(--brand-red); border-color: var(--brand-red); color: #fff; }
+.kindi-chip input:focus-visible + span { outline: 2px solid var(--brand-blue); outline-offset: 2px; }
+.kindi-giftfinder__select { padding: 0.6rem 0.9rem; border-radius: 0.8rem; border: 2px solid var(--border); font-weight: 600; font-family: inherit; max-width: 240px; }
+
+/* ---------- Product skills chips ---------- */
+.kindi-skills { margin-top: 1.25rem; }
+.kindi-skills h3 { font-size: 1rem; font-weight: 700; color: var(--brand-navy); margin: 0 0 0.6rem; }
+.kindi-skills__list { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; margin: 0; padding: 0; }
+.kindi-skill { display: inline-flex; align-items: center; padding: 0.35rem 0.85rem; border-radius: 999px; background: var(--brand-blue-soft); color: var(--brand-navy); font-weight: 600; font-size: 0.85rem; border: 1px solid color-mix(in oklab, var(--brand-blue) 18%, transparent); }
+
+/* ---------- Save & share cart ---------- */
+.kindi-savecart { margin: 1.5rem 0; padding: 1.25rem 1.5rem; border-radius: 1.25rem; background: var(--brand-blue-soft); border: 1px solid color-mix(in oklab, var(--brand-blue) 16%, transparent); }
+.kindi-savecart__head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.9rem; }
+.kindi-savecart__head .kindi-icon { color: var(--brand-red); flex: 0 0 auto; }
+.kindi-savecart__head strong { display: block; color: var(--brand-navy); font-size: 1.05rem; }
+.kindi-savecart__head span { color: var(--muted-foreground); font-size: 0.875rem; }
+.kindi-savecart__row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.kindi-savecart__row input[type="email"] { flex: 1; min-width: 200px; padding: 0.7rem 0.9rem; border-radius: 0.8rem; border: 2px solid var(--border); font-family: inherit; }
+.kindi-savecart__result { margin-top: 1rem; font-weight: 600; color: var(--brand-navy); }
+.kindi-savecart__link { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+.kindi-savecart__link input { flex: 1; padding: 0.6rem 0.8rem; border-radius: 0.7rem; border: 2px solid var(--border); background: #fff; font-size: 0.85rem; direction: ltr; text-align: left; }
+
+/* ---------- Category archive bottom description ---------- */
+.kindi-archive-desc { clear: both; margin: 2.5rem auto 0; padding: 1.5rem 0 0; border-top: 1px solid var(--border); color: var(--muted-foreground); line-height: 1.8; font-size: 0.95rem; max-width: 1100px; }
+.kindi-archive-desc h2, .kindi-archive-desc h3 { color: var(--brand-navy); }
+
+/* ---------- Single product — Lovable design parity ---------- */
+.kindi-pdp__brand { font-size: 0.78rem; font-weight: 800; color: var(--brand-blue); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 0.4rem; }
+/* perks list with blue check bubbles */
+.kindi-highlights { list-style: none; margin: 1.1rem 0; padding: 0; display: flex; flex-direction: column; gap: 0.65rem; }
+.kindi-highlights li { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.95rem; color: var(--foreground); font-weight: 500; }
+.kindi-highlights__ic { flex: 0 0 auto; width: 1.3rem; height: 1.3rem; margin-top: 1px; border-radius: 999px; background: var(--brand-blue-soft); color: var(--brand-blue); display: grid; place-items: center; }
+.kindi-highlights__ic .kindi-icon { width: 0.8rem; height: 0.8rem; }
+/* delivery + gift card */
+.kindi-pdp__delivery { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1rem 1.1rem; margin: 1.1rem 0; display: flex; flex-direction: column; gap: 0.9rem; }
+.kindi-pdp__drow { display: flex; align-items: flex-start; gap: 0.75rem; }
+.kindi-pdp__dic { flex: 0 0 auto; width: 2.5rem; height: 2.5rem; border-radius: 0.8rem; display: grid; place-items: center; }
+.kindi-pdp__dic--blue { background: var(--brand-blue-soft); color: var(--brand-blue); }
+.kindi-pdp__dic--red { background: var(--brand-red-soft); color: var(--brand-red); }
+.kindi-pdp__drow strong { display: block; color: var(--brand-navy); font-size: 0.9rem; }
+.kindi-pdp__drow span { font-size: 0.8rem; color: var(--muted-foreground); }
+/* after-summary full-width block */
+.kindi-pdp-extras { display: flex; flex-direction: column; gap: 1.25rem; margin: 0.5rem 0 0; }
+/* trust strip */
+/* key facts cards */
+.kindi-facts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.7rem; }
+@media (min-width: 640px) { .kindi-facts { grid-template-columns: repeat(4, 1fr); } }
+.kindi-fact { background: #fff; border: 1px solid var(--border); border-radius: 1.1rem; padding: 0.9rem; text-align: center; transition: box-shadow .15s ease, border-color .15s ease; }
+.kindi-fact:hover { border-color: color-mix(in oklab, var(--brand-red) 30%, transparent); box-shadow: var(--shadow-card); }
+.kindi-fact__ic { width: 2.25rem; height: 2.25rem; margin: 0 auto 0.4rem; border-radius: 0.7rem; background: var(--brand-blue-soft); color: var(--brand-blue); display: grid; place-items: center; }
+.kindi-fact__l { display: block; font-size: 0.66rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted-foreground); font-weight: 700; }
+.kindi-fact__v { display: block; font-size: 0.95rem; font-weight: 900; color: var(--brand-navy); }
+/* in-the-box navy card */
+.kindi-inboxcard { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--brand-navy), var(--brand-navy-dark)); color: #fff; border-radius: 1.25rem; padding: 1.3rem; }
+.kindi-inboxcard__head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem; }
+.kindi-inboxcard__ic { width: 2rem; height: 2rem; border-radius: 0.6rem; background: rgba(255,255,255,.15); display: grid; place-items: center; }
+.kindi-inboxcard__head h3 { margin: 0; font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.15rem; }
+.kindi-inboxcard__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.kindi-inboxcard__chip { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 999px; padding: 0.4rem 0.85rem; font-size: 0.8rem; font-weight: 600; }
+
+/* ---------- Recently viewed — span full width below the product grid ---------- */
+.kindi-rv { grid-column: 1 / -1; width: 100%; }
+.kindi-rv .kindi-sec-title { margin-bottom: 1.25rem; }
+
+/* ====================================================================== */
+/* PDP design alignment (Lovable)                                         */
+/* ====================================================================== */
+@media (min-width: 1024px) {
+  /* Gallery top-left, extras under it (col 1), buy box spanning both rows (col 2).
+     On mobile the grid is a single column so DOM order applies: gallery → buy box
+     → extras, dropping the trust strip below the quick-buy button. */
+  .kindi-pdp__grid { grid-template-columns: 1fr 1fr; gap: 2rem 3rem; }
+  .kindi-pdp__grid > .kindi-pdp__media { grid-column: 1; grid-row: 1; }
+  .kindi-pdp__grid > .kindi-pdp__summary { grid-column: 2; grid-row: 1 / span 2; }
+  .kindi-pdp__grid > .kindi-pdp-extras { grid-column: 1; grid-row: 2; }
+}
+
+/* Short description: two-line clamp + "more info" toggle. */
+.kindi-pdp__excerpt { color: var(--foreground); line-height: 1.7;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.kindi-pdp__excerpt.is-expanded { display: block; -webkit-line-clamp: unset; overflow: visible; }
+/* Product video under the gallery (self-hosted <video> or YouTube/Vimeo iframe). */
+.kindi-pdp__video { margin-top: 1rem; }
+.kindi-pdp__video-el,
+.kindi-pdp__video-oembed :where(iframe, video) {
+  display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0;
+  border-radius: 1.25rem; box-shadow: var(--shadow-card); background: #000;
+}
+.kindi-pdp__video-oembed { border-radius: 1.25rem; overflow: hidden; }
+.kindi-pdp__excerpt p { margin: 0; }
+.kindi-pdp__more[aria-expanded="true"] .kindi-icon { transform: rotate(180deg); }
+.kindi-pdp__more { display: inline-flex; align-items: center; gap: 0.25rem; margin: 0.35rem 0 0;
+  padding: 0; background: none; border: 0; cursor: pointer; color: var(--brand-blue); font-weight: 700; font-size: 0.9rem; }
+.kindi-pdp__more:hover { text-decoration: underline; }
+
+/* Rating row: number + red stars + reviews link + sku. */
+.kindi-pdp__rating { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 0.4rem 0 0; font-size: 0.9rem; }
+.kindi-pdp__rnum { font-weight: 800; color: var(--brand-navy); font-size: 1rem; }
+.kindi-pdp__rating .star-rating { color: var(--brand-red); font-size: 0.95rem; margin: 0; }
+.kindi-pdp__rating .star-rating::before { color: color-mix(in oklab, var(--brand-navy) 18%, transparent); }
+.kindi-pdp__rating .star-rating span::before { color: var(--brand-red); }
+.kindi-pdp__reviews { color: var(--brand-blue); font-weight: 700; text-decoration: none; }
+.kindi-pdp__reviews:hover { text-decoration: underline; }
+.kindi-pdp__sku { color: var(--muted-foreground); }
+
+/* Price box. */
+.kindi-pdp__pricebox { display: inline-flex; align-items: center; gap: 1rem; flex-wrap: wrap; width: fit-content; max-width: 100%; margin: 1.1rem 0; padding: 1.1rem 1.5rem;
+  border-radius: 1.25rem; border: 1px solid color-mix(in oklab, var(--brand-red) 14%, transparent);
+  background: linear-gradient(90deg, color-mix(in oklab, var(--brand-red) 9%, #fff), color-mix(in oklab, var(--brand-red) 3%, #fff)); }
+.kindi-pdp__save { margin-inline-start: 0 !important; }
+.kindi-pdp__price { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+.kindi-pdp__price ins { order: -1; text-decoration: none; }
+.kindi-pdp__price ins .woocommerce-Price-amount,
+.kindi-pdp__price > .woocommerce-Price-amount { color: var(--brand-red); font-weight: 900; font-size: 2.25rem; line-height: 1; }
+.kindi-pdp__price del { color: var(--muted-foreground); font-weight: 600; opacity: 0.85; }
+.kindi-pdp__price del .woocommerce-Price-amount { font-size: 1.15rem; }
+.kindi-pdp__save { margin-inline-start: auto; background: var(--brand-red); color: #fff; font-weight: 800; font-size: 0.8rem;
+  padding: 0.32rem 0.85rem; border-radius: 999px; white-space: nowrap; }
+
+/* In-stock line. */
+.woocommerce div.product.kindi-pdp p.stock,
+.kindi-pdp .stock.in-stock { color: #1a9d54; font-weight: 800; display: flex; align-items: center; gap: 0.45rem; margin: 0.5rem 0; }
+.kindi-pdp .stock.in-stock::before { content: ""; width: 0.55rem; height: 0.55rem; border-radius: 999px; background: #1a9d54; flex: 0 0 auto; }
+.woocommerce div.product.kindi-pdp p.stock.out-of-stock { color: var(--brand-red); }
+.woocommerce div.product.kindi-pdp p.stock.out-of-stock::before { background: var(--brand-red); }
+
+/* Delivery / reassurance card under the buy buttons. */
+.kindi-pdp__delivery { border: 1px solid var(--border); border-radius: 1.1rem; overflow: hidden; margin: 1.25rem 0; background: #fff; }
+.kindi-pdp__drow { display: flex; align-items: center; gap: 0.85rem; padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--border); text-decoration: none; color: inherit; }
+.kindi-pdp__drow:last-child { border-bottom: 0; }
+.kindi-pdp__dic { width: 2.6rem; height: 2.6rem; border-radius: 999px; display: grid; place-items: center; flex: 0 0 auto; }
+.kindi-pdp__dic--blue { background: var(--brand-blue-soft); color: var(--brand-blue); }
+.kindi-pdp__dic--red { background: var(--brand-red-soft); color: var(--brand-red); }
+.kindi-pdp__dtxt { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.kindi-pdp__dtxt strong { color: var(--brand-navy); font-weight: 800; font-size: 0.95rem; }
+.kindi-pdp__dtxt span { color: var(--muted-foreground); font-size: 0.82rem; display: flex; align-items: center; gap: 0.3rem; }
+
+/* Category notice — availability message beside add-to-cart and in the cart. */
+/* .kindi-catnotice styles live in components.css — the notice can now target
+   regular pages too, where this file isn't loaded. */
+
+/* Shipping & returns tab. */
+.kindi-pdp-ship p { margin: 0 0 0.75rem; line-height: 1.7; }
+.kindi-pdp-ship strong { color: var(--brand-navy); }
+/* Online-only stock/price disclaimer at the foot of the "מידע נוסף" tab. */
+.kindi-pdp-stocknote { margin: 1rem 0 0; padding: 0.8rem 1.1rem; background: var(--brand-red-soft); border-radius: 0.85rem; color: var(--brand-navy); font-size: 0.9rem; line-height: 1.6; }
+.kindi-pdp-stocknote strong { color: var(--brand-red-dark); } /* 4.5:1+ on the soft-red card. */
+
+/* Buy-now button under add-to-cart — sized to the qty + add-to-cart row (see the
+   form.cart rule below), with breathing room above it. */
+.kindi-buynow { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-basis: 100%; width: 100%;
+  margin-top: 1.1rem; background: var(--brand-navy); color: #fff; border-radius: 0.95rem;
+  padding: 0.95rem 1.5rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 1.05rem; border: 0; cursor: pointer; transition: background 0.15s ease; }
+.kindi-buynow:hover { background: var(--brand-navy-dark); color: #fff; }
+/* Simple-product cart: shrink the form to the qty + add row so the full-width
+   buy-now below it matches that row's width (not the whole column). */
+.woocommerce div.product form.cart:not(.variations_form) { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; width: fit-content; max-width: 100%; }
+.woocommerce div.product form.cart:not(.variations_form) .quantity { margin: 0 !important; }
+/* Variable products: the qty + add-to-cart sit in the variation area; lay them
+   out in a wrapping row so the full-width "קנייה מהירה" drops onto its own line
+   with a clear gap above it (it was stuck to the buttons above). */
+.woocommerce div.product .woocommerce-variation-add-to-cart { display: flex; flex-wrap: wrap; align-items: center; gap: 0.9rem; }
+.woocommerce div.product .woocommerce-variation-add-to-cart .kindi-buynow { margin-top: 0; }
+
+/* Force the gallery + summary to fill their 50% grid cells — WooCommerce core
+   sets both to 48% floats, which would shrink the image to a quarter of the page. */
+.woocommerce div.product.kindi-pdp .woocommerce-product-gallery,
+.woocommerce div.product.kindi-pdp .summary.entry-summary,
+.woocommerce div.product.kindi-pdp .kindi-pdp__summary { width: 100% !important; float: none !important; margin: 0 !important; }
+.woocommerce div.product.kindi-pdp .woocommerce-product-gallery__wrapper,
+.woocommerce div.product.kindi-pdp .woocommerce-product-gallery__wrapper img { width: 100%; }
+
+/* "Frequently bought together" bundle. */
+.kindi-bundle { margin: 2.5rem 0; padding: 1.5rem; border: 1px solid var(--border); border-radius: 1.25rem; background: #fff; box-shadow: var(--shadow-card); }
+.kindi-bundle__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.25rem; margin: 0 0 1.1rem; }
+.kindi-bundle__items { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.75rem; }
+.kindi-bundle__item { display: flex; align-items: center; gap: 0.7rem; flex: 1 1 14rem; min-width: 12rem; padding: 0.75rem; border: 1.5px solid var(--border); border-radius: 1rem; cursor: pointer; transition: border-color 0.15s ease; }
+.kindi-bundle__item:has(.kindi-bundle__cb:checked) { border-color: var(--brand-red); }
+.kindi-bundle__cb { width: 1.15rem; height: 1.15rem; accent-color: var(--brand-red); flex: 0 0 auto; }
+.kindi-bundle__media img { width: 56px; height: 56px; object-fit: contain; border-radius: 0.6rem; background: var(--brand-cream, #FBF6EC); display: block; }
+.kindi-bundle__info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.kindi-bundle__name { font-weight: 700; color: var(--brand-navy); font-size: 0.875rem; line-height: 1.3; }
+.kindi-bundle__price { font-weight: 800; color: var(--brand-red); font-size: 0.9rem; }
+.kindi-bundle__plus { align-self: center; font-size: 1.4rem; font-weight: 800; color: color-mix(in oklab, var(--brand-navy) 35%, transparent); flex: 0 0 auto; }
+.kindi-bundle__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.25rem; }
+.kindi-bundle__total { font-size: 1rem; color: var(--brand-navy); }
+.kindi-bundle__total strong { font-size: 1.35rem; font-weight: 900; color: var(--brand-red); }
+.kindi-bundle__add { background: var(--brand-navy); color: #fff; border: 0; border-radius: 0.95rem; padding: 0.85rem 1.6rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 1rem; cursor: pointer; transition: background 0.15s ease, transform 0.15s ease; }
+.kindi-bundle__add:hover { background: var(--brand-navy-dark); transform: translateY(-1px); }
+.kindi-bundle__add.is-loading { opacity: 0.7; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .kindi-bundle__add:hover { transform: none; } }
+
+/* Grouped product children list: hide the in-stock/quantity text (the row keeps
+   the price, title and qty stepper; out-of-stock rows keep "אזל המלאי"). */
+.woocommerce div.product .grouped_form .stock.in-stock,
+.woocommerce div.product .woocommerce-grouped-product-list .stock.in-stock { display: none; }
+
+/* Wishlist page now injects a real product-card grid — let it control layout. */
+.kindi-wish-grid { display: block; }
+.kindi-wish-grid > ul.products { margin: 0; }
+/* Fixed archive-sized tiles (via auto-fill) so a single favourite stays a normal
+   card aligned to the start instead of stretching across the row. */
+.kindi-wish-grid ul.products {
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 15rem)) !important;
+  justify-content: start;
+}
+.kindi-wish-grid:has(.kindi-wish-card) {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 15rem));
+  gap: 1rem; justify-content: start;
+}
+
+/* ====================================================================== */
+/* Product archive — hero, two-column layout, toolbar, view toggle        */
+/* ====================================================================== */
+/* Hide WooCommerce's default products header (the hero replaces it). */
+.woocommerce-products-header { display: none; }
+
+/* Hero band — full-bleed soft background, thin red top accent. */
+.kindi-archhero { position: relative; margin-block: -1.5rem 1.5rem;
+  width: 100vw !important; max-width: 100vw !important; margin-inline: calc(50% - 50vw) !important;
+  background: linear-gradient(120deg, color-mix(in oklab, var(--brand-blue) 7%, #fff), #fff 55%, color-mix(in oklab, var(--brand-red) 6%, #fff));
+  border-top: 3px solid var(--brand-red); }
+/* Make sure no WooCommerce/block wrapper clips the hero's full-bleed breakout. */
+.woocommerce-page .kindi-main, .woocommerce .kindi-main,
+.woocommerce-page .kindi-main > .woocommerce { overflow: visible; }
+.kindi-archhero__inner { max-width: 1440px; margin-inline: auto; padding: 2rem 1rem; display: flex; flex-wrap: wrap;
+  align-items: flex-start; justify-content: space-between; gap: 1.25rem; }
+/* Mobile: tighten the space above the breadcrumb (less top padding). */
+@media (max-width: 767px) { .kindi-archhero__inner { padding-top: 0.9rem; padding-bottom: 1.25rem; } }
+@media (min-width: 1024px) { .kindi-archhero__inner { padding-inline: 1.5rem; flex-wrap: nowrap; } }
+.kindi-archhero__text { min-width: 0; }
+.kindi-archhero__crumbs { font-size: 0.8rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem; }
+.kindi-archhero__crumbs a { color: var(--brand-navy); text-decoration: none; }
+.kindi-archhero__crumbs a:hover { color: var(--brand-red); }
+.kindi-archhero__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy);
+  font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.4rem); line-height: 1.1; margin: 0 0 0.5rem; }
+.kindi-archhero__descwrap { max-width: 60ch; }
+.kindi-archhero__desc { color: var(--foreground); font-size: 0.95rem; line-height: 1.6; margin: 0; }
+/* Clamp the category description to 4 lines until "קרא עוד" expands it. */
+.kindi-archhero__desc[data-kindi-clamp] { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; }
+.kindi-archhero__desc.is-expanded { display: block; -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; }
+.kindi-archhero__more { display: inline-block; margin-top: 0.35rem; padding: 0; background: none; border: 0; color: var(--brand-red); font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+.kindi-archhero__more:hover { text-decoration: underline; }
+.kindi-archhero__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; align-content: flex-start; justify-content: flex-start; flex-shrink: 0; max-width: 100%; }
+@media (min-width: 1024px) { .kindi-archhero__chips { max-width: 48%; justify-content: flex-end; } }
+
+/* Two-column layout: products (main) + filter sidebar (aside, right in RTL). */
+.kindi-archive { display: grid; grid-template-columns: 1fr; gap: 1.5rem; align-items: start; }
+@media (min-width: 1024px) { .kindi-archive { grid-template-columns: 17rem minmax(0, 1fr); } }
+.kindi-archive__main { min-width: 0; }
+.kindi-archive__side { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.25rem; box-shadow: var(--shadow-card); overflow: hidden; }
+@media (min-width: 1024px) { .kindi-archive__side { position: sticky; top: calc(var(--kindi-header-h, 4rem) + 1rem); max-height: calc(100vh - var(--kindi-header-h, 4rem) - 2rem); overflow-y: auto; } }
+/* Active view-toggle icon → white (the icons use a fixed navy stroke). */
+.kindi-view__btn.is-active .kindi-icon,
+.kindi-view__btn.is-active .kindi-icon * { stroke: #fff !important; }
+.kindi-side__head { display: flex; align-items: center; gap: 0.5rem; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.1rem; padding-bottom: 0.75rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+.kindi-side__group { border-bottom: 1px solid var(--border); padding: 0.6rem 0; }
+.kindi-side__group > summary { list-style: none; cursor: pointer; font-weight: 800; color: var(--brand-navy); padding: 0.3rem 0; display: flex; align-items: center; justify-content: space-between; }
+.kindi-side__group > summary::-webkit-details-marker { display: none; }
+.kindi-side__group > summary::after { content: "⌄"; color: var(--muted-foreground); }
+.kindi-side__group[open] > summary::after { transform: rotate(180deg); }
+.kindi-side__opts { display: flex; flex-direction: column; gap: 0.2rem; padding-top: 0.4rem; }
+.kindi-fopt { padding: 0.35rem 0.5rem; border-radius: 0.5rem; color: var(--foreground); text-decoration: none; font-size: 0.9rem; }
+.kindi-fopt:hover { background: var(--brand-blue-soft); color: var(--brand-navy); }
+.kindi-fopt.is-active { background: var(--brand-red-soft); color: var(--brand-red); font-weight: 700; }
+.kindi-archive__side .kindi-chip--reset { margin-top: 0.85rem; }
+
+/* Toolbar above the grid. */
+.kindi-archive__toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.kindi-archive__count { font-weight: 800; color: var(--brand-red); }
+.kindi-archive__tools { display: flex; align-items: center; gap: 0.6rem; }
+.kindi-view { display: inline-flex; border: 1.5px solid var(--border); border-radius: 0.75rem; overflow: hidden; }
+.kindi-view__btn { width: 2.5rem; height: 2.5rem; display: grid; place-items: center; background: #fff; border: 0; cursor: pointer; color: var(--brand-navy); }
+.kindi-view__btn.is-active { background: var(--brand-navy); color: #fff; }
+.woocommerce .kindi-archive__toolbar .woocommerce-ordering { margin: 0; }
+.woocommerce .kindi-archive__toolbar .woocommerce-ordering select { height: 2.75rem; border: 1.5px solid var(--border); border-radius: 999px; padding-inline: 1.1rem; font-weight: 700; color: var(--brand-navy); background: #fff; }
+
+/* 4-up product grid in the archive main column. */
+@media (min-width: 1024px) { .kindi-archive__main ul.products, .woocommerce .kindi-archive__main ul.products { grid-template-columns: repeat(4, 1fr); } }
+
+/* No-results state — the layout (and the sidebar filters) stays put. */
+.kindi-archive__empty {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 0.6rem; padding: 3rem 1.5rem; background: #fff;
+  border: 1px dashed color-mix(in oklab, var(--brand-navy) 20%, transparent);
+  border-radius: 1.5rem;
+}
+.kindi-archive__empty-ic { display: inline-flex; opacity: 0.85; }
+.kindi-archive__empty-ic .kindi-icon { width: 3rem; height: 3rem; }
+.kindi-archive__empty-title { margin: 0; font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); font-size: 1.5rem; }
+.kindi-archive__empty-text { margin: 0; color: var(--muted-foreground); font-weight: 600; max-width: 30rem; }
+.kindi-archive__empty .kindi-chip--reset { margin-top: 0.4rem; }
+
+/* Short description — hidden in grid, shown only in list view. */
+.kindi-pc__excerpt { display: none; }
+
+/* List view (toggle): image on the side, content spread across the full width
+   with the short description and a full-text add-to-cart button. */
+.kindi-archive.is-list ul.products { grid-template-columns: 1fr !important; gap: 1rem; }
+.kindi-archive.is-list ul.products li.product {
+  display: grid; grid-template-columns: 14rem 1fr; column-gap: 1.5rem; align-items: center; padding: 0.85rem;
+}
+.kindi-archive.is-list li.product .kindi-pc__media { grid-column: 1; grid-row: 1 / span 20; align-self: stretch; border-radius: 0.85rem; }
+.kindi-archive.is-list li.product .kindi-pc__brand,
+.kindi-archive.is-list li.product .kindi-pc__title,
+.kindi-archive.is-list li.product .kindi-pc__rating,
+.kindi-archive.is-list li.product .kindi-pc__excerpt,
+.kindi-archive.is-list li.product .kindi-pc__foot { grid-column: 2; padding-inline: 0; }
+.kindi-archive.is-list li.product .kindi-pc__brand { margin-top: 0; }
+.kindi-archive.is-list li.product .kindi-pc__title { -webkit-line-clamp: 1; min-height: 0; font-size: 1.2rem; }
+.kindi-archive.is-list li.product .kindi-pc__excerpt {
+  display: block; color: var(--muted-foreground); font-size: 0.9rem; line-height: 1.6; margin: 0.5rem 0 0;
+  -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
+}
+.kindi-archive.is-list li.product .kindi-pc__foot { border-top: 0; padding-bottom: 0; margin-top: 0.85rem; justify-content: flex-start; gap: 1.25rem; }
+/* Full-text add-to-cart button in list view (no round "+"). */
+.kindi-archive.is-list li.product .button.kindi-pc__add {
+  width: auto; height: auto; min-width: 0; border-radius: 0.9rem; padding: 0.65rem 1.6rem; font-size: 0.95rem; place-items: center; display: inline-flex;
+}
+.kindi-archive.is-list li.product .button.kindi-pc__add::before,
+.kindi-archive.is-list li.product .button.kindi-pc__add::after { content: none; }
+@media (max-width: 640px) {
+  .kindi-archive.is-list ul.products li.product { grid-template-columns: 7rem 1fr; column-gap: 0.85rem; }
+  .kindi-archive.is-list li.product .kindi-pc__excerpt { display: none; }
+}
+
+/* ====================================================================== */
+/* Archive sidebar — accordions, sub-cats, swatches, age pills, price     */
+/* ====================================================================== */
+/* Groups collapsed by default with a chevron (the sub-cats group is open). */
+.kindi-side__group > summary::after { content: ""; width: 0.6rem; height: 0.6rem; border-inline-start: 2px solid var(--muted-foreground); border-block-end: 2px solid var(--muted-foreground); transform: rotate(45deg); transition: transform 0.2s; margin-inline-start: auto; }
+.kindi-side__group[open] > summary::after { transform: rotate(-135deg); }
+
+/* Sub-category list: icon + name + count. */
+.kindi-side__cats { display: flex; flex-direction: column; padding-top: 0.5rem; }
+.kindi-side__cat { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.25rem; border-radius: 0.6rem; text-decoration: none; color: var(--brand-navy); font-weight: 600; }
+.kindi-side__cat:hover { background: var(--brand-blue-soft); color: var(--brand-red); }
+.kindi-side__cat-name { flex: 1; min-width: 0; }
+.kindi-side__cat-count { color: var(--muted-foreground); font-weight: 600; font-size: 0.85rem; }
+
+/* Colour swatches. */
+.kindi-side__opts--color { flex-direction: row !important; flex-wrap: wrap; gap: 0.6rem; }
+.kindi-swatch { width: 2rem; height: 2rem; border-radius: 999px; background: var(--sw); border: 2px solid #fff; box-shadow: 0 0 0 1px var(--border); display: block; transition: transform 0.12s, box-shadow 0.12s; }
+.kindi-swatch:hover { transform: scale(1.12); }
+.kindi-swatch.is-active { box-shadow: 0 0 0 2px var(--brand-navy); transform: scale(1.12); }
+
+/* Age pills. */
+.kindi-side__opts--age { flex-direction: row !important; flex-wrap: wrap; gap: 0.5rem; }
+.kindi-fopt--pill { border: 1.5px solid var(--border); border-radius: 999px; padding: 0.4rem 1rem; font-weight: 700; color: var(--brand-navy); background: #fff; }
+.kindi-fopt--pill:hover { border-color: var(--brand-blue); background: #fff; }
+.kindi-fopt--pill.is-active { background: var(--brand-navy); color: #fff; border-color: var(--brand-navy); }
+
+/* Price slider (dual range). */
+.kindi-priceslider { position: relative; padding: 1.5rem 0.4rem 0.5rem; }
+.kindi-priceslider__track { position: relative; height: 4px; border-radius: 999px; background: var(--border); }
+.kindi-priceslider__fill { position: absolute; top: 0; height: 100%; border-radius: 999px; background: var(--brand-red); }
+.kindi-priceslider input[type="range"] { position: absolute; top: 1rem; inset-inline: 0; width: 100%; margin: 0; background: none; pointer-events: none; -webkit-appearance: none; appearance: none; }
+.kindi-priceslider input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; pointer-events: auto; width: 1.1rem; height: 1.1rem; border-radius: 999px; background: var(--brand-red); border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); cursor: pointer; }
+.kindi-priceslider input[type="range"]::-moz-range-thumb { pointer-events: auto; width: 1.1rem; height: 1.1rem; border-radius: 999px; background: var(--brand-red); border: 2px solid #fff; cursor: pointer; }
+.kindi-priceslider__labels { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; font-weight: 700; color: var(--brand-navy); font-size: 0.85rem; }
+.kindi-priceslider__pill { background: var(--brand-red-soft); color: var(--brand-red); border-radius: 999px; padding: 0.2rem 0.7rem; font-weight: 800; }
+
+/* Mobile: filter button + sidebar as a drawer. */
+.kindi-archive__filterbtn { display: none; align-items: center; gap: 0.4rem; background: var(--brand-navy); color: #fff; border: 0; border-radius: 999px; padding: 0.55rem 1.1rem; font-weight: 800; cursor: pointer; font-family: var(--wp--preset--font-family--sans); font-size: 0.95rem; }
+.kindi-side__close { display: none; background: none; border: 0; color: var(--brand-navy); cursor: pointer; margin-inline-start: auto; }
+@media (max-width: 1023.98px) {
+  .kindi-archive__filterbtn { display: inline-flex; }
+  .kindi-archive__side {
+    position: fixed; inset-block: 0; inset-inline-end: 0; width: min(88vw, 22rem); z-index: 215;
+    overflow-y: auto; border-radius: 0; transform: translateX(100%); transition: transform 0.25s ease; box-shadow: -10px 0 40px rgba(0,0,0,0.25);
+  }
+  html[dir="rtl"] .kindi-archive__side { transform: translateX(-100%); }
+  .kindi-archive.is-filters-open .kindi-archive__side { transform: none; }
+  .kindi-archive.is-filters-open::before { content: ""; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 214; }
+  .kindi-side__close { display: inline-grid; place-items: center; }
+}
+
+/* ====================================================================== */
+/* PDP + mini-cart tweaks                                                 */
+/* ====================================================================== */
+/* Belt-and-braces: never show the hover-zoom magnifier overlay. */
+.woocommerce-product-gallery .zoomImg { display: none !important; }
+
+/* Product gallery main image — cap the height so it doesn't dominate. */
+.woocommerce div.product.kindi-pdp .woocommerce-product-gallery__image img,
+.woocommerce div.product.kindi-pdp .woocommerce-product-gallery__wrapper img {
+  max-height: 460px; width: auto; max-width: 100%; margin-inline: auto; object-fit: contain;
+}
+
+/* "מידע נוסף" — always its own line below the short description, never beside the price. */
+.kindi-pdp__more { display: inline-flex; clear: both; }
+.kindi-pdp__excerpt + .kindi-pdp__more { margin-top: 0.5rem; }
+
+/* Mini-cart: tidy price + per-item quantity stepper. The native "qty × price"
+   line is replaced by the stepper + single price below, so hide it outright
+   (belt-and-braces, regardless of the JS inline hide). */
+.kindi-cartdrawer .woocommerce-mini-cart-item .quantity { display: none !important; }
+.kindi-cartdrawer .woocommerce-mini-cart-item { flex-wrap: wrap; }
+.kindi-mcline { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; width: 100%; margin-top: 0.4rem; }
+.kindi-mcprice { font-weight: 800; color: var(--brand-red); white-space: nowrap; }
+.kindi-mcqty { display: inline-flex; align-items: center; border: 1.5px solid var(--border); border-radius: 0.6rem; overflow: hidden; }
+.kindi-mcqty__b { width: 1.9rem; height: 1.9rem; border: 0; background: var(--muted); color: var(--brand-navy); font-size: 1.05rem; line-height: 1; cursor: pointer; display: grid; place-items: center; }
+.kindi-mcqty__b:hover { background: var(--brand-red); color: #fff; }
+.kindi-mcqty__n { min-width: 2rem; text-align: center; font-weight: 700; color: var(--brand-navy); }
+
+/* ===================== Checkout order-bumps (upsells) ===================== */
+.kindi-upsells { margin: 1.25rem 0; display: flex; flex-direction: column; gap: 0.85rem; }
+.kindi-upsells__title { font-family: var(--wp--preset--font-family--display); font-weight: 800; color: var(--brand-navy); font-size: 1.05rem; margin: 0 0 0.15rem; }
+.kindi-upsell { position: relative; background: #fff; border: 1.5px solid var(--border); border-radius: 0.9rem; padding: 0.9rem; box-shadow: var(--shadow-card, 0 2px 10px rgba(27,42,82,0.06)); transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.kindi-upsell.is-added { border-color: var(--brand-blue); background: var(--brand-blue-soft, #eef4ff); }
+.kindi-upsell__badge { position: absolute; inset-inline-start: -0.4rem; top: -0.6rem; background: var(--brand-red); color: #fff; font-weight: 800; font-size: 0.72rem; padding: 0.25rem 0.6rem; border-radius: 0.6rem; box-shadow: var(--shadow-pop, 0 4px 10px rgba(230,57,70,0.3)); }
+.kindi-upsell__body { display: flex; gap: 0.85rem; align-items: flex-start; }
+.kindi-upsell__media { flex: 0 0 auto; width: 68px; height: 68px; border-radius: 0.7rem; overflow: hidden; background: var(--muted); }
+.kindi-upsell__media img,
+.kindi-upsell__img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kindi-upsell__content { flex: 1; min-width: 0; }
+.kindi-upsell__name { font-weight: 800; color: var(--brand-navy); margin: 0 0 0.15rem; font-size: 0.95rem; }
+.kindi-upsell__desc { color: var(--muted-foreground); font-size: 0.83rem; margin: 0 0 0.4rem; line-height: 1.45; }
+.kindi-upsell__cta { list-style: none; margin: 0 0 0.4rem; padding: 0; display: flex; flex-direction: column; gap: 0.2rem; }
+.kindi-upsell__cta li { display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; color: var(--foreground); }
+.kindi-upsell__cta li .kindi-icon { color: var(--brand-blue); flex: 0 0 auto; }
+.kindi-upsell__price { font-weight: 800; color: var(--brand-red); font-size: 1rem; }
+.kindi-upsell__price del { color: var(--muted-foreground); font-weight: 600; font-size: 0.85rem; margin-inline-end: 0.35rem; }
+.kindi-upsell__price ins { text-decoration: none; }
+.kindi-upsell__btn { margin-top: 0.75rem; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; background: var(--brand-blue); color: #fff; border: 0; border-radius: 0.7rem; padding: 0.6rem 1rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 0.9rem; cursor: pointer; transition: background 0.14s ease, transform 0.1s ease; }
+.kindi-upsell__btn:hover { background: var(--brand-navy); }
+.kindi-upsell__btn:focus-visible { outline: 3px solid var(--brand-navy); outline-offset: 2px; }
+.kindi-upsell.is-added .kindi-upsell__btn { background: var(--brand-navy); }
+.kindi-upsell__btn.is-busy { opacity: 0.65; cursor: wait; }
+.kindi-upsell__urgency { display: flex; align-items: center; justify-content: center; gap: 0.3rem; margin: 0.5rem 0 0; font-size: 0.78rem; font-weight: 700; color: var(--brand-red-dark); }
+.kindi-upsell-tag { display: inline-block; margin-inline-start: 0.4rem; font-size: 0.68rem; font-weight: 700; color: var(--brand-blue); background: var(--brand-blue-soft, #eef4ff); border-radius: 0.4rem; padding: 0.05rem 0.4rem; vertical-align: middle; }
+@media (prefers-reduced-motion: reduce) { .kindi-upsell, .kindi-upsell__btn { transition: none; } }
+
+/* ---------- Out-of-stock cart cleanup notice ---------- */
+.kindi-oos { background: var(--brand-red-soft); border: 1px solid color-mix(in oklab, var(--brand-red) 28%, transparent); border-radius: 1.25rem; padding: 1.1rem 1.25rem; margin: 0 0 1.5rem; }
+.kindi-oos__head { display: flex; align-items: center; gap: 0.55rem; color: var(--brand-navy); font-size: 1.05rem; }
+.kindi-oos__head .kindi-icon { flex: 0 0 auto; }
+.kindi-oos__list { margin: 0.6rem 0 0; padding-inline-start: 1.4rem; color: var(--brand-navy); font-weight: 600; }
+.kindi-oos__list li { margin: 0.15rem 0; }
+.kindi-oos__note { margin: 0.6rem 0 0; color: var(--muted-foreground); font-size: 0.9rem; }
+.kindi-oos__alts { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid color-mix(in oklab, var(--brand-red) 20%, transparent); }
+.kindi-oos__altstitle { display: block; font-weight: 800; color: var(--brand-navy); margin-bottom: 0.7rem; }
+.kindi-oos__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 0.75rem; }
+.kindi-oos__card { display: flex; flex-direction: column; gap: 0.35rem; background: #fff; border: 1px solid var(--border); border-radius: 0.9rem; padding: 0.6rem; text-decoration: none; color: inherit; transition: box-shadow 0.15s ease, transform 0.15s ease; }
+.kindi-oos__card:hover { box-shadow: var(--shadow-card); transform: translateY(-2px); }
+.kindi-oos__card img { width: 100%; height: auto; border-radius: 0.6rem; display: block; }
+.kindi-oos__name { font-size: 0.82rem; font-weight: 700; color: var(--brand-navy); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.kindi-oos__price { font-size: 0.85rem; font-weight: 800; color: var(--brand-red); }
+@media (prefers-reduced-motion: reduce) { .kindi-oos__card { transition: none; } }
+
+/* ---- הודעת חגים בעמוד התשלום (inc/holiday-popup.php) ---- */
+.kindi-holiday { display: flex; align-items: flex-start; gap: 0.8rem; margin: 0 0 1.5rem; padding: 1rem 1.15rem; border-radius: 1rem; background: var(--brand-red-soft); border: 1px solid color-mix(in oklab, var(--brand-red) 35%, transparent); }
+.kindi-holiday__ic { flex: 0 0 auto; display: inline-flex; }
+.kindi-holiday__tt { margin: 0 0 0.35rem; font-size: 1.05rem; font-weight: 800; color: var(--brand-navy); }
+.kindi-holiday__txt { font-size: 0.9rem; line-height: 1.6; color: var(--foreground); }
+.kindi-holiday__txt p { margin: 0 0 0.6em; }
+.kindi-holiday__txt p:last-child { margin-bottom: 0; }
+.kindi-holiday { position: relative; }
+.kindi-holiday[hidden] { display: none !important; }
+.kindi-holiday__x { position: absolute; top: 0.5rem; inset-inline-end: 0.5rem; display: inline-flex; padding: 0.3rem; background: none; border: 0; border-radius: 50%; cursor: pointer; color: var(--brand-navy); }
+.kindi-holiday__x svg { width: 1.1rem; height: 1.1rem; }

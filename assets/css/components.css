@@ -1,0 +1,397 @@
+/*
+ * Kindi component styles — site header, navigation, footer and other parts
+ * that appear on every view. Faithful port of the Lovable Header/Footer.
+ */
+
+/* ============================ Buttons ============================ */
+/* Brand buttons are used by always-on components (cookie banner, waitlist,
+   sticky bars) as well as the home sections — so they live in this
+   every-view layer, not in the conditionally-loaded sections.css. */
+.kindi-btn { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; border-radius: 1rem; padding: 0.75rem 1.5rem; text-decoration: none; transition: all 0.2s; cursor: pointer; border: 0; }
+.kindi-btn--red { background: var(--brand-red); color: #fff; box-shadow: var(--shadow-pop); }
+.kindi-btn--red:hover { background: var(--brand-red-dark); transform: scale(1.03); color: #fff; }
+.kindi-btn--ghost { background: rgba(255,255,255,0.8); color: var(--brand-navy); border: 2px solid color-mix(in oklab, var(--brand-navy) 15%, transparent); }
+.kindi-btn--ghost:hover { background: #fff; color: var(--brand-navy); }
+.kindi-btn--navy { background: var(--brand-navy); color: #fff; }
+.kindi-btn--navy:hover { background: var(--brand-navy-dark); }
+
+/* ============================ Header shell ============================ */
+/* The header box dissolves into the flow (display:contents) so the category nav
+   can be the only sticky element — the promo strips + search row scroll away. */
+.kindi-header { display: contents; }
+.kindi-promobar { background: var(--brand-navy); color: #fff; text-align: center; padding-block: 0.45rem; font-size: 13px; font-weight: 600; }
+.kindi-promobar__item { display: inline-flex; align-items: center; gap: 0.5rem; padding-inline: 1rem; }
+/* Mobile: the message wraps to two lines — keep the truck icon undistorted and
+   neatly beside the text (it was getting squished / misaligned). */
+@media (max-width: 767px) {
+  .kindi-promobar__item { padding-inline: 0.75rem; gap: 0.45rem; line-height: 1.35; }
+  .kindi-promobar__item > .kindi-icon { flex-shrink: 0; }
+}
+/* display:contents promotes the bars into the root flow, which injects block-gap
+   margins between them — zero those out so the strips sit flush. */
+.kindi-topbar, .kindi-promobar, .kindi-bar, .kindi-msearch, .kindi-nav { margin-block: 0; }
+/* The header is display:contents, so the WP flow-layout block-gap lands on these
+   strips and pushes them apart. Force them flush — the coloured bands stack with
+   no white gaps below the top strip, below the blue strip, or above the nav. */
+.kindi-header > * { margin-block: 0 !important; }
+
+.kindi-topbar { background: linear-gradient(to left, var(--brand-red), var(--brand-red-dark) 55%, var(--brand-navy)); color: #fff; overflow: hidden; }
+.kindi-topbar__track { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.25rem 0; padding-block: 0.5rem; padding-inline: 1rem; width: auto; }
+.kindi-topbar__item { display: inline-flex; align-items: center; gap: 0.5rem; padding-inline: 1.25rem; font-size: 13px; font-weight: 600; }
+/* Coloured icons shown directly on the strip — no chip/background behind them. */
+.kindi-topbar__ic { flex: 0 0 auto; display: inline-flex; align-items: center; }
+.kindi-topbar__ic .kindi-icon { width: 1.15em; height: 1.15em; }
+/* Mobile: hide the red ticker strip to keep the header compact. */
+@media (max-width: 1023.98px) { .kindi-topbar { display: none; } }
+
+
+.kindi-bar {
+  position: relative; z-index: 110; box-sizing: border-box;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
+  width: 100%; height: 5rem; display: flex; align-items: center;
+  gap: 1rem;
+  /* Keep the white bar full-width but centre its content on the same 1440px rail
+     as the category nav — otherwise the cart (left-most in RTL) gets shoved to
+     the viewport edge and looks cut off on wide screens. */
+  padding-inline: max(1rem, calc((100% - 1440px) / 2));
+}
+@media (min-width: 640px) { .kindi-bar { gap: 2rem; padding-inline: max(1.5rem, calc((100% - 1440px) / 2)); } }
+.kindi-bar__burger { display: inline-flex; background: none; border: 0; color: var(--brand-navy); cursor: pointer; padding: 0.5rem; }
+@media (min-width: 1024px) { .kindi-bar__burger { display: none; } }
+.kindi-bar__logo { flex-shrink: 0; display: flex; align-items: center; }
+.kindi-bar__logo img { height: 3rem; width: auto; }
+@media (min-width: 640px) { .kindi-bar__logo img { height: 3.5rem; } }
+
+.kindi-search { position: relative; flex: 1; max-width: 42rem; display: none; align-items: center; }
+@media (min-width: 768px) { .kindi-search { display: flex; } }
+.kindi-search__ic { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); }
+.kindi-search input {
+  width: 100%; height: 3rem; padding-inline: 3rem 8rem; background: #fff;
+  border: 2px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); border-radius: 1rem;
+  font-family: var(--wp--preset--font-family--sans); font-size: 0.875rem; font-weight: 600; box-shadow: var(--shadow-card); transition: border-color 0.2s, box-shadow 0.2s;
+}
+.kindi-search input::placeholder { color: color-mix(in oklab, var(--brand-navy) 50%, transparent); font-weight: 500; }
+.kindi-search input:hover { border-color: color-mix(in oklab, var(--brand-red) 40%, transparent); }
+.kindi-search input:focus { outline: none; border-color: var(--brand-red); box-shadow: 0 0 0 4px color-mix(in oklab, var(--brand-red) 15%, transparent); }
+.kindi-search__btn { position: absolute; left: 0.375rem; top: 50%; transform: translateY(-50%); display: inline-flex; align-items: center; gap: 0.375rem; background: var(--brand-red); color: #fff; height: 2.25rem; padding-inline: 1.25rem; border: 0; border-radius: 0.75rem; font-family: var(--wp--preset--font-family--sans); font-weight: 800; font-size: 0.875rem; cursor: pointer; transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; }
+.kindi-search__btn:hover { background: var(--brand-red-dark); transform: translateY(-50%) scale(1.05); box-shadow: 0 6px 16px color-mix(in oklab, var(--brand-red) 40%, transparent); }
+.kindi-search__btn:active { transform: translateY(-50%) scale(0.98); }
+@media (prefers-reduced-motion: reduce) { .kindi-search__btn { transition: background 0.2s ease; } .kindi-search__btn:hover, .kindi-search__btn:active { transform: translateY(-50%); } }
+
+.kindi-bar__actions { display: flex; align-items: center; gap: 0.25rem; margin-inline-start: auto; }
+@media (min-width: 640px) { .kindi-bar__actions { gap: 0.5rem; } }
+.kindi-bar__util { display: none; flex-direction: column; align-items: center; gap: 2px; padding-inline: 0.5rem; height: 3rem; justify-content: center; color: var(--muted-foreground); text-decoration: none; transition: color 0.2s; }
+.kindi-bar__util span { font-size: 10px; font-weight: 500; }
+.kindi-bar__util:hover { color: var(--brand-navy); }
+@media (min-width: 640px) { .kindi-bar__util { display: flex; } }
+.kindi-bar__phone { display: none; align-items: center; gap: 0.4rem; font-size: 0.875rem; font-weight: 500; color: var(--muted-foreground); text-decoration: none; padding-inline: 0.5rem; white-space: nowrap; transition: color 0.2s; }
+.kindi-bar__phone:hover { color: var(--brand-navy); }
+@media (min-width: 1024px) { .kindi-bar__phone { display: inline-flex; } }
+
+.kindi-cart { display: flex; align-items: center; gap: 0.75rem; height: 3rem; padding-inline-start: 1rem; padding-inline-end: 0.5rem; border-radius: 1rem; background: #fff; border: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); text-decoration: none; transition: all 0.2s; }
+.kindi-cart:hover { border-color: color-mix(in oklab, var(--brand-red) 40%, transparent); box-shadow: var(--shadow-card); }
+.kindi-cart__txt { text-align: right; line-height: 1.1; display: none; }
+@media (min-width: 640px) { .kindi-cart__txt { display: block; } }
+/* Mobile: only the icon shows, so make the white pill's padding symmetric — the
+   icon sits centred with equal space on both sides. */
+@media (max-width: 639px) {
+  .kindi-cart { padding-inline: 0.4rem; }
+  /* Show the favourites + phone (dial) icons in the header — icon-only (their
+     text labels stay hidden). Both are already in the DOM, just revealed here. */
+  .kindi-bar__actions .kindi-wish-link { display: inline-flex; }
+  .kindi-bar__actions .kindi-wish-link > span:last-child { display: none; }
+  .kindi-bar__phone { display: inline-flex; }
+  .kindi-bar__phone > span { display: none; }
+  /* Heart + phone icons the same, larger size. */
+  .kindi-bar__phone .kindi-icon,
+  .kindi-bar__actions .kindi-wish-link .kindi-icon { width: 1.5rem; height: 1.5rem; }
+}
+.kindi-cart__txt small { font-size: 10px; color: var(--muted-foreground); }
+.kindi-cart__txt b { display: block; font-size: 0.75rem; font-weight: 800; color: var(--brand-navy); }
+.kindi-cart__ic { position: relative; width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; background: var(--brand-red); display: grid; place-items: center; transition: background 0.2s; overflow: visible; }
+.kindi-cart:hover .kindi-cart__ic { background: var(--brand-red-dark); }
+/* Badge overhangs the icon's top-outer corner; keep the whole chain non-clipping
+   and the bar tall enough so the "3" bubble is never cut at the top. */
+.kindi-bar, .kindi-bar__actions, .kindi-cart { overflow: visible; }
+.kindi-cart__badge { position: absolute; top: -0.25rem; inset-inline-end: -0.25rem; z-index: 3; min-width: 20px; height: 20px; padding-inline: 4px; background: var(--brand-navy); color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; border-radius: 999px; box-shadow: 0 0 0 2px #fff; }
+
+/* Live search suggestions */
+.kindi-search { position: relative; }
+.kindi-suggest {
+  position: absolute; top: calc(100% + 0.5rem); right: 0; left: 0; z-index: 95;
+  background: #fff; border: 1px solid var(--border); border-radius: 1rem;
+  box-shadow: var(--shadow-pop); overflow: hidden; max-height: 70vh; overflow-y: auto;
+}
+.kindi-suggest__group { padding: 0.5rem 1rem; font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--brand-red); background: color-mix(in oklab, var(--brand-red) 5%, #fff); }
+.kindi-suggest__cat { display: flex; justify-content: space-between; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; color: var(--brand-navy); text-decoration: none; }
+.kindi-suggest__cat span { color: var(--muted-foreground); font-weight: 400; }
+.kindi-suggest__cat:hover, .kindi-suggest__item:hover,
+.kindi-suggest [role="option"].is-active { background: var(--brand-blue-soft); }
+.kindi-suggest__item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; text-decoration: none; border-top: 1px solid var(--border); }
+.kindi-suggest__item img { width: 48px; height: 48px; object-fit: cover; border-radius: 0.5rem; flex-shrink: 0; }
+.kindi-suggest__t { flex: 1; font-size: 0.875rem; font-weight: 600; color: var(--foreground); }
+.kindi-suggest__p { font-weight: 800; color: var(--brand-red); font-size: 0.8125rem; white-space: nowrap; }
+.kindi-suggest__p del { color: var(--muted-foreground); font-weight: 400; }
+.kindi-suggest__all { display: block; text-align: center; padding: 0.75rem; font-weight: 700; font-size: 0.8125rem; color: #fff; background: var(--brand-navy); text-decoration: none; }
+.kindi-suggest__all:hover { background: var(--brand-red); color: #fff; }
+.kindi-suggest__empty { padding: 1.5rem; text-align: center; color: var(--muted-foreground); font-size: 0.875rem; }
+
+/* Mobile search bar (under the main header row) */
+.kindi-msearch { position: relative; z-index: 110; display: block; padding: 0 1rem 0.75rem; background: rgba(255,255,255,0.95); }
+@media (min-width: 768px) { .kindi-msearch { display: none; } }
+.kindi-search--mobile { display: flex; position: relative; width: 100%; max-width: none; }
+.kindi-search--mobile input { width: 100%; height: 2.75rem; padding-inline: 2.75rem 1rem; background: #fff; border: 2px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); border-radius: 0.875rem; font-size: 0.9375rem; font-weight: 600; }
+.kindi-search--mobile input:focus { outline: none; border-color: var(--brand-red); }
+
+/* ============================ Category nav + mega ============================ */
+.kindi-nav { position: sticky; top: 0; z-index: 100; background: var(--brand-navy); color: #fff; display: block; }
+/* Mobile: the category/mega nav is replaced by the hamburger drawer (top-right),
+   so hide the strip itself to avoid a duplicate menu. */
+@media (max-width: 1023.98px) { .kindi-nav { display: none; } }
+/* One row. Mobile: swipe horizontally. Desktop: fit one line (JS shrinks --kindi-nav-fs if crowded). */
+.kindi-nav__inner { max-width: 1440px; margin-inline: auto; display: flex; flex-wrap: nowrap; align-items: center; gap: 0.25rem; min-height: 3rem; padding-inline: 1rem; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.kindi-nav__inner::-webkit-scrollbar { display: none; }
+@media (min-width: 1024px) { .kindi-nav__inner { padding-inline: 1.5rem; } }
+.kindi-nav__item { position: static; display: flex; align-items: center; flex-shrink: 0; }
+.kindi-nav__item--hl { margin-inline-start: auto; }
+@media (max-width: 1023px) { .kindi-nav__item--hl { margin-inline-start: 0; } .kindi-mega { display: none !important; } }
+.kindi-nav__link { display: inline-flex; align-items: center; gap: 0.375rem; font-size: var(--kindi-nav-fs, 0.875rem); font-weight: 600; white-space: nowrap; padding: 0.375rem 0.75rem; border-radius: 0.5rem; color: rgba(255,255,255,0.85); text-decoration: none; transition: background 0.15s, color 0.15s; }
+.kindi-nav__ic { display: inline-flex; align-items: center; }
+.kindi-nav__face { width: 1.5em; height: 1.5em; border-radius: 999px; object-fit: cover; background: #fff; flex-shrink: 0; }
+.kindi-nav__ic .kindi-icon { width: 1.2em; height: 1.2em; }
+.kindi-nav__link:hover { background: rgba(255,255,255,0.1); color: #fff; }
+/* Open mega item = white pill button with rotated chevron (like the design). */
+.kindi-nav__item:has(.kindi-mega):hover .kindi-nav__link,
+.kindi-nav__item:has(.kindi-mega):focus-within .kindi-nav__link { background: #fff; color: var(--brand-navy); box-shadow: 0 6px 16px rgba(20,35,63,0.12); }
+.kindi-nav__link > .kindi-icon { transition: transform 0.2s; }
+.kindi-nav__item:has(.kindi-mega):hover .kindi-nav__link > .kindi-icon,
+.kindi-nav__item:has(.kindi-mega):focus-within .kindi-nav__link > .kindi-icon { transform: rotate(180deg); }
+.kindi-nav__item--hl .kindi-nav__link { background: var(--brand-red); color: #fff; }
+.kindi-nav__item--hl .kindi-nav__link:hover { background: var(--brand-red-dark); }
+.kindi-nav__ic { width: 1.5rem; height: 1.5rem; border-radius: 0.375rem; background: #fff; display: grid; place-items: center; }
+.kindi-nav__item--hl .kindi-nav__ic { background: rgba(255,255,255,0.2); }
+
+.kindi-mega { position: fixed; top: var(--kindi-header-h, 11rem); left: 0; right: 0; background: var(--background, #fff); color: var(--foreground); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-top: 4px solid var(--brand-red); padding: 2rem 0; opacity: 0; visibility: hidden; transform: translateY(8px); transition: opacity 0.2s, transform 0.2s, visibility 0.2s; z-index: 120; }
+.kindi-nav__item:hover .kindi-mega, .kindi-nav__item:focus-within .kindi-mega { opacity: 1; visibility: visible; transform: translateY(0); }
+.kindi-mega__inner { display: flex; gap: 2rem; max-width: 1440px; margin-inline: auto; padding-inline: 1.5rem; }
+.kindi-mega__cols { flex: 1; display: flex; gap: 2rem; }
+.kindi-mega__col { flex: 1; min-width: 0; }
+.kindi-mega__title { display: flex; align-items: center; gap: 0.4rem; font-size: 1rem; letter-spacing: normal; color: var(--brand-red); font-weight: 800; margin: 0 0 0.85rem; }
+/* Childless category: the title itself is the link (rendered once, no duplicate
+   sub-item) — same look as the heading, underline on hover. */
+a.kindi-mega__title--link { text-decoration: none; }
+a.kindi-mega__title--link:hover { text-decoration: underline; }
+.kindi-mega__col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+
+/* Mega feature card */
+.kindi-mega__feature {
+  width: 240px; flex-shrink: 0; border-radius: 1rem; padding: 1.25rem; color: #fff;
+  position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 0.25rem;
+  text-decoration: none; min-height: 200px; transition: transform 0.2s;
+}
+.kindi-mega__feature:hover { transform: translateY(-2px); }
+.kindi-mega__feature--red { background: linear-gradient(to bottom left, var(--brand-red), var(--brand-red-dark)); }
+.kindi-mega__feature--navy { background: linear-gradient(to bottom left, var(--brand-navy), var(--brand-navy-dark)); }
+.kindi-mega__feature--blue { background: linear-gradient(to bottom left, var(--brand-blue), var(--brand-navy)); }
+.kindi-mega__feature-eyebrow { font-size: 0.7rem; font-weight: 700; opacity: 0.85; }
+.kindi-mega__feature-title { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1.5rem; line-height: 1.1; }
+.kindi-mega__feature-sub { font-size: 0.8125rem; opacity: 0.9; }
+.kindi-mega__feature-cta { margin-top: auto; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 700; font-size: 0.875rem; position: relative; z-index: 2; }
+.kindi-mega__feature-img { position: absolute; bottom: -0.5rem; left: -0.75rem; width: 96px; height: 96px; object-fit: contain; pointer-events: none; }
+.kindi-mega__col a { font-size: 0.9375rem; font-weight: 600; color: color-mix(in oklab, var(--foreground) 88%, transparent); text-decoration: none; transition: color 0.15s; }
+.kindi-mega__col a:hover { color: var(--brand-red); font-weight: 700; }
+
+/* Mobile drawer */
+.kindi-drawer { position: fixed; inset: 0; z-index: 200; }
+.kindi-drawer[hidden] { display: none; }
+.kindi-drawer__overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+.kindi-drawer__panel { position: absolute; top: 0; right: 0; bottom: 0; width: 85%; max-width: 24rem; background: var(--background); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.2); }
+.kindi-drawer__head { background: var(--brand-navy); color: #fff; padding: 1rem; display: flex; align-items: center; justify-content: space-between; }
+.kindi-drawer__title { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 800; }
+.kindi-drawer__title img { width: 2.5rem; height: 2.5rem; object-fit: contain; }
+.kindi-drawer__close { background: none; border: 0; color: #fff; cursor: pointer; }
+.kindi-drawer__body { flex: 1; overflow-y: auto; padding: 0.5rem; }
+.kindi-drawer__link { display: flex; align-items: center; gap: 0.625rem; padding: 0.875rem; font-weight: 600; font-size: 0.875rem; color: var(--foreground); text-decoration: none; border-bottom: 1px solid var(--border); }
+.kindi-drawer__link--hl { margin-top: 0.5rem; background: var(--brand-red); color: #fff; border-radius: 0.75rem; justify-content: center; border: 0; }
+.kindi-drawer__acc { border-bottom: 1px solid var(--border); }
+.kindi-drawer__acc > summary { list-style: none; cursor: pointer; }
+.kindi-drawer__acc > summary::-webkit-details-marker { display: none; }
+.kindi-drawer__acc > summary span { flex: 1; }
+.kindi-drawer__sub { padding: 0.25rem 0.5rem 0.75rem 2.25rem; display: flex; flex-direction: column; gap: 0.125rem; }
+.kindi-drawer__coltitle { font-size: 0.6875rem; font-weight: 800; color: var(--brand-red); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 0.5rem; }
+.kindi-drawer__sublink { padding: 0.4rem 0; font-size: 0.875rem; color: var(--foreground); text-decoration: none; }
+.kindi-drawer__sublink:hover { color: var(--brand-red); }
+
+/* Wishlist link badge */
+.kindi-wish-ic { position: relative; display: inline-flex; }
+.kindi-wish-badge { position: absolute; top: -8px; inset-inline-end: -8px; min-width: 16px; height: 16px; padding-inline: 3px; background: var(--brand-red); color: #fff; font-size: 10px; font-weight: 800; border-radius: 999px; display: grid; place-items: center; }
+
+/* Mini-cart drawer. Use dynamic viewport height so the fixed footer (checkout
+   button) stays visible above the mobile browser toolbar. */
+/* Above the floating WhatsApp/accessibility buttons (z-index 210/220) so the
+   open cart covers them instead of the buttons overlapping its footer actions. */
+.kindi-cartdrawer { position: fixed; inset: 0; height: 100vh; height: 100dvh; z-index: 240; }
+.kindi-cartdrawer[hidden] { display: none; }
+.kindi-cartdrawer__overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+.kindi-cartdrawer__panel { position: absolute; top: 0; bottom: 0; inset-inline-start: 0; width: 90%; max-width: 24rem; height: 100%; background: #fff; display: flex; flex-direction: column; box-shadow: 10px 0 40px rgba(0,0,0,0.25); }
+.kindi-cartdrawer:not([hidden]) .kindi-cartdrawer__panel { animation: kindi-cart-in 0.25s ease; }
+@keyframes kindi-cart-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .kindi-cartdrawer:not([hidden]) .kindi-cartdrawer__panel { animation: none; } }
+.kindi-cartdrawer__head { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; background: var(--brand-navy); color: #fff; font-family: var(--wp--preset--font-family--display); }
+.kindi-cartdrawer__head button { background: none; border: 0; color: #fff; cursor: pointer; }
+/* Panel = head (fixed) + body (scrolls) + foot (fixed). The foot lives OUTSIDE
+   the AJAX-replaced mini-cart, so the total + checkout button are structurally
+   always visible however long the items list gets. */
+.kindi-cartdrawer__body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 1rem 1.25rem; }
+.kindi-cartdrawer .woocommerce-mini-cart { list-style: none; margin: 0; padding: 0; }
+.kindi-cartdrawer .woocommerce-mini-cart__empty-message { text-align: center; color: var(--muted-foreground); padding: 2rem 0; }
+/* Cart-item rows: fixed-size thumbnail so product images never vary. */
+.kindi-cartdrawer .woocommerce-mini-cart li.mini_cart_item { position: relative; display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0 0.75rem 1.5rem; border-bottom: 1px solid var(--border); list-style: none; }
+.kindi-cartdrawer .woocommerce-mini-cart li.mini_cart_item::after { content: ""; display: table; clear: both; }
+.kindi-cartdrawer .woocommerce-mini-cart li.mini_cart_item a:not(.remove) { font-weight: 700; color: var(--brand-navy); text-decoration: none; font-size: 0.875rem; }
+.kindi-cartdrawer .woocommerce-mini-cart li.mini_cart_item img { width: 56px !important; height: 56px !important; object-fit: contain; border-radius: 0.6rem; background: color-mix(in oklab, var(--muted) 40%, transparent); flex: 0 0 auto; margin: 0 !important; float: none !important; }
+.kindi-cartdrawer .woocommerce-mini-cart li.mini_cart_item a.remove { position: absolute; inset-inline-start: 0; top: 50%; transform: translateY(-50%); margin: 0; }
+.kindi-cartdrawer .woocommerce-mini-cart .quantity { font-size: 0.8125rem; color: var(--muted-foreground); }
+/* The mini-cart's own total + buttons are replaced by our fixed footer. */
+.kindi-cartdrawer .woocommerce-mini-cart__total,
+.kindi-cartdrawer .woocommerce-mini-cart__buttons { display: none; }
+
+.kindi-cartdrawer__foot { flex: 0 0 auto; border-top: 1px solid var(--border); background: #fff; padding: 0.85rem 1.25rem calc(0.95rem + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 0.65rem; box-shadow: 0 -10px 24px rgba(20, 35, 63, 0.1); }
+.kindi-cartdrawer__foottotal { display: flex; justify-content: space-between; align-items: baseline; font-weight: 800; color: var(--brand-navy); }
+.kindi-cartdrawer__foottotal strong { font-size: 1.1rem; }
+.kindi-cartdrawer__footbtns { display: flex; gap: 0.5rem; }
+.kindi-cartdrawer__footbtns .button { flex: 1; text-align: center; border-radius: 0.875rem; margin: 0; }
+.kindi-cartdrawer__viewcart { background: var(--brand-navy); color: #fff; }
+.kindi-cartdrawer__checkout { background: var(--brand-red); color: #fff; }
+.kindi-cartdrawer__checkout:hover { background: var(--brand-red-dark); }
+/* Hide the whole footer when the cart is empty. */
+.kindi-cartdrawer__foot:has(.kindi-cartdrawer__foottotal.is-empty) { display: none; }
+
+/* Wishlist grid */
+.kindi-wish-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+@media (min-width: 640px) { .kindi-wish-grid { grid-template-columns: repeat(4, 1fr); } }
+.kindi-wish-card { background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 0.75rem; text-decoration: none; box-shadow: var(--shadow-card); display: flex; flex-direction: column; transition: all 0.2s; }
+.kindi-wish-card:hover { box-shadow: var(--shadow-pop); transform: translateY(-3px); }
+.kindi-wish-card img { border-radius: 0.75rem; aspect-ratio: 1; object-fit: cover; margin-bottom: 0.5rem; }
+.kindi-wish-card__t { font-size: 0.875rem; font-weight: 700; color: var(--foreground); }
+.kindi-wish-card__p { color: var(--brand-red); font-weight: 900; margin-top: 0.25rem; }
+
+/* ============================ Footer ============================ */
+.kindi-footer { background: var(--brand-navy); color: #fff; margin-top: 4rem; }
+.kindi-footer__inner { max-width: 1440px; margin-inline: auto; padding: 3rem 1.5rem; }
+.kindi-footer__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem 2rem; }
+@media (min-width: 768px) { .kindi-footer__grid { grid-template-columns: 2fr 1fr 1fr 1fr 1.2fr; } }
+.kindi-footer__brand { grid-column: span 2; display: flex; flex-direction: column; gap: 1rem; }
+@media (min-width: 768px) { .kindi-footer__brand { grid-column: span 1; } }
+.kindi-footer__logo { height: 5rem; width: auto; background: #fff; border-radius: 1rem; padding: 0.5rem; align-self: flex-start; }
+.kindi-footer__brand p { font-size: 0.875rem; color: rgba(255,255,255,0.75); line-height: 1.7; max-width: 24rem; }
+.kindi-footer__social { display: flex; gap: 0.5rem; }
+.kindi-footer__soc { width: 2.5rem; height: 2.5rem; border-radius: 999px; background: rgba(255,255,255,0.1); display: grid; place-items: center; color: #fff; text-decoration: none; transition: background 0.2s; font-weight: 700; }
+.kindi-footer__soc:hover { background: var(--brand-red); }
+.kindi-footer__col h4 { font-family: var(--wp--preset--font-family--display); font-weight: 900; font-size: 1rem; margin: 0 0 1rem; color: #fff; }
+.kindi-footer__col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.625rem; }
+.kindi-footer__col a, .kindi-footer__col li { font-size: 0.875rem; color: rgba(255,255,255,0.75); text-decoration: none; display: inline-flex; align-items: center; gap: 0.375rem; }
+.kindi-footer__col a:hover { color: #fff; text-decoration: underline; }
+.kindi-footer__hours { font-size: 0.75rem; color: rgba(255,255,255,0.6); padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+.kindi-footer__bottom { display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: space-between; padding-top: 2rem; margin-top: 2.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+@media (min-width: 640px) { .kindi-footer__bottom { flex-direction: row; } }
+.kindi-footer__copy { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+.kindi-footer__copy a { color: rgba(255,255,255,0.85); }
+.kindi-footer__credit { font-size: 0.75rem; color: rgba(255,255,255,0.55); }
+.kindi-footer__credit a { color: rgba(255,255,255,0.8); font-weight: 700; text-decoration: none; }
+.kindi-footer__credit a:hover { color: #fff; text-decoration: underline; }
+.kindi-footer__pay { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.kindi-footer__pay > span:first-child { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+.kindi-footer__paychip { font-size: 10px; font-weight: 700; background: #fff; color: var(--brand-navy); padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
+/* Mobile: tighten the footer — trim the oversized gaps + padding (desktop is
+   unchanged). */
+@media (max-width: 767px) {
+  .kindi-footer { margin-top: 2.5rem; }
+  .kindi-footer__inner { padding: 2rem 1.25rem; }
+  .kindi-footer__grid { gap: 1.5rem; }
+  .kindi-footer__bottom { padding-top: 1.25rem; margin-top: 1.5rem; }
+  /* Smaller logo box + minimal padding so the logo fills it, less space around. */
+  /* Force a small logo — override any global img sizing that was blowing it up. */
+  .kindi-footer__logo { height: 3.25rem !important; width: auto !important; max-width: 10rem; padding: 0.3rem; }
+  .kindi-footer__brand { gap: 0.75rem; }
+}
+
+/* ============================ Section title (legacy block helper) ============================ */
+.kindi-section-title { font-family: var(--wp--preset--font-family--display); color: var(--brand-navy); }
+
+/* Ticker animation removed by request — top bar is now a static centered strip. */
+
+/* ============================ Global shared chrome (was in sections.css — needed on every page) ============================ */
+.kindi-icon { display: inline-block; flex-shrink: 0; width: 24px; height: 24px; vertical-align: middle; }
+.kindi-icon--xs { width: 14px; height: 14px; }
+.kindi-icon--sm { width: 16px; height: 16px; }
+.kindi-icon--md { width: 20px; height: 20px; }
+.kindi-icon--lg { width: 28px; height: 28px; }
+.kindi-icon--xl { width: 32px; height: 32px; }
+.kindi-icon--2xl { width: 40px; height: 40px; }
+.kindi-icon--3xl { width: 48px; height: 48px; }
+.kindi-icon--white * { stroke: #fff !important; }
+
+.kindi-section { margin-block: 3rem; }
+@media (min-width: 640px) { .kindi-section { margin-block: 5rem; } }
+.kindi-sec-title { font-family: var(--wp--preset--font-family--display); font-weight: 900; line-height: 1.1; color: var(--brand-navy); font-size: clamp(1.5rem, 1.2rem + 1.6vw, 2.25rem); margin: 0; }
+.kindi-hl { color: var(--brand-red); background-image: linear-gradient(180deg, transparent 65%, color-mix(in oklab, var(--brand-red) 30%, transparent) 65%); background-repeat: no-repeat; background-size: 100% 100%; }
+.kindi-sec-desc { margin-top: 0.5rem; font-size: 0.875rem; color: color-mix(in oklab, var(--brand-navy) 65%, transparent); }
+
+/* Floating action buttons (whatsapp + accessibility) — on every page */
+.kindi-float { position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 210; width: 3.5rem; height: 3.5rem; border-radius: 999px; display: grid; place-items: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); transition: transform 0.2s; border: 0; cursor: pointer; }
+.kindi-float:hover { transform: scale(1.1); }
+.kindi-float--wa { background: #25D366; color: #fff; }
+/* The a11y button is a small edge tab at mid-height on the left (all
+   viewports): clear of the bottom thumb/scroll zone on mobile, and out of the
+   WhatsApp / sticky-cart area everywhere, while staying comfortably tappable
+   (40px). The fixed height keeps any inherited `bottom` from the sticky-cart
+   lift rule inert (over-constrained: top + height win). */
+.kindi-float--a11y {
+  left: 0; bottom: auto; top: 50%; transform: translateY(-50%);
+  width: 2.5rem; height: 2.5rem; background: var(--brand-navy); color: #fff;
+  border-radius: 0 999px 999px 0;
+  box-shadow: 0 10px 24px -8px rgba(0,0,0,0.35);
+}
+.kindi-float--a11y:hover { transform: translateY(-50%) scale(1.05); }
+
+/* ---------- Cookie consent banner ---------- */
+.kindi-cookie { position: fixed; inset-inline: 0; bottom: 0; z-index: 230; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.75rem 1.25rem; background: #fff; border-top: 1px solid var(--border); box-shadow: 0 -10px 30px rgba(20,35,63,0.12); padding: 0.9rem 1.25rem calc(0.9rem + env(safe-area-inset-bottom)); }
+.kindi-cookie[hidden] { display: none; }
+.kindi-cookie__txt { margin: 0; font-size: 0.85rem; color: var(--foreground); max-width: 70ch; line-height: 1.5; }
+.kindi-cookie__link { color: var(--brand-red); font-weight: 700; text-decoration: underline; }
+.kindi-cookie__ok { flex: 0 0 auto; padding: 0.6rem 1.5rem; }
+
+/* ============== Footer FAQ (site-wide accordion above the footer) ============== */
+/* Sits as the footer's first child, on its own light background — visually a
+   section above the navy footer. */
+.kindi-faq { background: var(--surface, #f7f9fc); padding: 3rem 1rem; }
+.kindi-faq__inner { max-width: 860px; margin-inline: auto; }
+.kindi-faq__title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); text-align: center; font-size: 1.7rem; margin: 0 0 0.75rem; }
+.kindi-faq__intro { text-align: center; color: var(--muted-foreground); margin: 0 auto 1.75rem; max-width: 62ch; line-height: 1.6; }
+.kindi-faq__list { display: flex; flex-direction: column; gap: 0.6rem; }
+.kindi-faq__item summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: var(--brand-navy); color: #fff; font-weight: 700; font-size: 0.95rem; padding: 0.85rem 1.15rem; border-radius: 0.75rem; cursor: pointer; list-style: none; }
+.kindi-faq__item summary::-webkit-details-marker { display: none; }
+.kindi-faq__item summary:hover { background: var(--brand-navy-dark, #16224a); }
+.kindi-faq__item summary:focus-visible { outline: 3px solid var(--brand-blue); outline-offset: 2px; }
+.kindi-faq__item[open] summary { border-radius: 0.75rem 0.75rem 0 0; }
+.kindi-faq__plus { flex: 0 0 auto; font-size: 1.25rem; line-height: 1; transition: transform 0.2s ease; }
+.kindi-faq__item[open] .kindi-faq__plus { transform: rotate(45deg); }
+@media (prefers-reduced-motion: reduce) { .kindi-faq__plus { transition: none; } }
+.kindi-faq__answer { background: #fff; border: 1px solid var(--border); border-top: 0; border-radius: 0 0 0.75rem 0.75rem; padding: 0.9rem 1.15rem; color: var(--foreground); line-height: 1.65; }
+.kindi-faq__answer p { margin: 0 0 0.5rem; }
+.kindi-faq__answer p:last-child { margin-bottom: 0; }
+.kindi-faq__outro-title { font-family: var(--wp--preset--font-family--display); font-weight: 900; color: var(--brand-navy); text-align: center; font-size: 1.25rem; margin: 2.25rem 0 0.5rem; }
+.kindi-faq__outro { text-align: center; color: var(--muted-foreground); max-width: 62ch; margin: 0 auto; line-height: 1.6; }
+
+/* ============================ Site notices ============================ */
+/* Availability/announcement box (Kindi ▸ הודעות קטגוריה) — shown beside
+   add-to-cart, on category archives, in the cart and at the top of chosen
+   pages, so it lives in this every-view layer. */
+.kindi-catnotice { display: flex; align-items: flex-start; gap: 0.7rem; margin: 1rem 0; padding: 0.85rem 1rem; border-radius: 1rem; background: var(--brand-red-soft); border: 1px solid color-mix(in oklab, var(--brand-red) 30%, transparent); }
+.kindi-catnotice--cart { margin: 0 0 1.25rem; }
+.kindi-catnotice--page { margin: 0 0 1.5rem; }
+.kindi-catnotice__ic { flex: 0 0 auto; display: inline-flex; margin-top: 0.05rem; }
+.kindi-catnotice__txt { min-width: 0; }
+.kindi-catnotice__txt p { margin: 0; color: var(--brand-navy); font-weight: 600; font-size: 0.9rem; line-height: 1.5; }
+.kindi-catnotice__txt p + p { margin-top: 0.5rem; }

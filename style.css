@@ -1,0 +1,21 @@
+/*
+Theme Name: Kindi
+Theme URI: https://github.com/multidigitalltd/kindiclaude
+Author: Multi Digital
+Author URI: https://multidigital.co.il
+Description: מותאם אישית לחנות "קינדר טויס" — תקן Multi Digital לביצועים, אבטחה ונגישות (ת"י 5568 / WCAG 2.2 AA).
+Version: 1.6.113
+Requires at least: 6.5
+Tested up to: 6.7
+Requires PHP: 8.3
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Update URI: https://github.com/multidigitalltd/kindiclaude
+Text Domain: kindi
+Tags: full-site-editing, block-patterns, rtl-language-support, e-commerce, accessibility-ready
+*/
+
+/*
+ * עיצוב הת'ים מנוהל ב-theme.json ובקבצי CSS המותנים שב-assets/css/.
+ * קובץ זה משמש למטא-דאטה בלבד — אין להוסיף כאן כללי עיצוב.
+ */
