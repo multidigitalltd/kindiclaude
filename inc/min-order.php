@@ -21,7 +21,8 @@ defined( 'ABSPATH' ) || exit;
 function kindi_min_order_settings( array $tabs ): array {
 	if ( isset( $tabs['texts']['sections'] ) ) {
 		$tabs['texts']['sections']['מינימום הזמנה למשלוח'] = array(
-			'min_order_amount' => array( 'type' => 'number', 'label' => 'סכום מינימום (₪)', 'help' => 'מתחת לסכום הזה לא ניתן להשלים הזמנה עם משלוח (איסוף עצמי תמיד אפשרי). 0 = כבוי.' ),
+			'min_order_amount'  => array( 'type' => 'number', 'label' => 'סכום מינימום (₪)', 'help' => 'מתחת לסכום הזה מוצגת ההודעה בסל ובעמוד התשלום (איסוף עצמי תמיד אפשרי). 0 = כבוי.' ),
+			'min_order_enforce' => array( 'type' => 'select', 'label' => 'אכיפה', 'options' => array( '1' => 'חסימת הזמנה (לא ניתן לשלוח מתחת למינימום)', '0' => 'הודעה בלבד (ההזמנה עוברת)' ), 'help' => 'קובע מה קורה כשלוחצים "אישור הזמנה" עם משלוח מתחת למינימום.' ),
 			'min_order_msg'    => array( 'type' => 'textarea', 'label' => 'טקסט ההודעה', 'help' => 'מוצגת בסל ובעמוד התשלום כשהסל מתחת למינימום, וגם כהודעת השגיאה אם מנסים לשלוח בכל זאת. {amount} מוחלף בסכום המינימום.' ),
 		);
 	}
@@ -91,12 +92,12 @@ add_action( 'woocommerce_before_checkout_form', 'kindi_min_order_notice', 5 );
 
 /**
  * Enforcement: block checkout submission under the minimum, unless the chosen
- * shipping method is local pickup.
+ * shipping method is local pickup — or the panel is set to notice-only mode.
  *
  * @return void
  */
 function kindi_min_order_check(): void {
-	if ( ! kindi_min_order_below() ) {
+	if ( '1' !== (string) kindi_opt( 'min_order_enforce' ) || ! kindi_min_order_below() ) {
 		return;
 	}
 	$chosen = WC()->session ? (array) WC()->session->get( 'chosen_shipping_methods' ) : array();
