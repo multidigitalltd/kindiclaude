@@ -89,6 +89,7 @@ function kindi_settings_tabs(): array {
 				'כללי'         => array(
 					'phone'                => array( 'type' => 'text', 'label' => 'טלפון' ),
 					'whatsapp'             => array( 'type' => 'text', 'label' => 'מספר וואטסאפ (בינלאומי, ללא +)', 'help' => 'לדוגמה: 972500000000' ),
+					'whatsapp_float_enable' => array( 'type' => 'select', 'label' => 'כפתור וואטסאפ צף (בפינת המסך)', 'options' => array( '1' => 'מופעל', '0' => 'כבוי' ), 'help' => 'כיבוי מסתיר רק את הכפתור הצף — הוואטסאפ בעמודי מוצר ובעמוד התשלום ממשיך לעבוד.' ),
 					'whatsapp_hours'       => array( 'type' => 'text', 'label' => 'שעות שירות וואטסאפ (תצוגה)' ),
 					'whatsapp_from'        => array( 'type' => 'number', 'label' => 'וואטסאפ — שעת פתיחה (0-23)', 'help' => 'משמש לסימון "זמינים עכשיו" בכפתור המוצר.' ),
 					'whatsapp_to'          => array( 'type' => 'number', 'label' => 'וואטסאפ — שעת סגירה (0-23)' ),

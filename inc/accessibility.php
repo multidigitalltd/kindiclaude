@@ -47,6 +47,11 @@ function kindi_floating_buttons(): void {
 	}
 
 	$wa = preg_replace( '/\D+/', '', (string) ( function_exists( 'kindi_opt' ) ? kindi_opt( 'whatsapp' ) : '' ) );
+	// Panel toggle for the floating button only — the product-page button and
+	// the checkout help box keep using the number regardless.
+	if ( function_exists( 'kindi_opt' ) && '1' !== (string) kindi_opt( 'whatsapp_float_enable' ) ) {
+		$wa = '';
+	}
 	if ( '' !== $wa ) {
 		echo '<a class="kindi-float kindi-float--wa" href="' . esc_url( 'https://wa.me/' . $wa ) . '" aria-label="צ׳אט בוואטסאפ" target="_blank" rel="noopener">' . kindi_icon( 'whatsapp', 'kindi-icon--xl kindi-icon--white' ) . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	}
