@@ -189,6 +189,10 @@ function kindi_default_options(): array {
 		// created by ACF (the data outlives the removed plugin).
 		'acf_key_archive_desc' => 'תאור_תחתון_לארכיון',
 
+		// מינימום הזמנה למשלוח (₪, 0 = כבוי) — איסוף עצמי תמיד אפשרי.
+		'min_order_amount' => '50',
+		'min_order_msg'    => 'שימו לב: לא ניתן להשלים הזמנה למשלוח בסכום נמוך מ־{amount}. אנא חזרו לסל והוסיפו מוצרים, או בחרו באיסוף עצמי מהחנות – הרב יעקב לנדא 7, בני ברק.',
+
 		// פופאפ שמירת עגלה — נפתח פעם אחת אחרי הוספת 2 מוצרים ומעלה לסל.
 		'savecart_popup_enable' => '1',
 

@@ -94,6 +94,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'filters.php' );
 	kindi_require( 'seo-facets.php' );
 	kindi_require( 'cart-cleanup.php' );
+	kindi_require( 'min-order.php' );
 	kindi_require( 'checkout.php' );
 	kindi_require( 'checkout-fields.php' );
 	kindi_require( 'club-points.php' );
