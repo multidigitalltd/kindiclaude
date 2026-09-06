@@ -31,6 +31,7 @@ function kindi_lw_settings( array $tabs ): array {
 		$tabs['texts']['sections']['מעקב משלוחים (LionWheel)'] = array(
 			'lionwheel_key'    => array( 'type' => 'secret', 'label' => 'מפתח API של LionWheel', 'help' => 'המפתח נשמר בצד השרת בלבד ואינו מוצג במסך. כשהוא מוגדר: סטטוס המשלוח מוצג אוטומטית באזור האישי בעמוד ההזמנה, ואפשר גם ליצור עמוד ייעודי עם השורטקוד [kindi_tracking] — טופס בדיקת סטטוס לפי מספר הזמנה וטלפון.' ),
 			'lionwheel_member' => array( 'type' => 'text', 'label' => 'מזהה חברה (Member ID)', 'help' => 'מזהה החברה בליונוויל. ברירת מחדל: 118376.' ),
+			'_lionwheel_log'   => array( 'type' => 'note', 'label' => 'קריאות API אחרונות', 'help_cb' => 'kindi_lw_log_html', 'help' => 'חמש הקריאות האחרונות ל-LionWheel — לאבחון. אם כל הקריאות מחזירות 404 או שהמשימה לא זוהתה, שלחו צילום של הטבלה.' ),
 		);
 	}
 	return $tabs;
@@ -102,6 +103,12 @@ function kindi_lw_extract_task( array $response ): ?array {
 	if ( isset( $response['data']['task'] ) && is_array( $response['data']['task'] ) ) {
 		return $response['data']['task'];
 	}
+	if ( isset( $response['tasks'][0] ) && is_array( $response['tasks'][0] ) ) {
+		return kindi_lw_extract_task( $response['tasks'][0] );
+	}
+	if ( isset( $response['data']['tasks'][0] ) && is_array( $response['data']['tasks'][0] ) ) {
+		return kindi_lw_extract_task( $response['data']['tasks'][0] );
+	}
 	if ( isset( $response[0] ) && is_array( $response[0] ) ) {
 		return kindi_lw_extract_task( $response[0] );
 	}
@@ -109,47 +116,114 @@ function kindi_lw_extract_task( array $response ): ?array {
 }
 
 /**
- * Fetch (with a 2-minute cache) the LionWheel task of an order.
+ * One API call: task by order reference. Every non-cached call is logged (URL
+ * without the key, HTTP code, whether a task was parsed, a body excerpt) for
+ * the panel's diagnostics table.
  *
- * @param int $order_id Order ID.
+ * @param string $ref Order reference (ID or order number).
+ * @return array<string,mixed>|null|WP_Error
+ */
+function kindi_lw_fetch( string $ref ) {
+	$url = add_query_arg(
+		array(
+			'key'       => kindi_lw_key(),
+			'member_id' => rawurlencode( trim( (string) kindi_opt( 'lionwheel_member' ) ) ),
+		),
+		'https://members.lionwheel.com/api/v1/tasks/by_order_id/' . rawurlencode( $ref )
+	);
+
+	$response = wp_remote_get( $url, array( 'timeout' => 15, 'headers' => array( 'Accept' => 'application/json' ) ) );
+	if ( is_wp_error( $response ) ) {
+		kindi_lw_log( $ref, 0, false, $response->get_error_message() );
+		return $response;
+	}
+
+	$code = (int) wp_remote_retrieve_response_code( $response );
+	$raw  = (string) wp_remote_retrieve_body( $response );
+	$body = json_decode( $raw, true );
+	$task = ( 200 === $code && is_array( $body ) ) ? kindi_lw_extract_task( $body ) : null;
+
+	kindi_lw_log( $ref, $code, is_array( $task ), $raw );
+
+	if ( 404 === $code ) {
+		return null;
+	}
+	if ( 200 !== $code || ! is_array( $body ) ) {
+		return new WP_Error( 'kindi_lw_bad_response', 'bad response', array( 'code' => $code ) );
+	}
+	return $task;
+}
+
+/**
+ * Fetch (with a 2-minute cache) the LionWheel task of an order — by order ID,
+ * and when that finds nothing, by the display order number if it differs
+ * (sequential-order-number plugins renumber orders).
+ *
+ * @param int    $order_id  Order ID.
+ * @param string $order_num Display order number ('' = same as the ID).
  * @return array<string,mixed>|null|WP_Error Task, null when no shipment
  *                                           exists, WP_Error on API failure.
  */
-function kindi_lw_task( int $order_id ) {
+function kindi_lw_task( int $order_id, string $order_num = '' ) {
 	$cache_key = 'kindi_lw_' . $order_id;
 	$cached    = get_transient( $cache_key );
 	if ( is_array( $cached ) ) {
 		return empty( $cached ) ? null : $cached; // Empty array = cached "no shipment".
 	}
 
-	$url = add_query_arg(
-		array(
-			'key'       => kindi_lw_key(),
-			'member_id' => rawurlencode( trim( (string) kindi_opt( 'lionwheel_member' ) ) ),
-		),
-		'https://members.lionwheel.com/api/v1/tasks/by_order_id/' . rawurlencode( (string) $order_id )
-	);
-
-	$response = wp_remote_get( $url, array( 'timeout' => 15, 'headers' => array( 'Accept' => 'application/json' ) ) );
-	if ( is_wp_error( $response ) ) {
-		return $response;
+	$task = kindi_lw_fetch( (string) $order_id );
+	if ( null === $task && '' !== $order_num && (string) $order_id !== $order_num ) {
+		$task = kindi_lw_fetch( $order_num );
+	}
+	if ( is_wp_error( $task ) ) {
+		return $task;
 	}
 
-	$code = (int) wp_remote_retrieve_response_code( $response );
-	$body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-	if ( 404 === $code ) {
-		set_transient( $cache_key, array(), 2 * MINUTE_IN_SECONDS );
-		return null;
-	}
-	if ( 200 !== $code || ! is_array( $body ) ) {
-		return new WP_Error( 'kindi_lw_bad_response', 'bad response', array( 'code' => $code ) );
-	}
-
-	$task = kindi_lw_extract_task( $body );
 	set_transient( $cache_key, is_array( $task ) ? $task : array(), 2 * MINUTE_IN_SECONDS );
-
 	return $task;
+}
+
+/**
+ * Append one call to the diagnostics log (last 5 kept, key never stored).
+ *
+ * @param string $ref    Order reference queried.
+ * @param int    $code   HTTP code (0 = connection error).
+ * @param bool   $parsed Whether a task was recognised in the body.
+ * @param string $body   Raw body / error message (excerpt stored).
+ * @return void
+ */
+function kindi_lw_log( string $ref, int $code, bool $parsed, string $body ): void {
+	$log   = get_option( 'kindi_lw_log', array() );
+	$log   = is_array( $log ) ? $log : array();
+	$log[] = array(
+		'time'   => current_time( 'd/m/Y H:i:s' ),
+		'ref'    => $ref,
+		'code'   => $code,
+		'parsed' => $parsed,
+		'body'   => mb_substr( wp_strip_all_tags( $body ), 0, 400 ),
+	);
+	update_option( 'kindi_lw_log', array_slice( $log, -5 ), false );
+}
+
+/**
+ * Diagnostics table for the panel (help_cb of the note field).
+ *
+ * @return string
+ */
+function kindi_lw_log_html(): string {
+	$log = get_option( 'kindi_lw_log', array() );
+	if ( ! is_array( $log ) || ! $log ) {
+		return '<p>עדיין לא בוצעו קריאות. הריצו בדיקה אחת בעמוד המעקב ורעננו את המסך.</p>';
+	}
+	$html = '<table class="widefat striped" style="max-width:900px"><thead><tr><th>זמן</th><th>הזמנה</th><th>קוד</th><th>משימה זוהתה</th><th>תחילת התשובה</th></tr></thead><tbody>';
+	foreach ( array_reverse( $log ) as $row ) {
+		$html .= '<tr><td>' . esc_html( (string) ( $row['time'] ?? '' ) ) . '</td>'
+			. '<td>' . esc_html( (string) ( $row['ref'] ?? '' ) ) . '</td>'
+			. '<td>' . esc_html( (string) ( $row['code'] ?? '' ) ) . '</td>'
+			. '<td>' . ( ! empty( $row['parsed'] ) ? '<span style="color:#15803d;font-weight:600">כן</span>' : '<span style="color:#b91c1c;font-weight:600">לא</span>' ) . '</td>'
+			. '<td style="direction:ltr;text-align:left;font-family:monospace;font-size:11px">' . esc_html( (string) ( $row['body'] ?? '' ) ) . '</td></tr>';
+	}
+	return $html . '</tbody></table>';
 }
 
 /**
@@ -245,7 +319,7 @@ function kindi_lw_lookup(): void {
 		kindi_lw_not_found();
 	}
 
-	$task = kindi_lw_task( $order_id );
+	$task = kindi_lw_task( $order_id, (string) $order->get_order_number() );
 	if ( is_wp_error( $task ) ) {
 		wp_send_json_error( array( 'message' => 'לא ניתן לקבל כרגע את נתוני המשלוח. נסו שוב מאוחר יותר.' ), 502 );
 	}
@@ -399,7 +473,8 @@ function kindi_lw_view_order( $order_id ): void {
 	if ( '' === kindi_lw_key() ) {
 		return;
 	}
-	$task = kindi_lw_task( (int) $order_id );
+	$kindi_order = wc_get_order( (int) $order_id );
+	$task        = kindi_lw_task( (int) $order_id, $kindi_order ? (string) $kindi_order->get_order_number() : '' );
 	if ( is_wp_error( $task ) || null === $task ) {
 		return; // No shipment (or API hiccup) — say nothing on the order page.
 	}
