@@ -13,12 +13,15 @@
  *   3. Duplicate/re-ordered values are normalised and 301'd to one canonical
  *      form, so the same result set stops producing endless unique URLs.
  *
- * robots.txt deliberately does NOT disallow the filter parameters any more:
- * a robots block only stops crawling, it does not remove indexed URLs — and it
- * even prevents Google from fetching the pages to see the noindex. Removal
- * requires crawl access + noindex (Google's own guidance). Once the index has
- * emptied out, a Disallow can be reinstated in a physical robots.txt to save
- * crawl budget.
+ *   4. robots.txt disallows the filter parameters — the crawler is not allowed
+ *      to fetch the ~1M already-known URLs at all, protecting the crawl budget
+ *      (the client's stated priority). Trade-off, accepted deliberately: a
+ *      robots-blocked page cannot show Google its noindex, so already-indexed
+ *      URLs decay slowly as "indexed though blocked" instead of being removed
+ *      quickly — Search Console prefix Removals hide them from results in the
+ *      meantime. The noindex/X-Robots-Tag stays: it is harmless, and it covers
+ *      any fetch that happens despite robots (bots that ignore robots.txt, or
+ *      Google testing a URL).
  *
  * @package Kindi
  */
@@ -35,6 +38,32 @@ defined( 'ABSPATH' ) || exit;
 function kindi_facet_extra_params(): array {
 	return array( 'min_price', 'max_price', 'kindi_age', 'kindi_budget', 'orderby', 'product-page' );
 }
+
+/**
+ * Disallow filter URLs in robots.txt so they are never crawled (only applies
+ * to WordPress's virtual robots.txt; a physical file or an SEO plugin's own
+ * robots.txt must be edited there).
+ *
+ * @param string $output Robots.txt body.
+ * @param string $public Whether the site is public.
+ * @return string
+ */
+function kindi_facets_robots_txt( string $output, $public ): string {
+	if ( '1' !== (string) $public ) {
+		return $output;
+	}
+
+	$rules  = "\n# Kindi — faceted navigation: block crawling of filter combinations.\n";
+	$rules .= "Disallow: /*?filter_\n";
+	$rules .= "Disallow: /*&filter_\n";
+	foreach ( kindi_facet_extra_params() as $param ) {
+		$rules .= 'Disallow: /*?' . $param . "=\n";
+		$rules .= 'Disallow: /*&' . $param . "=\n";
+	}
+
+	return $output . $rules;
+}
+add_filter( 'robots_txt', 'kindi_facets_robots_txt', 10, 2 );
 
 /**
  * Whether the current request carries any facet/filter parameter.
