@@ -458,6 +458,21 @@ function kindi_lw_shortcode_assets(): void {
 	<?php
 }
 
+/**
+ * Blank the Datalogics shipment-tracker shortcode on My Account pages — the
+ * LionWheel status (below) replaces it there. Overriding the shortcode with an
+ * empty renderer also swallows the raw "[datalogics_shipping_tracker]" text if
+ * the plugin is ever deactivated. Everywhere else the plugin is untouched.
+ *
+ * @return void
+ */
+function kindi_lw_mute_datalogics(): void {
+	if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+		add_shortcode( 'datalogics_shipping_tracker', '__return_empty_string' );
+	}
+}
+add_action( 'wp', 'kindi_lw_mute_datalogics', 20 );
+
 /* ------------------------------------------------------------------ *
  * My Account — automatic status on the view-order page
  * ------------------------------------------------------------------ */
