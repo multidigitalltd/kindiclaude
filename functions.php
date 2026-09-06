@@ -109,6 +109,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'sticky-cart.php' );
 	kindi_require( 'whatsapp.php' );
 	kindi_require( 'saved-cart.php' );
+	kindi_require( 'tracking.php' );
 	kindi_require( 'savecart-popup.php' );
 	kindi_require( 'archive-desc.php' );
 }
