@@ -179,6 +179,22 @@ function kindi_lw_task( int $order_id, string $order_num = '' ) {
 		return $task;
 	}
 
+	// Diagnostics on a miss: log the order's shipping/LionWheel-related meta —
+	// if the integration stores a task id there, that is the reliable lookup.
+	if ( null === $task ) {
+		$order = wc_get_order( $order_id );
+		if ( $order ) {
+			$hints = array();
+			foreach ( $order->get_meta_data() as $meta ) {
+				$mkey = (string) $meta->key;
+				if ( preg_match( '/lion|wheel|task|track|deliver|shipment/i', $mkey ) ) {
+					$hints[] = $mkey . '=' . mb_substr( (string) wp_json_encode( $meta->value ), 0, 80 );
+				}
+			}
+			kindi_lw_log( 'meta:' . $order_id, 0, false, $hints ? implode( ' | ', $hints ) : 'אין שדות מטא של משלוח/ליונוויל בהזמנה זו' );
+		}
+	}
+
 	set_transient( $cache_key, is_array( $task ) ? $task : array(), 2 * MINUTE_IN_SECONDS );
 	return $task;
 }
@@ -457,21 +473,6 @@ function kindi_lw_shortcode_assets(): void {
 	</script>
 	<?php
 }
-
-/**
- * Blank the Datalogics shipment-tracker shortcode on My Account pages — the
- * LionWheel status (below) replaces it there. Overriding the shortcode with an
- * empty renderer also swallows the raw "[datalogics_shipping_tracker]" text if
- * the plugin is ever deactivated. Everywhere else the plugin is untouched.
- *
- * @return void
- */
-function kindi_lw_mute_datalogics(): void {
-	if ( function_exists( 'is_account_page' ) && is_account_page() ) {
-		add_shortcode( 'datalogics_shipping_tracker', '__return_empty_string' );
-	}
-}
-add_action( 'wp', 'kindi_lw_mute_datalogics', 20 );
 
 /* ------------------------------------------------------------------ *
  * My Account — automatic status on the view-order page
