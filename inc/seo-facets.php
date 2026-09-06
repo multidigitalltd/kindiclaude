@@ -4,8 +4,9 @@
  *
  * Strategy (revised after ~1M filter URLs were already in Google's index):
  *
- *   1. Filter links carry rel="nofollow" — new combinations are not discovered
- *      by crawling the site in the first place.
+ *   1. Filter controls render as <button>s with NO URL in the HTML at all
+ *      (inc/filters.php + filters.js build the URL client-side on click), so
+ *      new combinations cannot be discovered by crawling the markup.
  *   2. Every filter URL serves noindex,nofollow at the HTML level (meta robots
  *      via wp_robots + an X-Robots-Tag header), so each recrawl DROPS the URL
  *      from the index.

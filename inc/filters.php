@@ -430,27 +430,32 @@ function kindi_archive_sidebar(): void {
 		foreach ( $facet['terms'] as $t ) {
 			$is_on = in_array( $t['slug'], $chosen, true );
 			$new   = $is_on ? array_diff( $chosen, array( $t['slug'] ) ) : array_merge( $chosen, array( $t['slug'] ) );
-			$url   = $new ? add_query_arg( $param, implode( ',', $new ) ) : remove_query_arg( $param );
 
-			// rel="nofollow" on every facet link: the filter URL space is
-			// effectively unlimited, and crawling it burns the crawl budget on
-			// pages that are noindex anyway (see inc/seo-facets.php).
+			// Buttons, NOT links: no filter URL exists anywhere in the HTML, so
+			// crawlers cannot even discover the (unlimited) filter URL space.
+			// data-fp/data-fv carry only the parameter name + its new value list;
+			// filters.js assembles the URL client-side on click (see also
+			// inc/seo-facets.php for the noindex safety net).
 			if ( 'color' === $type ) {
 				$hex = function_exists( 'kindi_resolve_color' ) ? kindi_resolve_color( $t['name'], $t['slug'] ) : '';
 				printf(
-					'<a class="kindi-swatch%s" href="%s" rel="nofollow" title="%s" aria-label="%s" style="--sw:%s"></a>',
+					'<button type="button" class="kindi-swatch%s" data-kindi-facet data-fp="%s" data-fv="%s" title="%s" aria-label="%s" aria-pressed="%s" style="--sw:%s"></button>',
 					$is_on ? ' is-active' : '',
-					esc_url( $url ),
+					esc_attr( $param ),
+					esc_attr( implode( ',', $new ) ),
 					esc_attr( $t['name'] ),
 					esc_attr( $t['name'] ),
+					$is_on ? 'true' : 'false',
 					esc_attr( $hex ? $hex : '#ccc' )
 				);
 			} else {
 				printf(
-					'<a class="kindi-fopt%s%s" href="%s" rel="nofollow">%s</a>',
+					'<button type="button" class="kindi-fopt%s%s" data-kindi-facet data-fp="%s" data-fv="%s" aria-pressed="%s">%s</button>',
 					$is_on ? ' is-active' : '',
 					'age' === $type ? ' kindi-fopt--pill' : '',
-					esc_url( $url ),
+					esc_attr( $param ),
+					esc_attr( implode( ',', $new ) ),
+					$is_on ? 'true' : 'false',
 					esc_html( $t['name'] )
 				);
 			}

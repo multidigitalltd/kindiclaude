@@ -91,8 +91,28 @@
 			.catch( function () { window.location.href = url; } );
 	};
 
-	// Sidebar filter/option links + pagination (NOT the hero category chips —
-	// those change the whole context, so they navigate normally).
+	// Facet buttons: the options render WITHOUT hrefs (crawlers must not find
+	// the filter URL space in the HTML — see inc/filters.php). The button only
+	// carries the parameter name (data-fp) and its new value list (data-fv);
+	// the URL is assembled here, on click, from the current location.
+	document.addEventListener( 'click', function ( e ) {
+		var b = e.target.closest( '[data-kindi-facet]' );
+		if ( ! b || ! b.dataset.fp ) {
+			return;
+		}
+		var u = new URL( location.href );
+		if ( b.dataset.fv ) {
+			u.searchParams.set( b.dataset.fp, b.dataset.fv );
+		} else {
+			u.searchParams.delete( b.dataset.fp );
+		}
+		u.searchParams.delete( 'paged' );
+		u.pathname = u.pathname.replace( /\/page\/\d+\/?$/, '/' );
+		load( u.href, true );
+	} );
+
+	// Sidebar links (sub-categories, reset) + pagination (NOT the hero category
+	// chips — those change the whole context, so they navigate normally).
 	document.addEventListener( 'click', function ( e ) {
 		var a = e.target.closest( '.kindi-archive__side a, .woocommerce-pagination a' );
 		if ( ! a || a.target === '_blank' ) {

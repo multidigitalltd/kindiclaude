@@ -1369,6 +1369,10 @@ body.kindi-wait-open { overflow: hidden; }
 .kindi-side__group[open] > summary::after { transform: rotate(180deg); }
 .kindi-side__opts { display: flex; flex-direction: column; gap: 0.2rem; padding-top: 0.4rem; }
 .kindi-fopt { padding: 0.35rem 0.5rem; border-radius: 0.5rem; color: var(--foreground); text-decoration: none; font-size: 0.9rem; }
+/* Facet options are now <button>s (no crawlable hrefs) — reset the UA button
+   chrome; the class rules above/below carry the visual design. */
+button.kindi-fopt { background: none; border: 0; font-family: inherit; font-size: 0.9rem; cursor: pointer; text-align: start; }
+button.kindi-swatch { padding: 0; cursor: pointer; }
 .kindi-fopt:hover { background: var(--brand-blue-soft); color: var(--brand-navy); }
 .kindi-fopt.is-active { background: var(--brand-red-soft); color: var(--brand-red); font-weight: 700; }
 .kindi-archive__side .kindi-chip--reset { margin-top: 0.85rem; }
