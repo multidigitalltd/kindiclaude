@@ -2,17 +2,22 @@
 /**
  * Faceted-navigation SEO — stop filter URLs from burning the crawl budget.
  *
- * noindex/canonical prevent INDEXING but not CRAWLING: Google still fetches
- * every filter combination to read the tag. With several multi-value facets the
- * URL space is effectively unlimited, so crawling is stopped at the source:
+ * Strategy (revised after ~1M filter URLs were already in Google's index):
  *
- *   1. Filter links carry rel="nofollow" — the combinations are not discovered
+ *   1. Filter links carry rel="nofollow" — new combinations are not discovered
  *      by crawling the site in the first place.
- *   2. robots.txt disallows the filter parameters — the crawler never fetches
- *      them (only applies to WordPress's virtual robots.txt; a physical file or
- *      an SEO plugin's own robots.txt must be edited there).
+ *   2. Every filter URL serves noindex,nofollow at the HTML level (meta robots
+ *      via wp_robots + an X-Robots-Tag header), so each recrawl DROPS the URL
+ *      from the index.
  *   3. Duplicate/re-ordered values are normalised and 301'd to one canonical
  *      form, so the same result set stops producing endless unique URLs.
+ *
+ * robots.txt deliberately does NOT disallow the filter parameters any more:
+ * a robots block only stops crawling, it does not remove indexed URLs — and it
+ * even prevents Google from fetching the pages to see the noindex. Removal
+ * requires crawl access + noindex (Google's own guidance). Once the index has
+ * emptied out, a Disallow can be reinstated in a physical robots.txt to save
+ * crawl budget.
  *
  * @package Kindi
  */
@@ -31,28 +36,52 @@ function kindi_facet_extra_params(): array {
 }
 
 /**
- * Disallow filter URLs in robots.txt so they are never crawled.
+ * Whether the current request carries any facet/filter parameter.
  *
- * @param string $output Robots.txt body.
- * @param string $public Whether the site is public.
- * @return string
+ * @return bool
  */
-function kindi_facets_robots_txt( string $output, $public ): string {
-	if ( '1' !== (string) $public ) {
-		return $output;
+function kindi_is_facet_request(): bool {
+	if ( empty( $_GET ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return false;
 	}
-
-	$rules  = "\n# Kindi — faceted navigation: block crawling of filter combinations.\n";
-	$rules .= "Disallow: /*?filter_\n";
-	$rules .= "Disallow: /*&filter_\n";
-	foreach ( kindi_facet_extra_params() as $param ) {
-		$rules .= 'Disallow: /*?' . $param . "=\n";
-		$rules .= 'Disallow: /*&' . $param . "=\n";
+	foreach ( array_keys( $_GET ) as $key ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$key = (string) $key;
+		if ( 0 === strpos( $key, 'filter_' ) || in_array( $key, kindi_facet_extra_params(), true ) ) {
+			return true;
+		}
 	}
-
-	return $output . $rules;
+	return false;
 }
-add_filter( 'robots_txt', 'kindi_facets_robots_txt', 10, 2 );
+
+/**
+ * HTML-level deindexing: meta robots noindex,nofollow on every filter URL.
+ * Duplicate robots tags from an SEO plugin are harmless — crawlers obey the
+ * most restrictive directive present.
+ *
+ * @param array<string,bool|string> $robots wp_robots directives.
+ * @return array<string,bool|string>
+ */
+function kindi_facets_noindex( array $robots ): array {
+	if ( kindi_is_facet_request() ) {
+		$robots['noindex']  = true;
+		$robots['nofollow'] = true;
+	}
+	return $robots;
+}
+add_filter( 'wp_robots', 'kindi_facets_noindex' );
+
+/**
+ * The same directive as an X-Robots-Tag response header (belt and braces; also
+ * covers responses whose <head> a crawler never parses).
+ *
+ * @return void
+ */
+function kindi_facets_noindex_header(): void {
+	if ( ! is_admin() && ! wp_doing_ajax() && kindi_is_facet_request() && ! headers_sent() ) {
+		header( 'X-Robots-Tag: noindex, nofollow' );
+	}
+}
+add_action( 'template_redirect', 'kindi_facets_noindex_header', 6 );
 
 /**
  * Canonical form of a filter value list: trimmed, de-duplicated, sorted.
