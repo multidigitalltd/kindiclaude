@@ -406,7 +406,8 @@ function kindi_lw_shortcode_assets(): void {
 	.kindi-track{max-width:28rem}
 	.kindi-track__field{display:flex;flex-direction:column;gap:.3rem;margin:0 0 .9rem}
 	.kindi-track__field label{font-weight:700;color:var(--brand-navy);font-size:.9rem}
-	.kindi-track__field input{border:1px solid var(--border);border-radius:.75rem;padding:.6rem .85rem;font-family:inherit;font-size:.95rem}
+	/* type="tel" defaults to LTR in browsers, pushing the placeholder left. */
+	.kindi-track__field input{border:1px solid var(--border);border-radius:.75rem;padding:.6rem .85rem;font-family:inherit;font-size:.95rem;direction:rtl;text-align:right}
 	.kindi-track__form .kindi-btn[disabled]{opacity:.6;cursor:wait}
 	.kindi-track__result{margin-top:1rem}
 	.kindi-track__box{border-radius:1rem;padding:1rem 1.15rem;font-size:.95rem;line-height:1.6}

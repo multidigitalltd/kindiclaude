@@ -24,6 +24,7 @@ $kindi_foot_menus = array(
 			'תקנון האתר'        => home_url( '/terms/' ),
 			'ביטול עסקה'        => home_url( '/refund_returns/' ),
 			'משלוחים והחזרות'   => home_url( '/shipping/' ),
+			'מעקב הזמנה'        => home_url( '/shipping-track/' ),
 			'מדיניות פרטיות'    => home_url( '/privacy-policy/' ),
 			'הצהרת נגישות'      => home_url( '/accessibility/' ),
 			'הבלוג שלנו'        => home_url( '/blog/' ),
