@@ -360,6 +360,16 @@ function kindi_settings_render(): void {
 				}
 				continue;
 			}
+			if ( 'secret' === $field['type'] ) {
+				// Never echoed back to the screen; an empty submit keeps the
+				// stored value, the "מחיקה" checkbox clears it.
+				if ( isset( $_POST['kindi__clear'][ $key ] ) ) {
+					$clean[ $key ] = '';
+				} elseif ( isset( $_POST['kindi'][ $key ] ) && '' !== trim( (string) wp_unslash( $_POST['kindi'][ $key ] ) ) ) {
+					$clean[ $key ] = sanitize_text_field( wp_unslash( $_POST['kindi'][ $key ] ) );
+				}
+				continue;
+			}
 			if ( 'cat_notices' === $field['type'] ) {
 				if ( isset( $_POST['kindi__present'][ $key ] ) && function_exists( 'kindi_sanitize_cat_notices' ) ) {
 					$rows          = isset( $_POST['kindi'][ $key ] ) ? (array) wp_unslash( $_POST['kindi'][ $key ] ) : array();
@@ -454,6 +464,19 @@ function kindi_settings_render(): void {
 					echo ' <button type="button" class="button-link kindi-imgfield__clear">' . esc_html__( 'הסר', 'kindi' ) . '</button>';
 					echo '<div class="kindi-imgfield__preview">' . ( '' !== $img ? '<img src="' . esc_url( $img ) . '" alt="">' : '' ) . '</div>';
 					echo '</div>';
+				} elseif ( 'secret' === $field['type'] ) {
+					// The stored value is never printed back into the page.
+					$has = '' !== trim( (string) $value );
+					printf(
+						'<input type="password" id="%1$s" name="kindi[%2$s]" value="" class="regular-text" dir="ltr" autocomplete="new-password" placeholder="%3$s">',
+						esc_attr( $id ),
+						esc_attr( $key ),
+						$has ? '••••••••••••' : ''
+					);
+					echo ' <label style="margin-inline-start:6px"><input type="checkbox" name="kindi__clear[' . esc_attr( $key ) . ']" value="1"> ' . esc_html__( 'מחיקת המפתח', 'kindi' ) . '</label>';
+					echo '<p class="description">' . ( $has
+						? esc_html__( 'מפתח שמור במערכת (מוסתר מטעמי אבטחה). הזינו ערך חדש רק כדי להחליף אותו; שמירה עם שדה ריק משאירה את הקיים.', 'kindi' )
+						: esc_html__( 'טרם הוגדר מפתח.', 'kindi' ) ) . '</p>';
 				} elseif ( 'note' === $field['type'] ) {
 					// A note carries no input; when it has a help_cb, render that
 					// (dynamic status HTML) here — the static help below still prints.

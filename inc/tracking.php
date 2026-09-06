@@ -29,7 +29,8 @@ defined( 'ABSPATH' ) || exit;
 function kindi_lw_settings( array $tabs ): array {
 	if ( isset( $tabs['texts']['sections'] ) ) {
 		$tabs['texts']['sections']['מעקב משלוחים (LionWheel)'] = array(
-			'lionwheel_key' => array( 'type' => 'text', 'label' => 'מפתח API של LionWheel', 'help' => 'המפתח נשמר בצד השרת בלבד. כשהוא מוגדר: סטטוס המשלוח מוצג אוטומטית באזור האישי בעמוד ההזמנה, ואפשר גם ליצור עמוד ייעודי עם השורטקוד [kindi_tracking] — טופס בדיקת סטטוס לפי מספר הזמנה וטלפון.' ),
+			'lionwheel_key'    => array( 'type' => 'secret', 'label' => 'מפתח API של LionWheel', 'help' => 'המפתח נשמר בצד השרת בלבד ואינו מוצג במסך. כשהוא מוגדר: סטטוס המשלוח מוצג אוטומטית באזור האישי בעמוד ההזמנה, ואפשר גם ליצור עמוד ייעודי עם השורטקוד [kindi_tracking] — טופס בדיקת סטטוס לפי מספר הזמנה וטלפון.' ),
+			'lionwheel_member' => array( 'type' => 'text', 'label' => 'מזהה חברה (Member ID)', 'help' => 'מזהה החברה בליונוויל. ברירת מחדל: 118376.' ),
 		);
 	}
 	return $tabs;
@@ -122,8 +123,10 @@ function kindi_lw_task( int $order_id ) {
 	}
 
 	$url = add_query_arg(
-		'key',
-		kindi_lw_key(),
+		array(
+			'key'       => kindi_lw_key(),
+			'member_id' => rawurlencode( trim( (string) kindi_opt( 'lionwheel_member' ) ) ),
+		),
 		'https://members.lionwheel.com/api/v1/tasks/by_order_id/' . rawurlencode( (string) $order_id )
 	);
 

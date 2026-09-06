@@ -189,6 +189,9 @@ function kindi_default_options(): array {
 		// created by ACF (the data outlives the removed plugin).
 		'acf_key_archive_desc' => 'תאור_תחתון_לארכיון',
 
+		// מעקב משלוחים LionWheel — מזהה החברה (המפתח מוזן בפאנל בלבד).
+		'lionwheel_member' => '118376',
+
 		// כפתור וואטסאפ צף בפינת המסך.
 		'whatsapp_float_enable' => '1',
 
