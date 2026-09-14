@@ -62,11 +62,17 @@ add_action( 'woocommerce_before_mini_cart', 'kindi_free_shipping_progress', 5 );
 function kindi_cart_shipping_info(): array {
 	$info = array( 'cost' => null, 'pickup' => false );
 
-	if ( ! class_exists( 'WooCommerce' ) || ! WC()->cart || ! WC()->cart->needs_shipping() || ! WC()->cart->show_shipping() ) {
+	if ( ! class_exists( 'WooCommerce' ) || ! WC()->cart || ! WC()->cart->needs_shipping() ) {
 		return $info;
 	}
 
-	$chosen = WC()->session ? (array) WC()->session->get( 'chosen_shipping_methods' ) : array();
+	// show_shipping() is deliberately NOT checked. With WooCommerce's "hide
+	// shipping costs until an address is entered" it returns false — yet the
+	// cost is ALREADY inside the order total (calculate_shipping() only checks
+	// needs_shipping()). That mismatch is the unexplained jump this row exists
+	// to remove, so the amount is read straight off the calculated totals.
+	$chosen   = WC()->session ? (array) WC()->session->get( 'chosen_shipping_methods' ) : array();
+	$resolved = false;
 
 	foreach ( WC()->shipping()->get_packages() as $index => $package ) {
 		$rates = (array) ( $package['rates'] ?? array() );
@@ -77,9 +83,14 @@ function kindi_cart_shipping_info(): array {
 		}
 		$selected = (string) ( $chosen[ $index ] ?? '' );
 		if ( '' !== $selected && isset( $rates[ $selected ] ) ) {
-			$info['cost'] = (float) $rates[ $selected ]->get_cost() + (float) $rates[ $selected ]->get_shipping_tax();
+			$resolved = true;
 		}
 		break; // Single-package store.
+	}
+
+	$total = (float) WC()->cart->get_shipping_total() + (float) WC()->cart->get_shipping_tax();
+	if ( $resolved || $total > 0 ) {
+		$info['cost'] = $total;
 	}
 
 	return $info;
