@@ -52,6 +52,40 @@ add_action( 'woocommerce_before_cart', 'kindi_free_shipping_progress', 5 );
 add_action( 'woocommerce_before_mini_cart', 'kindi_free_shipping_progress', 5 );
 
 /**
+ * What the order's shipping currently costs, as the chosen rate resolves right
+ * now: `cost` is the amount (0 = free) or null when shipping isn't applicable
+ * or no rate is resolvable yet, and `pickup` says whether a free self-pickup
+ * rate is on offer.
+ *
+ * @return array{cost:float|null,pickup:bool}
+ */
+function kindi_cart_shipping_info(): array {
+	$info = array( 'cost' => null, 'pickup' => false );
+
+	if ( ! class_exists( 'WooCommerce' ) || ! WC()->cart || ! WC()->cart->needs_shipping() || ! WC()->cart->show_shipping() ) {
+		return $info;
+	}
+
+	$chosen = WC()->session ? (array) WC()->session->get( 'chosen_shipping_methods' ) : array();
+
+	foreach ( WC()->shipping()->get_packages() as $index => $package ) {
+		$rates = (array) ( $package['rates'] ?? array() );
+		foreach ( $rates as $rate ) {
+			if ( 'local_pickup' === $rate->get_method_id() && (float) $rate->get_cost() <= 0 ) {
+				$info['pickup'] = true;
+			}
+		}
+		$selected = (string) ( $chosen[ $index ] ?? '' );
+		if ( '' !== $selected && isset( $rates[ $selected ] ) ) {
+			$info['cost'] = (float) $rates[ $selected ]->get_cost() + (float) $rates[ $selected ]->get_shipping_tax();
+		}
+		break; // Single-package store.
+	}
+
+	return $info;
+}
+
+/**
  * Shipping cost row in the cart totals, above the order total.
  *
  * WooCommerce's own shipping row is hidden on the cart page (choosing a method
@@ -63,27 +97,9 @@ add_action( 'woocommerce_before_mini_cart', 'kindi_free_shipping_progress', 5 );
  * @return void
  */
 function kindi_cart_shipping_row(): void {
-	if ( ! class_exists( 'WooCommerce' ) || ! WC()->cart || ! WC()->cart->needs_shipping() || ! WC()->cart->show_shipping() ) {
-		return;
-	}
-
-	$chosen = WC()->session ? (array) WC()->session->get( 'chosen_shipping_methods' ) : array();
-	$cost   = null;
-	$pickup = false;
-
-	foreach ( WC()->shipping()->get_packages() as $index => $package ) {
-		$rates = (array) ( $package['rates'] ?? array() );
-		foreach ( $rates as $rate ) {
-			if ( 'local_pickup' === $rate->get_method_id() && (float) $rate->get_cost() <= 0 ) {
-				$pickup = true;
-			}
-		}
-		$selected = (string) ( $chosen[ $index ] ?? '' );
-		if ( '' !== $selected && isset( $rates[ $selected ] ) ) {
-			$cost = (float) $rates[ $selected ]->get_cost() + (float) $rates[ $selected ]->get_shipping_tax();
-		}
-		break; // Single-package store.
-	}
+	$info   = kindi_cart_shipping_info();
+	$cost   = $info['cost'];
+	$pickup = $info['pickup'];
 
 	if ( null === $cost ) {
 		return;

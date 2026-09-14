@@ -152,9 +152,23 @@ function kindi_cart_foot_total_html(): string {
 	$subtotal = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_subtotal() : '';
 	$count    = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
 
+	// Shipping cost on its own line, so the drawer's subtotal is never the last
+	// number a shopper sees before the total grows at checkout.
+	$ship = '';
+	$info = function_exists( 'kindi_cart_shipping_info' ) ? kindi_cart_shipping_info() : array( 'cost' => null, 'pickup' => false );
+	if ( $count && null !== $info['cost'] ) {
+		$amount = $info['cost'] > 0
+			? wp_kses_post( wc_price( $info['cost'] ) )
+			: '<span class="kindi-cartdrawer__free">' . esc_html__( 'חינם', 'kindi' ) . '</span>';
+		$note   = ( $info['pickup'] && $info['cost'] > 0 ) ? ' · ' . esc_html__( 'איסוף עצמי חינם', 'kindi' ) : '';
+
+		$ship = '<div class="kindi-cartdrawer__footship"><span>' . esc_html__( 'משלוח', 'kindi' ) . '</span><span>' . $amount . $note . '</span></div>';
+	}
+
 	return '<div class="kindi-cartdrawer__foottotal' . ( $count ? '' : ' is-empty' ) . '">'
 		. '<span>' . esc_html__( 'סה"כ ביניים', 'kindi' ) . '</span>'
 		. '<strong>' . wp_kses_post( (string) $subtotal ) . '</strong>'
+		. $ship
 		. '</div>';
 }
 
