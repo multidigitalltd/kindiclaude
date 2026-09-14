@@ -50,3 +50,53 @@ add_action( 'woocommerce_before_cart', 'kindi_free_shipping_progress', 5 );
 // Mini-cart drawer: at the TOP, above the item list (refreshes with the cart
 // fragment on every add-to-cart / quantity change).
 add_action( 'woocommerce_before_mini_cart', 'kindi_free_shipping_progress', 5 );
+
+/**
+ * Shipping cost row in the cart totals, above the order total.
+ *
+ * WooCommerce's own shipping row is hidden on the cart page (choosing a method
+ * belongs to checkout), which left the jump between subtotal and total
+ * unexplained — the classic checkout-abandonment surprise. This row states the
+ * cost of the method the order will actually use, and points at free self
+ * pickup when that is offered.
+ *
+ * @return void
+ */
+function kindi_cart_shipping_row(): void {
+	if ( ! class_exists( 'WooCommerce' ) || ! WC()->cart || ! WC()->cart->needs_shipping() || ! WC()->cart->show_shipping() ) {
+		return;
+	}
+
+	$chosen = WC()->session ? (array) WC()->session->get( 'chosen_shipping_methods' ) : array();
+	$cost   = null;
+	$pickup = false;
+
+	foreach ( WC()->shipping()->get_packages() as $index => $package ) {
+		$rates = (array) ( $package['rates'] ?? array() );
+		foreach ( $rates as $rate ) {
+			if ( 'local_pickup' === $rate->get_method_id() && (float) $rate->get_cost() <= 0 ) {
+				$pickup = true;
+			}
+		}
+		$selected = (string) ( $chosen[ $index ] ?? '' );
+		if ( '' !== $selected && isset( $rates[ $selected ] ) ) {
+			$cost = (float) $rates[ $selected ]->get_cost() + (float) $rates[ $selected ]->get_shipping_tax();
+		}
+		break; // Single-package store.
+	}
+
+	if ( null === $cost ) {
+		return;
+	}
+
+	// Printed server-side through wc_price() like every other amount on the page.
+	echo '<tr class="kindi-cartship"><th>' . esc_html__( 'משלוח', 'kindi' ) . '</th><td data-title="' . esc_attr__( 'משלוח', 'kindi' ) . '">';
+	echo $cost > 0
+		? wp_kses_post( wc_price( $cost ) )
+		: '<strong class="kindi-cartship__free">' . esc_html__( 'חינם', 'kindi' ) . '</strong>';
+	if ( $pickup && $cost > 0 ) {
+		echo '<span class="kindi-cartship__note">' . esc_html__( 'איסוף עצמי מהחנות — חינם', 'kindi' ) . '</span>';
+	}
+	echo '</td></tr>';
+}
+add_action( 'woocommerce_cart_totals_before_order_total', 'kindi_cart_shipping_row' );

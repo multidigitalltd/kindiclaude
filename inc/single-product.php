@@ -101,10 +101,18 @@ add_action( 'woocommerce_single_product_summary', 'kindi_pdp_highlights', 33 );
  * @return void
  */
 function kindi_pdp_delivery_card(): void {
-	$threshold = (int) ( function_exists( 'kindi_opt' ) ? kindi_opt( 'free_shipping', 299 ) : 299 );
+	$opt       = static fn( string $k, $d ) => function_exists( 'kindi_opt' ) ? kindi_opt( $k, $d ) : $d;
+	$threshold = (int) $opt( 'free_shipping', 299 );
+	$cost      = (int) $opt( 'ship_cost', 29 );
+
+	// State the cost below the threshold too — the amount should never first be
+	// met as an unexplained jump in the cart total.
+	$sub = $cost > 0
+		? sprintf( 'מתחת לסכום — משלוח ₪%d · איסוף עצמי מהחנות חינם', $cost )
+		: 'הזמינו היום — משלוח מהיר עד הבית';
 
 	echo '<div class="kindi-pdp__delivery">';
-	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--blue">' . kindi_icon( 'truck', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>' . esc_html( sprintf( 'משלוח חינם בהזמנה מעל ₪%d (למעט ריהוט)', $threshold ) ) . '</strong><span>' . kindi_icon( 'clock', 'kindi-icon--xs' ) . 'הזמינו היום — משלוח מהיר עד הבית</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--blue">' . kindi_icon( 'truck', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>' . esc_html( sprintf( 'משלוח חינם בהזמנה מעל ₪%d (למעט ריהוט)', $threshold ) ) . '</strong><span>' . kindi_icon( 'clock', 'kindi-icon--xs' ) . esc_html( $sub ) . '</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	echo '<div class="kindi-pdp__drow"><span class="kindi-pdp__dic kindi-pdp__dic--red">' . kindi_icon( 'gift', 'kindi-icon--md' ) . '</span><div class="kindi-pdp__dtxt"><strong>עטיפת מתנה</strong><span>סמנו בעגלה — נעטוף יפה ונצרף ברכה</span></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	echo '</div>';
 }

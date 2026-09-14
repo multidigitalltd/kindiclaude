@@ -975,8 +975,14 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 @media (prefers-reduced-motion: reduce) { .kindi-wait__logo { animation: none; } }
 body.kindi-wait-open { overflow: hidden; }
 
-/* Cart: shipping method is chosen at checkout, so hide the shipping row +
-   calculator from the cart totals (no method-changing on the cart page). */
+/* Cart: our own shipping-cost row (inc/shipping-bar.php) — the total never
+   jumps unexplained. */
+.woocommerce-cart .cart_totals tr.kindi-cartship th { font-weight: 700; color: var(--brand-navy); }
+.woocommerce-cart .cart_totals tr.kindi-cartship .kindi-cartship__free { color: #15803d; font-weight: 800; }
+.woocommerce-cart .cart_totals tr.kindi-cartship .kindi-cartship__note { display: block; margin-top: 0.15rem; font-size: 0.78rem; font-weight: 600; color: var(--muted-foreground); }
+
+/* Cart: shipping method is chosen at checkout, so hide WooCommerce's own
+   shipping row + calculator from the cart totals (no method-changing here). */
 .woocommerce-cart .cart_totals .woocommerce-shipping-totals,
 .woocommerce-cart .cart_totals tr.shipping,
 .woocommerce-cart .cart_totals .shipping-calculator-form,

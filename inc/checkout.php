@@ -994,9 +994,43 @@ function kindi_is_gifta_gateway( string $id, string $label = '' ): bool {
 }
 
 /**
- * Remove Gifta's stray "connect/login" payment gateway. Gifta is a gift-card
- * *redemption* box (rendered in the summary), not a payment method, so its
- * gateway otherwise shows as an empty payment card.
+ * A gateway's id + titles as one haystack for the heuristics below.
+ *
+ * @param string $id      Gateway id.
+ * @param mixed  $gateway Gateway object.
+ * @return string
+ */
+function kindi_gateway_haystack( string $id, $gateway ): string {
+	if ( ! is_object( $gateway ) ) {
+		return $id;
+	}
+	$title  = method_exists( $gateway, 'get_title' ) ? (string) $gateway->get_title() : '';
+	$mtitle = method_exists( $gateway, 'get_method_title' ) ? (string) $gateway->get_method_title() : '';
+	return trim( $id . ' ' . $title . ' ' . $mtitle );
+}
+
+/**
+ * Whether a gateway completes the order WITHOUT taking payment — phone payment
+ * and the institutions' price quote. These belong at the END of the list and
+ * must never be the checkout's automatic default: a shopper who scrolls past
+ * the payment step and confirms would otherwise finish without paying, and a
+ * shopper looking for credit card would think it isn't offered.
+ *
+ * @param string $haystack Gateway id + titles.
+ * @return bool
+ */
+function kindi_is_deferred_gateway( string $haystack ): bool {
+	return false !== mb_stripos( $haystack, 'טלפוני' )
+		|| false !== stripos( $haystack, 'phone' )
+		|| false !== mb_stripos( $haystack, 'הצעת מחיר' )
+		|| false !== stripos( $haystack, 'quote' );
+}
+
+/**
+ * Order the payment methods: drop Gifta's stray "connect/login" gateway (it is
+ * a gift-card *redemption* box rendered in the summary, not a payment method,
+ * so it otherwise shows as an empty card), then push the deferred methods to
+ * the end. Everything else keeps the order set in WooCommerce → Payments.
  *
  * @param array<string,WC_Payment_Gateway> $gateways Available gateways.
  * @return array<string,WC_Payment_Gateway>
@@ -1005,20 +1039,54 @@ function kindi_order_payment_gateways( array $gateways ): array {
 	if ( is_admin() ) {
 		return $gateways;
 	}
+	$pay      = array();
+	$deferred = array();
 	foreach ( $gateways as $id => $gateway ) {
-		$label = '';
-		if ( is_object( $gateway ) ) {
-			$title  = method_exists( $gateway, 'get_title' ) ? (string) $gateway->get_title() : '';
-			$mtitle = method_exists( $gateway, 'get_method_title' ) ? (string) $gateway->get_method_title() : '';
-			$label  = trim( $title . ' ' . $mtitle );
+		$hay = kindi_gateway_haystack( (string) $id, $gateway );
+		if ( kindi_is_gifta_gateway( (string) $id, $hay ) ) {
+			continue;
 		}
-		if ( kindi_is_gifta_gateway( (string) $id, $label ) ) {
-			unset( $gateways[ $id ] );
+		if ( kindi_is_deferred_gateway( $hay ) ) {
+			$deferred[ $id ] = $gateway;
+		} else {
+			$pay[ $id ] = $gateway;
 		}
 	}
-	return $gateways;
+	return $pay + $deferred;
 }
 add_filter( 'woocommerce_available_payment_gateways', 'kindi_order_payment_gateways' );
+
+/**
+ * Never let a deferred method be the *pre-selected* one when the checkout page
+ * loads. WooCommerce stores the last-shown method in the session (even one the
+ * shopper never clicked), so an old session could keep phone payment selected
+ * after the reordering above. An active choice made on this page is untouched —
+ * only the plain page render is corrected.
+ *
+ * @return void
+ */
+function kindi_avoid_deferred_payment_default(): void {
+	if ( wp_doing_ajax() || ! function_exists( 'WC' ) || ! WC()->session ) {
+		return;
+	}
+	$chosen = (string) WC()->session->get( 'chosen_payment_method' );
+	if ( '' === $chosen ) {
+		return;
+	}
+
+	$gateways = WC()->payment_gateways()->get_available_payment_gateways();
+	if ( ! isset( $gateways[ $chosen ] ) || ! kindi_is_deferred_gateway( kindi_gateway_haystack( $chosen, $gateways[ $chosen ] ) ) ) {
+		return;
+	}
+
+	foreach ( $gateways as $id => $gateway ) {
+		if ( ! kindi_is_deferred_gateway( kindi_gateway_haystack( (string) $id, $gateway ) ) ) {
+			WC()->session->set( 'chosen_payment_method', $id );
+			return;
+		}
+	}
+}
+add_action( 'woocommerce_before_checkout_form', 'kindi_avoid_deferred_payment_default', 1 );
 
 /**
  * Note above the payment methods: a Gifta gift card can't be combined with
