@@ -377,9 +377,13 @@ picture.kindi-store__mascot { display: block; width: fit-content; }
 /* Skip rendering off-screen homepage sections until scrolled near — cuts
    initial render / main-thread work on mobile (faster FCP/LCP). The intrinsic
    size reserves space so it doesn't cause layout shift. */
+/* .kindi-zone is deliberately NOT in this list: content-visibility applies paint
+   containment at all times, and the club section renders far taller than the
+   520px placeholder on phones (stacked benefits + mascot stage), so on some
+   devices it painted clipped to the placeholder height. */
 @media (max-width: 1023.98px) {
   .kindi-promos, .kindi-ages, .kindi-values, .kindi-brands,
-  .kindi-zone, .kindi-store, .kindi-tst, .kindi-rv, .kindi-news {
+  .kindi-store, .kindi-tst, .kindi-rv, .kindi-news {
     content-visibility: auto;
     contain-intrinsic-size: auto 520px;
   }
@@ -397,6 +401,11 @@ picture.kindi-store__mascot { display: block; width: fit-content; }
   .kindi-zone__benefits { grid-template-columns: 1fr; }
   .kindi-zone__stage { min-height: 14rem; }
   .kindi-zone { gap: 1.25rem; padding: 1.75rem 1.5rem; }
+  /* On narrow phones the CTA's fixed padding made the inline-flex button wider
+     than the column, and the section's overflow:hidden cut it off. Let it wrap
+     and shrink; long words in the copy break instead of spilling out. */
+  .kindi-zone__cta { max-width: 100%; flex-wrap: wrap; justify-content: center; text-align: center; padding: 0.9rem 1.25rem; }
+  .kindi-zone__title, .kindi-zone__lead, .kindi-zone__benefit { overflow-wrap: break-word; }
 }
 @media (max-width: 767px) {
   /* Promo banners: stack each card full-width with the image on top and text
