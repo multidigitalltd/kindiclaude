@@ -401,6 +401,13 @@ picture.kindi-store__mascot { display: block; width: fit-content; }
   .kindi-zone__benefits { grid-template-columns: 1fr; }
   .kindi-zone__stage { min-height: 14rem; }
   .kindi-zone { gap: 1.25rem; padding: 1.75rem 1.5rem; }
+  /* Grid items default to min-width:auto, so the mascot's intrinsic width (it is
+     sized by height, up to max-height:30rem) stretched the single column to
+     480px on a 328px section — the title and lead rendered that wide and were
+     clipped off the left edge. Cap both: the column may shrink, the mascot
+     scales to fit. */
+  .kindi-zone__body, .kindi-zone__stage { min-width: 0; }
+  .kindi-zone__mascot, .kindi-zone__mascot > img { max-width: 100%; }
   /* On narrow phones the CTA's fixed padding made the inline-flex button wider
      than the column, and the section's overflow:hidden cut it off. Let it wrap
      and shrink; long words in the copy break instead of spilling out. */
