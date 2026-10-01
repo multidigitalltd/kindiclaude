@@ -39,6 +39,33 @@ function kindi_register_search_route(): void {
 add_action( 'rest_api_init', 'kindi_register_search_route' );
 
 /**
+ * Is a product listable in SEARCH results?
+ *
+ * WC_Product::is_visible() answers by the current page type, and a REST request
+ * is not a search page — so it judged these candidates by shop rules: products
+ * set to "search results only" were treated as hidden (and "shop only" ones as
+ * visible), the exact inverse of what a search dropdown needs. This applies the
+ * search-context rules directly, while keeping the status / out-of-stock checks
+ * and the third-party `woocommerce_product_is_visible` filter intact.
+ *
+ * @param WC_Product $product Product.
+ * @return bool
+ */
+function kindi_search_product_visible( WC_Product $product ): bool {
+	$visible = in_array( $product->get_catalog_visibility(), array( 'visible', 'search' ), true );
+
+	if ( 'publish' !== $product->get_status() ) {
+		$visible = false;
+	}
+	if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) && ! $product->is_in_stock() ) {
+		$visible = false;
+	}
+
+	/** This filter is documented in WooCommerce: includes/abstracts/abstract-wc-product.php */
+	return (bool) apply_filters( 'woocommerce_product_is_visible', $visible, $product->get_id() );
+}
+
+/**
  * Search products + categories for the live dropdown.
  *
  * @param WP_REST_Request $request Request.
@@ -56,18 +83,26 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 		return rest_ensure_response( $empty );
 	}
 
-	$cache_key = 'kindi_search_' . md5( $query );
+	// v2 key: the visibility fix below changes what a cached entry holds.
+	$cache_key = 'kindi_search_v2_' . md5( $query );
 	$cached    = get_transient( $cache_key );
 	if ( is_array( $cached ) ) {
 		return rest_ensure_response( $cached );
 	}
 
+	$limit    = 6;
 	$products = array();
+
+	// Over-fetch: candidates are dropped by the visibility check below, and
+	// asking for exactly $limit meant a single hidden-from-catalog product in
+	// the first six left the dropdown nearly empty. The loop stops as soon as
+	// $limit products are collected, so the extra candidates cost nothing in the
+	// common case.
 	$wp_query = new WP_Query(
 		array(
 			'post_type'              => 'product',
 			'post_status'            => 'publish',
-			'posts_per_page'         => 6,
+			'posts_per_page'         => 18,
 			's'                      => $query,
 			'no_found_rows'          => true,
 			'ignore_sticky_posts'    => true,
@@ -76,8 +111,11 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 	);
 
 	foreach ( $wp_query->posts as $post ) {
+		if ( count( $products ) >= $limit ) {
+			break;
+		}
 		$product = wc_get_product( $post->ID );
-		if ( ! $product || ! $product->is_visible() ) {
+		if ( ! $product || ! kindi_search_product_visible( $product ) ) {
 			continue;
 		}
 		$products[] = array(
