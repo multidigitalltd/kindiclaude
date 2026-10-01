@@ -39,6 +39,43 @@ function kindi_register_search_route(): void {
 add_action( 'rest_api_init', 'kindi_register_search_route' );
 
 /**
+ * How well a product title matches the search term.
+ *
+ * WordPress searches with a bare LIKE '%term%', which in Hebrew matches inside
+ * unrelated words — "לגו" hits "ספריי גליטר לשיער ולגוף" through "ולגוף". The
+ * tiers below separate a real word match from that noise, allowing for the
+ * single-letter prefixes (ו/ה/ב/ל/מ/ש/כ) and the plural endings Hebrew glues
+ * onto words, so "פאזלים" still scores as a full match for "פאזל".
+ *
+ * @param string $title Product title.
+ * @param string $term  Search term.
+ * @return int 100 = whole word, 50 = starts a word, 20 = anywhere, 0 = not in the title.
+ */
+function kindi_search_score( string $title, string $term ): int {
+	$title = trim( $title );
+	$term  = trim( $term );
+	if ( '' === $title || '' === $term ) {
+		return 0;
+	}
+
+	$quoted = preg_quote( $term, '/' );
+	$letter = '\x{05D0}-\x{05EA}a-zA-Z0-9';      // Hebrew, Latin and digits.
+	$prefix = '[\x{05D5}\x{05D4}\x{05D1}\x{05DC}\x{05DE}\x{05E9}\x{05DB}]?';
+	$suffix = '(?:\x{05D9}\x{05DD}|\x{05D5}\x{05EA}|\x{05D9}\x{05D5}\x{05EA}|\x{05D9}|\x{05D4})?';
+
+	if ( preg_match( '/(?<![' . $letter . '])' . $prefix . $quoted . $suffix . '(?![' . $letter . '])/ui', $title ) ) {
+		return 100;
+	}
+	if ( preg_match( '/(?<![' . $letter . '])' . $prefix . $quoted . '/ui', $title ) ) {
+		return 50;
+	}
+	if ( false !== mb_stripos( $title, $term ) ) {
+		return 20;
+	}
+	return 0;
+}
+
+/**
  * Is a product listable in SEARCH results?
  *
  * WC_Product::is_visible() answers by the current page type, and a REST request
@@ -110,10 +147,31 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 		)
 	);
 
+	// Rank by title match before loading any product: scoring is plain string
+	// work, so only the handful of products actually shown get instantiated.
+	$ranked = array();
 	foreach ( $wp_query->posts as $post ) {
+		$ranked[] = array( 'post' => $post, 'score' => kindi_search_score( (string) $post->post_title, $query ) );
+	}
+	// PHP 8 sorts are stable, so WordPress's own ordering survives within a tier.
+	usort( $ranked, static fn( array $a, array $b ): int => $b['score'] <=> $a['score'] );
+
+	// Keep the best tier that actually has results: a real word match wins over
+	// a mid-word coincidence, but a search whose only hits are weak still shows
+	// them rather than nothing.
+	foreach ( array( 100, 50, 20 ) as $floor ) {
+		$tier = array_values( array_filter( $ranked, static fn( array $r ): bool => $r['score'] >= $floor ) );
+		if ( $tier ) {
+			$ranked = $tier;
+			break;
+		}
+	}
+
+	foreach ( $ranked as $entry ) {
 		if ( count( $products ) >= $limit ) {
 			break;
 		}
+		$post    = $entry['post'];
 		$product = wc_get_product( $post->ID );
 		if ( ! $product || ! kindi_search_product_visible( $product ) ) {
 			continue;
