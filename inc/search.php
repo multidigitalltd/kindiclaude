@@ -121,7 +121,7 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 	}
 
 	// v2 key: the visibility fix below changes what a cached entry holds.
-	$cache_key = 'kindi_search_v2_' . md5( $query );
+	$cache_key = 'kindi_search_v3_' . md5( $query );
 	$cached    = get_transient( $cache_key );
 	if ( is_array( $cached ) ) {
 		return rest_ensure_response( $cached );
@@ -130,18 +130,19 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 	$limit    = 6;
 	$products = array();
 
-	// Over-fetch: candidates are dropped by the visibility check below, and
-	// asking for exactly $limit meant a single hidden-from-catalog product in
-	// the first six left the dropdown nearly empty. The loop stops as soon as
-	// $limit products are collected, so the extra candidates cost nothing in the
-	// common case.
+	// Wide candidate pool, because WordPress's own ordering buries real matches:
+	// for "לגו" it ranked "הרכבה לגו מכונית מירוץ" below scooters that only
+	// match inside their description, so a short pool never saw it. Scoring
+	// below is string work on titles, only the products finally shown are
+	// loaded, and the whole response is cached — so the pool is cheap.
 	$wp_query = new WP_Query(
 		array(
 			'post_type'              => 'product',
 			'post_status'            => 'publish',
-			'posts_per_page'         => 18,
+			'posts_per_page'         => 60,
 			's'                      => $query,
 			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
 			'ignore_sticky_posts'    => true,
 			'update_post_term_cache' => false,
 		)
