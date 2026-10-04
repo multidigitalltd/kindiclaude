@@ -434,7 +434,7 @@ function kindi_settings_render(): void {
 					esc_attr( $id ),
 					esc_attr( $key ),
 					esc_textarea( (string) $value ),
-					'textarea' === $field['type'] ? 4 : 12,
+					(int) ( $field['rows'] ?? ( 'textarea' === $field['type'] ? 4 : 12 ) ),
 					$is_code ? ' code' : '',
 					$is_code ? 'ltr' : 'rtl',
 					$is_code ? ' spellcheck="false"' : ''

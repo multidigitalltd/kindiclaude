@@ -103,21 +103,25 @@ function kindi_search_product_visible( WC_Product $product ): bool {
 }
 
 /**
- * Panel section for the search synonym dictionary.
+ * Dedicated "חיפוש באתר" tab for the synonym dictionary.
  *
  * @param array<string,array<string,mixed>> $tabs Settings tabs.
  * @return array<string,array<string,mixed>>
  */
 function kindi_search_settings( array $tabs ): array {
-	if ( isset( $tabs['texts']['sections'] ) ) {
-		$tabs['texts']['sections']['חיפוש באתר'] = array(
-			'search_synonyms' => array(
-				'type'  => 'textarea',
-				'label' => 'מילים נרדפות בחיפוש',
-				'help'  => 'שורה אחת לכל קבוצת מילים שוות ערך, מופרדות בפסיקים. לדוגמה: "לגו, lego" — גולש שיחפש "לגו" יקבל גם מוצרים שבשמם כתוב LEGO באנגלית, ולהפך. שימושי במיוחד לשמות מותגים באנגלית, לכינויים מקובלים ולשגיאות כתיב נפוצות. חל על החיפוש המהיר ועל עמוד התוצאות, ומתייחס לביטוי החיפוש המלא.',
+	$tabs['search'] = array(
+		'label'    => 'חיפוש באתר',
+		'sections' => array(
+			'מילים נרדפות בחיפוש' => array(
+				'search_synonyms' => array(
+					'type'  => 'textarea',
+					'rows'  => 14,
+					'label' => 'מילון מילים נרדפות',
+					'help'  => 'שורה אחת לכל קבוצת מילים שוות ערך, מופרדות בפסיקים. לדוגמה: "לגו, lego" — גולש שיחפש "לגו" יקבל גם מוצרים שבשמם כתוב LEGO באנגלית, ולהפך. שימושי במיוחד לשמות מותגים באנגלית, לכינויים מקובלים ולשגיאות כתיב נפוצות. חל על החיפוש המהיר ועל עמוד התוצאות, ומתייחס לביטוי החיפוש המלא.',
+				),
 			),
-		);
-	}
+		),
+	);
 	return $tabs;
 }
 add_filter( 'kindi_settings_tabs', 'kindi_search_settings' );
