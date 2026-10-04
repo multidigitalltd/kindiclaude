@@ -239,6 +239,21 @@ function kindi_search_apply_synonyms( string $search, $query ): string {
 add_filter( 'posts_search', 'kindi_search_apply_synonyms', 20, 2 );
 
 /**
+ * The match quality tier a score belongs to.
+ *
+ * @param int $score Score from kindi_search_score().
+ * @return int
+ */
+function kindi_search_tier( int $score ): int {
+	foreach ( array( 100, 50, 20 ) as $floor ) {
+		if ( $score >= $floor ) {
+			return $floor;
+		}
+	}
+	return 0;
+}
+
+/**
  * The best score a title reaches against any of the search terms.
  *
  * @param string   $title Product title.
@@ -275,7 +290,7 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 	}
 
 	// v5 key: the candidate pool is built differently below.
-	$cache_key = 'kindi_search_v5_' . md5( $query );
+	$cache_key = 'kindi_search_v6_' . md5( $query );
 	$cached    = get_transient( $cache_key );
 	if ( is_array( $cached ) ) {
 		return rest_ensure_response( $cached );
@@ -295,7 +310,6 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 	// a title match no higher than a passing mention in a description.
 	$candidates = array();
 	$seen       = array();
-	$per_term   = array();
 	foreach ( $terms as $term ) {
 		$wp_query = new WP_Query(
 			array(
@@ -309,7 +323,6 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 				'update_post_term_cache' => false,
 			)
 		);
-		$per_term[ $term ] = count( $wp_query->posts );
 		foreach ( $wp_query->posts as $post ) {
 			if ( isset( $seen[ $post->ID ] ) ) {
 				continue;
@@ -328,19 +341,18 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 	// PHP 8 sorts are stable, so WordPress's own ordering survives within a tier.
 	usort( $ranked, static fn( array $a, array $b ): int => $b['score'] <=> $a['score'] );
 
-	// Keep the best tier that actually has results: a real word match wins over
-	// a mid-word coincidence, but a search whose only hits are weak still shows
-	// them rather than nothing.
-	foreach ( array( 100, 50, 20 ) as $floor ) {
-		$tier = array_values( array_filter( $ranked, static fn( array $r ): bool => $r['score'] >= $floor ) );
-		if ( $tier ) {
-			$ranked = $tier;
-			break;
-		}
-	}
-
+	// The FIRST VISIBLE match sets the quality bar, and weaker tiers are never
+	// mixed in beneath it. Filtering to the top tier up front looked equivalent
+	// but wasn't: when the only whole-word match is a product WooCommerce hides
+	// from search (out of stock, or "shop only"), the dropdown came back empty
+	// while plainly weaker matches were sitting right below it.
+	$bar = null;
 	foreach ( $ranked as $entry ) {
 		if ( count( $products ) >= $limit ) {
+			break;
+		}
+		$tier = kindi_search_tier( (int) $entry['score'] );
+		if ( null !== $bar && $tier < $bar ) {
 			break;
 		}
 		$post    = $entry['post'];
@@ -348,6 +360,7 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 		if ( ! $product || ! kindi_search_product_visible( $product ) ) {
 			continue;
 		}
+		$bar        = $bar ?? $tier;
 		$products[] = array(
 			'title' => get_the_title( $post ),
 			'url'   => get_permalink( $post ),
@@ -357,8 +370,8 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 	}
 	wp_reset_postdata();
 
-	$cats  = array();
-	$terms = get_terms(
+	$cats      = array();
+	$cat_terms = get_terms(
 		array(
 			'taxonomy'   => 'product_cat',
 			'hide_empty' => true,
@@ -366,12 +379,12 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 			'search'     => $query,
 		)
 	);
-	if ( ! is_wp_error( $terms ) ) {
-		foreach ( $terms as $term ) {
+	if ( ! is_wp_error( $cat_terms ) ) {
+		foreach ( $cat_terms as $cat_term ) {
 			$cats[] = array(
-				'name'  => $term->name,
-				'url'   => (string) get_term_link( $term ),
-				'count' => (int) $term->count,
+				'name'  => $cat_term->name,
+				'url'   => (string) get_term_link( $cat_term ),
+				'count' => (int) $cat_term->count,
 			);
 		}
 	}
@@ -387,31 +400,6 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 			home_url( '/' )
 		),
 	);
-
-	// Temporary diagnostics (?debug=1): counts and scores only, the same
-	// catalogue data the dropdown already returns. Remove once the live
-	// behaviour is understood.
-	if ( '1' === (string) $request->get_param( 'debug' ) ) {
-		$sample = array();
-		foreach ( array_slice( $ranked, 0, 10 ) as $entry ) {
-			$product  = wc_get_product( $entry['post']->ID );
-			$sample[] = array(
-				'title'   => (string) $entry['post']->post_title,
-				'score'   => (int) $entry['score'],
-				'product' => (bool) $product,
-				'visible' => $product ? kindi_search_product_visible( $product ) : null,
-			);
-		}
-		$data['debug'] = array(
-			'terms'      => $terms,
-			'per_term'   => $per_term,
-			'candidates' => count( $candidates ),
-			'ranked'     => count( $ranked ),
-			'shown'      => count( $products ),
-			'sample'     => $sample,
-		);
-		return rest_ensure_response( $data ); // Never cached.
-	}
 
 	set_transient( $cache_key, $data, 5 * MINUTE_IN_SECONDS );
 
