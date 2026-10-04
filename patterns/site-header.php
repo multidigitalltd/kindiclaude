@@ -67,9 +67,18 @@ $kindi_nav = kindi_nav_items();
 		?>
 		<a class="kindi-bar__util" href="<?php echo esc_url( $kindi_account ); ?>"><?php echo kindi_icon( 'user', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><?php echo esc_html( is_user_logged_in() ? 'החשבון שלי' : 'התחברות' ); ?></span></a>
 		<a class="kindi-bar__util kindi-wish-link" href="<?php echo esc_url( home_url( '/wishlist/' ) ); ?>"><span class="kindi-wish-ic"><?php echo kindi_icon( 'heart', 'kindi-icon--md' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span class="kindi-wish-badge" data-kindi-wish-count hidden>0</span></span><span>מועדפים</span></a>
+		<?php
+		// WooCommerce only builds the cart object on front-end requests. Patterns
+		// are also rendered through the REST API (the site editor preloads
+		// templates that way), where WC()->cart is null — so the class check
+		// alone used to fatal. The header's counts are replaced live by the cart
+		// fragments anyway, so an empty cart is a safe fallback.
+		$kindi_cart  = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart : null;
+		$kindi_count = $kindi_cart ? (int) $kindi_cart->get_cart_contents_count() : 0;
+		?>
 		<a class="kindi-cart" href="<?php echo esc_url( class_exists( 'WooCommerce' ) && wc_get_cart_url() ? wc_get_cart_url() : '#' ); ?>" aria-label="סל קניות">
-			<span class="kindi-cart__txt"><small>סל הקניות</small><b class="kindi-cart-amount"><?php echo class_exists( 'WooCommerce' ) ? wp_kses_post( WC()->cart->get_cart_contents_count() . ' פריטים • ' . WC()->cart->get_cart_subtotal() ) : '0 פריטים'; ?></b></span>
-			<span class="kindi-cart__ic"><?php echo kindi_icon( 'cart', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span class="kindi-cart__badge kindi-cart-count"><?php echo class_exists( 'WooCommerce' ) ? absint( WC()->cart->get_cart_contents_count() ) : 0; ?></span></span>
+			<span class="kindi-cart__txt"><small>סל הקניות</small><b class="kindi-cart-amount"><?php echo $kindi_cart ? wp_kses_post( $kindi_count . ' פריטים • ' . $kindi_cart->get_cart_subtotal() ) : '0 פריטים'; ?></b></span>
+			<span class="kindi-cart__ic"><?php echo kindi_icon( 'cart', 'kindi-icon--md kindi-icon--white' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span class="kindi-cart__badge kindi-cart-count"><?php echo absint( $kindi_count ); ?></span></span>
 		</a>
 	</div>
 </div>
