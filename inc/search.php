@@ -103,6 +103,158 @@ function kindi_search_product_visible( WC_Product $product ): bool {
 }
 
 /**
+ * Panel section for the search synonym dictionary.
+ *
+ * @param array<string,array<string,mixed>> $tabs Settings tabs.
+ * @return array<string,array<string,mixed>>
+ */
+function kindi_search_settings( array $tabs ): array {
+	if ( isset( $tabs['texts']['sections'] ) ) {
+		$tabs['texts']['sections']['חיפוש באתר'] = array(
+			'search_synonyms' => array(
+				'type'  => 'textarea',
+				'label' => 'מילים נרדפות בחיפוש',
+				'help'  => 'שורה אחת לכל קבוצת מילים שוות ערך, מופרדות בפסיקים. לדוגמה: "לגו, lego" — גולש שיחפש "לגו" יקבל גם מוצרים שבשמם כתוב LEGO באנגלית, ולהפך. שימושי במיוחד לשמות מותגים באנגלית, לכינויים מקובלים ולשגיאות כתיב נפוצות. חל על החיפוש המהיר ועל עמוד התוצאות, ומתייחס לביטוי החיפוש המלא.',
+			),
+		);
+	}
+	return $tabs;
+}
+add_filter( 'kindi_settings_tabs', 'kindi_search_settings' );
+
+/**
+ * The synonym dictionary as groups of equivalent terms.
+ *
+ * @return array<int,string[]>
+ */
+function kindi_search_synonym_groups(): array {
+	static $groups = null;
+	if ( null !== $groups ) {
+		return $groups;
+	}
+
+	$groups = array();
+	foreach ( function_exists( 'kindi_opt_lines' ) ? kindi_opt_lines( 'search_synonyms' ) : array() as $line ) {
+		$terms = array_values(
+			array_unique(
+				array_filter(
+					array_map(
+						static fn( string $t ): string => trim( $t ),
+						preg_split( '/[,=|]/u', $line ) ?: array()
+					),
+					static fn( string $t ): bool => '' !== $t
+				)
+			)
+		);
+		if ( count( $terms ) > 1 ) {
+			$groups[] = $terms;
+		}
+	}
+	return $groups;
+}
+
+/**
+ * Terms equivalent to a search phrase, excluding the phrase itself.
+ *
+ * Matching is on the whole phrase: the dictionary exists for brand names and
+ * nicknames typed on their own ("לגו", "פליימוביל"), and expanding individual
+ * words inside a longer query would widen results unpredictably.
+ *
+ * @param string $term Search phrase.
+ * @return string[]
+ */
+function kindi_search_synonyms_for( string $term ): array {
+	$term = trim( $term );
+	if ( '' === $term ) {
+		return array();
+	}
+
+	$out = array();
+	foreach ( kindi_search_synonym_groups() as $group ) {
+		foreach ( $group as $candidate ) {
+			if ( 0 === strcasecmp( $candidate, $term ) ) {
+				$out = array_merge( $out, $group );
+				break;
+			}
+		}
+	}
+
+	return array_values(
+		array_filter(
+			array_unique( $out ),
+			static fn( string $t ): bool => 0 !== strcasecmp( $t, $term )
+		)
+	);
+}
+
+/**
+ * Widen a search to the phrase's synonyms (OR), for the site's main search
+ * query and for the dropdown's own query, which flags itself with
+ * `kindi_synonyms`.
+ *
+ * WordPress builds its search SQL as " AND (((title LIKE …) OR …))"; the
+ * original clause is kept intact and the synonym clauses are OR'd beside it,
+ * so nothing that already matched stops matching.
+ *
+ * @param string   $search Search SQL.
+ * @param WP_Query $query  Query.
+ * @return string
+ */
+function kindi_search_apply_synonyms( string $search, $query ): string {
+	if ( '' === trim( $search ) || ! $query instanceof WP_Query ) {
+		return $search;
+	}
+	$ours = (bool) $query->get( 'kindi_synonyms' );
+	if ( ! $ours && ( is_admin() || ! $query->is_search() || ! $query->is_main_query() ) ) {
+		return $search;
+	}
+
+	$terms = kindi_search_synonyms_for( (string) $query->get( 's' ) );
+	if ( ! $terms ) {
+		return $search;
+	}
+
+	global $wpdb;
+	$clauses = array();
+	foreach ( $terms as $term ) {
+		$like      = '%' . $wpdb->esc_like( $term ) . '%';
+		$clauses[] = $wpdb->prepare(
+			"({$wpdb->posts}.post_title LIKE %s) OR ({$wpdb->posts}.post_excerpt LIKE %s) OR ({$wpdb->posts}.post_content LIKE %s)",
+			$like,
+			$like,
+			$like
+		);
+	}
+
+	// Only rewrite WordPress's own shape; anything else is left untouched.
+	$inner = preg_replace( '/^\s*AND\s+/i', '', $search, 1, $replaced );
+	if ( ! $replaced ) {
+		return $search;
+	}
+
+	return ' AND ( ' . $inner . ' OR ' . implode( ' OR ', $clauses ) . ' ) ';
+}
+add_filter( 'posts_search', 'kindi_search_apply_synonyms', 20, 2 );
+
+/**
+ * The best score a title reaches against any of the search terms.
+ *
+ * @param string   $title Product title.
+ * @param string[] $terms Search phrase plus its synonyms.
+ * @return int
+ */
+function kindi_search_best_score( string $title, array $terms ): int {
+	$best = 0;
+	foreach ( $terms as $term ) {
+		$best = max( $best, kindi_search_score( $title, $term ) );
+		if ( 100 === $best ) {
+			break;
+		}
+	}
+	return $best;
+}
+
+/**
  * Search products + categories for the live dropdown.
  *
  * @param WP_REST_Request $request Request.
@@ -120,8 +272,8 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 		return rest_ensure_response( $empty );
 	}
 
-	// v2 key: the visibility fix below changes what a cached entry holds.
-	$cache_key = 'kindi_search_v3_' . md5( $query );
+	// v4 key: synonym expansion changes what a cached entry holds.
+	$cache_key = 'kindi_search_v4_' . md5( $query );
 	$cached    = get_transient( $cache_key );
 	if ( is_array( $cached ) ) {
 		return rest_ensure_response( $cached );
@@ -129,6 +281,9 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 
 	$limit    = 6;
 	$products = array();
+	// The phrase plus anything the panel's dictionary calls equivalent, so a
+	// Hebrew "לגו" also ranks a title that spells the brand "LEGO".
+	$terms = array_merge( array( $query ), kindi_search_synonyms_for( $query ) );
 
 	// Wide candidate pool, because WordPress's own ordering buries real matches:
 	// for "לגו" it ranked "הרכבה לגו מכונית מירוץ" below scooters that only
@@ -141,6 +296,7 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 			'post_status'            => 'publish',
 			'posts_per_page'         => 60,
 			's'                      => $query,
+			'kindi_synonyms'         => true, // Opts this query into the synonym OR.
 			'no_found_rows'          => true,
 			'update_post_meta_cache' => false,
 			'ignore_sticky_posts'    => true,
@@ -152,7 +308,7 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 	// work, so only the handful of products actually shown get instantiated.
 	$ranked = array();
 	foreach ( $wp_query->posts as $post ) {
-		$ranked[] = array( 'post' => $post, 'score' => kindi_search_score( (string) $post->post_title, $query ) );
+		$ranked[] = array( 'post' => $post, 'score' => kindi_search_best_score( (string) $post->post_title, $terms ) );
 	}
 	// PHP 8 sorts are stable, so WordPress's own ordering survives within a tier.
 	usort( $ranked, static fn( array $a, array $b ): int => $b['score'] <=> $a['score'] );

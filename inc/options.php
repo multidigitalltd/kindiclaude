@@ -192,6 +192,9 @@ function kindi_default_options(): array {
 		// מעקב משלוחים LionWheel — מזהה החברה (המפתח מוזן בפאנל בלבד).
 		'lionwheel_member' => '118376',
 
+		// חיפוש באתר — מילים נרדפות (שורה לכל קבוצה, מופרדות בפסיקים).
+		'search_synonyms' => "לגו, lego\nפליימוביל, playmobil",
+
 		// כפתור וואטסאפ צף בפינת המסך.
 		'whatsapp_float_enable' => '1',
 
