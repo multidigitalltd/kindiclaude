@@ -295,6 +295,7 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 	// a title match no higher than a passing mention in a description.
 	$candidates = array();
 	$seen       = array();
+	$per_term   = array();
 	foreach ( $terms as $term ) {
 		$wp_query = new WP_Query(
 			array(
@@ -308,6 +309,7 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 				'update_post_term_cache' => false,
 			)
 		);
+		$per_term[ $term ] = count( $wp_query->posts );
 		foreach ( $wp_query->posts as $post ) {
 			if ( isset( $seen[ $post->ID ] ) ) {
 				continue;
@@ -385,6 +387,31 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 			home_url( '/' )
 		),
 	);
+
+	// Temporary diagnostics (?debug=1): counts and scores only, the same
+	// catalogue data the dropdown already returns. Remove once the live
+	// behaviour is understood.
+	if ( '1' === (string) $request->get_param( 'debug' ) ) {
+		$sample = array();
+		foreach ( array_slice( $ranked, 0, 10 ) as $entry ) {
+			$product  = wc_get_product( $entry['post']->ID );
+			$sample[] = array(
+				'title'   => (string) $entry['post']->post_title,
+				'score'   => (int) $entry['score'],
+				'product' => (bool) $product,
+				'visible' => $product ? kindi_search_product_visible( $product ) : null,
+			);
+		}
+		$data['debug'] = array(
+			'terms'      => $terms,
+			'per_term'   => $per_term,
+			'candidates' => count( $candidates ),
+			'ranked'     => count( $ranked ),
+			'shown'      => count( $products ),
+			'sample'     => $sample,
+		);
+		return rest_ensure_response( $data ); // Never cached.
+	}
 
 	set_transient( $cache_key, $data, 5 * MINUTE_IN_SECONDS );
 
