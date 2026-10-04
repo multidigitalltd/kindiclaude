@@ -192,13 +192,12 @@ function kindi_search_synonyms_for( string $term ): array {
 }
 
 /**
- * Widen a search to the phrase's synonyms (OR), for the site's main search
- * query and for the dropdown's own query, which flags itself with
- * `kindi_synonyms`.
+ * Widen the site's main search to the phrase's synonyms (OR).
  *
  * WordPress builds its search SQL as " AND (((title LIKE …) OR …))"; the
  * original clause is kept intact and the synonym clauses are OR'd beside it,
- * so nothing that already matched stops matching.
+ * so nothing that already matched stops matching. The dropdown does its own
+ * expansion in PHP (see kindi_rest_search) rather than relying on this.
  *
  * @param string   $search Search SQL.
  * @param WP_Query $query  Query.
@@ -208,8 +207,7 @@ function kindi_search_apply_synonyms( string $search, $query ): string {
 	if ( '' === trim( $search ) || ! $query instanceof WP_Query ) {
 		return $search;
 	}
-	$ours = (bool) $query->get( 'kindi_synonyms' );
-	if ( ! $ours && ( is_admin() || ! $query->is_search() || ! $query->is_main_query() ) ) {
+	if ( is_admin() || ! $query->is_search() || ! $query->is_main_query() ) {
 		return $search;
 	}
 
@@ -276,8 +274,8 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 		return rest_ensure_response( $empty );
 	}
 
-	// v4 key: synonym expansion changes what a cached entry holds.
-	$cache_key = 'kindi_search_v4_' . md5( $query );
+	// v5 key: the candidate pool is built differently below.
+	$cache_key = 'kindi_search_v5_' . md5( $query );
 	$cached    = get_transient( $cache_key );
 	if ( is_array( $cached ) ) {
 		return rest_ensure_response( $cached );
@@ -286,32 +284,43 @@ function kindi_rest_search( WP_REST_Request $request ): WP_REST_Response {
 	$limit    = 6;
 	$products = array();
 	// The phrase plus anything the panel's dictionary calls equivalent, so a
-	// Hebrew "לגו" also ranks a title that spells the brand "LEGO".
+	// Hebrew "לגו" also reaches a title that spells the brand "LEGO".
 	$terms = array_merge( array( $query ), kindi_search_synonyms_for( $query ) );
 
-	// Wide candidate pool, because WordPress's own ordering buries real matches:
-	// for "לגו" it ranked "הרכבה לגו מכונית מירוץ" below scooters that only
-	// match inside their description, so a short pool never saw it. Scoring
-	// below is string work on titles, only the products finally shown are
-	// loaded, and the whole response is cached — so the pool is cheap.
-	$wp_query = new WP_Query(
-		array(
-			'post_type'              => 'product',
-			'post_status'            => 'publish',
-			'posts_per_page'         => 60,
-			's'                      => $query,
-			'kindi_synonyms'         => true, // Opts this query into the synonym OR.
-			'no_found_rows'          => true,
-			'update_post_meta_cache' => false,
-			'ignore_sticky_posts'    => true,
-			'update_post_term_cache' => false,
-		)
-	);
+	// One plain query per term, merged by post ID. OR-ing the synonyms into the
+	// SQL (as the results page does) depends on WordPress's search clause
+	// keeping its exact shape; running the searches separately is predictable
+	// and still cheap — one query per term, at most a handful, and the whole
+	// response is cached. The pool is deliberately wide because WordPress ranks
+	// a title match no higher than a passing mention in a description.
+	$candidates = array();
+	$seen       = array();
+	foreach ( $terms as $term ) {
+		$wp_query = new WP_Query(
+			array(
+				'post_type'              => 'product',
+				'post_status'            => 'publish',
+				'posts_per_page'         => 60,
+				's'                      => $term,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'ignore_sticky_posts'    => true,
+				'update_post_term_cache' => false,
+			)
+		);
+		foreach ( $wp_query->posts as $post ) {
+			if ( isset( $seen[ $post->ID ] ) ) {
+				continue;
+			}
+			$seen[ $post->ID ] = true;
+			$candidates[]      = $post;
+		}
+	}
 
 	// Rank by title match before loading any product: scoring is plain string
 	// work, so only the handful of products actually shown get instantiated.
 	$ranked = array();
-	foreach ( $wp_query->posts as $post ) {
+	foreach ( $candidates as $post ) {
 		$ranked[] = array( 'post' => $post, 'score' => kindi_search_best_score( (string) $post->post_title, $terms ) );
 	}
 	// PHP 8 sorts are stable, so WordPress's own ordering survives within a tier.
