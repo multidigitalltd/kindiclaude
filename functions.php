@@ -112,4 +112,5 @@ if ( class_exists( 'WooCommerce' ) ) {
 	kindi_require( 'tracking.php' );
 	kindi_require( 'savecart-popup.php' );
 	kindi_require( 'archive-desc.php' );
+	kindi_require( 'faq-schema.php' );
 }
