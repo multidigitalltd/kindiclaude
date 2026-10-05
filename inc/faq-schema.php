@@ -56,6 +56,11 @@ function kindi_faq_schema_items( int $term_id ): array {
 	if ( '' === trim( $html ) ) {
 		return array();
 	}
+	// Parse what the page actually shows: the renderer pipes the stored value
+	// through wpautop(), so a description kept as bare lines only grows its <p>
+	// tags on the way out. Matching that here keeps the questions and the markup
+	// in step whichever way the text was saved.
+	$html = wpautop( $html );
 
 	/**
 	 * Heading that opens the FAQ block inside the bottom description. Only the
