@@ -1577,3 +1577,8 @@ button.kindi-swatch { padding: 0; cursor: pointer; }
 .kindi-holiday[hidden] { display: none !important; }
 .kindi-holiday__x { position: absolute; top: 0.5rem; inset-inline-end: 0.5rem; display: inline-flex; padding: 0.3rem; background: none; border: 0; border-radius: 50%; cursor: pointer; color: var(--brand-navy); }
 .kindi-holiday__x svg { width: 1.1rem; height: 1.1rem; }
+
+/* ---- Terms checkbox, flagged where it stands (store.js) ---- */
+.woocommerce-checkout .form-row.kindi-termserr { border-radius: 0.6rem; box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 35%, transparent); }
+.woocommerce-checkout .form-row.kindi-termserr #terms { outline: 2px solid var(--brand-red); outline-offset: 2px; }
+.woocommerce-checkout .kindi-termserr__msg { margin: 0.45rem 0 0; color: var(--brand-red-dark); font-size: 0.85rem; font-weight: 700; text-align: center; }

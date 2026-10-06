@@ -157,3 +157,59 @@ function kindi_email_shipping_note( $order, $sent_to_admin = false, $plain_text 
 	}
 }
 add_action( 'woocommerce_email_order_meta', 'kindi_email_shipping_note', 10, 3 );
+
+/**
+ * Keep the contact fields across a checkout reload.
+ *
+ * WooCommerce persists the ADDRESS a shopper types (it needs it to price
+ * shipping) but not the name, email or phone — so leaving the page and coming
+ * back emptied exactly the fields that feel most like lost work. Shoppers read
+ * that as "my order disappeared".
+ *
+ * The values ride along in the order-review refresh WooCommerce already makes,
+ * so this adds no request of its own, and they are stored in the WooCommerce
+ * customer session — the same place the address lives. Nothing is written to
+ * the browser. WC_Checkout::get_value() then repopulates the fields.
+ *
+ * @param string $post_data Serialised checkout form data.
+ * @return void
+ */
+function kindi_checkout_keep_contact( $post_data ): void {
+	if ( ! function_exists( 'WC' ) || ! WC()->customer ) {
+		return;
+	}
+
+	$posted = array();
+	parse_str( (string) $post_data, $posted );
+
+	$fields = array(
+		'billing_first_name',
+		'billing_last_name',
+		'billing_email',
+		'billing_phone',
+		'shipping_first_name',
+		'shipping_last_name',
+		'shipping_phone',
+	);
+
+	foreach ( $fields as $field ) {
+		if ( ! isset( $posted[ $field ] ) || ! is_string( $posted[ $field ] ) ) {
+			continue;
+		}
+		$value = wc_clean( wp_unslash( $posted[ $field ] ) );
+
+		if ( 'billing_email' === $field ) {
+			$value = sanitize_email( $value );
+			// A half-typed address would otherwise be stored and echoed back.
+			if ( '' !== $value && ! is_email( $value ) ) {
+				continue;
+			}
+		}
+
+		$setter = 'set_' . $field;
+		if ( is_callable( array( WC()->customer, $setter ) ) ) {
+			WC()->customer->{$setter}( $value );
+		}
+	}
+}
+add_action( 'woocommerce_checkout_update_order_review', 'kindi_checkout_keep_contact' );

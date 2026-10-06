@@ -885,7 +885,6 @@
 	if ( window.jQuery ) {
 		window.jQuery( document.body ).on( 'checkout_error updated_checkout', hide );
 	}
-
 	// Backstop: any new WooCommerce notice (validation errors rendered into the
 	// page) means processing stopped — release the overlay.
 	var notices = document.querySelector( '.woocommerce-notices-wrapper' );
@@ -909,6 +908,106 @@
 	// Returning via the browser back button (bfcache) must never restore a
 	// stale overlay.
 	window.addEventListener( 'pageshow', hide );
+}() );
+
+/* Terms checkbox — validate it where it stands.
+ * WooCommerce ships the box without `required`, so the browser allowed the
+ * submit and the only feedback was a notice at the top of the page, a long way
+ * from the box itself (it sits at the end of the payment card, and on a phone
+ * below the whole order summary). Marking it required hands the check to the
+ * browser, which means every path already in this file gets it right: the wait
+ * overlay stays down, the jump pill reports the form as invalid, and the submit
+ * never leaves the page. The `invalid` event then replaces the native bubble
+ * with a message beside the box, and scrolls it into view. */
+( function () {
+	'use strict';
+	var form = document.querySelector( 'form.checkout' );
+	if ( ! form ) {
+		return;
+	}
+	var MSG = 'יש לאשר את תנאי השימוש ומדיניות הפרטיות כדי להמשיך.';
+	var reduce = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+
+	// The terms markup lives inside #payment, which WooCommerce replaces on
+	// every order-review refresh — so the attribute is re-applied after each.
+	var mark = function () {
+		var box = document.getElementById( 'terms' );
+		if ( box && ! box.required ) {
+			box.required = true;
+		}
+	};
+	mark();
+	if ( window.jQuery ) {
+		window.jQuery( document.body ).on( 'updated_checkout', mark );
+	}
+
+	var clear = function ( row, box ) {
+		row.classList.remove( 'kindi-termserr' );
+		var note = row.querySelector( '.kindi-termserr__msg' );
+		if ( note ) {
+			note.remove();
+		}
+		box.removeAttribute( 'aria-invalid' );
+		box.removeAttribute( 'aria-describedby' );
+	};
+
+	// `invalid` does not bubble, hence the capture phase on the document.
+	document.addEventListener( 'invalid', function ( e ) {
+		var box = e.target;
+		if ( ! box || 'terms' !== box.id ) {
+			return;
+		}
+		e.preventDefault(); // Our own message instead of the browser's bubble.
+
+		var row = box.closest( '.form-row' ) || box.parentNode;
+		if ( ! row || row.querySelector( '.kindi-termserr__msg' ) ) {
+			return;
+		}
+		row.classList.add( 'kindi-termserr' );
+		var note = document.createElement( 'p' );
+		note.className = 'kindi-termserr__msg';
+		note.id = 'kindi-terms-error';
+		note.textContent = MSG;
+		row.appendChild( note );
+		box.setAttribute( 'aria-invalid', 'true' );
+		box.setAttribute( 'aria-describedby', note.id );
+
+		row.scrollIntoView( { behavior: reduce ? 'auto' : 'smooth', block: 'center' } );
+		window.setTimeout( function () {
+			try {
+				box.focus( { preventScroll: true } );
+			} catch ( err ) {
+				box.focus();
+			}
+		}, reduce ? 0 : 350 );
+	}, true );
+
+	document.addEventListener( 'change', function ( e ) {
+		var box = e.target;
+		if ( ! box || 'terms' !== box.id || ! box.checked ) {
+			return;
+		}
+		var row = box.closest( '.form-row' ) || box.parentNode;
+		if ( row ) {
+			clear( row, box );
+		}
+	} );
+
+	/* Contact fields survive a reload (see kindi_checkout_keep_contact).
+	 * WooCommerce only sends the form to the server when it recalculates the
+	 * order review, and a changed name or phone does not trigger that on its
+	 * own. One refresh per field, on blur and only when the value actually
+	 * changed — `change` already guarantees both. */
+	if ( window.jQuery ) {
+		var $ = window.jQuery;
+		var timer = null;
+		$( document.body ).on( 'change', '#billing_first_name, #billing_last_name, #billing_email, #billing_phone', function () {
+			window.clearTimeout( timer );
+			timer = window.setTimeout( function () {
+				$( document.body ).trigger( 'update_checkout' );
+			}, 700 );
+		} );
+	}
 }() );
 
 /* Floating "jump to checkout" pill (cart + checkout).
