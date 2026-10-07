@@ -910,15 +910,19 @@
 	window.addEventListener( 'pageshow', hide );
 }() );
 
-/* Terms checkbox — validate it where it stands.
- * WooCommerce ships the box without `required`, so the browser allowed the
- * submit and the only feedback was a notice at the top of the page, a long way
- * from the box itself (it sits at the end of the payment card, and on a phone
- * below the whole order summary). Marking it required hands the check to the
- * browser, which means every path already in this file gets it right: the wait
- * overlay stays down, the jump pill reports the form as invalid, and the submit
- * never leaves the page. The `invalid` event then replaces the native bubble
- * with a message beside the box, and scrolls it into view. */
+/* Terms checkbox — stop the submit and flag the box where it stands.
+ * The box sits at the end of the payment card (on a phone, below the whole
+ * order summary), so WooCommerce's own answer — a notice at the top of the
+ * page — left shoppers staring at a form that had jumped away from the thing
+ * it was complaining about.
+ *
+ * `required` alone cannot stop the submit: checkout.js puts `novalidate` on the
+ * form, so the browser never validates it on its own. It is still worth
+ * setting, because the explicit checkValidity() calls elsewhere in this file
+ * (the wait overlay, the jump pill) then see the form as invalid and hold back.
+ * The submit itself is cancelled through WooCommerce's own gate: returning
+ * false from `checkout_place_order` aborts before the AJAX call, which covers
+ * the button, the Enter key and the floating pill alike. */
 ( function () {
 	'use strict';
 	var form = document.querySelector( 'form.checkout' );
@@ -927,6 +931,13 @@
 	}
 	var MSG = 'יש לאשר את תנאי השימוש ומדיניות הפרטיות כדי להמשיך.';
 	var reduce = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+	var flagged = false; // An error is standing, and the box is still unticked.
+
+	var termsBox = function () {
+		var box = document.getElementById( 'terms' );
+		// Absent (no terms page set) or hidden — nothing to enforce.
+		return box && null !== box.offsetParent ? box : null;
+	};
 
 	// The terms markup lives inside #payment, which WooCommerce replaces on
 	// every order-review refresh — so the attribute is re-applied after each.
@@ -937,9 +948,6 @@
 		}
 	};
 	mark();
-	if ( window.jQuery ) {
-		window.jQuery( document.body ).on( 'updated_checkout', mark );
-	}
 
 	var clear = function ( row, box ) {
 		row.classList.remove( 'kindi-termserr' );
@@ -951,27 +959,33 @@
 		box.removeAttribute( 'aria-describedby' );
 	};
 
-	// `invalid` does not bubble, hence the capture phase on the document.
-	document.addEventListener( 'invalid', function ( e ) {
-		var box = e.target;
-		if ( ! box || 'terms' !== box.id ) {
+	/**
+	 * Flag the box. `move` is false when re-drawing after a fragment refresh —
+	 * scrolling then would yank the page while the shopper is typing.
+	 */
+	var flag = function ( move ) {
+		var box = termsBox();
+		if ( ! box || box.checked ) {
 			return;
 		}
-		e.preventDefault(); // Our own message instead of the browser's bubble.
-
+		flagged = true;
 		var row = box.closest( '.form-row' ) || box.parentNode;
-		if ( ! row || row.querySelector( '.kindi-termserr__msg' ) ) {
+		if ( ! row ) {
 			return;
 		}
-		row.classList.add( 'kindi-termserr' );
-		var note = document.createElement( 'p' );
-		note.className = 'kindi-termserr__msg';
-		note.id = 'kindi-terms-error';
-		note.textContent = MSG;
-		row.appendChild( note );
-		box.setAttribute( 'aria-invalid', 'true' );
-		box.setAttribute( 'aria-describedby', note.id );
-
+		if ( ! row.querySelector( '.kindi-termserr__msg' ) ) {
+			row.classList.add( 'kindi-termserr' );
+			var note = document.createElement( 'p' );
+			note.className = 'kindi-termserr__msg';
+			note.id = 'kindi-terms-error';
+			note.textContent = MSG;
+			row.appendChild( note );
+			box.setAttribute( 'aria-invalid', 'true' );
+			box.setAttribute( 'aria-describedby', note.id );
+		}
+		if ( ! move ) {
+			return;
+		}
 		row.scrollIntoView( { behavior: reduce ? 'auto' : 'smooth', block: 'center' } );
 		window.setTimeout( function () {
 			try {
@@ -980,6 +994,39 @@
 				box.focus();
 			}
 		}, reduce ? 0 : 350 );
+	};
+
+	if ( window.jQuery ) {
+		var $ = window.jQuery;
+
+		// WooCommerce checks this handler's return value before sending the
+		// order. The event is fired with triggerHandler, which does not bubble,
+		// so it has to be bound to the form element itself.
+		$( form ).on( 'checkout_place_order', function () {
+			var box = termsBox();
+			if ( box && ! box.checked ) {
+				flag( true );
+				return false;
+			}
+		} );
+
+		$( document.body ).on( 'updated_checkout', function () {
+			mark();
+			// The refresh replaces #payment and takes the message with it.
+			if ( flagged ) {
+				flag( false );
+			}
+		} );
+	}
+
+	// Fires when something calls checkValidity() explicitly (novalidate only
+	// suppresses the browser's own pass), so the message appears there too.
+	// `invalid` does not bubble, hence the capture phase on the document.
+	document.addEventListener( 'invalid', function ( e ) {
+		if ( e.target && 'terms' === e.target.id ) {
+			e.preventDefault(); // Our own message instead of the browser's bubble.
+			flag( true );
+		}
 	}, true );
 
 	document.addEventListener( 'change', function ( e ) {
@@ -987,6 +1034,7 @@
 		if ( ! box || 'terms' !== box.id || ! box.checked ) {
 			return;
 		}
+		flagged = false;
 		var row = box.closest( '.form-row' ) || box.parentNode;
 		if ( row ) {
 			clear( row, box );
