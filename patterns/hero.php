@@ -16,9 +16,28 @@
 	<span class="kindi-hero__dots" aria-hidden="true"></span>
 
 	<div class="kindi-hero__grid">
+		<?php
+		// The H1 is deliberately decoupled from the campaign copy: it is the one
+		// heading the page is identified by, so it stays put while the badge, the
+		// line below it and the lead rotate with the season. The campaign line is
+		// a paragraph rather than a heading, so it never competes for the H1.
+		$kindi_h1    = trim( (string) kindi_opt( 'hero_h1' ) );
+		$kindi_tag1  = (string) kindi_opt( 'hero_title1' );
+		$kindi_tag_h = (string) kindi_opt( 'hero_hl' );
+		$kindi_tag2  = (string) kindi_opt( 'hero_title2' );
+		$kindi_tag   = '' !== trim( $kindi_tag1 . $kindi_tag_h . $kindi_tag2 );
+		if ( '' === $kindi_h1 ) {
+			// Never leave the page without an H1 — fall back to the campaign line.
+			$kindi_h1  = trim( $kindi_tag1 . ' ' . $kindi_tag_h . ' ' . $kindi_tag2 );
+			$kindi_tag = false;
+		}
+		?>
 		<div class="kindi-hero__copy">
 			<span class="kindi-hero__badge"><span class="kindi-hero__dot" aria-hidden="true"></span><?php echo esc_html( kindi_opt( 'hero_badge' ) ); ?></span>
-			<h1 class="kindi-hero__title"><?php echo esc_html( kindi_opt( 'hero_title1' ) ); ?> <span class="kindi-hero__underline"><?php echo esc_html( kindi_opt( 'hero_hl' ) ); ?></span><br><span class="kindi-hero__blue"><?php echo esc_html( kindi_opt( 'hero_title2' ) ); ?></span></h1>
+			<h1 class="kindi-hero__title"><?php echo esc_html( $kindi_h1 ); ?></h1>
+			<?php if ( $kindi_tag ) : ?>
+			<p class="kindi-hero__tag"><?php echo esc_html( $kindi_tag1 ); ?> <span class="kindi-hero__underline"><?php echo esc_html( $kindi_tag_h ); ?></span><br><span class="kindi-hero__blue"><?php echo esc_html( $kindi_tag2 ); ?></span></p>
+			<?php endif; ?>
 			<p class="kindi-hero__lead"><?php echo esc_html( kindi_opt( 'hero_lead' ) ); ?></p>
 
 			<div class="kindi-hero__cta">

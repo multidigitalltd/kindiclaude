@@ -63,6 +63,7 @@ function kindi_default_options(): array {
 		'bundle_coupon' => '',
 
 		// Hero.
+		'hero_h1'       => 'קינדר טויס – חנות צעצועים ומשחקים לילדים, אונליין ובבני ברק',
 		'hero_badge'    => 'חדש בקינדר טויס • קולקציית 2026',
 		'hero_title1'   => 'עולם של',
 		'hero_hl'       => 'קסם, משחק ויצירה',
