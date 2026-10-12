@@ -122,8 +122,10 @@ picture.kindi-hero__mascot { display: block; }
 }
 .kindi-usp__item:hover { box-shadow: var(--shadow-pop); transform: translateY(-2px); }
 .kindi-usp__ic { width: 3rem; height: 3rem; border-radius: 0.75rem; background: var(--brand-blue-soft); display: grid; place-items: center; flex-shrink: 0; }
-.kindi-usp__title { font-weight: 800; color: var(--brand-navy); font-size: 0.875rem; }
-.kindi-usp__sub { font-size: 0.8125rem; color: var(--muted-foreground); }
+/* The strip is desktop-only (hidden below 1024px), and its cards are wide, so
+   the type can sit comfortably rather than squeezed against the icon. */
+.kindi-usp__title { font-weight: 800; color: var(--brand-navy); font-size: 1.0625rem; line-height: 1.35; }
+.kindi-usp__sub { font-size: 0.9375rem; color: var(--muted-foreground); line-height: 1.45; }
 
 /* ============================ Category grid ============================ */
 .kindi-cats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
