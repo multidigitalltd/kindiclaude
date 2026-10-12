@@ -70,7 +70,7 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .kindi-pc__media img { width: 100%; height: 100%; object-fit: cover; margin: 0 !important; border-radius: 0; transition: transform 0.5s; }
 .woocommerce ul.products li.product:hover .kindi-pc__media img { transform: scale(1.05); }
 .kindi-pc__badges { position: absolute; top: 0.5rem; inset-inline-end: 0.5rem; z-index: 2; display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-end; }
-.kindi-pc__badge { font-size: 0.625rem; font-weight: 800; padding: 0.25rem 0.5rem; border-radius: 999px; color: #fff; line-height: 1.4; }
+.kindi-pc__badge { font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.5rem; border-radius: 999px; color: #fff; line-height: 1.4; }
 .kindi-pc__badge--best { background: var(--brand-red); }
 .kindi-pc__badge--sale { background: var(--brand-blue); }
 .kindi-pc__badge--new { background: var(--brand-navy); }
@@ -82,16 +82,16 @@ ul.products[aria-busy="true"] { transition: opacity 0.15s; pointer-events: none;
 .woocommerce ul.products li.product .kindi-pc__title,
 .woocommerce ul.products li.product .kindi-pc__rating,
 .woocommerce ul.products li.product .kindi-pc__foot { padding-inline: 1rem; }
-.kindi-pc__brand { display: block; font-size: 0.6875rem; color: var(--brand-red); font-weight: 700; letter-spacing: 0.02em; margin-top: 0.85rem; }
+.kindi-pc__brand { display: block; font-size: 0.8125rem; color: var(--brand-red); font-weight: 700; letter-spacing: 0.02em; margin-top: 0.85rem; }
 .kindi-pc__title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 1rem; font-weight: 700; color: var(--brand-navy); line-height: 1.35; min-height: 2.7rem; text-decoration: none; margin: 0.25rem 0 0; }
 .kindi-pc__title:hover { color: var(--brand-red); }
 .kindi-pc__rating { display: flex; align-items: center; gap: 0.4rem; margin: 0.5rem 0 0; }
 .kindi-pc__rating .star-rating { color: var(--brand-red); font-size: 0.85rem; width: 5.4em; height: 1.2em; line-height: 1.2; margin: 0; }
 .kindi-pc__rating .star-rating::before { color: color-mix(in oklab, var(--brand-navy) 18%, transparent); }
-.kindi-pc__rcount { font-size: 0.6875rem; color: var(--muted-foreground); font-weight: 600; }
+.kindi-pc__rcount { font-size: 0.78rem; color: var(--muted-foreground); font-weight: 600; }
 .kindi-pc__foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.75rem; padding-bottom: 1rem; border-top: 1px solid color-mix(in oklab, var(--brand-navy) 10%, transparent); }
 .kindi-pc__price { color: var(--brand-red); font-weight: 900; font-size: 1.125rem; line-height: 1.15; }
-.kindi-pc__price del { display: block; color: var(--muted-foreground); font-weight: 600; font-size: 0.6875rem; opacity: 0.85; margin: 0 0 0.1rem; }
+.kindi-pc__price del { display: block; color: var(--muted-foreground); font-weight: 600; font-size: 0.8125rem; opacity: 0.85; margin: 0 0 0.1rem; }
 .kindi-pc__price ins { text-decoration: none; }
 .kindi-pc__foot .added_to_cart { display: none; }
 .woocommerce ul.products li.product .button.kindi-pc__add {
