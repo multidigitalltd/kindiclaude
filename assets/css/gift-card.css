@@ -1,0 +1,217 @@
+/* ===========================================================================
+ * Gift card product page (YITH WooCommerce Gift Cards).
+ *
+ * Every rule is scoped to .kindi-gc, the class the theme puts on the body of
+ * this one page, so no other product can be touched. The file is enqueued on
+ * that page alone.
+ *
+ * On !important: the plugin prints an inline <style> block built from its own
+ * colour setting, and marks the selected state !important —
+ *     .selected_button { background-color: rgba(0,0,0,.91) !important }
+ * which is where the black comes from. Inline <style> and this file are both
+ * author CSS, so the only reliable way to win is higher specificity on an
+ * !important declaration of our own. That is why the selected-state rules below
+ * are long and carry !important; the rest of the file does not need it.
+ * (Changing "main colour" in YITH → Gift Cards → Styles would make these
+ * particular overrides unnecessary.)
+ * ======================================================================== */
+
+/* ------------------------------- Step headings ------------------------- */
+.kindi-gc .ywgc_choose_design_title,
+.kindi-gc .ywgc_select_amount_title,
+.kindi-gc .ywgc_delivery_info_title {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-family: var(--wp--preset--font-family--display);
+  font-size: 1.25rem; font-weight: 900; color: var(--brand-navy);
+  margin: 1.75rem 0 0.85rem; padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+.kindi-gc .ywgc_choose_design_title::before,
+.kindi-gc .ywgc_select_amount_title::before,
+.kindi-gc .ywgc_delivery_info_title::before {
+  flex: 0 0 auto; width: 1.75rem; height: 1.75rem; border-radius: 999px;
+  background: var(--brand-blue-soft); color: var(--brand-navy);
+  display: grid; place-items: center; font-size: 0.9rem; font-weight: 800;
+}
+.kindi-gc .ywgc_choose_design_title::before { content: "1"; }
+.kindi-gc .ywgc_select_amount_title::before { content: "2"; }
+.kindi-gc .ywgc_delivery_info_title::before { content: "3"; }
+
+/* -------------------------------- Designs ------------------------------ */
+.kindi-gc .ywgc-design-list ul {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 0.6rem;
+}
+.kindi-gc .ywgc-design-list li { margin: 0; }
+/* The plugin sizes every thumbnail 150x150; the artwork is landscape, so it
+   arrived squashed. Fill the tile instead and crop. */
+.kindi-gc .ywgc-preset-image {
+  position: relative; width: 100%; border-radius: 0.75rem; overflow: hidden;
+  border: 2px solid var(--border); background: #fff; cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.kindi-gc .ywgc-preset-image :where(img, picture) { display: block; width: 100%; height: 100%; }
+.kindi-gc .ywgc-design-list .ywgc-preset-image :where(img, picture) {
+  width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover;
+}
+.kindi-gc .ywgc-preset-image:hover { border-color: color-mix(in oklab, var(--brand-red) 45%, transparent); }
+.kindi-gc .ywgc-preset-image:focus-visible { outline: 3px solid var(--brand-blue); outline-offset: 2px; }
+/* Chosen design: the plugin's dashed black outline, replaced by the brand
+   border plus a tick — a cue that does not rely on colour alone. */
+.kindi-gc .ywgc-preset-image.selected_image_parent {
+  outline: none !important; border-color: var(--brand-red);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-red) 22%, transparent);
+}
+.kindi-gc .ywgc-preset-image.selected_image_parent::after {
+  content: ""; position: absolute; top: 0.4rem; inset-inline-end: 0.4rem;
+  width: 1.4rem; height: 1.4rem; border-radius: 999px;
+  background: var(--brand-red) var(--kindi-gc-tick) center / 0.85rem no-repeat;
+}
+
+/* -------------------------------- Amounts ------------------------------ */
+:root { --kindi-gc-tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); }
+
+.kindi-gc .gift-cards-list { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.kindi-gc .gift-cards-list > h3 { flex: 1 0 100%; }
+.kindi-gc .gift-cards-list button.ywgc-amount-buttons {
+  flex: 1 1 7rem; min-width: 7rem; min-height: 3rem; margin: 0; padding: 0.6rem 0.9rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: inherit; font-size: 1.05rem; font-weight: 800; line-height: 1.2;
+  color: var(--brand-navy); background: #fff;
+  border: 1.5px solid var(--border); border-radius: 0.75rem; cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.kindi-gc .gift-cards-list button.ywgc-amount-buttons:hover {
+  background: var(--brand-red-soft);
+  border-color: color-mix(in oklab, var(--brand-red) 55%, transparent);
+  color: var(--brand-red-dark);
+}
+.kindi-gc .gift-cards-list button.ywgc-amount-buttons:focus-visible {
+  outline: 3px solid var(--brand-blue); outline-offset: 2px;
+}
+.kindi-gc .gift-cards-list button.ywgc-amount-buttons .amount,
+.kindi-gc .gift-cards-list button.ywgc-amount-buttons .woocommerce-Price-currencySymbol { color: inherit; }
+
+/* Chosen amount. Specificity has to clear the plugin's !important rules. */
+.kindi-gc .gift-cards-list button.ywgc-predefined-amount-button.selected_button,
+.kindi-gc .gift-cards-list button.ywgc-manual-amount-container.selected_button {
+  background-color: var(--brand-red) !important;
+  border-color: var(--brand-red) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 14px -5px color-mix(in oklab, var(--brand-red) 60%, transparent);
+}
+/* A tick as well as the colour, so the choice is legible without it. */
+.kindi-gc .gift-cards-list button.ywgc-predefined-amount-button.selected_button::before {
+  content: ""; width: 1rem; height: 1rem; margin-inline-end: 0.4rem; flex: 0 0 auto;
+  background: var(--kindi-gc-tick) center / contain no-repeat;
+}
+
+/* Free amount: same shell, with the field itself carrying the typing. */
+.kindi-gc .gift-cards-list button.ywgc-manual-amount-container { padding: 0; overflow: hidden; }
+.kindi-gc #ywgc-manual-amount-div-wrapper { width: 100%; height: 100%; display: flex; align-items: center; }
+.kindi-gc input#ywgc-manual-amount {
+  width: 100%; height: 100%; min-height: 3rem; margin: 0; padding: 0.6rem 0.9rem;
+  border: 0; background: transparent; box-shadow: none; text-align: center;
+  font-family: inherit; font-size: 1.05rem; font-weight: 800; color: var(--brand-navy);
+}
+.kindi-gc input#ywgc-manual-amount:focus { outline: none; }
+.kindi-gc .gift-cards-list button.ywgc-manual-amount-container.selected_button input#ywgc-manual-amount {
+  background-color: transparent !important; color: #fff !important;
+}
+.kindi-gc .gift-cards-list button.ywgc-manual-amount-container.selected_button .ywgc-manual-currency-symbol {
+  background-color: transparent !important; color: #fff !important;
+}
+.kindi-gc .ywgc-manual-currency-symbol { background: transparent; }
+
+/* --------------------------------- Fields ------------------------------ */
+.kindi-gc .ywgc-label-above-input { margin-bottom: 1rem; }
+.kindi-gc .ywgc-label-above-input > label,
+.kindi-gc .ywgc-delivery-notification-checkbox-container > label {
+  display: block; margin-bottom: 0.35rem;
+  font-size: 0.95rem; font-weight: 700; color: var(--brand-navy);
+}
+/* Required fields marked from the attribute itself, so the marks follow
+   whatever the plugin decides is required. */
+.kindi-gc .ywgc-label-above-input:has(:is(input, textarea)[required]) > label::after {
+  content: " *"; color: var(--brand-red); font-weight: 800;
+}
+.kindi-gc .ywgc-single-recipient :is(input, textarea),
+.kindi-gc .ywgc-message textarea,
+.kindi-gc .ywgc-postdated input,
+.kindi-gc .ywgc-sender-name input {
+  width: 100%; padding: 0.7rem 0.85rem; font-family: inherit; font-size: 1rem;
+  color: var(--foreground); background: #fff;
+  border: 1.5px solid var(--border); border-radius: 0.75rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.kindi-gc :is(input, textarea):focus {
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-blue) 20%, transparent);
+  outline: none;
+}
+.kindi-gc .ywgc-message textarea { min-height: 7rem; resize: vertical; line-height: 1.6; }
+/* Addresses are written left to right even in a right-to-left form. */
+.kindi-gc input#ywgc-recipient-email { direction: ltr; text-align: left; }
+
+/* Date + sender side by side where there is room. */
+.kindi-gc .ywgc-send-and-delivery-container { display: grid; gap: 0 1rem; }
+@media (min-width: 560px) { .kindi-gc .ywgc-send-and-delivery-container { grid-template-columns: 1fr 1fr; } }
+
+.kindi-gc .ywgc-delivery-notification-checkbox-container {
+  display: flex; align-items: flex-start; gap: 0.55rem; margin-top: 0.25rem;
+}
+.kindi-gc #ywgc-delivery-notification-checkbox { width: 1.15rem; height: 1.15rem; margin: 0.15rem 0 0; flex: 0 0 auto; accent-color: var(--brand-red); }
+.kindi-gc .ywgc-delivery-notification-checkbox-container > label { margin: 0; font-weight: 500; line-height: 1.5; }
+
+/* The note the theme prints under the form. */
+.kindi-gc .kindi-gc__note {
+  margin: 0.9rem 0 0; padding: 0.7rem 0.9rem;
+  font-size: 0.95rem; font-weight: 600; line-height: 1.5; color: var(--brand-navy);
+  background: var(--brand-blue-soft); border-radius: 0.75rem;
+}
+
+/* --------------------------------- Preview ----------------------------- */
+.kindi-gc .ywgc-main-form-preview-container {
+  padding: 1rem 1.15rem; background: #fff;
+  border: 1px solid var(--border); border-radius: 1rem;
+}
+/* The separator carries an inline margin from the plugin. */
+.kindi-gc .ywgc-main-form-preview-container hr {
+  margin: 0.75rem 0 !important; border: 0; border-top: 1px solid var(--border);
+}
+.kindi-gc .ywgc-form-preview-title-container { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
+.kindi-gc .ywgc-form-preview-product-title { font-weight: 800; color: var(--brand-navy); }
+.kindi-gc .ywgc-form-preview-amount { font-size: 1.35rem; font-weight: 900; color: var(--brand-red) !important; }
+.kindi-gc .ywgc-form-preview-from-to-container { font-size: 0.95rem; line-height: 1.7; color: var(--foreground); }
+.kindi-gc .ywgc-form-preview-title { font-weight: 700; color: var(--brand-navy); }
+/* A long greeting must still show in full. */
+.kindi-gc .ywgc-form-preview-message { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* ------------------------------ Buy button ----------------------------- */
+.kindi-gc .gift_card_template_button { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 1.25rem; }
+.kindi-gc .gift_card_add_to_cart_button { flex: 1 1 14rem; min-height: 3.25rem; }
+
+/* ------------------------------- Mobile -------------------------------- */
+@media (max-width: 1023.98px) {
+  /* The plugin hangs its preview off the gallery column, which on one column
+     pushed the whole form below it. Flattening the media column into the page
+     grid lets the preview sit after the form instead, without moving markup. */
+  .kindi-gc .kindi-pdp__media { display: contents; }
+  .kindi-gc .kindi-pdp__grid > .woocommerce-product-gallery { order: 1; }
+  .kindi-gc .kindi-pdp__grid > .kindi-pdp__summary { order: 2; }
+  .kindi-gc .kindi-pdp__grid > .ywgc-main-form-preview-container { order: 3; }
+  .kindi-gc .kindi-pdp__grid > .kindi-pdp-extras { order: 4; }
+
+  /* 16px keeps iOS from zooming the page when a field takes focus. */
+  .kindi-gc :is(input, textarea, select) { font-size: 16px; }
+  /* As many as fit on a row, all the same size, never narrower than a price. */
+  .kindi-gc .gift-cards-list button.ywgc-amount-buttons { flex: 1 1 6rem; min-width: 0; }
+  .kindi-gc .gift_card_add_to_cart_button { flex: 1 1 100%; }
+  .kindi-gc .ywgc-design-list ul { grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kindi-gc .ywgc-preset-image,
+  .kindi-gc .gift-cards-list button.ywgc-amount-buttons,
+  .kindi-gc :is(input, textarea) { transition: none; }
+}

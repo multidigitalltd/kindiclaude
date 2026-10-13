@@ -125,7 +125,19 @@ add_action( 'woocommerce_single_product_summary', 'kindi_pdp_delivery_card', 34 
  * @return string
  */
 function kindi_product_video_url( WC_Product $product ): string {
-	return trim( (string) $product->get_meta( '_kindi_product_video' ) );
+	// The field has turned up holding an array on at least one product, which
+	// cast to the string "Array" and rendered a link to "http://Array". Take the
+	// first value of a multi-row field, ignore anything else, and let only a real
+	// http(s) URL through.
+	$value = $product->get_meta( '_kindi_product_video' );
+	if ( is_array( $value ) ) {
+		$value = reset( $value );
+	}
+	if ( ! is_scalar( $value ) ) {
+		return '';
+	}
+	$url = trim( (string) $value );
+	return preg_match( '#^https?://\S+$#i', $url ) ? $url : '';
 }
 
 /**
