@@ -145,6 +145,8 @@ function kindi_default_options(): array {
 		'club_benefits' => "5% חזרה על כל קנייה\nמתנה ביום הולדת\nמבצעים בלעדיים\nמשלוח חינם מהיר",
 		'club_cta_url'  => '/my-account/',
 		'giftcard_note' => 'כרטיס המתנה ניתן למימוש באתר בלבד.',
+		'giftcard_header' => '1',
+		'giftcard_url'  => '/product/gift-card/',
 
 		// Store.
 		'store_address' => 'הרב יעקב לנדא 7, בני ברק',

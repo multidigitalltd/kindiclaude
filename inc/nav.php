@@ -175,22 +175,29 @@ function kindi_nav_items(): array {
 	$locations = get_nav_menu_locations();
 	$menu_id   = ! empty( $locations['primary'] ) ? (int) $locations['primary'] : 0;
 
+	$tree = null;
 	if ( $menu_id ) {
 		// The menu rarely changes — cache the built tree, flushed on menu save.
 		$key    = 'kindi_nav_tree_' . $menu_id;
 		$cached = get_transient( $key );
 		if ( is_array( $cached ) ) {
-			return $cached;
-		}
-		$items = wp_get_nav_menu_items( $menu_id );
-		if ( $items ) {
-			$tree = kindi_build_nav_tree( $items );
-			set_transient( $key, $tree, DAY_IN_SECONDS );
-			return $tree;
+			$tree = $cached;
+		} else {
+			$items = wp_get_nav_menu_items( $menu_id );
+			if ( $items ) {
+				$tree = kindi_build_nav_tree( $items );
+				set_transient( $key, $tree, DAY_IN_SECONDS );
+			}
 		}
 	}
 
-	return kindi_default_nav();
+	/**
+	 * The finished top-level navigation. Filtered after the cache, so a setting
+	 * that hides an item takes effect without waiting for the menu to be saved.
+	 *
+	 * @param array<int,array<string,mixed>> $tree Navigation items.
+	 */
+	return (array) apply_filters( 'kindi_nav_items', $tree ?? kindi_default_nav() );
 }
 
 /**

@@ -60,6 +60,12 @@ $kindi_nav = kindi_nav_items();
 		$kindi_phone = function_exists( 'kindi_opt' ) ? (string) kindi_opt( 'phone', '03-5293383' ) : '03-5293383';
 		$kindi_phone = '' !== $kindi_phone ? $kindi_phone : '03-5293383';
 		?>
+		<?php
+		// Gift card shortcut — beside the phone, icon-only on a phone screen.
+		if ( function_exists( 'kindi_gift_card_header_link' ) ) {
+			kindi_gift_card_header_link();
+		}
+		?>
 		<a class="kindi-bar__phone" href="tel:<?php echo esc_attr( preg_replace( '/\D+/', '', $kindi_phone ) ); ?>" aria-label="<?php esc_attr_e( 'התקשרו אלינו', 'kindi' ); ?>"><?php echo kindi_icon( 'phone', 'kindi-icon--sm' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><?php echo esc_html( $kindi_phone ); ?></span></a>
 		<?php
 		$kindi_account = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : '';

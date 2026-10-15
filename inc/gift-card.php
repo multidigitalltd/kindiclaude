@@ -158,7 +158,7 @@ function kindi_gift_card_cart_text( $text ): string {
 add_filter( 'woocommerce_product_single_add_to_cart_text', 'kindi_gift_card_cart_text', 20 );
 
 /**
- * Panel field: the note printed under the form.
+ * Panel fields: the header shortcut and the note printed under the form.
  *
  * @param array<string,array<string,mixed>> $tabs Settings tabs.
  * @return array<string,array<string,mixed>>
@@ -166,7 +166,21 @@ add_filter( 'woocommerce_product_single_add_to_cart_text', 'kindi_gift_card_cart
 function kindi_gift_card_settings( array $tabs ): array {
 	if ( isset( $tabs['texts']['sections'] ) ) {
 		$tabs['texts']['sections']['כרטיס מתנה'] = array(
-			'giftcard_note' => array(
+			'giftcard_header' => array(
+				'type'    => 'select',
+				'label'   => 'כפתור כרטיס מתנה בראש האתר',
+				'options' => array(
+					'1' => 'מופעל',
+					'0' => 'כבוי',
+				),
+				'help'    => 'כפתור עם אייקון מתנה ליד הטלפון, בדסקטופ ובמובייל. כשהוא מופעל, פריט כרטיס המתנה יורד אוטומטית מסרגל הקטגוריות ומתפריט המובייל, כדי שלא יופיע פעמיים — אין צורך לגעת בתפריט עצמו. כיבוי מחזיר אותו לסרגל.',
+			),
+			'giftcard_url'    => array(
+				'type'  => 'url',
+				'label' => 'קישור כרטיס המתנה',
+				'help'  => 'היעד של הכפתור, וגם הפריט שיורד מסרגל הקטגוריות.',
+			),
+			'giftcard_note'   => array(
 				'type'  => 'textarea',
 				'label' => 'הערה מתחת לטופס',
 				'rows'  => 2,
@@ -176,6 +190,75 @@ function kindi_gift_card_settings( array $tabs ): array {
 	}
 	return $tabs;
 }
+
+/**
+ * Whether the header shortcut is switched on, and pointed somewhere.
+ *
+ * @return bool
+ */
+function kindi_gift_card_header_on(): bool {
+	return '0' !== (string) kindi_opt( 'giftcard_header' ) && '' !== trim( (string) kindi_opt( 'giftcard_url' ) );
+}
+
+/**
+ * The gift card link, as an absolute URL.
+ *
+ * @return string
+ */
+function kindi_gift_card_url(): string {
+	$url = trim( (string) kindi_opt( 'giftcard_url' ) );
+	if ( '' === $url ) {
+		return '';
+	}
+	return preg_match( '#^https?://#i', $url ) ? $url : home_url( $url );
+}
+
+/**
+ * The header shortcut — a gift icon beside the phone number.
+ *
+ * The label stays in the markup on small screens (hidden visually, not with
+ * display:none) so the link keeps its name for a screen reader.
+ *
+ * @return void
+ */
+function kindi_gift_card_header_link(): void {
+	if ( ! kindi_gift_card_header_on() ) {
+		return;
+	}
+	printf(
+		'<a class="kindi-bar__gift" href="%1$s"><span class="kindi-bar__gift-ic">%2$s</span><span class="kindi-bar__gift-txt">%3$s</span></a>',
+		esc_url( kindi_gift_card_url() ),
+		kindi_icon( 'gift', 'kindi-icon--md' ), // phpcs:ignore WordPress.Security.EscapeOutput -- inline SVG from the theme's own icon set.
+		esc_html( 'כרטיס מתנה' )
+	);
+}
+
+/**
+ * Drop the gift card out of the category bar while the header shortcut is on,
+ * so the same link is not offered twice. The menu itself is left alone — the
+ * item comes straight back when the shortcut is switched off.
+ *
+ * @param array<int,array<string,mixed>> $items Navigation items.
+ * @return array<int,array<string,mixed>>
+ */
+function kindi_gift_card_hide_nav_item( $items ): array {
+	if ( ! is_array( $items ) || ! kindi_gift_card_header_on() ) {
+		return is_array( $items ) ? $items : array();
+	}
+	$path = untrailingslashit( (string) wp_parse_url( kindi_gift_card_url(), PHP_URL_PATH ) );
+	if ( '' === $path ) {
+		return $items;
+	}
+	$kept = array();
+	foreach ( $items as $item ) {
+		$item_path = untrailingslashit( (string) wp_parse_url( (string) ( $item['url'] ?? '' ), PHP_URL_PATH ) );
+		if ( $item_path !== $path ) {
+			$kept[] = $item;
+		}
+	}
+	return $kept;
+}
+add_filter( 'kindi_nav_items', 'kindi_gift_card_hide_nav_item' );
 add_filter( 'kindi_settings_tabs', 'kindi_gift_card_settings' );
 
 /**

@@ -84,6 +84,31 @@
 .kindi-bar__util span { font-size: 0.72rem; font-weight: 500; }
 .kindi-bar__util:hover { color: var(--brand-navy); }
 @media (min-width: 640px) { .kindi-bar__util { display: flex; } }
+/* Gift card shortcut. The only coloured thing among the header's grey icons,
+   which is what marks it out as the special one rather than another utility. */
+.kindi-bar__gift {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+  height: 2.75rem; padding-inline: 0.8rem; border-radius: 999px;
+  background: var(--brand-red-soft);
+  border: 1px solid color-mix(in oklab, var(--brand-red) 28%, transparent);
+  color: var(--brand-red-dark); text-decoration: none;
+  font-size: 0.8rem; font-weight: 800; white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s, transform 0.12s;
+}
+.kindi-bar__gift:hover { background: color-mix(in oklab, var(--brand-red) 14%, #fff); border-color: var(--brand-red); }
+.kindi-bar__gift:active { transform: scale(0.94); }
+.kindi-bar__gift:focus-visible { outline: 3px solid var(--brand-blue); outline-offset: 2px; }
+.kindi-bar__gift-ic { display: inline-flex; }
+.kindi-bar__gift .kindi-icon { width: 1.4rem; height: 1.4rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .kindi-bar__gift:hover .kindi-bar__gift-ic { animation: kindi-giftbob 0.6s ease; }
+}
+@keyframes kindi-giftbob {
+  0%, 100% { transform: none; }
+  30% { transform: translateY(-3px) rotate(-9deg); }
+  65% { transform: translateY(-1px) rotate(6deg); }
+}
+
 .kindi-bar__phone { display: none; align-items: center; gap: 0.4rem; font-size: 0.875rem; font-weight: 500; color: var(--muted-foreground); text-decoration: none; padding-inline: 0.5rem; white-space: nowrap; transition: color 0.2s; }
 .kindi-bar__phone:hover { color: var(--brand-navy); }
 @media (min-width: 1024px) { .kindi-bar__phone { display: inline-flex; } }
@@ -105,6 +130,14 @@
   /* Heart + phone icons the same, larger size. */
   .kindi-bar__phone .kindi-icon,
   .kindi-bar__actions .kindi-wish-link .kindi-icon { width: 1.5rem; height: 1.5rem; }
+  /* Gift card: a round tappable icon, still 44px so it is an easy target. */
+  .kindi-bar__gift { width: 2.75rem; padding-inline: 0; }
+  .kindi-bar__gift .kindi-icon { width: 1.5rem; height: 1.5rem; }
+  /* Hidden to the eye, not to a screen reader — this is the link's name. */
+  .kindi-bar__gift-txt {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+  }
 }
 .kindi-cart__txt small { font-size: 0.72rem; color: var(--muted-foreground); }
 .kindi-cart__txt b { display: block; font-size: 0.75rem; font-weight: 800; color: var(--brand-navy); }
